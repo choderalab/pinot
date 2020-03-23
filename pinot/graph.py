@@ -125,20 +125,6 @@ def from_oemol(mol, use_fp=True):
 
     g.ndata['h0'] = h_v
 
-    try:
-        # enter xyz in if there is conformer
-        conformer = mol.GetConformer()
-        g.ndata['xyz'] = torch.Tensor(
-            [
-                [
-                    conformer.GetAtomPosition(idx).x,
-                    conformer.GetAtomPosition(idx).y,
-                    conformer.GetAtomPosition(idx).z
-                ] for idx in range(n_atoms)
-            ])
-    except:
-        pass
-
     # enter bonds
     bonds = list(mol.GetBonds())
     bonds_begin_idxs = [bond.GetBgnIdx() for bond in bonds]
@@ -183,20 +169,6 @@ def from_rdkit_mol(mol, use_fp=True):
             dim=-1) # (n_atoms, 117)
 
     g.ndata['h0'] = h_v
-
-    try:
-        # enter xyz in if there is conformer
-        conformer = mol.GetConformer()
-        g.ndata['xyz'] = torch.Tensor(
-            [
-                [
-                    conformer.GetAtomPosition(idx).x,
-                    conformer.GetAtomPosition(idx).y,
-                    conformer.GetAtomPosition(idx).z
-                ] for idx in range(n_atoms)
-            ])
-    except:
-        pass
 
     # enter bonds
     bonds = list(mol.GetBonds())

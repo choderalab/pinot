@@ -27,7 +27,7 @@ class GN(torch.nn.Module):
             model_name)(in_feat, out_feat, **kwargs)
 
     def forward(self, g):
-        x = g.nodes['atom'].data['h']
+        x = g.ndata['h']
         x = self.gn(g, x)
-        g.nodes['atom'].data['h'] = x
+        g.ndata['h'] = x
         return g

@@ -5,13 +5,21 @@ class Sequential(torch.nn.Module):
     def __init__(self, model, config, feature_units=117, input_units=128):
         super(Sequential, self).__init__()
 
+        # the initial dimensionality
         dim = input_units
+
+        # record the name of the layers in a list
         self.exes = []
 
+        # initial featurization
         self.f_in = torch.nn.Sequential(
             torch.nn.Linear(feature_units, input_units),
             torch.nn.Tanh())
 
+        # readout
+        self.f_out = torch.Linear(config[-1], 1)
+
+        # make a pytorch function on tensors on graphs
         def apply_atom_in_graph(fn):
             def _fn(g):
                 g.apply_nodes(
@@ -19,6 +27,7 @@ class Sequential(torch.nn.Module):
                 return g
             return _fn
 
+        # parse the config
         for idx, exe in enumerate(config):
 
             try:
@@ -29,6 +38,7 @@ class Sequential(torch.nn.Module):
             except:
                 pass
 
+            # int -> feedfoward
             if type(exe) == int:
                 setattr(
                     self,
@@ -38,6 +48,7 @@ class Sequential(torch.nn.Module):
                 dim = exe
                 self.exes.append('d' + str(idx))
 
+            # str -> activation
             elif type(exe) == str:
                 activation = getattr(torch.nn.functional, exe)
 
@@ -48,6 +59,7 @@ class Sequential(torch.nn.Module):
 
                 self.exes.append('a' + str(idx))
 
+            # float -> dropout
             elif type(exe) == float:
                 dropout = torch.nn.Dropout(exe)
                 setattr(
@@ -57,37 +69,14 @@ class Sequential(torch.nn.Module):
 
                 self.exes.append('o' + str(idx))
 
-            self.readout = ParamReadout(
-                readout_units=readout_units,
-                in_dim=dim)
-
-    def forward(self, g, return_graph=False):
+    def forward(self, g):
 
         g.apply_nodes(
-            lambda nodes: {'h': self.f_in(nodes.data['h0'])},
-            ntype='atom')
+            lambda nodes: {'h': self.f_in(nodes.data['h0'])})
 
         for exe in self.exes:
             g = getattr(self, exe)(g)
 
-        g = self.readout(g)
+        y_hat = torch.squeeze(self.f_out(dgl.sum_nodes(g)))
 
-        if return_graph == True:
-            return g
-
-        g = hgfp.mm.geometry_in_heterograph.from_heterograph_with_xyz(
-            g)
-
-        g = hgfp.mm.energy_in_heterograph.u(g)
-
-        u = torch.sum(
-                torch.cat(
-                [
-                    g.nodes['mol'].data['u' + term][:, None] for term in [
-                        'bond', 'angle', 'torsion', 'one_four', 'nonbonded', '0'
-                ]],
-                dim=1),
-            dim=1)
-
-
-        return u
+        return g
