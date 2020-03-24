@@ -23,12 +23,12 @@ class GaussianVariationalPosteriorBayesianByBackprop(torch.nn.Module):
             initializer_std * torch.ones_like(weight)
         ).sample()) for weight in self.mu]
 
-    def foward(self, *args, **kwargs):
+    def foward(self, sigma=1.0, *args, **kwargs):
         # compose the weights
         epsilon = [
             torch.distributions.normal.Normal(
                 torch.zeros_like(self.mu[idx]),
-                torch.ones_like(self.mu[idx])
+                sigma * torch.ones_like(self.mu[idx])
             ).sample() for idx in range(self.n_param)]
 
         theta = [
@@ -42,9 +42,9 @@ class GaussianVariationalPosteriorBayesianByBackprop(torch.nn.Module):
 
         return self.base_module.forward(*args, **kwargs)
 
-    def sample(self, n_samples=1, *args, **args):
+    def sample(self, sigma=1.0, n_samples=1, *args, **args):
 
         return torch.stack(
             [
-                self.foward(*args, **args) for _ in range(n_samples)
+                self.foward(sigma, *args, **args) for _ in range(n_samples)
             ], dim=0)
