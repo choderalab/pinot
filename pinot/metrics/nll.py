@@ -16,7 +16,7 @@ def gaussian(sigma):
     """ Negative log likelihood for Gaussian distribution.
     """
     
-    def loss_fn(y_hat, y):
+    def loss_fn(y, y_hat):
         return torch.log(sigma * torch.sqrt(2. * math.pi))\
             + 0.5 * torch.pow(torch.div(y_hat - y, sigma), 2.)
 

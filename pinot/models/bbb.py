@@ -5,7 +5,6 @@
 # =============================================================================
 import torch
 import dgl
-import hgfp
 
 # =============================================================================
 # MODULE CLASSES
@@ -42,9 +41,9 @@ class GaussianVariationalPosteriorBayesianByBackprop(torch.nn.Module):
 
         return self.base_module.forward(*args, **kwargs)
 
-    def sample(self, sigma=1.0, n_samples=1, *args, **args):
+    def sample(self, sigma=1.0, n_samples=1, *args, **kwargs):
 
         return torch.stack(
             [
-                self.foward(sigma, *args, **args) for _ in range(n_samples)
+                self.foward(sigma, *args, **kwargs) for _ in range(n_samples)
             ], dim=0)

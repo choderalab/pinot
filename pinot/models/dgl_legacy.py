@@ -7,8 +7,8 @@
 # =============================================================================
 import torch
 import dgl
-import hgfp
 import math
+import dgl
 from dgl.nn import pytorch as dgl_pytorch
 
 # =============================================================================

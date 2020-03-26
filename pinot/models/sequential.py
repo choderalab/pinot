@@ -1,5 +1,8 @@
 """ Chain mutiple layers of GN together.
 """
+import pinot
+import torch
+import dgl
 
 class Sequential(torch.nn.Module):
     def __init__(self, model, config, feature_units=117, input_units=128):
@@ -16,14 +19,11 @@ class Sequential(torch.nn.Module):
             torch.nn.Linear(feature_units, input_units),
             torch.nn.Tanh())
 
-        # readout
-        self.f_out = torch.Linear(config[-1], 1)
-
         # make a pytorch function on tensors on graphs
         def apply_atom_in_graph(fn):
             def _fn(g):
                 g.apply_nodes(
-                    lambda node: {'h': fn(node.data['h'])}, ntype='atom')
+                    lambda node: {'h': fn(node.data['h'])})
                 return g
             return _fn
 
@@ -69,6 +69,10 @@ class Sequential(torch.nn.Module):
 
                 self.exes.append('o' + str(idx))
 
+        # readout
+        self.f_out = torch.nn.Linear(dim, 1)
+
+
     def forward(self, g):
 
         g.apply_nodes(
@@ -77,6 +81,6 @@ class Sequential(torch.nn.Module):
         for exe in self.exes:
             g = getattr(self, exe)(g)
 
-        y_hat = torch.squeeze(self.f_out(dgl.sum_nodes(g)))
+        y_hat = torch.squeeze(self.f_out(dgl.sum_nodes(g, 'h')))
 
-        return g
+        return y_hat
