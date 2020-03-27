@@ -5,7 +5,7 @@ import torch
 import dgl
 
 class Sequential(torch.nn.Module):
-    def __init__(self, model, config, feature_units=117, input_units=128):
+    def __init__(self, model, config, feature_units=117, input_units=128, output_units=1):
         super(Sequential, self).__init__()
 
         # the initial dimensionality
@@ -70,7 +70,7 @@ class Sequential(torch.nn.Module):
                 self.exes.append('o' + str(idx))
 
         # readout
-        self.f_out = torch.nn.Linear(dim, 1)
+        self.f_out = torch.nn.Linear(dim, output_units)
 
 
     def forward(self, g):
@@ -81,6 +81,6 @@ class Sequential(torch.nn.Module):
         for exe in self.exes:
             g = getattr(self, exe)(g)
 
-        y_hat = torch.squeeze(self.f_out(dgl.sum_nodes(g, 'h')))
+        h_hat = dgl.sum_nodes(g, 'h')
 
-        return y_hat
+        return h_hat
