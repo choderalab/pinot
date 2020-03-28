@@ -13,24 +13,36 @@ import math
 # =============================================================================
 # MODULE FUNCTIONS
 # =============================================================================
-def nll(x, mu, log_sigma):
-    return torch.mean(log_sigma + 0.5 * torch.log(torch.tensor(2. * math.pi)) \
-            + 0.5 * torch.pow(
-                torch.div(
-                    x - mu,
-                    torch.exp(log_sigma)), 2))
-
 def run(args):
     # get single layer
     layer = getattr(
-        pinot.models,
+        pinot.representation,
         args.model).GN
 
-    # nest layers together
-    net = pinot.models.Sequential(
+    # nest layers together to form the representation learning
+    net_representation = pinot.representation.Sequential(
         layer,
-        eval(args.config),
-        output_units=2) # output mu and sigma
+        eval(args.config)) # output mu and sigma
+
+    # get the last units as the input units of prediction layer
+    param_in_units = list(filter(lambda x: type(x)==int, eval(args.config)))[-1]
+
+    # construct a separated prediction net
+    net_parameterization = pinot.parameterization.Linear(
+        param_in_units,
+        int(args.n_params))
+
+    # get the distribution class
+    distribution_class = getattr(
+        getattr(
+            torch.distributions,
+            args.distribution.lower()),
+        args.distribution.capitalize())
+
+    net = pinot.Net(
+        net_representation, 
+        net_parameterization,
+        distribution_class)
 
     # get the entire dataset
     ds= getattr(
@@ -85,40 +97,25 @@ def run(args):
             f_handle.write('\n')
 
         f_handle.write(str(net))
+        f_handle.write('\n')
 
     # without further ado, train it
     for idx_epoch in range(n_epoches):
         net.train()
         for g, y in ds_tr:
-            mu_and_log_sigma = net(g)
-            mu = mu_and_log_sigma[:, 0]
-            log_sigma = mu_and_log_sigma[:, 1]
-            loss = nll(y, mu, log_sigma)
-            print(loss)
+            loss = torch.sum(net.loss(g, y))
             opt.zero_grad()
             loss.backward()
             opt.step()
 
         net.eval()
         
-        loss_tr_this_batch = []
-        loss_te_this_batch = []
-
-        for g, y in ds_tr:
-            mu_and_sigma = net(g)
-            mu = mu_and_sigma[:, 0]
-            sigma = mu_and_sigma[:, 1]
-            loss_tr_this_batch.append(nll(y, mu, sigma))
-                    
-
-        for g, y in ds_te:
-            mu_and_sigma = net(g)
-            mu = mu_and_sigma[:, 0]
-            sigma = mu_and_sigma[:, 1]
-            loss_te_this_batch.append(nll(y, mu, sigma))
+        loss_tr_this_epoch = [net.loss(g, y) for g, y in ds_tr]
+        loss_te_this_epoch = [net.loss(g, y) for g, y in ds_te]
  
-        losses_tr.append(torch.mean(torch.stack(loss_tr_this_batch)).detach().numpy())
-        losses_tr.append(torch.mean(torch.stack(loss_te_this_batch)).detach().numpy())
+        # TODO: is sum right?
+        losses_tr.append(torch.mean(torch.cat(loss_tr_this_epoch)).detach().numpy())
+        losses_te.append(torch.mean(torch.cat(loss_te_this_epoch)).detach().numpy())
 
         if args.report == True:
             torch.save(net.state_dict(), time_str + '/w' + str(idx_epoch) + '.bin') 
@@ -128,6 +125,29 @@ def run(args):
             plt.legend()
             plt.savefig(time_str + '/nll.png')
 
+
+    time1 = time.time()
+    f_handle.write('# Time used\n')
+    f_handle.write(str(time1 - time0) + ' s\n')
+
+    f_handle.write('# Performance \n')
+    f_handle.write('{:<15}'.format('|'))
+    f_handle.write('{:<15}'.format('|NLL')+ '|' + '\n')
+
+    f_handle.write('{:<15}'.format('|' + '-' * 13))
+    f_handle.write('{:<15}'.format('|' + '-' * 13))
+    f_handle.write('|' + '\n')
+
+    f_handle.write('{:<15}'.format('|TRAIN'))
+    f_handle.write('{:<15}'.format('|%.2f' % losses_tr[-1]) + '|' + '\n')
+
+    f_handle.write('{:<15}'.format('|TEST'))
+    f_handle.write('{:<15}'.format('|%.2f' % losses_te[-1]) + '|' + '\n')
+
+
+    f_handle.write('<div align="center"><img src="nll.jpg" width="600"></div>')
+    f_handle.close()
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
@@ -135,14 +155,15 @@ if __name__ == '__main__':
     parser.add_argument(
         '--config', 
         default="[128, 0.1, 'tanh', 128, 0.1, 'tanh', 128, 0.1, 'tanh']")
+    parser.add_argument('--distribution', default='normal')
+    parser.add_argument('--n_params', default=2)
     parser.add_argument('--data', default='esol')
     parser.add_argument('--batch_size', default=32, type=int)
     parser.add_argument('--opt', default='Adam')
-    parser.add_argument('--lr', default=1e-3, type=float)
+    parser.add_argument('--lr', default=1e-5, type=float)
     parser.add_argument('--partition', default='4:1', type=str)
     parser.add_argument('--n_epochs', default=10)
-    parser.add_argument('--report', default=True, type=bool)
-    
+    parser.add_argument('--report', default=True, type=bool) 
     args = parser.parse_args()
     run(args)
 

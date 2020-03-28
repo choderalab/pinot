@@ -5,4 +5,6 @@ import pinot.app
 import pinot.metrics
 import pinot.representation
 import pinot.inference
-import pinot.prediction
+import pinot.parameterization
+
+from pinot.net import Net
