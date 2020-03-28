@@ -1,4 +1,5 @@
-""" Build simple graph from OpenEye or RDKit molecule object.
+""" Combine representation, parameterization, and distribution class
+to construct a model.
 
 """
 # =============================================================================
