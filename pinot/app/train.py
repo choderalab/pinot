@@ -9,6 +9,8 @@ import matplotlib
 from matplotlib import pyplot as plt
 import numpy as np
 import math
+from datetime import datetime
+import os
 
 # =============================================================================
 # MODULE FUNCTIONS
@@ -28,7 +30,7 @@ def run(args):
     param_in_units = list(filter(lambda x: type(x)==int, eval(args.config)))[-1]
 
     # construct a separated prediction net
-    net_parameterization = pinot.parameterization.Linear(
+    net_parameterization = pinot.regression.Linear(
         param_in_units,
         int(args.n_params))
 
@@ -66,87 +68,27 @@ def run(args):
     opt = getattr(torch.optim, args.opt)(
         net.parameters(),
         lr)
-    n_epoches = int(args.n_epochs)
-    
-    losses_tr = []
-    losses_te = []
+    n_epochs = int(args.n_epochs)
 
-    if args.report == True:
-        from matplotlib import pyplot as plt
-        plt.style.use('fivethirtyeight')
-        import time
-        from datetime import datetime
-        import os
-
-        now = datetime.now()
-
-        time_str = now.strftime("%Y-%m-%d-%H%M%S%f")
-        os.mkdir(time_str)
-
-        losses = np.array([0.])
-        time0 = time.time()
-
-        f_handle = open(time_str + '/report.md', 'w')
-        f_handle.write(time_str)
-        f_handle.write('\n')
-        f_handle.write('===========================')
-        f_handle.write('\n')
-        f_handle.write('# Model Summary\n')
-        for arg in vars(args):
-            f_handle.write(arg+ '=' + str(getattr(args, arg)))
-            f_handle.write('\n')
-
-        f_handle.write(str(net))
-        f_handle.write('\n')
-
-    # without further ado, train it
-    for idx_epoch in range(n_epoches):
-        net.train()
-        for g, y in ds_tr:
-            loss = torch.sum(net.loss(g, y))
-            opt.zero_grad()
-            loss.backward()
-            opt.step()
-
-        net.eval()
-        
-        loss_tr_this_epoch = [net.loss(g, y) for g, y in ds_tr]
-        loss_te_this_epoch = [net.loss(g, y) for g, y in ds_te]
- 
-        # TODO: is sum right?
-        losses_tr.append(torch.mean(torch.cat(loss_tr_this_epoch)).detach().numpy())
-        losses_te.append(torch.mean(torch.cat(loss_te_this_epoch)).detach().numpy())
-
-        if args.report == True:
-            torch.save(net.state_dict(), time_str + '/w' + str(idx_epoch) + '.bin') 
-            plt.figure()
-            plt.plot(losses_tr, label='training')
-            plt.plot(losses_te, label='test')
-            plt.legend()
-            plt.savefig(time_str + '/nll.png')
+    # define reporters
+    now = datetime.now() 
+    time_str = now.strftime("%Y-%m-%d-%H%M%S%f")
+    os.mkdir(time_str)
 
 
-    time1 = time.time()
-    f_handle.write('# Time used\n')
-    f_handle.write(str(time1 - time0) + ' s\n')
+    markdown_reporter = pinot.app.reporters.MarkdownReporter(
+        time_str, ds_tr, ds_te, args=args, net=net)
+    visual_reporter = pinot.app.reporters.VisualReporter(
+        time_str, ds_tr, ds_te)
+    weight_reporter = pinot.app.reporters.WeightReporter(
+        time_str)
 
-    f_handle.write('# Performance \n')
-    f_handle.write('{:<15}'.format('|'))
-    f_handle.write('{:<15}'.format('|NLL')+ '|' + '\n')
+    reporters = [
+        markdown_reporter,
+        visual_reporter,
+        weight_reporter]
 
-    f_handle.write('{:<15}'.format('|' + '-' * 13))
-    f_handle.write('{:<15}'.format('|' + '-' * 13))
-    f_handle.write('|' + '\n')
-
-    f_handle.write('{:<15}'.format('|TRAIN'))
-    f_handle.write('{:<15}'.format('|%.2f' % losses_tr[-1]) + '|' + '\n')
-
-    f_handle.write('{:<15}'.format('|TEST'))
-    f_handle.write('{:<15}'.format('|%.2f' % losses_te[-1]) + '|' + '\n')
-
-
-    f_handle.write('<div align="center"><img src="nll.jpg" width="600"></div>')
-    f_handle.close()
+    pinot.app.utils.train(net, ds_tr, ds_te, opt, reporters, n_epochs)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
