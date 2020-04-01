@@ -1,1 +1,1 @@
-from pinot.parameterization.param_out import *
+from pinot.regression.param_out import *

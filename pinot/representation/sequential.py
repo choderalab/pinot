@@ -73,13 +73,16 @@ class Sequential(torch.nn.Module):
         self.f_out = torch.nn.Linear(dim, output_units)
 
 
-    def forward(self, g):
+    def forward(self, g, return_graph=False):
 
         g.apply_nodes(
             lambda nodes: {'h': self.f_in(nodes.data['h0'])})
 
         for exe in self.exes:
             g = getattr(self, exe)(g)
+
+        if return_graph == True:
+            return g
 
         h_hat = dgl.sum_nodes(g, 'h')
 

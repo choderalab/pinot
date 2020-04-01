@@ -104,6 +104,10 @@ class VisualReporter(ReporterBase):
         plt.legend()
         plt.savefig(self.path + '/loss.png')
 
+    def after(self, net):
+        np.save(self.path + '/losses_tr.npy', np.array(self.losses_tr))
+        np.save(self.path + '/losses_te.npy', np.array(self.losses_te))
+
 class WeightReporter(ReporterBase):
     def __init__(self, path):
         self.path = path

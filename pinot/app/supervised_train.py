@@ -30,7 +30,7 @@ def run(args):
     param_in_units = list(filter(lambda x: type(x)==int, eval(args.config)))[-1]
 
     # construct a separated prediction net
-    net_parameterization = pinot.regression.Linear(
+    net_regression = pinot.regression.Linear(
         param_in_units,
         int(args.n_params))
 
@@ -41,9 +41,17 @@ def run(args):
             args.distribution.lower()),
         args.distribution.capitalize())
 
+    if args.representation_parameter != '':
+        net_representation.load_state_dict(
+            torch.load(args.representation_parameter))
+
+    if args.regression_parameter != '':
+        net_parameterization.load_state_dict(
+            torch.load(args.regression_parameter))
+
     net = pinot.Net(
         net_representation, 
-        net_parameterization,
+        net_regression,
         distribution_class)
 
     # get the entire dataset
@@ -106,6 +114,9 @@ if __name__ == '__main__':
     parser.add_argument('--partition', default='4:1', type=str)
     parser.add_argument('--n_epochs', default=10)
     parser.add_argument('--report', default=True, type=bool) 
+    parser.add_argument('--representation_parameter', default='')
+    parser.add_argument('--regression_parameter', default='')
+    
     args = parser.parse_args()
     run(args)
 

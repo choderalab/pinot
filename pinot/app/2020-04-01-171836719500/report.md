@@ -1,4 +1,4 @@
-2020-04-01-163728168159
+2020-04-01-171836719500
 ===========================
 # Model Summary
 model=dgl_legacy
@@ -12,7 +12,7 @@ lr=1e-05
 partition=4:1
 n_epochs=10
 report=True
-representation_parameter=
+representation_parameter=semi-supervised.ds
 regression_parameter=
 Net(
   (representation): Sequential(
@@ -46,9 +46,9 @@ Net(
   (parameterization): Linear(in_features=128, out_features=2, bias=True)
 )
 # Time used
-11.318145275115967 s
+11.574890375137329 s
 # Performance 
 |              |NLL           |
 |------------- |------------- |
-|TRAIN         |6.95          |
-|TEST          |49.36         |
+|TRAIN         |10.61         |
+|TEST          |12.66         |
