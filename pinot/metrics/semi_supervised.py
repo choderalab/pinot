@@ -1,4 +1,4 @@
-""" Slow metrics.
+""" Metrics and loss function for semi-supervised learning.
 
 """
 
