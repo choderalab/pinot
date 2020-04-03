@@ -1,4 +1,4 @@
-""" Slow metrics.
+""" Metrics and loss function for semi-supervised learning.
 
 """
 
@@ -53,5 +53,5 @@ def score(g, k=10, pooling_fn=lambda g: dgl.sum_nodes(g, 'h')):
     score_same = torch.nn.functional.cosine_similarity(h_v, h_u)
     score_diff = torch.nn.functional.cosine_similarity(h_v, h_u[torch.randperm(h_v.shape[0])])
     
-    return score_same - score_diff
+    return score_same - k * score_diff
 
