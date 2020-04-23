@@ -115,5 +115,5 @@ class AdLaLa(torch.optim.Optimizer):
             for w in group['params']:
                 state = self.state[w]
                 # B step
-                state['p'].add_(-h * w.grad)
+                state['p'].add_(-group['h'] * w.grad)
                     
