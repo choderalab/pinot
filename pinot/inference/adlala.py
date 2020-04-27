@@ -40,6 +40,10 @@ class AdLaLa(torch.optim.Optimizer):
 
         for group in self.param_groups:
             for w in group['params']:
+               
+                if w.grad == None:
+                    continue
+
                 state = self.state[w]
 
                 # state initialization
@@ -63,6 +67,10 @@ class AdLaLa(torch.optim.Optimizer):
         
         for group in self.param_groups:
             for w in group['params']:
+
+                if w.grad == None:
+                    continue
+
                 state = self.state[w]
                 if group['partition'].lower() == 'adla':
 
@@ -88,6 +96,10 @@ class AdLaLa(torch.optim.Optimizer):
 
         for group in self.param_groups[::-1]:
             for w in group['params']:
+
+                if w.grad == None:
+                    continue
+
                 state = self.state[w]
                 if group['partition'].lower() == 'adla':
                     # E_(h/2) step: \xi := \xi + 0.5 * h * \epsilon * (p^T p - N * \tao)
@@ -113,6 +125,10 @@ class AdLaLa(torch.optim.Optimizer):
 
         for group in self.param_groups[::-1]:
             for w in group['params']:
+
+                if w.grad == None:
+                    continue
+
                 state = self.state[w]
                 # B step
                 state['p'].add_(-group['h'] * w.grad)
