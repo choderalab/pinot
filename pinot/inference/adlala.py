@@ -50,7 +50,8 @@ class AdLaLa(torch.optim.Optimizer):
             sigma=0.01,
             epsilon=0.05,
             tau=1e-4,
-            xi_init=1e-3):
+            xi_init=1e-3,
+            partition='La'):
     
         defaults = dict(
             h=torch.tensor(h),
@@ -58,7 +59,8 @@ class AdLaLa(torch.optim.Optimizer):
             gamma=torch.tensor(gamma),
             sigma=torch.tensor(sigma),
             epsilon=torch.tensor(epsilon),
-            xi_init=torch.tensor(xi_init),)
+            xi_init=torch.tensor(xi_init),
+            partition='La')
 
         super(AdLaLa, self).__init__(params, defaults)
 
