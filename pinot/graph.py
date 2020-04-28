@@ -6,46 +6,25 @@
 # =============================================================================
 import dgl
 import torch
-from rdkit import Chem
-from openeye import oechem
-
-# =============================================================================
-# CONSTANTS
-# =============================================================================
-HYBRIDIZATION_RDKIT = {
-    Chem.rdchem.HybridizationType.SP: torch.tensor(
-        [1, 0, 0, 0, 0], dtype=torch.float32),
-    Chem.rdchem.HybridizationType.SP2: torch.tensor(
-        [0, 1, 0, 0, 0], dtype=torch.float32),
-    Chem.rdchem.HybridizationType.SP3: torch.tensor(
-        [0, 0, 1, 0, 0], dtype=torch.float32),
-    Chem.rdchem.HybridizationType.SP3D: torch.tensor(
-        [0, 0, 0, 1, 0], dtype=torch.float32),
-    Chem.rdchem.HybridizationType.SP3D2: torch.tensor(
-        [0, 0, 0, 0, 1], dtype=torch.float32),
-    Chem.rdchem.HybridizationType.S: torch.tensor(
-        [0, 0, 0, 0, 0], dtype=torch.float32)
-}
-
-HYBRIDIZATION_OE = {
-    oechem.OEHybridization_sp: torch.tensor(
-        [1, 0, 0, 0, 0], dtype=torch.float32),
-    oechem.OEHybridization_sp2: torch.tensor(
-        [0, 1, 0, 0, 0], dtype=torch.float32),
-    oechem.OEHybridization_sp3: torch.tensor(
-        [0, 0, 1, 0, 0], dtype=torch.float32),
-    oechem.OEHybridization_sp3d: torch.tensor(
-        [0, 0, 0, 1, 0], dtype=torch.float32),
-    oechem.OEHybridization_sp3d2: torch.tensor(
-        [0, 0, 0, 0, 1], dtype=torch.float32),
-    oechem.OEHybridization_Unknown: torch.tensor(
-        [0, 0, 0, 0, 0], dtype=torch.float32)
-}
 
 # =============================================================================
 # UTILITY FUNCTIONS
 # =============================================================================
 def fp_oe(atom):
+    HYBRIDIZATION_OE = {
+        oechem.OEHybridization_sp: torch.tensor(
+            [1, 0, 0, 0, 0], dtype=torch.float32),
+        oechem.OEHybridization_sp2: torch.tensor(
+            [0, 1, 0, 0, 0], dtype=torch.float32),
+        oechem.OEHybridization_sp3: torch.tensor(
+            [0, 0, 1, 0, 0], dtype=torch.float32),
+        oechem.OEHybridization_sp3d: torch.tensor(
+            [0, 0, 0, 1, 0], dtype=torch.float32),
+        oechem.OEHybridization_sp3d2: torch.tensor(
+            [0, 0, 0, 0, 1], dtype=torch.float32),
+        oechem.OEHybridization_Unknown: torch.tensor(
+            [0, 0, 0, 0, 0], dtype=torch.float32)
+    }
     return torch.cat(
         [
             torch.tensor(
@@ -69,6 +48,20 @@ def fp_oe(atom):
         dim=0)
 
 def fp_rdkit(atom):
+    HYBRIDIZATION_RDKIT = {
+        Chem.rdchem.HybridizationType.SP: torch.tensor(
+            [1, 0, 0, 0, 0], dtype=torch.float32),
+        Chem.rdchem.HybridizationType.SP2: torch.tensor(
+            [0, 1, 0, 0, 0], dtype=torch.float32),
+        Chem.rdchem.HybridizationType.SP3: torch.tensor(
+            [0, 0, 1, 0, 0], dtype=torch.float32),
+        Chem.rdchem.HybridizationType.SP3D: torch.tensor(
+            [0, 0, 0, 1, 0], dtype=torch.float32),
+        Chem.rdchem.HybridizationType.SP3D2: torch.tensor(
+            [0, 0, 0, 0, 1], dtype=torch.float32),
+        Chem.rdchem.HybridizationType.S: torch.tensor(
+            [0, 0, 0, 0, 0], dtype=torch.float32)
+    }
     return torch.cat(
         [
             torch.tensor(
@@ -95,6 +88,7 @@ def fp_rdkit(atom):
 # MODULE FUNCTIONS
 # =============================================================================
 def from_oemol(mol, use_fp=True):
+    from openeye import oechem
     # initialize graph
     g = dgl.DGLGraph()
 
@@ -140,6 +134,7 @@ def from_oemol(mol, use_fp=True):
     return g
 
 def from_rdkit_mol(mol, use_fp=True):
+    from rdkit import Chem
     # initialize graph
     g = dgl.DGLGraph()
 
