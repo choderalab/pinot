@@ -33,13 +33,15 @@ class AdLaLa(torch.optim.Optimizer):
     tau: float, default=1e-4
         temperature.
     xi_init: float, default=1e-3
-        initial value for $\xi$.
+        initial value for $xi$.
 
     Methods
     -------
     step(closure): apply gradient.
-        
+    
+
     """
+
     def __init__(
             self,
             params,
@@ -87,15 +89,16 @@ class AdLaLa(torch.optim.Optimizer):
         the steps are:
         ```
         A: w := w + hp
-        B: p := p-h\\nabla L(w)
-        C: p := e^{-h\\xi} p
-        D: p := p + \\sigma \\sqrt{h}R_n
-        E: \xi := \\xi + h\\epsilon [p^T p - N\\tau]
+        B: p := p-h nabla L(w)
+        C: p := e^{-h * xi} p
+        D: p := p + sigma sqrt{h}R_n
+        E: xi := xi + h * epsilon [p^T p - N * tau]
         O: p := c p + d R
 
+        
         ```
-
         """
+
         # call closure if closure is specified
         if closure is not None:
             with torch.enable_grad():
