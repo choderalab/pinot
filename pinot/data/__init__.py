@@ -1,8 +1,9 @@
+import pinot
 import pinot.data
-import pinot.data.utils as utils
+# import pinot.data.utils as utils
 import os
 
-esol = utils.from_csv(
+esol = pinot.data.utils.from_csv(
     os.path.dirname(
         utils.__file__) + '/esol.csv')
 
