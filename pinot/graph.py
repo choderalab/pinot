@@ -11,6 +11,7 @@ import torch
 # UTILITY FUNCTIONS
 # =============================================================================
 def fp_oe(atom):
+    from openeye import oechem
     HYBRIDIZATION_OE = {
         oechem.OEHybridization_sp: torch.tensor(
             [1, 0, 0, 0, 0], dtype=torch.float32),
@@ -48,6 +49,7 @@ def fp_oe(atom):
         dim=0)
 
 def fp_rdkit(atom):
+    from rdkit import Chem
     HYBRIDIZATION_RDKIT = {
         Chem.rdchem.HybridizationType.SP: torch.tensor(
             [1, 0, 0, 0, 0], dtype=torch.float32),
