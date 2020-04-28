@@ -1,3 +1,4 @@
+import pinot.data
 import pinot.data.utils as utils
 import os
 
