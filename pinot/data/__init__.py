@@ -1,6 +1,6 @@
 import pinot
 import pinot.data
-import utils
+import .utils
 import os
 
 esol = utils.from_csv(
