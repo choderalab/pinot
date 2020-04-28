@@ -12,7 +12,7 @@ class SGLD(Optimizer):
         according to RMSProp.
     """
   
-  def __init__(self,
+    def __init__(self,
                  params,
                  lr=1e-2,
                  precondition_decay_rate=0.95,
@@ -63,7 +63,7 @@ class SGLD(Optimizer):
         super().__init__(params, defaults)
 
 
-  def step(self, closure=None):
+    def step(self, closure=None):
         loss = None
 
         if closure is not None:
@@ -117,5 +117,4 @@ class SGLD(Optimizer):
                 )
 
                 parameter.data.add_(-lr * scaled_grad)
-
         return loss
