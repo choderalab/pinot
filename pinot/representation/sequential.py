@@ -5,7 +5,7 @@ import torch
 import dgl
 
 class Sequential(torch.nn.Module):
-    def __init__(self, model, config, feature_units=117, input_units=128, output_units=1):
+    def __init__(self, model, config, feature_units=117, input_units=128, output_units=1, model_kwargs={}):
         super(Sequential, self).__init__()
 
         # the initial dimensionality
@@ -43,7 +43,7 @@ class Sequential(torch.nn.Module):
                 setattr(
                     self,
                     'd' + str(idx),
-                    model(dim, exe))
+                    model(dim, exe, **model_kwargs))
 
                 dim = exe
                 self.exes.append('d' + str(idx))
