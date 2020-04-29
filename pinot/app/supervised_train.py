@@ -24,10 +24,11 @@ def run(args):
     # nest layers together to form the representation learning
     net_representation = pinot.representation.Sequential(
         layer,
-        eval(args.config)) # output mu and sigma
+        args.config) # output mu and sigma
+
 
     # get the last units as the input units of prediction layer
-    param_in_units = list(filter(lambda x: type(x)==int, eval(args.config)))[-1]
+    param_in_units = int(list(filter(lambda x: x.isdigit(), args.config))[-1])
 
     # construct a separated prediction net
     net_regression = pinot.regression.Linear(
@@ -78,14 +79,21 @@ def run(args):
         lr)
     n_epochs = int(args.n_epochs)
 
-    # define reporters
-    now = datetime.now() 
-    time_str = now.strftime("%Y-%m-%d-%H%M%S%f")
+    if args.time_str != '': 
+        # define reporters
+        now = datetime.now() 
+        time_str = now.strftime("%Y-%m-%d-%H%M%S%f")
+    else:
+        time_str = args.time_str
+
     os.mkdir(time_str)
 
 
     markdown_reporter = pinot.app.reporters.MarkdownReporter(
-        time_str, ds_tr, ds_te, args=args, net=net)
+        time_str, ds_tr, ds_te, args=args, net=net,
+        extra_losses={
+            'rmse': pinot.metrics.slow.rmse,
+            'r2': pinot.metrics.slow.r2})
     visual_reporter = pinot.app.reporters.VisualReporter(
         time_str, ds_tr, ds_te)
     weight_reporter = pinot.app.reporters.WeightReporter(
@@ -103,20 +111,20 @@ if __name__ == '__main__':
 
     parser.add_argument('--model', default='dgl_legacy')
     parser.add_argument(
-        '--config', 
-        default="[128, 0.1, 'tanh', 128, 0.1, 'tanh', 128, 0.1, 'tanh']")
+        '--config',
+        nargs='*')
     parser.add_argument('--distribution', default='normal')
     parser.add_argument('--n_params', default=2)
     parser.add_argument('--data', default='esol')
     parser.add_argument('--batch_size', default=32, type=int)
     parser.add_argument('--opt', default='Adam')
-    parser.add_argument('--lr', default=1e-5, type=float)
+    parser.add_argument('--lr', default=1e-2, type=float)
     parser.add_argument('--partition', default='4:1', type=str)
     parser.add_argument('--n_epochs', default=10)
     parser.add_argument('--report', default=True, type=bool) 
     parser.add_argument('--representation_parameter', default='')
     parser.add_argument('--regression_parameter', default='')
-    
+    parser.add_argument('--time_str', default='') 
     args = parser.parse_args()
     run(args)
 
