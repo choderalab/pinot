@@ -129,7 +129,7 @@ class AdLaLa(torch.optim.Optimizer):
                 state = self.state[w]
                 state['xi'].add_(
                     fraction * group['h'] * group['epsilon'] * \
-                    (torch.sum(torch.pow(state['p'].flatten(), 2)) - state['p'].shape[0] * group['tau']))
+                    (torch.sum(torch.pow(state['p'].flatten(), 2)) - torch.numel(state['p']) * group['tau']))
 
     def O_step(self, group, fraction=0.5):
         """O_fraction: p := c p + d R
