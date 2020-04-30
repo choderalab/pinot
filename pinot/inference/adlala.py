@@ -60,7 +60,7 @@ class AdLaLa(torch.optim.Optimizer):
             sigma=torch.tensor(sigma),
             epsilon=torch.tensor(epsilon),
             xi_init=torch.tensor(xi_init),
-            partition='La')
+            partition=partition)
 
         super(AdLaLa, self).__init__(params, defaults)
 
@@ -99,19 +99,23 @@ class AdLaLa(torch.optim.Optimizer):
 
         
         ```
+        NOTE: a B_(h/2) step is performed during initialization stage
+
         """
 
-        # call closure if closure is specified
-        if closure is not None:
-            with torch.enable_grad():
-                loss = closure()
+        # make sure closure is specified
+        assert closure is not None, 'Closure is needed in the training loop.'
+
+        # call closure
+        with torch.enable_grad():
+            loss = closure()
 
         # loop through param groups with possible different parameter settings.
         for group in self.param_groups:
             for w in group['params']:
                 # NOTE: `w.grad == None` is different from `w.grad == 0.`
                 # as the later could be used to sample parameters without taking grads.
-                if w.grad == None:
+                if w.grad is None: # skip network params not contributing to loss.
                     continue
 
                 state = self.state[w]
