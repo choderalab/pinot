@@ -165,7 +165,7 @@ class AdLaLa(torch.optim.Optimizer):
                     # E_(h/2) step: \xi := \xi + 0.5 * h * \epsilon * (p^T p - N * \tao)
                     state['xi'].add_(
                         0.5 * group['h'] * group['epsilon'] *\
-                        (torch.sum(torch.pow(state['p'].flatten(), 2)) - state['p'].shape[0] * group['tau']))
+                        (torch.sum(torch.pow(state['p'].flatten(), 2)) - state['p'].shape.numel() * group['tau']))
                 
                 elif group['partition'].lower() == 'la': # Langevin
                     
