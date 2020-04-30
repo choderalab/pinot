@@ -79,7 +79,7 @@ def run(args):
         lr)
     n_epochs = int(args.n_epochs)
 
-    if args.time_str != '': 
+    if args.time_str == '': 
         # define reporters
         now = datetime.now() 
         time_str = now.strftime("%Y-%m-%d-%H%M%S%f")
