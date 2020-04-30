@@ -141,7 +141,7 @@ class AdLaLa(torch.optim.Optimizer):
 
         for w in self.param_groups[group]['params']:
             if w.grad is not None:
-                # TODO: these are just scalars, don't have to be torched I think
+                # TODO: these are just scalars, may not have to be torched?
                 dt = (fraction * group['h'])
                 c = torch.exp(
                     -dt * group['gamma'])
@@ -194,7 +194,7 @@ class AdLaLa(torch.optim.Optimizer):
                         1. - torch.exp(-2. * group['h'] * group['gamma']
                                        )) * torch.sqrt(group['tau'])
 
-        # TODO: NOTE: a B_(h/2) step is performed during initialization stage
+        # TODO: a B_(h/2) step is performed during initialization stage, but
         #   should this instead be a B_h step?
         for i in range(len(self.param_groups)):
             self.B_step(i, 0.5)  # requires gradient
