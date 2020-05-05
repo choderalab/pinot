@@ -94,10 +94,25 @@ class Test():
             results[metric.__name__] = {}
 
         for state_name, state in states.items(): # loop through states
-            for metric in metrics: # loop through metrics
-                net.load_state_dict(state)
-                for g, y in data: # loop through the dataset
-                    
+            net.load_state_dict(state)
+            
+            # concat y and y_hat in test set
+            y = []
+            g = []
+            for g_, y_ in data:
+                y.append(y)
+                g += dgl.unbatch(g_)
+            
+            y = torch.cat(ys)
+            g = dgl.batch(g)
+
+            for metric in metrics: # loop through the metrics
+                results[metric.__name__][state_name] = metric(net, g, y)
+                
+        self.results = results
+        return self.results
+
+                
 
 
          
