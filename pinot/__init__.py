@@ -5,8 +5,7 @@ from pinot.metrics import *
 
 import pinot.app
 
-from pinot.app.experiment import Train
-from pinot.app.experiment import Test
+from pinot.app.experiment import *
 
 import pinot.metrics
 import pinot.representation

@@ -19,4 +19,5 @@ def table(results):
         returned from `pinot.Test`
 
     """
+    pass
 
