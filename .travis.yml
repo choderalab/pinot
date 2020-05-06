@@ -3,7 +3,7 @@ python:
     - "3.6"
     - "3.7"
 install:
-    - source devtools/travis-ci/before-install.sh
+    - source devtools/travis-ci/before_install.sh
     - export PYTHONUNBUFFERED=true
     - conda config --add channels conda-forge
     - conda update --quiet --yes --all
