@@ -1,6 +1,15 @@
 language: python
 python:
+    - "3.6"
     - "3.7"
 install:
-    - pip install -r requirements.txt
+    - source devtools/travis-ci/install.sh
+    - export PYTHONUNBUFFERED=true
+    - conda config --add channels conda-forge
+    - conda update --quiet --yes --all
+script:
+    - conda create --quiet --yes -n test python=$python conda-build conda-verify jinja2 pip nose nose-timer coverage modeller
+    - source activate test
+    - conda build devtools/conda-envs
+    - conda install -c $HOME/miniconda/envs/test/conda-bld/ --quiet --yes --use-local ${PACKAGENAME}-dev
 
