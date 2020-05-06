@@ -10,6 +10,6 @@ install:
 script:
     - conda create --quiet --yes -n test python=$python conda-build conda-verify jinja2 pip nose nose-timer coverage modeller
     - source activate test
-    - conda build devtools/conda-envs
-    - conda install -c $HOME/miniconda/envs/test/conda-bld/ --quiet --yes --use-local ${PACKAGENAME}-dev
+    - pip install pytorch dgl matplotlib numpy scipy
+    - conda install -c rdkit rdkit
 
