@@ -1,7 +1,6 @@
 # =============================================================================
 # IMPORTS
 # =============================================================================
-import pinot
 import torch
 import dgl
 import argparse
@@ -12,6 +11,8 @@ import math
 from datetime import datetime
 import os
 from abc import ABC
+import copy
+import pinot
 
 # =============================================================================
 # MODULE CLASSES
@@ -105,7 +106,6 @@ class Test():
                 pinot.rmse,
                 pinot.r2
             ]): 
-        import copy
         self.net = copy.deepcopy(net) # deepcopy the model object
         self.data = data
         self.metrics = metrics
@@ -139,15 +139,21 @@ class Test():
 
 class TrainAndTest():
     """ Train a model and then test it.
+
     """
     def __init__(
             self, 
-            net, data, metrics, states, optimizer, n_epochs, 
-            record_inverval=1):
+            net, 
+            data_tr,
+            data_te,
+            optimizer, 
+            metrics=[pinot.rmse, pinot.r2],
+            n_epochs=100, 
+            record_interval=1):
         self.net = copy.deepcopy(net) # deepcopy the model object
-        self.data = data
+        self.data_tr = data_tr
+        self.data_te = data_te
         self.metrics = metrics
-        self.states = states
         self.optimizer = optimizer
         self.n_epochs = n_epochs
         self.record_interval = record_interval
@@ -156,15 +162,32 @@ class TrainAndTest():
     def run(self):
         train = Train(
             net=self.net,
-            data=self.data,
+            data=self.data_tr,
             optimizer=self.optimizer,
             n_epochs=self.n_epochs)
 
+        self.states = train.states
+
         test = Test(
             net=self.net,
-            data=self.data,
+            data=self.data_te,
             metrics=self.metrics,
-            states=train.states)
+            states=self.states)
+
+        self.results_te = test.results
+
+        test = Test(
+            net=self.net,
+            data=self.data_tr,
+            metrics=self.metrics,
+            states=self.states)
+
+        self.results_tr = test.results
+
+
+
+
+
 
 
 
