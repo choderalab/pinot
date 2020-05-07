@@ -1,6 +1,7 @@
 import pytest
 import numpy as np
 import numpy.testing as npt
+import torch
 
 @pytest.mark.parametrize(
     "y_fn", [
@@ -22,7 +23,7 @@ def test_linear_regression_fixed_sigma(y_fn):
             loc=torch.zeros(size=(256, 1)),
             scale=10 * torch.ones(size=(256, 1))).sample()
 
-    y = torch.flatten(-2.0 * x + 1.0)
+    y = y_fn(x)
 
     # initialize a simple model
     net = pinot.Net(
