@@ -12,5 +12,6 @@ script:
     - source activate test
     - pip install pytorch dgl matplotlib numpy scipy
     - conda install -c rdkit rdkit
+    - export PYTHONPATH=$PYTHONPATH:$(pwd)
     - pytest
 
