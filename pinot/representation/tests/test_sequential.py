@@ -1,5 +1,5 @@
 import pinot
 
 def test_setup():
-    gn = pinot.models.dgl_legacy
-    nets = pinot.models.Sequential(gn, [128, 'tanh', 0.1])
+    gn = pinot.representation.dgl_legacy.gn()
+    nets = pinot.representation.Sequential(gn, [128, 'tanh', 0.1])

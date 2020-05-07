@@ -12,7 +12,7 @@ import dgl
 from dgl.nn import pytorch as dgl_pytorch
 
 # =============================================================================
-# MODULE CLASS
+# MODULE CLASSES
 # =============================================================================
 class GN(torch.nn.Module):
     def __init__(
@@ -31,3 +31,16 @@ class GN(torch.nn.Module):
         x = self.gn(g, x)
         g.ndata['h'] = x
         return g
+
+# =============================================================================
+# MODULE FUNCTIONS
+# =============================================================================
+def gn(
+    model_name='SAGEConv',
+    kwargs={'aggregator_type': 'mean'}):
+
+    return lambda in_feat, out_feat: GN(
+            in_feat, 
+            out_feat,
+            model_name,
+            kwargs)

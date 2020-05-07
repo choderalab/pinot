@@ -1,23 +1,23 @@
-""" Slow metrics.
-
-"""
-
 # =============================================================================
 # IMPORTS
 # =============================================================================
-import pinot
 import torch
-import math
-
+import numpy as np
+import matplotlib
+from matplotlib import pyplot as plt
+import pinot
 
 # =============================================================================
-# MODULE FUNCTIONS
+# MODULE CLASSES
 # =============================================================================
-def rmse(y, y_hat):
-    return torch.sqrt(
-        torch.nn.functional.mse_loss(
-            y,
-            y_hat))
+def table(results):
+    """ Report the final states as a latex table.
 
+    Parameters
+    ----------
+    results : dictionary
+        returned from `pinot.Test`
 
+    """
+    pass
 
