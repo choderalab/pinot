@@ -32,7 +32,7 @@ def from_csv(path, toolkit='rdkit', smiles_col=-1, y_col=-2, seed=2666):
                     oechem.OEGraphMol(), smiles) for smiles in df_smiles] 
             gs = [pinot.graph.from_oemol(mol) for mol in mols]
 
-        ds = list(zip(gs, list(df_y.values)))
+        ds = list(zip(gs, list(torch.tensor(df_y.values))))
         random.seed(seed)
         random.shuffle(ds)
 
