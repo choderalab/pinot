@@ -7,7 +7,7 @@ install:
     - export PYTHONUNBUFFERED=true
     - conda config --add channels conda-forge
     - conda update --quiet --yes --all
-    - pip install pytorch dgl matplotlib numpy scipy
+    - pip install torch dgl matplotlib numpy scipy
     - conda install -c rdkit rdkit
 script:
     - conda create --quiet --yes -n test python=$python conda-build conda-verify jinja2 pip nose nose-timer coverage modeller
