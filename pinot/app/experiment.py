@@ -59,7 +59,6 @@ class Train():
                 loss = torch.sum(self.net.loss(g, y))
                 self.optimizer.zero_grad()
                 loss.backward()
-                print(loss, flush=True)
                 return loss
             
             self.optimizer.step(l)
