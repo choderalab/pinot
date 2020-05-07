@@ -26,8 +26,6 @@ def rmse(net, g, y):
     return _rmse(y, y_hat)
 
 def _r2(y, y_hat):
-    print(y)
-    print(y - y.mean())
     ss_tot = (y - y.mean()).pow(2).sum()
     ss_res = (y_hat - y).pow(2).sum()
     return 1 - torch.div(ss_res, ss_tot)
