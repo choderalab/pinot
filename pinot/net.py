@@ -24,7 +24,7 @@ class Net(torch.nn.Module):
             expectation_fn=lambda x, y: x):
         super(Net, self).__init__()
         self.representation = representation
-        self.parameterization = parameterization
+        self.parametrization = parameterization
         self.distribution_class = distribution_class
         self.param_transform = param_transform
         self.expectation_fn = expectation_fn
@@ -40,7 +40,7 @@ class Net(torch.nn.Module):
         # latent representation $h$
         # ->
         # parameters $\theta$
-        theta = self.parameterization(h)
+        theta = self.parametrization(h)
 
         return theta
 
