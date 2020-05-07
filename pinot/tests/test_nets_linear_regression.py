@@ -2,7 +2,14 @@ import pytest
 import numpy as np
 import numpy.testing as npt
 
-def test_linear_regression_fixed_sigma():
+@pytest.mark.parametrize(
+    "y_fn", [
+        lambda x: torch.flatten(-2.0 * x + 1.0), # no noise
+        lambda x: torch.flatten(
+            torch.distributions.normal.Normal(
+                loc=-2.0 * x + 1.0,
+                scale=1e-3).sample())])
+def test_linear_regression_fixed_sigma(y_fn):
     """ We test the model is able to recover parameters
     through linear regression.
 
