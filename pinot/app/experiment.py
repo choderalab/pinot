@@ -127,7 +127,11 @@ class Test():
                 y.append(y_)
                 g += dgl.unbatch(g_)
             
-            y = torch.cat(y)
+            if y[0].dim == 0:
+                y = torch.stack(y)
+            else:
+                y = torch.cat(y)
+
             g = dgl.batch(g)
 
             for metric in self.metrics: # loop through the metrics
