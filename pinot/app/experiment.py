@@ -75,7 +75,8 @@ class Train():
             self.train_once()
             
             if epoch_idx % self.record_interval == 0:
-                self.states[epoch_idx] = self.net.state_dict()
+                self.states[epoch_idx] = copy.deepcopy(
+                        self.net.state_dict())
 
         self.states['final'] = self.net.state_dict()
 
