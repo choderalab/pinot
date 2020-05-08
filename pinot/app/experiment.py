@@ -127,7 +127,7 @@ class Test():
                 y.append(y_)
                 g += dgl.unbatch(g_)
             
-            if y[0].dim == 0:
+            if y[0].dim() == 0:
                 y = torch.stack(y)
             else:
                 y = torch.cat(y)
