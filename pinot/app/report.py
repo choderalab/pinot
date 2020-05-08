@@ -8,18 +8,41 @@ from matplotlib import pyplot as plt
 import pinot
 
 # =============================================================================
-# MODULE CLASSES
+# MODULE FUNCTIONS
 # =============================================================================
-def table(results_dict):
-    """ Report the final states as a latex table.
+def markdown(results_dict):
+    # initialize markdown string
+    md = ""
 
-    Parameters
-    ----------
-    results : dictionary
-        returned from `pinot.Test`
+    # get all the results
+    metrics = list(list(results_dict.values())[0].keys())
+    ds_names = list(results_dict.keys())
 
-    """
-    pass
+    n_metrics = len(metrics)
+
+    md += '{:<15}'.format('|')
+    for metric in metrics:
+        md += '{:<15}'.format('|%s' % metric)
+    md += '|'
+    md += '\n'
+
+    for _ in range(n_metrics + 1):
+        md += '{:<15}'.format('|' + '-' * 13)
+
+    md += '|'
+    md += '\n'
+
+    for ds_name, results in results_dict.items():
+        md += '{:<15}'.format('|' + ds_name)
+        
+        for metric, value in results.items():
+            md += '{:<15}'.format('|%.4f' % value['final'])
+
+        md += '|'
+        md += '\n'
+        
+
+    return md
 
 def visual(results_dict):
     # make plots less ugly
