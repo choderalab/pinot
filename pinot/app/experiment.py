@@ -74,7 +74,7 @@ class Train():
         for epoch_idx in range(self.n_epochs):
             self.train_once()
             
-            if epoch_idx // self.record_interval == 0:
+            if epoch_idx % self.record_interval == 0:
                 self.states[epoch_idx] = self.net.state_dict()
 
         self.states['final'] = self.net.state_dict()
