@@ -9,6 +9,8 @@ import numpy as np
 # =============================================================================
 # MODULE FUNCTIONS
 # =============================================================================
+
+
 def train_once(net, ds_tr, opt):
     """ Train the model for one batch.
     """
@@ -20,6 +22,7 @@ def train_once(net, ds_tr, opt):
 
     return net, opt
 
+
 def train(net, ds_tr, ds_te, opt, reporters, n_epochs):
     [reporter.before() for reporter in reporters]
 
@@ -30,11 +33,3 @@ def train(net, ds_tr, ds_te, opt, reporters, n_epochs):
         [reporter.during(net) for reporter in reporters]
 
     [reporter.after(net) for reporter in reporters]
-
-
-
-
-
-
-
-

@@ -4,6 +4,7 @@ import pinot
 import torch
 import dgl
 
+
 class Sequential(torch.nn.Module):
     def __init__(self, model, config, feature_units=117, input_units=128, output_units=1, model_kwargs={}):
         super(Sequential, self).__init__()
@@ -35,11 +36,11 @@ class Sequential(torch.nn.Module):
 
                 if exe >= 1:
                     exe = int(exe)
-            except:
+            except BaseException:
                 pass
 
             # int -> feedfoward
-            if type(exe) == int:
+            if isinstance(exe, int):
                 setattr(
                     self,
                     'd' + str(idx),
@@ -49,7 +50,7 @@ class Sequential(torch.nn.Module):
                 self.exes.append('d' + str(idx))
 
             # str -> activation
-            elif type(exe) == str:
+            elif isinstance(exe, str):
                 activation = getattr(torch.nn.functional, exe)
 
                 setattr(
@@ -60,7 +61,7 @@ class Sequential(torch.nn.Module):
                 self.exes.append('a' + str(idx))
 
             # float -> dropout
-            elif type(exe) == float:
+            elif isinstance(exe, float):
                 dropout = torch.nn.Dropout(exe)
                 setattr(
                     self,
@@ -71,7 +72,6 @@ class Sequential(torch.nn.Module):
 
         # readout
         self.f_out = torch.nn.Linear(dim, output_units)
-
 
     def forward(self, g, return_graph=False):
 
