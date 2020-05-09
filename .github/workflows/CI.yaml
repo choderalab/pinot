@@ -47,7 +47,7 @@ jobs:
 
       - name: Fix conda permissions in MacOS
         shell: bash
-        if: startsWith(matrix.cfg.os, 'macOS')
+        if: startsWith(matrix.os, 'macOS')
         run: |
           sudo chown -R $(id -u):$(id -g) ${CONDA}
 
