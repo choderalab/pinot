@@ -1,22 +1,26 @@
 name: test
 channels:
-    - conda-forge
+  - conda-forge
+  - defaults
+  - salilab
 dependencies:
-    # Base dependencies
+  # Base dependencies
   - python
   - pip
-
-    # Testing
+  # 3rd party
+  - modeller
+  - rdkit
+  - numpy
+  - matplotlib
+  - scipy
+  # Testing
   - pytest
   - pytest-cov
   - codecov
-  
-  - rdkit
-
-    # Pip-only installs
+  - nose
+  - nose-timer
+  - coverage
+  # Pip-only installs
   - pip:
-    - pytorch
-    - dgl
-    - matplotlib
-    
-
+      - torch
+      - dgl
