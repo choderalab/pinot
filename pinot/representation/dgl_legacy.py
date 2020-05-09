@@ -14,6 +14,8 @@ from dgl.nn import pytorch as dgl_pytorch
 # =============================================================================
 # MODULE CLASSES
 # =============================================================================
+
+
 class GN(torch.nn.Module):
     def __init__(
             self,
@@ -35,12 +37,14 @@ class GN(torch.nn.Module):
 # =============================================================================
 # MODULE FUNCTIONS
 # =============================================================================
+
+
 def gn(
-    model_name='SAGEConv',
-    kwargs={'aggregator_type': 'mean'}):
+        model_name='SAGEConv',
+        kwargs={'aggregator_type': 'mean'}):
 
     return lambda in_feat, out_feat: GN(
-            in_feat, 
-            out_feat,
-            model_name,
-            kwargs)
+        in_feat,
+        out_feat,
+        model_name,
+        kwargs)

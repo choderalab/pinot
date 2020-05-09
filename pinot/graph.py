@@ -10,6 +10,8 @@ import torch
 # =============================================================================
 # UTILITY FUNCTIONS
 # =============================================================================
+
+
 def fp_oe(atom):
     from openeye import oechem
     HYBRIDIZATION_OE = {
@@ -47,6 +49,7 @@ def fp_oe(atom):
             HYBRIDIZATION_OE[atom.GetHyb()]
         ],
         dim=0)
+
 
 def fp_rdkit(atom):
     from rdkit import Chem
@@ -89,6 +92,8 @@ def fp_rdkit(atom):
 # =============================================================================
 # MODULE FUNCTIONS
 # =============================================================================
+
+
 def from_oemol(mol, use_fp=True):
     from openeye import oechem
     # initialize graph
@@ -100,7 +105,7 @@ def from_oemol(mol, use_fp=True):
     g.ndata['type'] = torch.Tensor(
         [[atom.GetAtomicNum()] for atom in mol.GetAtoms()])
 
-    h_v =  torch.zeros(
+    h_v = torch.zeros(
         g.ndata['type'].shape[0], 100, dtype=torch.float32)
 
     h_v[
@@ -117,7 +122,7 @@ def from_oemol(mol, use_fp=True):
                 h_v,
                 h_v_fp
             ],
-            dim=-1) # (n_atoms, 117)
+            dim=-1)  # (n_atoms, 117)
 
     g.ndata['h0'] = h_v
 
@@ -135,6 +140,7 @@ def from_oemol(mol, use_fp=True):
 
     return g
 
+
 def from_rdkit_mol(mol, use_fp=True):
     from rdkit import Chem
     # initialize graph
@@ -146,7 +152,7 @@ def from_rdkit_mol(mol, use_fp=True):
     g.ndata['type'] = torch.Tensor(
         [[atom.GetAtomicNum()] for atom in mol.GetAtoms()])
 
-    h_v =  torch.zeros(
+    h_v = torch.zeros(
         g.ndata['type'].shape[0], 100, dtype=torch.float32)
 
     h_v[
@@ -163,7 +169,7 @@ def from_rdkit_mol(mol, use_fp=True):
                 h_v,
                 h_v_fp
             ],
-            dim=-1) # (n_atoms, 117)
+            dim=-1)  # (n_atoms, 117)
 
     g.ndata['h0'] = h_v
 

@@ -11,6 +11,8 @@ import torch
 # =============================================================================
 # MODULE FUNCTIONS
 # =============================================================================
+
+
 class Net(torch.nn.Module):
     """ An object that combines the representation and parameter
     learning, puts into a predicted distribution and calculates the
@@ -19,9 +21,9 @@ class Net(torch.nn.Module):
     """
 
     def __init__(self, representation, parameterization,
-            distribution_class=torch.distributions.normal.Normal,
-            param_transform=lambda x, y: (x, torch.exp(y) + 1e-5),
-            expectation_fn=lambda x, y: x):
+                 distribution_class=torch.distributions.normal.Normal,
+                 param_transform=lambda x, y: (x, torch.exp(y) + 1e-5),
+                 expectation_fn=lambda x, y: x):
         super(Net, self).__init__()
         self.representation = representation
         self.parametrization = parameterization
@@ -52,7 +54,7 @@ class Net(torch.nn.Module):
 
         # parameterize the distribution according to the parameters
         # and the distribution class
-        
+
         distribution = self.distribution_class(
             *self.param_transform(
                 *torch.unbind(theta, dim=-1)))
@@ -79,6 +81,5 @@ class Net(torch.nn.Module):
         """
 
         distribution = self.condition(g)
-        
+
         return -distribution.log_prob(y)
-    

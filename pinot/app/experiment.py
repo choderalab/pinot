@@ -17,6 +17,8 @@ import pinot
 # =============================================================================
 # MODULE CLASSES
 # =============================================================================
+
+
 class Train():
     """ Training experiment.
 
@@ -33,7 +35,7 @@ class Train():
     n_epochs : int, default=100
         number of epochs
 
-    
+
     """
 
     def __init__(
@@ -60,9 +62,8 @@ class Train():
                 self.optimizer.zero_grad()
                 loss.backward()
                 return loss
-            
+
             self.optimizer.step(l)
-            
 
     def train(self):
         """ Train the model for multiple steps and
@@ -73,17 +74,17 @@ class Train():
 
         for epoch_idx in range(self.n_epochs):
             self.train_once()
-            
+
             if epoch_idx % self.record_interval == 0:
                 self.states[epoch_idx] = copy.deepcopy(
-                        self.net.state_dict())
+                    self.net.state_dict())
 
         self.states['final'] = self.net.state_dict()
 
 
 class Test():
     """ Run sequences of test on a trained model.
-    
+
     Attributes
     ----------
     net : `pinot.Net` object
@@ -97,16 +98,17 @@ class Test():
 
 
     """
+
     def __init__(
-            self, 
-            net, 
-            data, 
+            self,
+            net,
+            data,
             states,
             metrics=[
                 pinot.rmse,
                 pinot.r2
-            ]): 
-        self.net = copy.deepcopy(net) # deepcopy the model object
+            ]):
+        self.net = copy.deepcopy(net)  # deepcopy the model object
         self.data = data
         self.metrics = metrics
         self.states = states
@@ -118,16 +120,16 @@ class Test():
         for metric in self.metrics:
             results[metric.__name__] = {}
 
-        for state_name, state in self.states.items(): # loop through states
+        for state_name, state in self.states.items():  # loop through states
             self.net.load_state_dict(state)
-            
+
             # concat y and y_hat in test set
             y = []
             g = []
             for g_, y_ in self.data:
                 y.append(y_)
                 g += dgl.unbatch(g_)
-            
+
             if y[0].dim() == 0:
                 y = torch.stack(y)
             else:
@@ -135,33 +137,34 @@ class Test():
 
             g = dgl.batch(g)
 
-            for metric in self.metrics: # loop through the metrics
+            for metric in self.metrics:  # loop through the metrics
                 results[metric.__name__][state_name] = metric(self.net, g, y)
-                
+
         self.results = results
         return self.results
+
 
 class TrainAndTest():
     """ Train a model and then test it.
 
     """
+
     def __init__(
-            self, 
-            net, 
+            self,
+            net,
             data_tr,
             data_te,
-            optimizer, 
+            optimizer,
             metrics=[pinot.rmse, pinot.r2],
-            n_epochs=100, 
+            n_epochs=100,
             record_interval=1):
-        self.net = copy.deepcopy(net) # deepcopy the model object
+        self.net = copy.deepcopy(net)  # deepcopy the model object
         self.data_tr = data_tr
         self.data_te = data_te
         self.metrics = metrics
         self.optimizer = optimizer
         self.n_epochs = n_epochs
         self.record_interval = record_interval
-
 
     def run(self):
         train = Train(
@@ -187,11 +190,3 @@ class TrainAndTest():
             states=self.states)
 
         self.results_tr = test.results
-
-
-
-
-
-
-
-
