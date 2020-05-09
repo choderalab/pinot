@@ -59,7 +59,6 @@ class Train():
                 loss = torch.sum(self.net.loss(g, y))
                 self.optimizer.zero_grad()
                 loss.backward()
-                print(loss, flush=True)
                 return loss
             
             self.optimizer.step(l)
@@ -75,8 +74,9 @@ class Train():
         for epoch_idx in range(self.n_epochs):
             self.train_once()
             
-            if epoch_idx // self.record_interval == 0:
-                self.states[epoch_idx] = self.net.state_dict()
+            if epoch_idx % self.record_interval == 0:
+                self.states[epoch_idx] = copy.deepcopy(
+                        self.net.state_dict())
 
         self.states['final'] = self.net.state_dict()
 
@@ -128,7 +128,11 @@ class Test():
                 y.append(y_)
                 g += dgl.unbatch(g_)
             
-            y = torch.cat(y)
+            if y[0].dim() == 0:
+                y = torch.stack(y)
+            else:
+                y = torch.cat(y)
+
             g = dgl.batch(g)
 
             for metric in self.metrics: # loop through the metrics
