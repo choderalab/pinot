@@ -1,8 +1,8 @@
 pinot
 ==============================
 [//]: # (Badges)
-[![Travis Build Status](https://travis-ci.org/choderalab/pinot.svg?branch=master)](https://travis-ci.com/choderalab/pinot)
 
+![](https://github.com/choderalab/pinot/workflows/test/badge.svg)
 
 Probabilistic Inference for NOvel Therapeutics
 
