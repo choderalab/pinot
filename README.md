@@ -2,7 +2,7 @@ pinot
 ==============================
 [//]: # (Badges)
 
-![](https://github.com/choderalab/pinot/workflows/test/badge.svg)
+![](https://github.com/choderalab/pinot/workflows/CI/badge.svg)
 
 Probabilistic Inference for NOvel Therapeutics
 
