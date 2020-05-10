@@ -161,11 +161,15 @@ class TrainAndTest:
             n_epochs=self.n_epochs,
         )
 
+        train.train()
+
         self.states = train.states
 
         test = Test(
             net=self.net, data=self.data_te, metrics=self.metrics, states=self.states
         )
+
+        test.test()
 
         self.results_te = test.results
 
@@ -173,4 +177,8 @@ class TrainAndTest:
             net=self.net, data=self.data_tr, metrics=self.metrics, states=self.states
         )
 
+        test.test()
+
         self.results_tr = test.results
+
+        return {'test': self.results_te, 'training': self.results_tr}
