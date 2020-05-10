@@ -20,10 +20,14 @@ class Net(torch.nn.Module):
 
     """
 
-    def __init__(self, representation, parameterization,
-                 distribution_class=torch.distributions.normal.Normal,
-                 param_transform=lambda x, y: (x, torch.exp(y) + 1e-5),
-                 expectation_fn=lambda x, y: x):
+    def __init__(
+        self,
+        representation,
+        parameterization,
+        distribution_class=torch.distributions.normal.Normal,
+        param_transform=lambda x, y: (x, torch.exp(y) + 1e-5),
+        expectation_fn=lambda x, y: x,
+    ):
         super(Net, self).__init__()
         self.representation = representation
         self.parametrization = parameterization
@@ -56,8 +60,8 @@ class Net(torch.nn.Module):
         # and the distribution class
 
         distribution = self.distribution_class(
-            *self.param_transform(
-                *torch.unbind(theta, dim=-1)))
+            *self.param_transform(*torch.unbind(theta, dim=-1))
+        )
 
         return distribution
 
@@ -73,8 +77,7 @@ class Net(torch.nn.Module):
 
     def expectation(self, g):
         theta = self.forward(g)
-        return self.expectation_fn(
-            *torch.unbind(theta, dim=-1))
+        return self.expectation_fn(*torch.unbind(theta, dim=-1))
 
     def loss(self, g, y):
         """ Compute the loss with a input graph and a set of parameters.
