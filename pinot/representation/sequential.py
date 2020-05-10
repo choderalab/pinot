@@ -6,7 +6,15 @@ import dgl
 
 
 class Sequential(torch.nn.Module):
-    def __init__(self, model, config, feature_units=117, input_units=128, output_units=1, model_kwargs={}):
+    def __init__(
+        self,
+        model,
+        config,
+        feature_units=117,
+        input_units=128,
+        output_units=1,
+        model_kwargs={},
+    ):
         super(Sequential, self).__init__()
 
         # the initial dimensionality
@@ -17,15 +25,15 @@ class Sequential(torch.nn.Module):
 
         # initial featurization
         self.f_in = torch.nn.Sequential(
-            torch.nn.Linear(feature_units, input_units),
-            torch.nn.Tanh())
+            torch.nn.Linear(feature_units, input_units), torch.nn.Tanh()
+        )
 
         # make a pytorch function on tensors on graphs
         def apply_atom_in_graph(fn):
             def _fn(g):
-                g.apply_nodes(
-                    lambda node: {'h': fn(node.data['h'])})
+                g.apply_nodes(lambda node: {"h": fn(node.data["h"])})
                 return g
+
             return _fn
 
         # parse the config
@@ -41,42 +49,32 @@ class Sequential(torch.nn.Module):
 
             # int -> feedfoward
             if isinstance(exe, int):
-                setattr(
-                    self,
-                    'd' + str(idx),
-                    model(dim, exe, **model_kwargs))
+                setattr(self, "d" + str(idx), model(dim, exe, **model_kwargs))
 
                 dim = exe
-                self.exes.append('d' + str(idx))
+                self.exes.append("d" + str(idx))
 
             # str -> activation
             elif isinstance(exe, str):
                 activation = getattr(torch.nn.functional, exe)
 
-                setattr(
-                    self,
-                    'a' + str(idx),
-                    apply_atom_in_graph(activation))
+                setattr(self, "a" + str(idx), apply_atom_in_graph(activation))
 
-                self.exes.append('a' + str(idx))
+                self.exes.append("a" + str(idx))
 
             # float -> dropout
             elif isinstance(exe, float):
                 dropout = torch.nn.Dropout(exe)
-                setattr(
-                    self,
-                    'o' + str(idx),
-                    apply_atom_in_graph(dropout))
+                setattr(self, "o" + str(idx), apply_atom_in_graph(dropout))
 
-                self.exes.append('o' + str(idx))
+                self.exes.append("o" + str(idx))
 
         # readout
         self.f_out = torch.nn.Linear(dim, output_units)
 
     def forward(self, g, return_graph=False):
 
-        g.apply_nodes(
-            lambda nodes: {'h': self.f_in(nodes.data['h0'])})
+        g.apply_nodes(lambda nodes: {"h": self.f_in(nodes.data["h0"])})
 
         for exe in self.exes:
             g = getattr(self, exe)(g)
@@ -84,6 +82,6 @@ class Sequential(torch.nn.Module):
         if return_graph == True:
             return g
 
-        h_hat = dgl.sum_nodes(g, 'h')
+        h_hat = dgl.sum_nodes(g, "h")
 
         return h_hat

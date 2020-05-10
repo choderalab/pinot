@@ -48,14 +48,14 @@ class AdLaLa(torch.optim.Optimizer):
     """
 
     def __init__(
-            self,
-            params,
-            h=0.25,
-            gamma=0.1,
-            sigma=0.01,
-            epsilon=0.05,
-            tau=1e-4,
-            xi_init=1e-3,
+        self,
+        params,
+        h=0.25,
+        gamma=0.1,
+        sigma=0.01,
+        epsilon=0.05,
+        tau=1e-4,
+        xi_init=1e-3,
     ):
         """
         Arguments
@@ -91,40 +91,37 @@ class AdLaLa(torch.optim.Optimizer):
 
     def A_step(self, group, fraction=0.5):
         """ A_fraction: w := w + (fraction h) p"""
-        h = self.param_groups[group]['h']
+        h = self.param_groups[group]["h"]
 
-        for w in self.param_groups[group]['params']:
+        for w in self.param_groups[group]["params"]:
             if w.grad is not None:
-                w.add_(fraction * h * self.state[w]['p'])
+                w.add_(fraction * h * self.state[w]["p"])
 
     def B_step(self, group, fraction=0.5):
         """B_fraction: p := p - (fraction h) nabla L(w)"""
-        h = self.param_groups[group]['h']
+        h = self.param_groups[group]["h"]
 
-        for w in self.param_groups[group]['params']:
+        for w in self.param_groups[group]["params"]:
             if w.grad is not None:
-                self.state[w]['p'].add_(- fraction * h * w.grad)
+                self.state[w]["p"].add_(-fraction * h * w.grad)
 
     def C_step(self, group, fraction=0.5):
         """C_fraction: p := e^{-(fraction h) * xi} p"""
-        h = self.param_groups[group]['h']
-        for w in self.param_groups[group]['params']:
+        h = self.param_groups[group]["h"]
+        for w in self.param_groups[group]["params"]:
             if w.grad is not None:
                 state = self.state[w]
-                state['p'].mul_(torch.exp(- fraction * h * state['xi']))
+                state["p"].mul_(torch.exp(-fraction * h * state["xi"]))
 
     def D_step(self, group, fraction=0.5):
         """D_fraction: p := p + sigma sqrt{fraction h} R_n"""
         g = self.param_groups[group]
-        h, sigma = g['h'], g['sigma']
+        h, sigma = g["h"], g["sigma"]
 
-        for w in self.param_groups[group]['params']:
+        for w in self.param_groups[group]["params"]:
             if w.grad is not None:
                 state = self.state[w]
-                state['p'].add_(
-                    torch.sqrt(fraction * h) * \
-                    sigma * \
-                    torch.randn(w.shape))
+                state["p"].add_(torch.sqrt(fraction * h) * sigma * torch.randn(w.shape))
 
     def E_step(self, group, fraction=0.5):
         """E_fraction: xi := xi + (fraction h) * epsilon [p^T p - N * tau]
@@ -133,14 +130,20 @@ class AdLaLa(torch.optim.Optimizer):
             vs. the number of parameters in the current tensor
         """
         g = self.param_groups[group]
-        h, tau, epsilon = g['h'], g['tau'], g['epsilon']
+        h, tau, epsilon = g["h"], g["tau"], g["epsilon"]
 
-        for w in self.param_groups[group]['params']:
+        for w in self.param_groups[group]["params"]:
             if w.grad is not None:
                 state = self.state[w]
-                state['xi'].add_(
-                    fraction * h * epsilon * \
-                    (torch.sum(torch.pow(state['p'].flatten(), 2)) - torch.numel(state['p']) * tau))
+                state["xi"].add_(
+                    fraction
+                    * h
+                    * epsilon
+                    * (
+                        torch.sum(torch.pow(state["p"].flatten(), 2))
+                        - torch.numel(state["p"]) * tau
+                    )
+                )
 
     def O_step(self, group, fraction=0.5):
         """O_fraction: p := c p + d R
@@ -150,19 +153,17 @@ class AdLaLa(torch.optim.Optimizer):
             d = sqrt(1 - exp(-2 (fraction h) gamma)) sqrt(tau)
         """
         g = self.param_groups[group]
-        h, tau, gamma = g['h'], g['tau'], g['gamma']
+        h, tau, gamma = g["h"], g["tau"], g["gamma"]
 
-        for w in self.param_groups[group]['params']:
+        for w in self.param_groups[group]["params"]:
             if w.grad is not None:
                 # TODO: these are just scalars, may not have to be torched?
-                dt = (fraction * h)
-                c = torch.exp(
-                    -dt * gamma)
-                d = torch.sqrt(
-                    1 - torch.exp(-2. * dt * gamma)) * torch.sqrt(tau)
+                dt = fraction * h
+                c = torch.exp(-dt * gamma)
+                d = torch.sqrt(1 - torch.exp(-2.0 * dt * gamma)) * torch.sqrt(tau)
 
                 state = self.state[w]
-                state['p'] = (c * state['p']) + (d * torch.randn(w.shape))
+                state["p"] = (c * state["p"]) + (d * torch.randn(w.shape))
 
     def initialize(self, closure):
         """Initialize state and group parameters, and take a half kick step.
@@ -183,7 +184,7 @@ class AdLaLa(torch.optim.Optimizer):
             loss = closure()
 
         for group in self.param_groups:
-            for w in group['params']:
+            for w in group["params"]:
                 # NOTE: `w.grad == None` is different from `w.grad == 0.`
                 # as the later could be used to sample parameters without taking grads.
                 if w.grad is None:  # skip network params not contributing to loss.
@@ -194,18 +195,17 @@ class AdLaLa(torch.optim.Optimizer):
                 # state initialization
                 if len(state) == 0:
                     # initialize momentum
-                    state['p'] = torch.zeros_like(w)
+                    state["p"] = torch.zeros_like(w)
 
                     # initialize $\xi$
-                    state['xi'] = group['xi_init']
+                    state["xi"] = group["xi_init"]
 
                     # TODO: can remove these...
                     # specify the $c$ and $d$ parameters for Langevin
-                    group['c'] = torch.exp(
-                        -group['h'] * group['gamma'])
-                    group['d'] = torch.sqrt(
-                        1. - torch.exp(-2. * group['h'] * group['gamma']
-                                       )) * torch.sqrt(group['tau'])
+                    group["c"] = torch.exp(-group["h"] * group["gamma"])
+                    group["d"] = torch.sqrt(
+                        1.0 - torch.exp(-2.0 * group["h"] * group["gamma"])
+                    ) * torch.sqrt(group["tau"])
 
         # TODO: a B_(h/2) step is performed during initialization stage, but
         #   should this instead be a B_h step?
@@ -217,7 +217,7 @@ class AdLaLa(torch.optim.Optimizer):
         """Composition of Langevin and Adaptive Langevin substeps."""
 
         # make sure closure is specified
-        assert closure is not None, 'Closure is needed in the training loop.'
+        assert closure is not None, "Closure is needed in the training loop."
 
         if not self.initialized:
             self.initialize(closure)

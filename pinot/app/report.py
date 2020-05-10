@@ -22,26 +22,26 @@ def markdown(results_dict):
 
     n_metrics = len(metrics)
 
-    md += '{:<15}'.format('|')
+    md += "{:<15}".format("|")
     for metric in metrics:
-        md += '{:<15}'.format('|%s' % metric)
-    md += '|'
-    md += '\n'
+        md += "{:<15}".format("|%s" % metric)
+    md += "|"
+    md += "\n"
 
     for _ in range(n_metrics + 1):
-        md += '{:<15}'.format('|' + '-' * 13)
+        md += "{:<15}".format("|" + "-" * 13)
 
-    md += '|'
-    md += '\n'
+    md += "|"
+    md += "\n"
 
     for ds_name, results in results_dict.items():
-        md += '{:<15}'.format('|' + ds_name)
+        md += "{:<15}".format("|" + ds_name)
 
         for metric, value in results.items():
-            md += '{:<15}'.format('|%.4f' % value['final'])
+            md += "{:<15}".format("|%.4f" % value["final"])
 
-        md += '|'
-        md += '\n'
+        md += "|"
+        md += "\n"
 
     return md
 
@@ -49,8 +49,9 @@ def markdown(results_dict):
 def visual(results_dict):
     # make plots less ugly
     from matplotlib import pyplot as plt
-    plt.rc('font', size=14)
-    plt.rc('lines', linewidth=6)
+
+    plt.rc("font", size=14)
+    plt.rc("lines", linewidth=6)
 
     # initialize the figure
     fig = plt.figure()
@@ -65,11 +66,14 @@ def visual(results_dict):
         # loop through the results
         for ds_name, results in results_dict.items():
             ax.plot(
-                [results[metric][idx].detach().numpy() for idx in range(
-                    len(results[metric]) - 1)],
-                label=ds_name)
+                [
+                    results[metric][idx].detach().numpy()
+                    for idx in range(len(results[metric]) - 1)
+                ],
+                label=ds_name,
+            )
 
-        ax.set_xlabel('epochs')
+        ax.set_xlabel("epochs")
         ax.set_ylabel(metric)
 
     plt.tight_layout()

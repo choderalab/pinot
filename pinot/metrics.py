@@ -22,8 +22,7 @@ def mse(net, g, y):
 
 
 def _rmse(y, y_hat):
-    return torch.sqrt(
-        torch.nn.functional.mse_loss(y, y_hat))
+    return torch.sqrt(torch.nn.functional.mse_loss(y, y_hat))
 
 
 def rmse(net, g, y):

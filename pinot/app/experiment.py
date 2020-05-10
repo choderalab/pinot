@@ -19,7 +19,7 @@ import pinot
 # =============================================================================
 
 
-class Train():
+class Train:
     """ Training experiment.
 
     Attributes
@@ -38,13 +38,7 @@ class Train():
 
     """
 
-    def __init__(
-            self,
-            net,
-            data,
-            optimizer,
-            n_epochs=100,
-            record_interval=1):
+    def __init__(self, net, data, optimizer, n_epochs=100, record_interval=1):
 
         self.data = data
         self.optimizer = optimizer
@@ -57,6 +51,7 @@ class Train():
         """ Train the model for one batch.
         """
         for g, y in self.data:
+
             def l():
                 loss = torch.sum(self.net.loss(g, y))
                 self.optimizer.zero_grad()
@@ -76,13 +71,12 @@ class Train():
             self.train_once()
 
             if epoch_idx % self.record_interval == 0:
-                self.states[epoch_idx] = copy.deepcopy(
-                    self.net.state_dict())
+                self.states[epoch_idx] = copy.deepcopy(self.net.state_dict())
 
-        self.states['final'] = self.net.state_dict()
+        self.states["final"] = self.net.state_dict()
 
 
-class Test():
+class Test:
     """ Run sequences of test on a trained model.
 
     Attributes
@@ -99,15 +93,7 @@ class Test():
 
     """
 
-    def __init__(
-            self,
-            net,
-            data,
-            states,
-            metrics=[
-                pinot.rmse,
-                pinot.r2
-            ]):
+    def __init__(self, net, data, states, metrics=[pinot.rmse, pinot.r2]):
         self.net = copy.deepcopy(net)  # deepcopy the model object
         self.data = data
         self.metrics = metrics
@@ -144,20 +130,21 @@ class Test():
         return self.results
 
 
-class TrainAndTest():
+class TrainAndTest:
     """ Train a model and then test it.
 
     """
 
     def __init__(
-            self,
-            net,
-            data_tr,
-            data_te,
-            optimizer,
-            metrics=[pinot.rmse, pinot.r2],
-            n_epochs=100,
-            record_interval=1):
+        self,
+        net,
+        data_tr,
+        data_te,
+        optimizer,
+        metrics=[pinot.rmse, pinot.r2],
+        n_epochs=100,
+        record_interval=1,
+    ):
         self.net = copy.deepcopy(net)  # deepcopy the model object
         self.data_tr = data_tr
         self.data_te = data_te
@@ -171,22 +158,19 @@ class TrainAndTest():
             net=self.net,
             data=self.data_tr,
             optimizer=self.optimizer,
-            n_epochs=self.n_epochs)
+            n_epochs=self.n_epochs,
+        )
 
         self.states = train.states
 
         test = Test(
-            net=self.net,
-            data=self.data_te,
-            metrics=self.metrics,
-            states=self.states)
+            net=self.net, data=self.data_te, metrics=self.metrics, states=self.states
+        )
 
         self.results_te = test.results
 
         test = Test(
-            net=self.net,
-            data=self.data_tr,
-            metrics=self.metrics,
-            states=self.states)
+            net=self.net, data=self.data_tr, metrics=self.metrics, states=self.states
+        )
 
         self.results_tr = test.results

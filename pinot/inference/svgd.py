@@ -5,6 +5,7 @@ arXiv:1608.04471
 import torch
 import numpy as np
 
+
 def rbf_kernel(x):
     """ Compute the pairwise RBF kernel for a stack of vectors.
     """
@@ -13,13 +14,10 @@ def rbf_kernel(x):
 
     # compute bandwidth
     h = torch.div(
-        torch.median(torch.reshape(pairwise_distance_square, [-1])),
-        np.log(x.shape[0]))
+        torch.median(torch.reshape(pairwise_distance_square, [-1])), np.log(x.shape[0])
+    )
 
-    k_xx = torch.exp(
-        torch.div(
-            pairwise_distance_square,
-            -h))
+    k_xx = torch.exp(torch.div(pairwise_distance_square, -h))
 
     return k_xx
 
@@ -37,5 +35,5 @@ def svgd_grad(theta, grad):
 
     # compute the modified grad
     phi = (k_xx.detach().matmul(grad) - d_k_xx_d_theta) / theta.size(0)
-    
+
     return phi
