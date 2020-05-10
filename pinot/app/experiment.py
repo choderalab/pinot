@@ -145,7 +145,7 @@ class TrainAndTest:
         n_epochs=100,
         record_interval=1,
     ):
-        self.net = copy.deepcopy(net)  # deepcopy the model object
+        self.net = net  # deepcopy the model object
         self.data_tr = data_tr
         self.data_te = data_te
         self.metrics = metrics
