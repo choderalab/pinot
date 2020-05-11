@@ -34,14 +34,14 @@ def visual(results_dict):
     plt.rc("lines", linewidth=6)
 
     # initialize the figure
-    fig = plt.figure()
+    fig = plt.figure(figsize=(8, 3))
 
     # get all the results
     metrics = list(list(results_dict.values())[0].keys())
     n_metrics = len(metrics)
     # loop through metrics
     for idx_metric, metric in enumerate(metrics):
-        ax = plt.subplot(n_metrics, 1, idx_metric + 1)
+        ax = plt.subplot(1, n_metrics, idx_metric + 1)
 
         # loop through the results
         for ds_name, results in results_dict.items():
@@ -61,41 +61,31 @@ def visual(results_dict):
 
     return fig
 
-def single_line_visual_and_table(results_dict):
-    # make plots less ugly
-    from matplotlib import pyplot as plt
+def visual_base64(results_dict):
+    fig = visual(results_dict)
+    import io
+    import base64
+    img = io.BytesIO()
+    fig.savefig(img, format='png', dpi=50)
+    img.seek(0)
+    img = base64.b64encode(img.read()).decode('utf-8')
+    # img = "![img](data:image/png;base64%s)" % img
+    return(img)
 
-    plt.rc("font", size=14)
-    plt.rc("lines", linewidth=6)
+def html(results_dict):
+    html_string = """
+    <p>
+    <br>
+    <div style='height:15%%;width:100%%;'>
+        <div style='float:left'>
+            <img src='data:image/png;base64, %s'/>
+        </div>
+        <div style='float:left'>
+            %s
+        </div>
+    </div>
+    </br>
+    <p/>
+    """ % (visual_base64(results)[:-1], dataframe(results).to_html())
 
-    # initialize the figure
-    fig = plt.figure(figsize=(15, 3))
-
-    # get all the results
-    metrics = list(list(results_dict.values())[0].keys())
-    n_metrics = len(metrics)
-    # loop through metrics
-    for idx_metric, metric in enumerate(metrics):
-        ax = plt.subplot(1, n_metrics+1, idx_metric + 1)
-
-        # loop through the results
-        for ds_name, results in results_dict.items():
-            ax.plot(
-                [
-                    results[metric][idx].detach().numpy()
-                    for idx in range(len(results[metric]) - 1)
-                ],
-                label=ds_name,
-            )
-
-        ax.set_xlabel("epochs")
-        ax.set_ylabel(metric)
-
-    plt.legend()
-    ax = plt.subplot(1, n_metrics+1, n_metrics+1)
-    df = dataframe(results_dict)
-    ax.axis('off')
-    # ax.axis('tight')
-    ax.table(df.values, rowLabels=df.index, colLabels=df.columns, loc='center')
-    plt.tight_layout()
-    return fig
+    return html_string
