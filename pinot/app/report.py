@@ -6,45 +6,23 @@ import numpy as np
 import matplotlib
 from matplotlib import pyplot as plt
 import pinot
+import pandas as pd
 
 # =============================================================================
 # MODULE FUNCTIONS
 # =============================================================================
 
-
 def markdown(results_dict):
-    # initialize markdown string
-    md = ""
-
     # get all the results
     metrics = list(list(results_dict.values())[0].keys())
     ds_names = list(results_dict.keys())
-
     n_metrics = len(metrics)
-
-    md += "{:<15}".format("|")
-    for metric in metrics:
-        md += "{:<15}".format("|%s" % metric)
-    md += "|"
-    md += "\n"
-
-    for _ in range(n_metrics + 1):
-        md += "{:<15}".format("|" + "-" * 13)
-
-    md += "|"
-    md += "\n"
-
-    for ds_name, results in results_dict.items():
-        md += "{:<15}".format("|" + ds_name)
-
-        for metric, value in results.items():
-            md += "{:<15}".format("|%.4f" % value["final"])
-
-        md += "|"
-        md += "\n"
-
-    return md
-
+    df = pd.DataFrame(
+        [[value['final'] for metric, value in results.items()] for ds_name, results in results_dict.items()],
+        columns=metrics,
+        index=ds_names)
+    
+    return df.to_markdown()
 
 def visual(results_dict):
     # make plots less ugly
