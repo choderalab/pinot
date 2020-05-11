@@ -75,6 +75,8 @@ class Train:
 
         self.states["final"] = self.net.state_dict()
 
+        return self.net
+
 
 class Test:
     """ Run sequences of test on a trained model.
@@ -140,7 +142,7 @@ class TrainAndTest:
         data_tr,
         data_te,
         optimizer,
-        metrics=[pinot.rmse, pinot.r2],
+        metrics=[pinot.rmse, pinot.r2, pinot.avg_nll],
         n_epochs=100,
         record_interval=1,
     ):
@@ -164,7 +166,7 @@ class TrainAndTest:
         _str += '\n'
         _str += '# n_epochs'
         _str += '\n'
-        _str += str(n_epochs)
+        _str += str(self.n_epochs)
         _str += '\n'
         return _str
         
@@ -198,3 +200,24 @@ class TrainAndTest:
         self.results_tr = test.results
 
         return {'test': self.results_te, 'training': self.results_tr}
+
+def ControlledTrainAndTest:
+    """ A sequence of controlled experiment.
+
+    
+    """
+
+    def __init__(self, experiment_generating_fn, param_dicts):
+        self.experiment_generating_fn = experiment_generating_fn
+        self.param_dicts = param_dicts
+    
+    def run(self):
+        results = []
+
+        for param_dict in param_dicts:
+            train_and_test = self.experiment_generating_fn(param_dict)
+            result = train_and_test.run()
+            results.append(param_dict, result)
+
+
+
