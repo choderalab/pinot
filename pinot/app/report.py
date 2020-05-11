@@ -17,7 +17,7 @@ def dataframe(results_dict):
     ds_names = list(results_dict.keys())
     n_metrics = len(metrics)
     df = pd.DataFrame(
-        [[value['final'] for metric, value in results.items()] for ds_name, results in results_dict.items()],
+        [[value['final'].detach().numpy().round(4) for metric, value in results.items()] for ds_name, results in results_dict.items()],
         columns=metrics,
         index=ds_names)
     return df
@@ -59,4 +59,43 @@ def visual(results_dict):
     plt.tight_layout()
     plt.legend()
 
+    return fig
+
+def single_line_visual_and_table(results_dict):
+    # make plots less ugly
+    from matplotlib import pyplot as plt
+
+    plt.rc("font", size=14)
+    plt.rc("lines", linewidth=6)
+
+    # initialize the figure
+    fig = plt.figure(figsize=(15, 3))
+
+    # get all the results
+    metrics = list(list(results_dict.values())[0].keys())
+    n_metrics = len(metrics)
+    # loop through metrics
+    for idx_metric, metric in enumerate(metrics):
+        ax = plt.subplot(1, n_metrics+1, idx_metric + 1)
+
+        # loop through the results
+        for ds_name, results in results_dict.items():
+            ax.plot(
+                [
+                    results[metric][idx].detach().numpy()
+                    for idx in range(len(results[metric]) - 1)
+                ],
+                label=ds_name,
+            )
+
+        ax.set_xlabel("epochs")
+        ax.set_ylabel(metric)
+
+    plt.legend()
+    ax = plt.subplot(1, n_metrics+1, n_metrics+1)
+    df = dataframe(results_dict)
+    ax.axis('off')
+    # ax.axis('tight')
+    ax.table(df.values, rowLabels=df.index, colLabels=df.columns, loc='center')
+    plt.tight_layout()
     return fig
