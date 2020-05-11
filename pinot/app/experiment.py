@@ -129,7 +129,6 @@ class Test:
         self.results = results
         return self.results
 
-
 class TrainAndTest:
     """ Train a model and then test it.
 
@@ -152,6 +151,23 @@ class TrainAndTest:
         self.optimizer = optimizer
         self.n_epochs = n_epochs
         self.record_interval = record_interval
+
+    def __str__(self):
+        _str = ''
+        _str += '# model'
+        _str += '\n'
+        _str += str(self.net)
+        _str += '\n'
+        _str += '# optimizer'
+        _str += '\n'
+        _str += str(self.optimizer)
+        _str += '\n'
+        _str += '# n_epochs'
+        _str += '\n'
+        _str += str(n_epochs)
+        _str += '\n'
+        return _str
+        
 
     def run(self):
         train = Train(
