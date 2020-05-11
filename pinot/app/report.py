@@ -11,8 +11,7 @@ import pandas as pd
 # =============================================================================
 # MODULE FUNCTIONS
 # =============================================================================
-
-def markdown(results_dict):
+def dataframe(results_dict):
     # get all the results
     metrics = list(list(results_dict.values())[0].keys())
     ds_names = list(results_dict.keys())
@@ -21,7 +20,10 @@ def markdown(results_dict):
         [[value['final'] for metric, value in results.items()] for ds_name, results in results_dict.items()],
         columns=metrics,
         index=ds_names)
+    return df
     
+def markdown(results_dict):
+    df = dataframe(results_dict)
     return df.to_markdown()
 
 def visual(results_dict):
