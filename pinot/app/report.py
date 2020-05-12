@@ -39,16 +39,28 @@ def visual(results_dict):
     # get all the results
     metrics = list(list(results_dict.values())[0].keys())
     n_metrics = len(metrics)
+
     # loop through metrics
     for idx_metric, metric in enumerate(metrics):
         ax = plt.subplot(1, n_metrics, idx_metric + 1)
+        
+        # get all the recorded indices
+        idxs = list(
+                [
+                    key for results[metric].keys(
+                    ) if isinstance(key, int)
+                ])
+
+        # sort it ascending
+        idxs.sort()
 
         # loop through the results
         for ds_name, results in results_dict.items():
             ax.plot(
+                idxs,
                 [
                     results[metric][idx].detach().numpy()
-                    for idx in range(len(results[metric]) - 1)
+                    for idx in idxs
                 ],
                 label=ds_name,
             )
