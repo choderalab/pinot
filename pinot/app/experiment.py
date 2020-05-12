@@ -201,7 +201,7 @@ class TrainAndTest:
 
         return {'test': self.results_te, 'training': self.results_tr}
 
-def ControlledTrainAndTest:
+class MultipleTrainAndTest:
     """ A sequence of controlled experiment.
 
     
@@ -214,10 +214,14 @@ def ControlledTrainAndTest:
     def run(self):
         results = []
 
-        for param_dict in param_dicts:
+        for param_dict in self.param_dicts:
             train_and_test = self.experiment_generating_fn(param_dict)
             result = train_and_test.run()
-            results.append(param_dict, result)
+            results.append((param_dict, result))
+
+        self.results = results
+
+        return self.results
 
 
 
