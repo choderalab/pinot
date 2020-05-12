@@ -75,7 +75,6 @@ def visual_base64(results_dict):
 def html(results_dict):
     html_string = """
     <p>
-    <br>
     <div style='height:15%%;width:100%%;'>
         <div style='float:left'>
             <img src='data:image/png;base64, %s'/>
@@ -84,7 +83,6 @@ def html(results_dict):
             %s
         </div>
     </div>
-    </br>
     <p/>
     """ % (visual_base64(results)[:-1], dataframe(results).to_html())
 
