@@ -1,0 +1,151 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{indentfirst}
+\usepackage[bitstream-charter]{mathdesign}
+\usepackage[T1]{fontenc}
+\usepackage[letter, margin=0.5in]{geometry}
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{amsmath, amssymb}
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{multirow}
+\usepackage{caption}
+\usepackage{tabularx}
+\usepackage{authblk}
+\usepackage[labelformat=empty]{caption}
+\usepackage[
+citestyle=numeric
+backend=biber,
+style=numeric,
+]{biblatex}
+\addbibresource{main.bib}
+\title{\textsc{Autonomous Multi-Objective Therapeutics Design by Reinforcement Learning}}
+\author[1]{Yuanqing Wang}
+\author[1, 2]{Manh Nguyen}
+\author[1]{Josh Fass}
+\author[3]{Theofanis Karaletsos}
+\author[1]{John D. Chodera}
+
+\affil[1]{Memorial Sloan Kettering Cancer Center, New York, N.Y. 10065}
+\affil[2]{University of Pennsylvania, Philadelphia, Penn. 19104}
+\affil[3]{Uber AI Labs, San Francisco, Calif. 94103}
+
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section{Specific Aims}
+Molecular machine learning (ML)—statistical models that predict (the distributions of) properties of small molecules and proteins—have been shown to be promising in accelerating the design of novel therapeutics~\cite{wu2018moleculenet}. Nonetheless, to the best of our knowledge, the utilization of molecular ML in drug discovery campaigns are primarily limited to prioritizing synthesis and essaying, leaving decision-making processes to human experts. This stands out, in a time when reinforcement learning (RL) algorithms are able to autonomously navigate some highly sophisticated space, like busy city streets,~\cite{doi:10.1080/15472450.2017.1291351} or battlegrounds in video games~\cite{DBLP:journals/corr/abs-1710-03748}. 
+
+The challenges in exploring chemical spaces using RL, we believe, could be summarized into two aspects: first, the chemical space is discrete and combinatorial, which stops us from directly using well-established continuous optimization methods. Secondly, the accurate assessment of the reward and cost functions, i.e. potency, physical properties, and synthesis complexity, are prohibitively expensive. This poses difficulties when training model-free RL models which usually depends on rapid querying of the oracle function.
+
+To circumvent these obstacles, we propose to partition the goal into two subaims, the first being to come up with ways to quantitatively characterize the uncertainty associated with predictions made graph nets~\cite{battaglia2018relational}---the modern workhorse of molecular ML. Upon completion of this task, we will then incorporate such uncertainty estimation to direct RL in chemical space search.\\
+
+\noindent\textbf{Aim 1. Quantifying Prediction Uncertainty Associated with Graph Nets Predictions}
+
+\noindent\textbf{Aim 2. Model-Based Reinforcement Learning on Combinatorial Space}
+
+\section{Research Strategies---Significance}
+\noindent\textbf{Collecting data in a drug discovery campaign is money- and time-consuming.}
+
+Drug discovery, from a statistician's point of view, can be regarded as optimizing certain properties (potency, selectivity, and physical properties such as solubility) while constraining others (toxicity, side effects, and so forth) on \textit{chemical space}--the space spanned by the astronomically large space of synthetically accessible molecules. One complete round of such optimization typically take more than \$1 billion and 10 years~\cite{Paul2010}. 
+The difficulty of this process can be attributed to multiple factors: the vastness of the chemical universe, the large number of optimization steps needed (up to 10,000 molecules per project), the potentially suboptimally rational choices made by human experts, and the high cost associated with each step of evaluation---the purchase, synthesis, and characterization of compounds. Although these costs are sensitive to conditions like the degree of parallelism, the project stage, and the location and the organization structure of the institution, generally speaking, the cost of characterization increases as greater precision is required. Alchemical free energy calculations, with the uncertainty within few kcal/mol~\cite{pmid28430432}, cost approximately \$5--10 per compound, whereas physical binding assays namely isothermal titration calorimetry (ITC) and NMR, which brings the uncertainty down to within 0.1~kcal/mol (within a very narrow dynamic range), cost around \$50--100 for each compound, even if we neglect the cost of synthesizing or purchasing the compound, which usually surpasses that of the characterization.
+
+\textit{In silico}  drug discovery aims to reduce such high cost by providing quantitative insights on the relationship between structure and activity. We will dedicate the rest of this section to discussing the challenges in ligand- and structure-based drug discovery we aim to address in this project.\\\\
+
+\begin{minipage}[tb]{\linewidth}
+    \small
+    \centering
+\resizebox{\textwidth}{!}{
+\begin{tabular}[\textwidth]{c c c c c}
+\hline
+Type & Assays & Uncertainty (kcal/mol) & Cost per compound (\$) & Time per compound\\
+\hline
+    & Machine earning & & 0 & 0\\
+\textit{in Silico} & Docking & & 0 & 0\\
+    & Alchemical calculations & <3 & $5\sim10$ & 24 hr \\\\
+
+   Chemical and physical & ITC & 0.1 kcal/mol & $20\sim40$ &$1\sim1.5$ hr\\
+    & NMR & & $50\sim100$ & $2\sim3$ hr\\
+\hline
+\end{tabular}}
+\textbf{Table 1. Summary of the uncertainty, cost, and time required for common assays in drug discovery.}
+\end{minipage}\\\\
+
+\noindent\textbf{Traditional machine learning methods are data-hungry, limiting their use in drug design, where data is limited.}
+The popular machine learning algorithms that power applications that shape our daily lives were trained on millions of pictures of cats and dogs or large canons of multilingual newsletters (ImageNet \cite{imagenet_cvpr09}: 1.3M images; WMT\cite{wmt19}: 36M English-French sentences pairs). For molecular machine learning, on the other hand, because of the aforementioned high costs, datasets with abundance anywhere near that magnitude would be a true luxury. (One of the most popular dataset of QM-calculated properties, QM9~\cite{ramakrishnan2014quantum}, totals 133,885 compounds.) Medicinal chemistry teams often produce no more than a few thousand data molecules in a high-throughput screening project. The cost would easily exceed \$ 1 billion if one wanted to construct a dataset of comparable size with ImageNet that composed of \textit{experimental} data.
+
+The scarcity of data in drug discovery poses several challenges. First, with less data, learning invariances directly from data is more difficult. This is particularly true for string-based methods~\cite{DBLP:journals/corr/Altae-TranRPP16}, which often use a recurrent neural network~\cite{DBLP:journals/corr/ChungGCB14, Hochreiter:1997:LSM:1246443.1246450} to learn the information along string representation of molecules, and do not guarantee the same results will be produced for the same molecule that may have several distinct valid representations. Second, non-Bayesian approaches are sensitive to outliers, especially when data are scarce, whereas outliers are almost inevitable for data from experiments of high complexity~\cite{pmid26201396}.\\
+
+\section{Research Strategies---Approach}
+Here, we briefly review the formulation of \textit{graph nets} in the context of molecular ML. Molecules are modelled as undirected graphs of atoms which each carry attributes reflecting their chemical nature---a tuple of three sets:\begin{equation}
+\mathcal{G} = \{ \mathcal{V, E, U}\}
+\end{equation}where $\mathcal{V}$ is the set of the vertices (or nodes) (atoms), $\mathcal{E}$ the set of (hyper)edges (bonds, angles, and dihedral angles), and $\mathcal{U} = \{ \mathbf{u}\}$ the universal (global) attribute. 
+
+The notations and formulations we adopt is proposed by Battaglia et al~\cite{DBLP:journals/corr/abs-1806-01261}. 
+For more details regarding the representation of molecules as graphs and strategies to enhance the learning and inference efficiency for small molecule topology, see our previous publication. \cite{2019arXiv190907903W}.
+
+Generally speaking, a set of learnable functions govern the three stages of a graph net in both training or inference process:  initialization, propagation, and readout. In \textit{propagation stage}, for each round of message passing, the attributes of nodes, edges, and the graph as a whole, $\mathbf{v}, \mathbf{e}, \text{and } \mathbf{u}$ are updated by trainable functions in the following order:
+    \begin{align}
+    \mathbf{e}_k^{(t+1)} &= \phi^e(\mathbf{e}_k^{(t)}, \sum_{i \in \mathcal{N}^e_k}\mathbf{v}_i, \mathbf{u}^{(t)}), \\
+    \bar{\mathbf{e}}_i^{(t+1)} &=\rho^{e\rightarrow v}(E_i^{(t+1)}), \\
+    \mathbf{v}_i^{(t+1)} &= \phi^v(\bar{\mathbf{e}}_i^{(t+1)}, \mathbf{v}_i^{(t)}, \mathbf{u}^{(t)}), \\
+    \bar{\mathbf{e}}^{(t+1)} &= \rho^{e \rightarrow u}(E^{(t+1)}), \\
+    \bar{\mathbf{v}}^{(t+1)} &= \rho^{v \rightarrow u}(V^{(t)}), \\
+    \mathbf{u}^{(t+1)} &= \phi^u(\bar{\mathbf{e}}^{(t+1)}, \bar{\mathbf{v}}^{(t+1)}, \mathbf{u}^{(t)}),
+    \end{align}where $E_i=\{ \mathbf{e}_k, k\in \mathcal{N}_i^v\}$ is the set of attributes of edges connected to a specific node, $E_i = \{ e_k, k \in 1, 2, ..., N^e\}$ is the set of attributes of all edges, $V$ is the set of attributes of all nodes, and $\mathcal{N}^v$ and $\mathcal{N}^e$ denote the set of indices of entities connected to a certain node or a certain edge, respectively. $\phi^e$, $\phi^v$, and $\phi^u$ are update functions that take the \textit{environment} of the an entity as input and update the attribute of the entity, which could be stateful [as in recurrent neural networks (RNNs)] or not; $\rho^{e \rightarrow v}$, $\rho^{e \rightarrow u}$, and $\rho^{v \rightarrow u}$ are aggregate functions that aggregate the attributes of multiple entities into an \textit{aggregated} attribute which shares the same dimension with each entity. 
+
+\subsection*{ \textbf{Aim 1} Assess strategies for quantifying prediction uncertainty in predictions made with graph models.}
+
+In this \textit{Aim}, we will study the formulations, sampling strategies, and performances of Bayesian graph nets, to establish an understanding of how uncertainty estimates could be used to improve molecular property estimation and efficient molecular optimization strategy.\\
+    
+\noindent\textbf{Rationale}
+
+In a neural network, simply by replacing the constants weights by distributions, one get a \textit{Bayesian} neural network~\cite{blundell2015weight, neal2012bayesian}. 
+In the inference phase, we abstract the information from the data $\mathcal{D} = \{(x_i, y_i)\}$ into the posterior distribution of the weights $\mathbf{w}_\text{NN}$, and the distribution of the new data points could thus be expressed as:
+\begin{equation}
+P(y^{(n+1)}|x^{(n+1)}, \mathcal{D}) = \int P(y^{(n+1)}|x^{(n+1)}, \mathbf{w}_\text{NN}) \, P(\mathbf{w}_\text{NN} | \{(x_i, y_i)\}) \, \operatorname{d}\mathbf{w}_\text{NN}.
+\label{int}
+\end{equation}
+Note here that fitting a vanilla neural network is equivalent to finding the  maximum likelihood estimation (MLP), or, in the cases with regularization, maximum a posteriori (MAP) of $\mathbf{w}_\text{NN}$ via backprop.
+
+The advantages of Bayesian neural networks could be summarized as follow:  
+\begin{enumerate}
+    \item \textbf{For single point predictions, it is less prone to overfit.} The stochasticity introduced to the inference process itself is a means of regularization. To put it in another way, since the uncertainty in the training data will be assessed, overly confident decisions based on outliers will be less likely to appear. 
+    \item \textbf{Representation is richer through cheap averaging.} The uncertainties could be used in simple reinforcement learning settings namely contextual bandits~\cite{slivkins2014contextual}.
+\end{enumerate}
+
+When it comes to \textit{in silico} drug discovery, these are significant advantages: \textbf{1.} would allow low-data learning with high tolerance for outliers, which is common in drug discovery projects; \textbf{2.} can potentially accelerate Bayesian active search for small molecules with optimal efficacy~\cite{garnett2012bayesian}.
+
+Traditionally, uncertainty estimation could be achieved via either ensemble model~\cite{dietterich2000ensemble} or dropout variational inference~\cite{gal2016dropout}, both of which some surrogate for Bayesian, could be applied to essentially all types of supervised learning scenarios. To the best of our knowledge, no one has studied the effect of Bayesian probabilistic models on graph learning, let alone in molecular machine learning field.
+
+We hypothesize that, Bayesian graph nets provide more accurate point estimates of molecular properties compared to their fixed-weights counterparts, especially when training data is limited. We furthermore hypothesize that the uncertainty estimate given by such formulation could accelerate molecular optimization.\\
+
+\noindent\textbf{What formulations and sampling methods of Bayesian graph nets lead to more efficient data utilization and more generalizable models?}
+
+Despite their theoretical advantages, Bayesian models, in reality, could be difficult to construct and train. Therefore, we are interested in comparing how various formulations, sampling methods, and approximation techniques in Bayesian modelling would have different complexity--performance tradeoff. We start by reviewing two Bayesian formulations (one approximated, one full Bayesian).
+
+\textbf{Bayes-by-backprop (BBB)}~\cite{blundell2015weight} variationally optimizes the parameters of Bayesian networks $\theta$ by backpropagation. That is to say, it assumes that the weights in the neural network $\mathbf{w}$ follows a certain parameterized distribution $\mathbf{w} \sim q(\mathbf{w} | \theta)$. The parameters are thus found by minimizing the Kullback-Leibler (KL) divergence with the true Bayesian posterior on the weights:
+
+\begin{equation}
+\theta^* = \underset{\theta}{\operatorname{argmin}}\mathcal{D}_\mathtt{KL}[q(\mathbf{w} | \theta) || P(\mathbf{w}|\mathcal{D})],
+\end{equation}where the divergence could be approximated using Monte Carlo samples,
+\begin{equation}
+\mathcal{D}_\mathtt{KL}[q(\mathbf{w} | \theta) || P(\mathbf{w}|\mathcal{D})] \approx \sum\limits_{i=1}^n \log q(\textbf{w}^{(i)}|\theta) - \log P(\textbf{w}^{(i)}) - \log P(\mathcal{D} | \mathbf{w}^{(i)}).
+\end{equation}
+
+\textbf{Langevin dynamics}~\cite{leimkuhler2019partitioned} Langevin dynamics is a sampling method originated in molecular simulations, where the parameter space is sampled using the time-discretized integration Langevin equation. In this setting, rather than minimizing a loss function, we aim to sample the \textit{interesting} region of the posterior distribution of parameters in \ref{int}, $P(\mathbf{w}_\text{NN} | \{(x_i, y_i)\})$, where its value is not trivially small. Similar to sampling the low energy regions of a molecular system, effectively sampling the space of $\textbf{w}_\text{NN}$ can be achieved by high quality Langevin integrators. One example is BAOAB, which splits the integration of the stoachastic differential equation system of Langevin dynamics into linear "drift"($A$), linear "kick"($B$), and Ornstein-Uhlenbeck process($O$)~\cite{schobel1999stochastic}.
+
+We will compare the performance of the models yielded from employing these sampling methods, and with vanilla graph nets (with dropout and in ensemble), in terms of accuracy of point estimate, computation complexity, and reliability of uncertainty estimation. We will split the dataset, namely QM9~\cite{ramakrishnan2014quantum}, into training, validation, and test (80:10:10), and independently train incrementally on 10\%, 20\%, 30\%, ... of the training data, and test on test set to study the change of performance w.r.t. the exposure of training data. In the mean time, we will record the trajectory of loss function to compare the speed of convergence. The leave-one-out (LOO) uncertainty estimation of samples used in training set could be approximated using \cite{Vehtari_2016}. We will test if the uncertainty estimations include the ground truth value most of the time. Finally, the computation efficiency could be evaluated by the number of parameters, complexity analysis, and by timing the training and inference on various hardware.\\ 
+
+\noindent\textbf{What does uncertainty estimation really mean? Can it be used to drive a RL agent?}
+
+The functional uncertainty given by a Bayesian model reflects the reliability of the prediction, given the weights in the model. We are interested to study if such uncertainty could be integrated into a RL system and used by the agent to make informative moves when exploring the chemical spaces. 
+
+To be more specific, we will define a function of the molecular topology with its ground truth values known within a dataset. To mimic the real applications in drug discovery projects, this could be a combination of solubility, binding energy to a specific protein, and toxicity. The agent is allowed to access a certain number of ground truth values at each step, based on which the regression models are trained, and decisions are made, namely using Thompson sampling~\cite{slivkins2014contextual}, to access the next batch of molecules. We will compare the number of steps needed for each agents to reach the region where the target function are high in values. We believe this experiment will cast light on the role and significance of uncertainty estimation in reinforcement learning-aided drug discovery.\\
+
+\end{document}
