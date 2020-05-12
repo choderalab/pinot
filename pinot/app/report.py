@@ -83,6 +83,7 @@ def html(results_dict):
             %s
         </div>
     </div>
+    <br><br><br>
     <p/>
     """ % (visual_base64(results_dict)[:-1], dataframe(results_dict).to_html())
 
@@ -91,7 +92,7 @@ def html(results_dict):
 def html_multiple_train_and_test(results):
     html_string = ""
     for param, result in results:
-        html_string += '<p><br><br><br>' + str(param) + '<br><br><br><p/>'
+        html_string += '<p><br><br><br>' + str(param) + '<p/>'
         html_string += html(result)
         html_string += '<br><br><br>'
         
