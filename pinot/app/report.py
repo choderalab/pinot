@@ -91,10 +91,7 @@ def html(results_dict):
 def html_multiple_train_and_test(results):
     html_string = ""
     for param, result in results:
-        html_string += '<br>'
-        html_string += '<hr>'
-        html_string += '\n'
-        html_string += '<p><br>' + str(param) + '<br><p/>'
+        html_string += '<p><br><br><br>' + str(param) + '<br><br><br><p/>'
         html_string += html(result)
         html_string += '<br><br><br>'
         
