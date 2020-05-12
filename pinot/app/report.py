@@ -84,7 +84,7 @@ def html(results_dict):
         </div>
     </div>
     <p/>
-    """ % (visual_base64(results)[:-1], dataframe(results).to_html())
+    """ % (visual_base64(results_dict)[:-1], dataframe(results_dict).to_html())
 
     return html_string
 
