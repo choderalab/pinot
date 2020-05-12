@@ -218,6 +218,7 @@ class MultipleTrainAndTest:
             train_and_test = self.experiment_generating_fn(param_dict)
             result = train_and_test.run()
             results.append((param_dict, result))
+            del train_and_test
 
         self.results = results
 
