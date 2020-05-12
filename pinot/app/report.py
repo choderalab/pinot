@@ -94,8 +94,8 @@ def html_multiple_train_and_test(results):
         html_string += '<br>'
         html_string += '<hr>'
         html_string += '\n'
-        html_string += '<br><p>' + str(param) + '<p/><br/>'
+        html_string += '<p><br>' + str(param) + '<br><p/>'
         html_string += html(result)
-        html_string += '<br/>'
+        html_string += '<br><br><br>'
         
     return html_string
