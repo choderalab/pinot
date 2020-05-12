@@ -87,3 +87,15 @@ def html(results_dict):
     """ % (visual_base64(results)[:-1], dataframe(results).to_html())
 
     return html_string
+
+def html_multiple_train_and_test(results):
+    html_string = ""
+    for param, result in results:
+        html_string += '<br>'
+        html_string += '<hr>'
+        html_string += '\n'
+        html_string += '<br><p>' + str(param) + '<p/><br/>'
+        html_string += html(result)
+        html_string += '<br/>'
+        
+    return html_string
