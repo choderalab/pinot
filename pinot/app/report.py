@@ -17,7 +17,7 @@ def dataframe(results_dict):
     ds_names = list(results_dict.keys())
     n_metrics = len(metrics)
     df = pd.DataFrame(
-        [[value['final'].detach().numpy().round(4) for metric, value in results.items()] for ds_name, results in results_dict.items()],
+        [[value['final'].round(4) for metric, value in results.items()] for ds_name, results in results_dict.items()],
         columns=metrics,
         index=ds_names)
     return df
@@ -47,8 +47,7 @@ def visual(results_dict):
         # get all the recorded indices
         idxs = list(
                 [
-                    key for results[metric].keys(
-                    ) if isinstance(key, int)
+                    key for key in results[metric].keys() if isinstance(key, int)
                 ])
 
         # sort it ascending
@@ -59,7 +58,7 @@ def visual(results_dict):
             ax.plot(
                 idxs,
                 [
-                    results[metric][idx].detach().numpy()
+                    results[metric][idx]
                     for idx in idxs
                 ],
                 label=ds_name,
