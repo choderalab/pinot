@@ -73,7 +73,7 @@ class Train:
             if epoch_idx % self.record_interval == 0:
                 self.states[epoch_idx] = copy.deepcopy(self.net.state_dict())
 
-        self.states["final"] = self.net.state_dict()
+        self.states["final"] = copy.deepcopy(self.net.state_dict())
 
         return self.net
 
@@ -96,12 +96,15 @@ class Test:
     """
 
     def __init__(self, net, data, states, metrics=[pinot.rmse, pinot.r2]):
-        self.net = copy.deepcopy(net)  # deepcopy the model object
+        self.net = net  # deepcopy the model object
         self.data = data
         self.metrics = metrics
         self.states = states
 
     def test(self):
+        # switch to test
+        self.net.eval()
+
         # initialize an empty dict for each metrics
         results = {}
 
@@ -129,7 +132,7 @@ class Test:
                 results[metric.__name__][state_name] = metric(self.net, g, y)
 
         self.results = results
-        return self.results
+        return dict(results)
 
 class TrainAndTest:
     """ Train a model and then test it.
@@ -178,11 +181,13 @@ class TrainAndTest:
             optimizer=self.optimizer,
             n_epochs=self.n_epochs,
         )
-
+        
+        print('start training', flush=True)
         train.train()
 
         self.states = train.states
 
+        print('start testing', flush=True)
         test = Test(
             net=self.net, data=self.data_te, metrics=self.metrics, states=self.states
         )
@@ -198,6 +203,9 @@ class TrainAndTest:
         test.test()
 
         self.results_tr = test.results
+
+        print('deleting training obj', flush=True)
+        del train
 
         return {'test': self.results_te, 'training': self.results_tr}
 
@@ -215,6 +223,7 @@ class MultipleTrainAndTest:
         results = []
 
         for param_dict in self.param_dicts:
+            print(param_dict, flush=True)
             train_and_test = self.experiment_generating_fn(param_dict)
             result = train_and_test.run()
             results.append((param_dict, result))
