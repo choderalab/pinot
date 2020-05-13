@@ -3,6 +3,7 @@ import pinot
 
 def run():
     def experiment_generating_fn(param_dict):
+
         param_transform = param_dict['param_transform']
 
         if 'log_sigma' in param_dict:
@@ -36,7 +37,8 @@ def run():
             data_tr=ds_tr,
             data_te=ds_te,
             optimizer=torch.optim.Adam(net.parameters(), 1e-3),
-            n_epochs=3000)
+            n_epochs=3000,
+            record_interval=1)
 
         return train_and_test
 
@@ -58,13 +60,13 @@ def run():
             },
         ])
 
-    _ = multiple_train_and_test.run()
+    multiple_train_and_test.run()
     
     html_string = pinot.app.report.html_multiple_train_and_test(multiple_train_and_test.results)
     
     f_handle = open('results.html', 'w')
     f_handle.write(html_string)
     f_handle.close()
-    
+
 if __name__ == '__main__':
     run()
