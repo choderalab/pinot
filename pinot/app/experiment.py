@@ -220,7 +220,6 @@ class MultipleTrainAndTest:
         results = []
 
         for param_dict in self.param_dicts:
-            print(param_dict, flush=True)
             train_and_test = self.experiment_generating_fn(param_dict)
             result = train_and_test.run()
             results.append((param_dict, result))
