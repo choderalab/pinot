@@ -11,7 +11,6 @@ import torch
 # MODULE FUNCTIONS
 # =============================================================================
 
-
 def _mse(y, y_hat):
     return torch.nn.functional.mse_loss(y, y_hat)
 
@@ -39,3 +38,6 @@ def _r2(y, y_hat):
 def r2(net, g, y):
     y_hat = net.expectation(g)
     return _r2(y, y_hat)
+
+def avg_nll(net, g, y):
+    return net.loss(g, y).mean()

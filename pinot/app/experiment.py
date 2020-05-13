@@ -73,7 +73,9 @@ class Train:
             if epoch_idx % self.record_interval == 0:
                 self.states[epoch_idx] = copy.deepcopy(self.net.state_dict())
 
-        self.states["final"] = self.net.state_dict()
+        self.states["final"] = copy.deepcopy(self.net.state_dict())
+
+        return self.net
 
 
 class Test:
@@ -94,12 +96,15 @@ class Test:
     """
 
     def __init__(self, net, data, states, metrics=[pinot.rmse, pinot.r2]):
-        self.net = copy.deepcopy(net)  # deepcopy the model object
+        self.net = net  # deepcopy the model object
         self.data = data
         self.metrics = metrics
         self.states = states
 
     def test(self):
+        # switch to test
+        self.net.eval()
+
         # initialize an empty dict for each metrics
         results = {}
 
@@ -124,11 +129,10 @@ class Test:
             g = dgl.batch(g)
 
             for metric in self.metrics:  # loop through the metrics
-                results[metric.__name__][state_name] = metric(self.net, g, y)
+                results[metric.__name__][state_name] = metric(self.net, g, y).detach().numpy()
 
         self.results = results
-        return self.results
-
+        return dict(results)
 
 class TrainAndTest:
     """ Train a model and then test it.
@@ -141,17 +145,34 @@ class TrainAndTest:
         data_tr,
         data_te,
         optimizer,
-        metrics=[pinot.rmse, pinot.r2],
+        metrics=[pinot.rmse, pinot.r2, pinot.avg_nll],
         n_epochs=100,
         record_interval=1,
     ):
-        self.net = copy.deepcopy(net)  # deepcopy the model object
+        self.net = net  # deepcopy the model object
         self.data_tr = data_tr
         self.data_te = data_te
         self.metrics = metrics
         self.optimizer = optimizer
         self.n_epochs = n_epochs
         self.record_interval = record_interval
+
+    def __str__(self):
+        _str = ''
+        _str += '# model'
+        _str += '\n'
+        _str += str(self.net)
+        _str += '\n'
+        _str += '# optimizer'
+        _str += '\n'
+        _str += str(self.optimizer)
+        _str += '\n'
+        _str += '# n_epochs'
+        _str += '\n'
+        _str += str(self.n_epochs)
+        _str += '\n'
+        return _str
+        
 
     def run(self):
         train = Train(
@@ -160,7 +181,7 @@ class TrainAndTest:
             optimizer=self.optimizer,
             n_epochs=self.n_epochs,
         )
-
+        
         train.train()
 
         self.states = train.states
@@ -181,4 +202,32 @@ class TrainAndTest:
 
         self.results_tr = test.results
 
+        del train
+
         return {'test': self.results_te, 'training': self.results_tr}
+
+class MultipleTrainAndTest:
+    """ A sequence of controlled experiment.
+
+    
+    """
+
+    def __init__(self, experiment_generating_fn, param_dicts):
+        self.experiment_generating_fn = experiment_generating_fn
+        self.param_dicts = param_dicts
+    
+    def run(self):
+        results = []
+
+        for param_dict in self.param_dicts:
+            train_and_test = self.experiment_generating_fn(param_dict)
+            result = train_and_test.run()
+            results.append((param_dict, result))
+            del train_and_test
+
+        self.results = results
+
+        return self.results
+
+
+

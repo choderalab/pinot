@@ -6,45 +6,25 @@ import numpy as np
 import matplotlib
 from matplotlib import pyplot as plt
 import pinot
+import pandas as pd
 
 # =============================================================================
 # MODULE FUNCTIONS
 # =============================================================================
-
-
-def markdown(results_dict):
-    # initialize markdown string
-    md = ""
-
+def dataframe(results_dict):
     # get all the results
     metrics = list(list(results_dict.values())[0].keys())
     ds_names = list(results_dict.keys())
-
     n_metrics = len(metrics)
-
-    md += "{:<15}".format("|")
-    for metric in metrics:
-        md += "{:<15}".format("|%s" % metric)
-    md += "|"
-    md += "\n"
-
-    for _ in range(n_metrics + 1):
-        md += "{:<15}".format("|" + "-" * 13)
-
-    md += "|"
-    md += "\n"
-
-    for ds_name, results in results_dict.items():
-        md += "{:<15}".format("|" + ds_name)
-
-        for metric, value in results.items():
-            md += "{:<15}".format("|%.4f" % value["final"])
-
-        md += "|"
-        md += "\n"
-
-    return md
-
+    df = pd.DataFrame(
+        [[value['final'].round(4) for metric, value in results.items()] for ds_name, results in results_dict.items()],
+        columns=metrics,
+        index=ds_names)
+    return df
+    
+def markdown(results_dict):
+    df = dataframe(results_dict)
+    return df.to_markdown()
 
 def visual(results_dict):
     # make plots less ugly
@@ -54,21 +34,33 @@ def visual(results_dict):
     plt.rc("lines", linewidth=6)
 
     # initialize the figure
-    fig = plt.figure()
+    fig = plt.figure(figsize=(8, 3))
 
     # get all the results
     metrics = list(list(results_dict.values())[0].keys())
     n_metrics = len(metrics)
+
     # loop through metrics
     for idx_metric, metric in enumerate(metrics):
-        ax = plt.subplot(n_metrics, 1, idx_metric + 1)
-
+        ax = plt.subplot(1, n_metrics, idx_metric + 1)
+        
         # loop through the results
         for ds_name, results in results_dict.items():
+
+            # get all the recorded indices
+            idxs = list(
+                    [
+                        key for key in results[metric].keys() if isinstance(key, int)
+                    ])
+
+            # sort it ascending
+            idxs.sort()
+
             ax.plot(
+                idxs,
                 [
-                    results[metric][idx].detach().numpy()
-                    for idx in range(len(results[metric]) - 1)
+                    results[metric][idx]
+                    for idx in idxs
                 ],
                 label=ds_name,
             )
@@ -80,3 +72,40 @@ def visual(results_dict):
     plt.legend()
 
     return fig
+
+def visual_base64(results_dict):
+    fig = visual(results_dict)
+    import io
+    import base64
+    img = io.BytesIO()
+    fig.savefig(img, format='png', dpi=50)
+    img.seek(0)
+    img = base64.b64encode(img.read()).decode('utf-8')
+    # img = "![img](data:image/png;base64%s)" % img
+    return(img)
+
+def html(results_dict):
+    html_string = """
+    <p>
+    <div style='height:15%%;width:100%%;'>
+        <div style='float:left'>
+            <img src='data:image/png;base64, %s'/>
+        </div>
+        <div style='float:left'>
+            %s
+        </div>
+    </div>
+    <br><br><br>
+    <p/>
+    """ % (visual_base64(results_dict)[:-1], dataframe(results_dict).to_html())
+
+    return html_string
+
+def html_multiple_train_and_test(results):
+    html_string = ""
+    for param, result in results:
+        html_string += '<p><br><br><br>' + str(param) + '<p/>'
+        html_string += html(result)
+        html_string += '<br><br><br>'
+        
+    return html_string
