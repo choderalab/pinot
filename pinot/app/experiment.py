@@ -182,12 +182,10 @@ class TrainAndTest:
             n_epochs=self.n_epochs,
         )
         
-        print('start training', flush=True)
         train.train()
 
         self.states = train.states
 
-        print('start testing', flush=True)
         test = Test(
             net=self.net, data=self.data_te, metrics=self.metrics, states=self.states
         )
@@ -204,7 +202,6 @@ class TrainAndTest:
 
         self.results_tr = test.results
 
-        print('deleting training obj', flush=True)
         del train
 
         return {'test': self.results_te, 'training': self.results_tr}
