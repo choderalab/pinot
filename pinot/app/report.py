@@ -44,17 +44,18 @@ def visual(results_dict):
     for idx_metric, metric in enumerate(metrics):
         ax = plt.subplot(1, n_metrics, idx_metric + 1)
         
-        # get all the recorded indices
-        idxs = list(
-                [
-                    key for key in results[metric].keys() if isinstance(key, int)
-                ])
-
-        # sort it ascending
-        idxs.sort()
-
         # loop through the results
         for ds_name, results in results_dict.items():
+
+            # get all the recorded indices
+            idxs = list(
+                    [
+                        key for key in results[metric].keys() if isinstance(key, int)
+                    ])
+
+            # sort it ascending
+            idxs.sort()
+
             ax.plot(
                 idxs,
                 [

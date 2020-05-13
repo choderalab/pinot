@@ -129,7 +129,7 @@ class Test:
             g = dgl.batch(g)
 
             for metric in self.metrics:  # loop through the metrics
-                results[metric.__name__][state_name] = metric(self.net, g, y)
+                results[metric.__name__][state_name] = metric(self.net, g, y).detach().numpy()
 
         self.results = results
         return dict(results)
