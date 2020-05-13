@@ -71,5 +71,6 @@ def test_train_and_test():
         optimizer=torch.optim.Adam(net.parameters(), 1e-3),
         n_epochs=1,
         data_tr=pinot.data.utils.batch(pinot.data.esol()[:10], 5),
-        data_te=pinot.data.utils.batch(pinot.data.esol()[:10], 5),
-    )
+        data_te=pinot.data.utils.batch(pinot.data.esol()[:10], 5),)
+
+    print(train_and_test)
