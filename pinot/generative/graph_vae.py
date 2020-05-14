@@ -55,8 +55,7 @@ class GraphVAE(torch.nn.module):
         # unbind to two parameters and return
         return torch.unbind(theta, dim=2)
 
-    @staticmethod
-    def inference(mu, log_sigma):
+    def inference(self, mu, log_sigma):
         r""" Construct a distribution of latent code from parameters.
 
 
@@ -88,8 +87,7 @@ class GraphVAE(torch.nn.module):
 
         return q_z_i
 
-    @staticmethod
-    def p_a_given_z(a, z):
+    def log_p_a_given_z(self, a, z):
         """ Calculate the probability of an adjacency matrix given the latent code.
         
         TODO: better naming
@@ -102,12 +100,50 @@ class GraphVAE(torch.nn.module):
         z : torch.tensor, shape=(`N`, `D`)
             where `N` is the number of nodes and `D` is the hidden dimension
             latent code.
+        
+        Returns
+        -------
+        log_p_a_z : torch.tensor, shape=(),
+            log probability of adjacency map given laten
+
         """
         # compute the dot product of latent code
         # (N, N)
         z_i_t_z_j = torch.sum(
                 z[:, None, :] * z[None, :, :],
                 dim=2)
+        
+        # compute the joint probability of edges given latent code
+        log_p_a_given_z = torch.where(
+                torch.gt(a, 0.5),
+                torch.log(torch.nn.functional.sigmoid(z_i_t_z_j)),
+                torch.log(1.0 - torch.nn.function.sigmoid(z_i_t_z_j))).sum()
+
+        return log_p_a_given_z
+
+    def loss(self, x, a):
+        """ Calculate the ELBO of the learning and inference processes.
+
+        """
+        # get distribution parameters
+        theta = self.linear(x)
+
+        # inference pass
+        q_z_i = self.inference(theta)
+
+        # sample from q_z_i with reparametrization trick
+        z = q_z_i.rsample()
+
+        # compute loss function
+        # reconstruct term
+        log_p_a_given_z = self.log_p_a_given_z(a, z)
+
+        # kl-divergence term
+        kl = q_z_i.log_prob(z) - torch.distributions.normal.Normal(
+                loc=torch.zeros_like(z),
+                scale=torch.ones_like(z)).log_prob(z)
+
+        return log_p_a_given_z - kl
 
 
 
