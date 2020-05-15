@@ -2,6 +2,10 @@ from __future__ import division
 from __future__ import print_function
 
 import argparse
+import time
+
+import numpy as np
+import scipy.sparse as sp
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--model', type=str, default='gcn_vae', help="models used")
@@ -11,108 +15,81 @@ parser.add_argument('--hidden1', type=int, default=32, help='Number of units in 
 parser.add_argument('--hidden2', type=int, default=16, help='Number of units in hidden layer 2.')
 parser.add_argument('--lr', type=float, default=0.01, help='Initial learning rate.')
 parser.add_argument('--dropout', type=float, default=0., help='Dropout rate (1 - keep probability).')
+parser.add_argument('--dataset-str', type=str, default='cora', help='type of dataset.')
 
 args = parser.parse_args()
 
 import torch
 from torch import optim
-import time
-import numpy as np
-import scipy.sparse as sp
-import dgl
+
 import pinot
+import dgl
 from pinot.generative.torch_gvae.model import GCNModelVAE
-from pinot.generative.torch_gvae.loss import negative_ELBO
-from pinot.generative.torch_gvae.utils import get_roc_score, negative_shifted_laplacian, \
-    prepare_train_test_val_data_from_adj_matrix, prepare_train_test_val
+from pinot.generative.torch_gvae.optimizer import loss_function
+from pinot.generative.torch_gvae.utils import load_data, mask_test_edges, preprocess_graph, get_roc_score
+
+
 
 def gae_for(args):
-    # Grab some data from esol
-    ds_tr = pinot.data.esol()
-    # print(ds_tr)
-    graph_data = zip(*prepare_train_test_val(ds_tr))
+    print("Using {} dataset".format(args.dataset_str))
 
-    # # Initialize the model and the optimization scheme
-    feat_dim = ds_tr[0][0].ndata["type"].shape[1] + ds_tr[0][0].ndata["h0"].shape[1]
+    # Grab some data from esol
+    ds_tr = pinot.data.esol()[:10]
+
+    # discard the measurement (we're doing unsupervised learning here)
+    gs, _ = zip(*ds_tr)
+
+    # Combine the molecular graphs into a large one
+    g = dgl.batch(gs)
+
+    # get the adjacency matrix for the giant graph
+    adj = g.adjacency_matrix()
+
+    features = torch.cat((g.ndata["type"], g.ndata["h0"]), dim=1) # horizontal concat
+    print(features.shape)
+    n_nodes, feat_dim = features.shape
+
+    adj_orig = adj
+    diag = adj_orig.to_dense().diagonal()
+
+    # Subtract the diagonal?
+    adj_orig = adj_orig - torch.diag(diag).to_sparse()
+
+    # Some preprocessing
+    adj_label = torch.eye(adj.shape[0]) + adj
+    # adj_label = sparse_to_tuple(adj_label)
+    adj_label = torch.FloatTensor(adj_label)
+
+    pos_weight = float(adj.shape[0] * adj.shape[0] -\
+         torch.sparse.sum(adj)) / torch.sparse.sum(adj)
+    
+    norm = adj.shape[0] * adj.shape[0] \
+        / float((adj.shape[0] * adj.shape[0] - torch.sparse.sum(adj)) * 2)
+
     model = GCNModelVAE(feat_dim, args.hidden1, args.hidden2, args.dropout)
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
-    N_molecules = len(ds_tr)
 
-    print("Processing ", N_molecules, "molecules")
-
+    hidden_emb = None
     for epoch in range(args.epochs):
         t = time.time()
+        model.train()
+        optimizer.zero_grad()
+        recovered, mu, logvar = model(features, adj_orig)
+        loss = loss_function(preds=recovered, labels=adj_label,
+                             mu=mu, logvar=logvar, n_nodes=n_nodes,
+                             norm=norm,
+                             pos_weight=torch.from_numpy(np.array([pos_weight])))
+        loss.backward()
+        cur_loss = loss.item()
+        optimizer.step()
 
-        total_epoch_tr_loss = 0.
-        epoch_val_roc_score = 0.
-        epoch_val_ap_score = 0.
-        epoch_test_roc_score = 0.
-        epoch_test_ap_score = 0.
+        hidden_emb = mu.data.numpy()
 
-        for molecule in graph_data:
-            ################ DATA PREPARATION #########################
-            # get the adjacency matrix for the molecular graph
-            # Because torch.SparseTensor doesn't interoperate too well with numpy
-            # or scipy sparse matrix, we would need to work with scipy sparse matrix
-            # and convert to torch.tensor where needed
-            (adj_orig,
-                adj_norm,
-                adj_label,
-                adj_train,
-                train_edges,
-                val_edges,
-                val_edges_false,
-                test_edges,
-                test_edges_false,
-                node_features,
-                norm,
-                pos_weight,
-                measurement) = molecule
-
-            ################ Optimization ######################
-
-            model.train()
-            optimizer.zero_grad()
-            n_nodes, num_features = node_features.shape
-            assert(num_features == feat_dim)
-
-            recovered, mu, logvar = model.encode_and_decode(node_features, adj_norm)
-
-            # Compute the (sub-sampled) negative ELBO loss
-            loss = negative_ELBO(preds=recovered, labels=adj_label,
-                                mu=mu, logvar=logvar, n_nodes=n_nodes,
-                                norm=norm, pos_weight=pos_weight)
-            loss.backward()
-            cur_loss = loss.item()
-            optimizer.step()
-
-            hidden_emb = mu.data.numpy() # embedding/latent representation of the nodes
-
-            # Compute the ROC score (with respect to link prediction task)
-            roc_val, ap_val = get_roc_score(hidden_emb, adj_orig, val_edges, val_edges_false)
-            roc_test, ap_test = get_roc_score(hidden_emb, adj_orig, test_edges, test_edges_false)
-
-            # Update average training/validation ROC/ validation AP score in this epoch
-            total_epoch_tr_loss += 1./N_molecules * loss
-            epoch_val_ap_score += 1./N_molecules * ap_val
-            epoch_val_roc_score += 1./N_molecules* roc_val
-            epoch_test_roc_score += 1./N_molecules * roc_test
-            epoch_test_ap_score += 1./N_molecules * ap_test
-
-
-        print("Epoch:", '%04d' % (epoch + 1), "train_loss=", "{:.5f}".format(total_epoch_tr_loss),
-            "val_ap=", "{:.5f}".format(epoch_val_ap_score),
-            "val_roc={:.5f}".format(epoch_val_roc_score),
-            "test_ap=", "{:.5f}".format(epoch_test_ap_score),
-            "test_roc={:.5f}".format(epoch_test_roc_score),
-            "time=", "{:.5f}".format(time.time() - t), 
-        )
+        print("Epoch:", '%04d' % (epoch + 1), "train_loss=", "{:.5f}".format(cur_loss),
+              "time=", "{:.5f}".format(time.time() - t)
+              )
 
     print("Optimization Finished!")
-
-    # roc_score, ap_score = get_roc_score(hidden_emb, adj_orig, test_edges, test_edges_false)
-    # print('Test ROC score: ' + str(roc_score))
-    # print('Test AP score: ' + str(ap_score))
 
 
 if __name__ == '__main__':

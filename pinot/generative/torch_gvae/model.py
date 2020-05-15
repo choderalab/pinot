@@ -6,68 +6,29 @@ from pinot.generative.torch_gvae.layers import GraphConvolution
 
 
 class GCNModelVAE(nn.Module):
-    """Graph convolutional neural networks for VAE
-    """
     def __init__(self, input_feat_dim, hidden_dim1, hidden_dim2, dropout):
-        """ Construct a VAE with GCN
-        """
         super(GCNModelVAE, self).__init__()
         self.gc1 = GraphConvolution(input_feat_dim, hidden_dim1, dropout, act=F.relu)
-        self.dc = InnerProductDecoder(dropout, act=lambda x: x) # Decoder
-        self.output_regression = torch.nn.ModuleList([
-            GraphConvolution(hidden_dim1, hidden_dim2, dropout, act=lambda x: x),
-            GraphConvolution(hidden_dim1, hidden_dim2, dropout, act=lambda x: x),
-        ])
+        self.gc2 = GraphConvolution(hidden_dim1, hidden_dim2, dropout, act=lambda x: x)
+        self.gc3 = GraphConvolution(hidden_dim1, hidden_dim2, dropout, act=lambda x: x)
+        self.dc = InnerProductDecoder(dropout, act=lambda x: x)
+
+    def parameterization(self, x, adj):
+        hidden1 = self.gc1(x, adj)
+        return self.gc2(hidden1, adj), self.gc3(hidden1, adj)
+
+    def inference(self, mu, logvar):
+        if self.training:
+            std = torch.exp(logvar)
+            eps = torch.randn_like(std)
+            return eps.mul(std).add_(mu)
+        else:
+            return mu
 
     def forward(self, x, adj):
-        """ Compute the parameters of the approximate Gaussian posterior
-         distribution
-        
-        Args:
-            x (FloatTensor): node features
-                Shape (N, D) where N is the number of nodes in the graph
-            adj (FloatTensor): adjacency matrix
-                Shape (N, N)
-
-        Returns:
-            z: (FloatTensor): latent encodings of the nodes
-                Shape (N, D)
-        """
-        z = self.gc1(x, adj)
-        return z
-
-    def condition(self, x, adj):
-        """ Compute the approximate Normal posterior distribution q(z|x, adj)
-        and associated parameters
-        """
-        z = self.forward(x, adj)
-        theta = [parameter(z, adj) for parameter in self.output_regression]
-        mu  = theta[0]
-        logvar = theta[1]
-        distribution = torch.distributions.normal.Normal(
-                    loc=theta[0],
-                    scale=torch.exp(theta[1]))
-
-        return distribution, theta[0], theta[1]
-
-    def encode_and_decode(self, x, adj):
-        """ Forward pass through the GVAE
-
-        Args:
-            x (FloatTensor): node features
-                Shape (N, D) where N is the number of nodes in the graph
-            adj (FloatTensor): adjacency matrix
-                Shape (N, N)
-
-        Returns:
-            adj*, mu, logvar
-                adj* is the reconstructed adjacency matrix
-                mu, logvar are the parameters of the approximate Gaussian
-                    posterior
-        """
-        approx_posterior, mu, logvar = self.condition(x, adj)
-        z_sample = approx_posterior.rsample()
-        return self.dc(z_sample), mu, logvar
+        mu, logvar = self.parameterization(x, adj)
+        z = self.inference(mu, logvar)
+        return self.dc(z), mu, logvar
 
 
 class InnerProductDecoder(nn.Module):
