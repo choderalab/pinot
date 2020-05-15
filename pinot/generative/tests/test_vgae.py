@@ -5,12 +5,12 @@ import numpy.testing as npt
 
 def test_import():
     import pinot
-    vgae = pinot.generative.VGAE()
+    vgae = pinot.generative.VGAE(32)
 
 @pytest.fixture
 def vgae():
     import pinot
-    return pinot.generative.VGAE()
+    return pinot.generative.VGAE(16)
 
 def test_parameterization(vgae):
     x = torch.distributions.normal.Normal(
@@ -19,23 +19,9 @@ def test_parameterization(vgae):
 
     mu, log_sigma = vgae.parametrization(x)
 
-    assert mu.shape == torch.Size([32, 16])
-    assert log_sigma.shape == torch.Size([32, 16])
+    assert mu.shape == torch.Size([32])
+    assert log_sigma.shape == torch.Size([32])
 
-    # kill stochasicity to center the latent space
-    # distribution
-
-    vgae.linear = lambda x: torch.stack(
-            [
-                torch.zeros_like(x),
-                torch.ones_like(x)
-            ],
-            dim=-1)
-
-    mu, log_sigma = vgae.parametrization(x)
-
-    assert mu == torch.zeros_like(x)
-    assert log_sigma == torch.ones_like(x)
 
 def test_inference(vgae):
     
@@ -52,7 +38,7 @@ def test_log_p_a_given_z(vgae):
     a = torch.eye(5)
 
     # define z to be all ones
-    z = torch.zeros((5, 32))
+    z = torch.zeros((5, ))
 
     log_p_a_given_z = vgae.log_p_a_given_z(a, z)
 
