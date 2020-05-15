@@ -85,19 +85,26 @@ def visual_base64(results_dict):
     return(img)
 
 def html(results_dict):
-    html_string = """
-    <p>
-    <div style='height:15%%;width:100%%;'>
-        <div style='float:left'>
-            <img src='data:image/png;base64, %s'/>
+    html_string = ""
+
+    if isinstance(results_dict, dict):
+        results_dict = [result_dict]
+    
+    for _result_dict in result_dict:
+
+        html_string += """
+        <p>
+        <div style='height:15%%;width:100%%;'>
+            <div style='float:left'>
+                <img src='data:image/png;base64, %s'/>
+            </div>
+            <div style='float:left'>
+                %s
+            </div>
         </div>
-        <div style='float:left'>
-            %s
-        </div>
-    </div>
-    <br><br><br>
-    <p/>
-    """ % (visual_base64(results_dict)[:-1], dataframe(results_dict).to_html())
+        <br><br><br>
+        <p/>
+        """ % (visual_base64(_results_dict)[:-1], dataframe(_results_dict).to_html())
 
     return html_string
 
@@ -111,19 +118,17 @@ def html_multiple_train_and_test(results):
     return html_string
 
 def html_multiple_train_and_test_2d_grid(results):
-    # get the list of parameters
-    params = list(results.keys())
-    
     # make sure there are only two paramter types
-    param_names = list(params[0].keys())
+    param_names = list(results[0][0].keys())
     assert len(param_names) == 2
     param_col_name, param_row_name = param_names
-    
-    param_col_values = list(set([param[param_col_name] for param in results.keys()]))
-    param_row_values = list(set([param[param_row_name] for param in results.keys()]))
+
+    param_col_values = list(set([result[0][param_col_name] for result in results ]))
+    param_row_values = list(set([result[0][param_row_name] for result in results ]))
 
     param_col_values.sort()
     param_row_values.sort()
+    
 
     # initialize giant table in nested lists
     table = [['NA' for _ in param_col_values] for _ in param_row_values]
@@ -131,35 +136,45 @@ def html_multiple_train_and_test_2d_grid(results):
     # populate this table
     for idx_col, param_col in enumerate(param_col_values):
         for idx_row, param_row in enumerate(param_row_values):
-            table[idx_row][idx_col] = html(
-                    results[{
+            param_dict = {
                         param_col_name: param_col, 
                         param_row_name: param_row
-                        }])
+                        }
 
-    
+            # TODO:
+            # make this less ugly
+
+            for result in results:
+                if result[0] == param_dict:
+                    table[idx_row][idx_col] = html(result[1])
+            
     html_string = ""
     html_string += "<table style='border: 1px solid black'>"
+    
 
     # first row
-    html_string += "<tr style='border: 1px solid black'>"
-    html_string += "<td style='border: 1px solid black'>" +\
-            param_row_name + "/" + param_col_name +  "<td/>"
+    html_string += "<thread><tr style='border: 1px solid black'>"
+    html_string += "<th style='border: 1px solid black'>" +\
+            param_row_name + "/" + param_col_name +  "</th>"
 
     for param_col in param_col_values:
-        html_string += "<th scope='col'>" + str(param_col) + "<th/>"
+        html_string += "<th style='border: 1px solid black'>" + str(param_col) + "</th>"
     
-    html_string += "</tr>"
+    html_string += "</tr></thread>"
 
     # the rest of the rows
     for idx_row, param_row in enumerate(param_row_values):
         html_string += "<tr style='border: 1px solid black'>"
-        html_string += "<th scope='row'>" + param_row  + " </th>"
+        
+        # html_string += "<td></td>"
+
+        html_string += "<th style='border: 1px solid black'>" + param_row  + " </th>"
         
         for idx_col, param_col in enumerate(param_col_values):
-            html_string += "<td>" + table[idx_row][idx_col] + "</td>"
+            html_string += "<td style='border: 1px solid black'>" + table[idx_row][idx_col] + "</td>"
 
 
         html_string += "</tr>"
 
     html_string += "</table>"
+    return html_string
