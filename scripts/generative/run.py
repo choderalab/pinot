@@ -36,10 +36,10 @@ def run():
           1e-2)
 
     # train
-    for _  in range(100):
+    for _  in range(3000):
         opt.zero_grad()
         x = net(g, return_graph=True).ndata['h']
-        loss = vgae.loss(x, a).sum()
+        loss = vgae.loss(x, a, sample_shape=[64]).sum()
         print(loss)
         loss.backward()
         opt.step()

@@ -28,6 +28,8 @@ class VGAE(torch.nn.Module):
     """
     def __init__(self, units):
         super(VGAE, self).__init__()
+        
+        # the only trainable bit
         self.linear = torch.nn.Linear(units, 2)
 
     def parametrization(self, x):
@@ -56,7 +58,6 @@ class VGAE(torch.nn.Module):
 
     def inference(self, mu, log_sigma):
         r""" Construct a distribution of latent code from parameters.
-
 
         $$
         
@@ -115,9 +116,12 @@ class VGAE(torch.nn.Module):
 
         # compute the dot product of latent code
         # (N, )
-        z_i_t_z_j = z[:, None] @ z[None, :]
-
-
+        # z_i_t_z_j = z[:, None] @ z[None, :]
+        # to make it compatible with distribution with batch dimensions
+        z_i_t_z_j = torch.matmul(
+                z.reshape(list(z.shape) + [1]),
+                z.reshape(list(z.shape)[:-1] + [1] + [z.shape[-1]]))
+    
         # compute the joint probability of edges given latent code
         log_p_a_given_z = torch.where(
                 torch.gt(a, 0.5),
@@ -127,7 +131,7 @@ class VGAE(torch.nn.Module):
 
         return log_p_a_given_z
 
-    def loss(self, x, a):
+    def loss(self, x, a, sample_shape=[]):
         """ Calculate the ELBO of the learning and inference processes.
 
         """
@@ -138,33 +142,38 @@ class VGAE(torch.nn.Module):
         q_z_i = self.inference(*theta)
 
         # sample from q_z_i with reparametrization trick
-        z = q_z_i.rsample()
+        z = q_z_i.rsample(sample_shape)
 
         # compute loss function
         # reconstruct term
         log_p_a_given_z = self.log_p_a_given_z(a, z)
 
         # kl-divergence term
-        kl = q_z_i.log_prob(z) - torch.distributions.normal.Normal(
+        kl = q_z_i.log_prob(z).sum() - torch.distributions.normal.Normal(
                 loc=torch.zeros_like(z),
-                scale=torch.ones_like(z)).log_prob(z)
+                scale=torch.ones_like(z)).log_prob(z).sum()
 
-        return log_p_a_given_z - kl
+        return -log_p_a_given_z + kl
 
     def generate(self, x):
         """ Generate an adjacency matrix from a latent code.
 
         """
         # get distribution paramters 
-        theta = self.linear(x)
+        theta = self.parametrization(x)
 
         # inference pass
-        q_z_i = self.inference(theta)
+        q_z_i = self.inference(*theta)
 
         # sample
         z = q_z_i.rsample()
 
-        return z
+        # construct graph
+        a = torch.nn.functional.sigmoid(
+                z[:, None] @ z[None, :])
+        
+
+        return a
 
 
 
