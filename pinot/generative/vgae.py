@@ -9,7 +9,7 @@ import pinot
 # MODULE FUNCTIONS
 # =============================================================================
 
-class GraphVAE(torch.nn.module):
+class VGAE(torch.nn.Module):
     r""" Variational Graph Auto-Encoders. (VGAE)
     arXiv: 1611.07308
 
@@ -26,8 +26,9 @@ class GraphVAE(torch.nn.module):
     $$
 
     """
-    def __init__(self):
-        self.linear = torch.nn.Linear(1, 2)
+    def __init__(self, units):
+        super(VGAE, self).__init__()
+        self.linear = torch.nn.Linear(units, 2)
 
     def parametrization(self, x):
         r""" Generate the parameters for a Gaussian distribution
@@ -46,14 +47,12 @@ class GraphVAE(torch.nn.module):
             parameters of distribution.
 
         """
-        # expand the dimension of the input signal
-        x = x[:, :, None]
 
         # compute the parameters
         theta = self.linear(x)
 
         # unbind to two parameters and return
-        return torch.unbind(theta, dim=2)
+        return torch.unbind(theta, dim=1)
 
     def inference(self, mu, log_sigma):
         r""" Construct a distribution of latent code from parameters.
@@ -107,17 +106,24 @@ class GraphVAE(torch.nn.module):
             log probability of adjacency map given laten
 
         """
+
+        def log_sigmoid(x):
+            return x - torch.log(torch.exp(x) + 1)
+
+        def log_one_minus_sigmoid(x):
+            return -torch.log(torch.exp(x) + 1)
+
         # compute the dot product of latent code
-        # (N, N)
-        z_i_t_z_j = torch.sum(
-                z[:, None, :] * z[None, :, :],
-                dim=2)
-        
+        # (N, )
+        z_i_t_z_j = z[:, None] @ z[None, :]
+
+
         # compute the joint probability of edges given latent code
         log_p_a_given_z = torch.where(
                 torch.gt(a, 0.5),
-                torch.log(torch.nn.functional.sigmoid(z_i_t_z_j)),
-                torch.log(1.0 - torch.nn.function.sigmoid(z_i_t_z_j))).sum()
+                log_sigmoid(z_i_t_z_j),
+                log_one_minus_sigmoid(z_i_t_z_j)).sum()
+
 
         return log_p_a_given_z
 
@@ -126,10 +132,10 @@ class GraphVAE(torch.nn.module):
 
         """
         # get distribution parameters
-        theta = self.linear(x)
-
+        theta = self.parametrization(x)
+        
         # inference pass
-        q_z_i = self.inference(theta)
+        q_z_i = self.inference(*theta)
 
         # sample from q_z_i with reparametrization trick
         z = q_z_i.rsample()
@@ -144,6 +150,21 @@ class GraphVAE(torch.nn.module):
                 scale=torch.ones_like(z)).log_prob(z)
 
         return log_p_a_given_z - kl
+
+    def generate(self, x):
+        """ Generate an adjacency matrix from a latent code.
+
+        """
+        # get distribution paramters 
+        theta = self.linear(x)
+
+        # inference pass
+        q_z_i = self.inference(theta)
+
+        # sample
+        z = q_z_i.rsample()
+
+        return z
 
 
 
