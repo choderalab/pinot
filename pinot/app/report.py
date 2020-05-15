@@ -109,3 +109,57 @@ def html_multiple_train_and_test(results):
         html_string += '<br><br><br>'
         
     return html_string
+
+def html_multiple_train_and_test_2d_grid(results):
+    # get the list of parameters
+    params = list(results.keys())
+    
+    # make sure there are only two paramter types
+    param_names = list(params[0].keys())
+    assert len(param_names) == 2
+    param_col_name, param_row_name = param_names
+    
+    param_col_values = list(set([param[param_col_name] for param in results.keys()]))
+    param_row_values = list(set([param[param_row_name] for param in results.keys()]))
+
+    param_col_values.sort()
+    param_row_values.sort()
+
+    # initialize giant table in nested lists
+    table = [['NA' for _ in param_col_values] for _ in param_row_values]
+
+    # populate this table
+    for idx_col, param_col in enumerate(param_col_values):
+        for idx_row, param_row in enumerate(param_row_values):
+            table[idx_row][idx_col] = html(
+                    results[{
+                        param_col_name: param_col, 
+                        param_row_name: param_row
+                        }])
+
+    
+    html_string = ""
+    html_string += "<table style='border: 1px solid black'>"
+
+    # first row
+    html_string += "<tr style='border: 1px solid black'>"
+    html_string += "<td style='border: 1px solid black'>" +\
+            param_row_name + "/" + param_col_name +  "<td/>"
+
+    for param_col in param_col_values:
+        html_string += "<th scope='col'>" + str(param_col) + "<th/>"
+    
+    html_string += "</tr>"
+
+    # the rest of the rows
+    for idx_row, param_row in enumerate(param_row_values):
+        html_string += "<tr style='border: 1px solid black'>"
+        html_string += "<th scope='row'>" + param_row  + " </th>"
+        
+        for idx_col, param_col in enumerate(param_col_values):
+            html_string += "<td>" + table[idx_row][idx_col] + "</td>"
+
+
+        html_string += "</tr>"
+
+    html_string += "</table>"
