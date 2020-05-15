@@ -33,10 +33,10 @@ def run():
             list(net.parameters())\
           + list(vgae.parameters()),
 
-          1e-5)
+          1e-2)
 
     # train
-    for _  in range(1000):
+    for _  in range(100):
         opt.zero_grad()
         x = net(g, return_graph=True).ndata['h']
         loss = vgae.loss(x, a).sum()
@@ -44,7 +44,11 @@ def run():
         loss.backward()
         opt.step()
     
+    a = vgae.generate(x)
+    
+    g = pinot.generative.utils.graph_from_adjacency_matrix(a)
 
+    print(g)
 
 
 if __name__ == '__main__':
