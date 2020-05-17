@@ -46,7 +46,7 @@ class ListOutModule(nn.ModuleList):
         
 class NetClass(nn.Module):
     def __init__(self, n_input=None, n_output=[10,10], hidden_dim=[10,10], nonlinearity='softplus', dropout=False):
-        super(Xdec_DVF, self).__init__()
+        super(NetClass, self).__init__()
         self.n_input = n_input
         self.n_output = n_output
         self.dropout = dropout
