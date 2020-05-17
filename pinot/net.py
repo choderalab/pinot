@@ -23,18 +23,15 @@ class Net(torch.nn.Module):
     ----------
     representation: a `pinot.representation` module
         the model that translates graphs to latent representations
-    output_regression: a `torch.nn.Moudle` or None,
+    output_regression: a `torch.nn.Module` or None,
         if None, this will be set as a simple `Linear` layer that inputs
         the latent dimension and output the number of parameters for
         `self.distribution_class`
-    distribution_class: a `torch.distribution` object,
-        default=`torch.distributions.normal.Normal`
-        the class of distribution the model outputs
     noise_model: either a string (
         one of 
-            'homoschedastic',
-            'heteroschedastic',
-            'homoschedastic-fixed') 
+            'normal-homoschedastic',
+            'normal-heteroschedastic',
+            'normla-homoschedastic-fixed') 
         or a function that transforms a set of parameters.
 
 
@@ -44,52 +41,33 @@ class Net(torch.nn.Module):
         self,
         representation,
         output_regression=None,
-        distribution_class=torch.distributions.normal.Normal,
-        noise_model='heteroschedastic',
+        measurement_dimension=1,
+        noise_model='normal-heteroschedastic',
     ):
         
         super(Net, self).__init__()
         self.representation = representation
-        self.distribution_class = distribution_class
 
         # grab the last dimension of `representation`
-        regression_in_features = [
+        representation_hidden_units = [
                 layer for layer in list(self.representation.modules())\
                         if hasattr(layer, 'out_features')][-1].out_features
-
-        # TODO:
-        # make this less ugly
-        regression_out_features = len(distribution_class.arg_constraints)
 
         if output_regression is None:
             # make the output regression as simple as a linear one
             # if nothing is specified
             self._output_regression = torch.nn.ModuleList(
                     [
-                        torch.nn.Linear(regression_in_features, 1)\
-                                for _ in range(regression_out_features)
+                        torch.nn.Linear(representation_hidden_units, measurement_dimension)\
+                                for _ in range(2) # now we hard code # of parameters
                     ])
 
             def output_regression(theta):
                 return [f(theta) for f in self._output_regression]
 
         self.output_regression = output_regression
-
-        # TODO:
-        # make this less ugly
-        if isinstance(noise_model, str):
-            if noise_model == 'heteroschedastic':
-                self.noise_model = lambda x : x
-
-            elif noise_model == 'homoschedasstic':
-                # NOTE: we assume noise parameter is the last one
-                self.LOG_SIGMA = torch.tensor(0.)
-                self.noise_model = lambda x: x[:-1] + \
-                        [self.LOG_SIGMA * torch.ones_like(x[-1])]
-
-            elif noise_model == 'homoschedastic':
-                self.noise_model = lambda x: x[:-1] + torch.ones_like(x[-1])
-            
+        
+        self.noise_model = noise_model
 
     def forward(self, g):
         """ Forward pass.
@@ -109,24 +87,32 @@ class Net(torch.nn.Module):
     def condition(self, g):
         """ Compute the output distribution.
         """
-        # get the parameters
-        theta = self.forward(g)
 
-        # put theta through noise model
-        theta = self.noise_model(theta)
+        if self.noise_model == 'normal-heteroschedastic':
+            mu, log_sigma = self.forward(g)
+            distribution = torch.distributions.normal.Normal(
+                    loc=mu,
+                    scale=torch.exp(log_sigma))
 
-        # parameterize the distribution according to the parameters
-        # and the distribution class
-        distribution = self.distribution_class(*theta)
+        elif self.noise_model == 'normal-homoschedastic':
+            mu, _ = self.forward(g)
+
+            # initialize a `LOG_SIMGA` if there isn't one
+            if not hasattr(self, 'LOG_SIGMA'):
+                self.LOG_SIGMA = torch.tenosr(0.0)
+                self.LOG_SIMGA.requires_grad = True
+
+            distribution = torch.distributions.normal.Normal(
+                    loc=mu,
+                    scale=torch.exp(self.LOG_SIGMA))
+
+        elif self.noise_model == 'normal-homoschedastic-fixed':
+            mu, _ = self.forward(g)
+            distribution = torch.distributions.normal.Normal(
+                    loc=mu, 
+                    scale=torch.tensor(1.0))
 
         return distribution
-
-    def expectation(self, g):
-        # construct the distribution
-        distribution = self.condition(g)
-        
-        # expectation is the analytical mean of the distribution
-        return distribution.mean()
 
     def loss(self, g, y):
         """ Compute the loss with a input graph and a set of parameters.
