@@ -99,7 +99,7 @@ class Net(torch.nn.Module):
 
             # initialize a `LOG_SIMGA` if there isn't one
             if not hasattr(self, 'LOG_SIGMA'):
-                self.LOG_SIGMA = torch.tenosr(0.0)
+                self.LOG_SIGMA = torch.zeros((1, measurement_dimension))
                 self.LOG_SIMGA.requires_grad = True
 
             distribution = torch.distributions.normal.Normal(
@@ -110,7 +110,17 @@ class Net(torch.nn.Module):
             mu, _ = self.forward(g)
             distribution = torch.distributions.normal.Normal(
                     loc=mu, 
-                    scale=torch.tensor(1.0))
+                    scale=torch.ones((1, measurement_dimension)))
+
+
+        else:
+            assert isinstance(
+                    self.noise_model,
+                    dict)
+
+            distribution = self.noise_model[distribution](
+                    self.noise_model[kwargs])
+
 
         return distribution
 
