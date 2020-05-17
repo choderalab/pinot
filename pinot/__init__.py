@@ -11,6 +11,8 @@ import pinot.metrics
 import pinot.representation
 import pinot.inference
 import pinot.regression
+import pinot.generative
+
 
 from pinot.net import Net
 from pinot.inference.adlala import AdLaLa
