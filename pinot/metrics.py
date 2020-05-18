@@ -16,7 +16,7 @@ def _mse(y, y_hat):
 
 
 def mse(net, g, y):
-    y_hat = net.expectation(g)
+    y_hat = net.condition(g).mean
     return _mse(y, y_hat)
 
 
@@ -25,7 +25,7 @@ def _rmse(y, y_hat):
 
 
 def rmse(net, g, y):
-    y_hat = net.expectation(g)
+    y_hat = net.condition(g).mean
     return _rmse(y, y_hat)
 
 
@@ -36,7 +36,7 @@ def _r2(y, y_hat):
 
 
 def r2(net, g, y):
-    y_hat = net.expectation(g)
+    y_hat = net.condition(g).mean
     return _r2(y, y_hat)
 
 def avg_nll(net, g, y):

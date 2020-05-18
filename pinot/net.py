@@ -53,6 +53,8 @@ class Net(torch.nn.Module):
                 layer for layer in list(self.representation.modules())\
                         if hasattr(layer, 'out_features')][-1].out_features
 
+        print('representation_hidden_units %s' % representation_hidden_units)
+
         if output_regression is None:
             # make the output regression as simple as a linear one
             # if nothing is specified
@@ -99,7 +101,7 @@ class Net(torch.nn.Module):
 
             # initialize a `LOG_SIMGA` if there isn't one
             if not hasattr(self, 'LOG_SIGMA'):
-                self.LOG_SIGMA = torch.zeros((1, measurement_dimension))
+                self.LOG_SIGMA = torch.zeros((1, self.measurement_dimension))
                 self.LOG_SIMGA.requires_grad = True
 
             distribution = torch.distributions.normal.Normal(
@@ -110,8 +112,7 @@ class Net(torch.nn.Module):
             mu, _ = self.forward(g)
             distribution = torch.distributions.normal.Normal(
                     loc=mu, 
-                    scale=torch.ones((1, measurement_dimension)))
-
+                    scale=torch.ones((1, self.measurement_dimension)))
 
         else:
             assert isinstance(
