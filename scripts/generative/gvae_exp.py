@@ -23,8 +23,7 @@ import dgl
 import pinot
 from pinot.generative.torch_gvae.model import GCNModelVAE
 from pinot.generative.torch_gvae.loss import negative_ELBO
-from pinot.generative.torch_gvae.utils import load_data, mask_test_edges, preprocess_graph, get_roc_score
-
+from pinot.generative.torch_gvae.utils import mask_test_edges, preprocess_graph, get_roc_score
 
 
 def gae_for(args):
@@ -69,6 +68,7 @@ def gae_for(args):
     norm = adj_train.shape[0] * adj_train.shape[0] \
          / float((adj_train.shape[0] * adj_train.shape[0] - adj_train.sum()) * 2)
 
+    # Initialize the model and the optimization scheme
     model = GCNModelVAE(feat_dim, args.hidden1, args.hidden2, args.dropout)
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
 
@@ -78,6 +78,8 @@ def gae_for(args):
         model.train()
         optimizer.zero_grad()
         recovered, mu, logvar = model(features, adj_norm)
+
+        # Compute the (sub-sampled) negative ELBO loss
         loss = negative_ELBO(preds=recovered, labels=adj_label,
                              mu=mu, logvar=logvar, n_nodes=n_nodes,
                              norm=norm, pos_weight=pos_weight)

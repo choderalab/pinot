@@ -7,52 +7,13 @@ import torch
 from sklearn.metrics import roc_auc_score, average_precision_score
 
 
-def load_data(dataset, folderpath):
-    # load the data: x, tx, allx, graph
-    names = ['x', 'tx', 'allx', 'graph']
-    objects = []
-    for i in range(len(names)):
-        '''
-        fix Pickle incompatibility of numpy arrays between Python 2 and 3
-        https://stackoverflow.com/questions/11305790/pickle-incompatibility-of-numpy-arrays-between-python-2-and-3
-        '''
-        with open("{}/ind.{}.{}".format(folderpath, dataset, names[i]), 'rb') as rf:
-            u = pkl._Unpickler(rf)
-            u.encoding = 'latin1'
-            cur_data = u.load()
-            objects.append(cur_data)
-        # objects.append(
-        #     pkl.load(open("data/ind.{}.{}".format(dataset, names[i]), 'rb')))
-    x, tx, allx, graph = tuple(objects)
-    test_idx_reorder = parse_index_file(
-        "{}/ind.{}.test.index".format(folderpath, dataset))
-    test_idx_range = np.sort(test_idx_reorder)
-
-    if dataset == 'citeseer':
-        # Fix citeseer dataset (there are some isolated nodes in the graph)
-        # Find isolated nodes, add them as zero-vecs into the right position
-        test_idx_range_full = range(
-            min(test_idx_reorder), max(test_idx_reorder) + 1)
-        tx_extended = sp.lil_matrix((len(test_idx_range_full), x.shape[1]))
-        tx_extended[test_idx_range - min(test_idx_range), :] = tx
-        tx = tx_extended
-
-    features = sp.vstack((allx, tx)).tolil()
-    features[test_idx_reorder, :] = features[test_idx_range, :]
-    features = torch.FloatTensor(np.array(features.todense()))
-    adj = nx.adjacency_matrix(nx.from_dict_of_lists(graph))
-
-    return adj, features
-
-
-def parse_index_file(filename):
-    index = []
-    for line in open(filename):
-        index.append(int(line.strip()))
-    return index
-
-
 def sparse_to_tuple(sparse_mx):
+    """ Simply convert a sparse matrix into a 3-element tuple of
+    (an array of 2d coordinates, an array of values, shape)
+
+    Arg:
+        sparse_mx: a sparse matrix (in COO layout by default)
+    """
     if not sp.isspmatrix_coo(sparse_mx):
         sparse_mx = sparse_mx.tocoo()
     coords = np.vstack((sparse_mx.row, sparse_mx.col)).transpose()
@@ -62,9 +23,22 @@ def sparse_to_tuple(sparse_mx):
 
 
 def mask_test_edges(adj):
+    """ "Split" the adjacency matrix by masking edges 
+    to be used in link prediction
+
+    Arg:
+        adj: adjacency matrix of the graph
+
+    Returns: A 6-tuple of sparse matrices
+        adj_train: graph for training
+        train_edges: positive edges for training
+        val_edges: validation edges
+        val_edges_false: negative validation edges
+        test_edges: test edges
+        test_edges_false: negative test edges
+
+    """
     # Function to build test set with 10% positive links
-    # NOTE: Splits are randomized and results might slightly deviate from reported numbers in the paper.
-    # TODO: Clean up.
 
     # Remove diagonal elements
     adj = adj - sp.dia_matrix((adj.diagonal()[np.newaxis, :], [0]), shape=adj.shape)
@@ -144,6 +118,8 @@ def mask_test_edges(adj):
 
 
 def preprocess_graph(adj):
+    """ Normalize the adjacency matrix
+    """
     adj = sp.coo_matrix(adj)
     adj_ = adj + sp.eye(adj.shape[0])
     rowsum = np.array(adj_.sum(1))
@@ -164,6 +140,8 @@ def sparse_mx_to_torch_sparse_tensor(sparse_mx):
 
 
 def get_roc_score(emb, adj_orig, edges_pos, edges_neg):
+    """ Compute ROC score (on link prediction)
+    """
     def sigmoid(x):
         return 1 / (1 + np.exp(-x))
 
