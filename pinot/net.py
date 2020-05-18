@@ -68,7 +68,7 @@ class Net(torch.nn.Module):
                 return [f(theta) for f in self._output_regression]
 
         self.output_regression = output_regression
-        
+        self.measurement_dimension=measurement_dimension 
         self.noise_model = noise_model
 
     def forward(self, g):
@@ -102,7 +102,7 @@ class Net(torch.nn.Module):
             # initialize a `LOG_SIMGA` if there isn't one
             if not hasattr(self, 'LOG_SIGMA'):
                 self.LOG_SIGMA = torch.zeros((1, self.measurement_dimension))
-                self.LOG_SIMGA.requires_grad = True
+                self.LOG_SIGMA.requires_grad = True
 
             distribution = torch.distributions.normal.Normal(
                     loc=mu,

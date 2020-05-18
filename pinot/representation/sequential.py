@@ -8,7 +8,7 @@ import dgl
 class Sequential(torch.nn.Module):
     def __init__(
         self,
-        model,
+        layer,
         config,
         feature_units=117,
         input_units=128,
@@ -48,7 +48,7 @@ class Sequential(torch.nn.Module):
 
             # int -> feedfoward
             if isinstance(exe, int):
-                setattr(self, "d" + str(idx), model(dim, exe, **model_kwargs))
+                setattr(self, "d" + str(idx), layer(dim, exe, **model_kwargs))
 
                 dim = exe
                 self.exes.append("d" + str(idx))
