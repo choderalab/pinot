@@ -28,7 +28,7 @@ class GCNModelVAE(nn.Module):
                 Shape (N, N)
 
         Returns:
-            (mu, logvar) (Float, Float): parameters of approximate posterior
+            (mu, logvar) (FloatTensor, FloatTensor): parameters of approximate posterior
         """
         hidden1 = self.gc1(x, adj)
         return self.gc2(hidden1, adj), self.gc3(hidden1, adj)
@@ -37,8 +37,11 @@ class GCNModelVAE(nn.Module):
         """ Returns a sample from the approximate posterior distribution
 
         Args:
-            mu (Float): mean parameter
-            logvar (Float): log variance
+            mu (FloatTensor): mean parameter
+                Shape (N, d_z) where N is the number of nodes from the input
+                    graph
+            logvar (FloatTensor): log variance
+                Shape (N, d_z)
 
         Returns:
             If during training, returns a sample from N(mu, exp(logvar))
