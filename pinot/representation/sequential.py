@@ -8,11 +8,10 @@ import dgl
 class Sequential(torch.nn.Module):
     def __init__(
         self,
-        model,
+        layer,
         config,
         feature_units=117,
         input_units=128,
-        output_units=1,
         model_kwargs={},
     ):
         super(Sequential, self).__init__()
@@ -49,7 +48,7 @@ class Sequential(torch.nn.Module):
 
             # int -> feedfoward
             if isinstance(exe, int):
-                setattr(self, "d" + str(idx), model(dim, exe, **model_kwargs))
+                setattr(self, "d" + str(idx), layer(dim, exe, **model_kwargs))
 
                 dim = exe
                 self.exes.append("d" + str(idx))
@@ -68,9 +67,6 @@ class Sequential(torch.nn.Module):
                 setattr(self, "o" + str(idx), apply_atom_in_graph(dropout))
 
                 self.exes.append("o" + str(idx))
-
-        # readout
-        self.f_out = torch.nn.Linear(dim, output_units)
 
     def forward(self, g, return_graph=False):
 

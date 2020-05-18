@@ -88,9 +88,9 @@ def html(results_dict):
     html_string = ""
 
     if isinstance(results_dict, dict):
-        results_dict = [result_dict]
+        results_dict = [results_dict]
     
-    for _result_dict in result_dict:
+    for _results_dict in results_dict:
 
         html_string += """
         <p>

@@ -3,31 +3,31 @@ import torch
 import pinot
 
 def test_html_grid():
+
+    ds = pinot.data.utils.batch(
+        pinot.data.esol()[:10],
+        5)
+
+    ds_tr, ds_te = pinot.data.utils.split(
+        ds,
+        [1, 1])
+    
     def experiment_generating_fn(param_dict):
 
 
         net = pinot.Net(
             representation=pinot.representation.Sequential(
-                pinot.representation.dgl_legacy.gn(model_name=param_dict['model'], kwargs={}),
-                [32, 'tanh', 32, 'tanh', 32, 'tanh']),
-            parameterization=pinot.regression.Linear(32, 2))
+                pinot.representation.dgl_legacy.GN,
+                [32, 'tanh', 32, 'tanh', 32, 'tanh']))
 
         optimizer=torch.optim.Adam(net.parameters(), param_dict['lr'])
-
-        ds = pinot.data.utils.batch(
-            pinot.data.esol()[:10],
-            5)
-
-        ds_tr, ds_te = pinot.data.utils.split(
-            ds,
-            [1, 1])
 
         train_and_test = pinot.TrainAndTest(
             net=net,
             data_tr=ds_tr,
             data_te=ds_te,
             optimizer=optimizer,
-            n_epochs=10,
+            n_epochs=1,
             record_interval=1)
 
         return train_and_test

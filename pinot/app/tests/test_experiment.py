@@ -13,9 +13,9 @@ def test_train():
     net_representation = pinot.representation.Sequential(
         layer, [32, "tanh", 32, "tanh", 32, "tanh"]
     )
-    net_regression = pinot.regression.Linear(32, 2)
-    net = pinot.Net(net_representation, net_regression)
-
+    
+    net = pinot.Net(net_representation)
+    
     train = pinot.Train(
         net=net,
         data=pinot.data.esol()[:10],
@@ -30,12 +30,11 @@ def test_test():
     import pinot
     import copy
 
-    layer = pinot.representation.dgl_legacy.GN
+    layer = pinot.representation.dgl_legacy.gn()
     net_representation = pinot.representation.Sequential(
         layer, [32, "tanh", 32, "tanh", 32, "tanh"]
     )
-    net_regression = pinot.regression.Linear(32, 2)
-    net = pinot.Net(net_representation, net_regression)
+    net = pinot.Net(net_representation)
 
     train = pinot.Train(
         net=net,
@@ -59,12 +58,11 @@ def test_test():
 def test_train_and_test():
     import pinot
 
-    layer = pinot.representation.dgl_legacy.GN
+    layer = pinot.representation.dgl_legacy.gn()
     net_representation = pinot.representation.Sequential(
         layer, [32, "tanh", 32, "tanh", 32, "tanh"]
     )
-    net_regression = pinot.regression.Linear(32, 2)
-    net = pinot.Net(net_representation, net_regression)
+    net = pinot.Net(net_representation)
 
     train_and_test = pinot.TrainAndTest(
         net=net,
