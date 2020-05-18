@@ -2,10 +2,6 @@ from __future__ import division
 from __future__ import print_function
 
 import argparse
-import time
-
-import numpy as np
-import scipy.sparse as sp
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--model', type=str, default='gcn_vae', help="models used")
@@ -15,17 +11,18 @@ parser.add_argument('--hidden1', type=int, default=32, help='Number of units in 
 parser.add_argument('--hidden2', type=int, default=16, help='Number of units in hidden layer 2.')
 parser.add_argument('--lr', type=float, default=0.01, help='Initial learning rate.')
 parser.add_argument('--dropout', type=float, default=0., help='Dropout rate (1 - keep probability).')
-parser.add_argument('--dataset-str', type=str, default='cora', help='type of dataset.')
 
 args = parser.parse_args()
 
 import torch
 from torch import optim
-
-import pinot
+import time
+import numpy as np
+import scipy.sparse as sp
 import dgl
+import pinot
 from pinot.generative.torch_gvae.model import GCNModelVAE
-from pinot.generative.torch_gvae.optimizer import loss_function
+from pinot.generative.torch_gvae.loss import negative_ELBO
 from pinot.generative.torch_gvae.utils import load_data, mask_test_edges, preprocess_graph, get_roc_score
 
 
@@ -43,6 +40,9 @@ def gae_for(args):
     g = dgl.batch(gs)
 
     # get the adjacency matrix for the giant graph
+    # Because torch.SparseTensor doesn't interoperate too well with numpy
+    # or scipy sparse matrix, we would need to work with scipy sparse matrix
+    # and convert to torch.tensor where needed
     adj = sp.coo_matrix(g.adjacency_matrix().to_dense().numpy())
     features = torch.cat([g.ndata["type"], g.ndata["h0"]], dim=1)
     n_nodes, feat_dim = features.shape
@@ -78,7 +78,7 @@ def gae_for(args):
         model.train()
         optimizer.zero_grad()
         recovered, mu, logvar = model(features, adj_norm)
-        loss = loss_function(preds=recovered, labels=adj_label,
+        loss = negative_ELBO(preds=recovered, labels=adj_label,
                              mu=mu, logvar=logvar, n_nodes=n_nodes,
                              norm=norm, pos_weight=pos_weight)
         loss.backward()
