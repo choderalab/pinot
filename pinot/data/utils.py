@@ -13,14 +13,14 @@ import random
 # =============================================================================
 
 
-def from_csv(path, toolkit="rdkit", smiles_col=-1, y_col=-2, seed=2666):
+def from_csv(path, toolkit="rdkit", smiles_col=-1, y_cols=[-2], seed=2666):
     """ Read csv from file.
     """
 
     def _from_csv():
         df = pd.read_csv(path)
         df_smiles = df.iloc[:, smiles_col]
-        df_y = df.iloc[:, y_col]
+        df_y = df.iloc[:, y_cols]
 
         if toolkit == "rdkit":
             from rdkit import Chem
@@ -97,7 +97,7 @@ def batch(ds, batch_size, seed=2666):
     ]
 
     ys_batched = [
-        torch.tensor(ys[idx * batch_size : (idx + 1) * batch_size])
+        torch.stack(ys[idx * batch_size : (idx + 1) * batch_size], dim=0)
         for idx in range(n_batches)
     ]
 
