@@ -13,20 +13,27 @@ class BBB(pinot.Sampler):
     """ Gaussian Variational Posterior Bayesian-by-Backprop.
 
     """
-    def __init__(self, optimizer, initializer_std=1e-3):
+    def __init__(self, optimizer, initializer_std=1e-3,
+            theta_prior=torch.distributions.normal.Normal(0, 1)
+        ):
         super(BBB, self).__init__()
         self.optimizer = optimizer
 
         # sigma here is initialized from a Gaussian distribution
         # with dimensions matching the parameters
-        self.sigma = [[torch.nn.Parameter(
-            torch.distributions.normal.Normal(
-                torch.zeros_like(p),
-                initializer_std * torch.ones_like(p)
-            ).sample() for p in group['params']]
-            for group in self.mu]
+        for group in self.optimizer.param_groups:
+            for p in group['params']:
+                if p.grad is None:
+                    continue
+
+                state = self.optimizer.state[p]
+                state['log_sigma'] = torch.distributions.normal.Normal(
+                    torch.zeros_like(p),
+                    initializer_std * torch.ones_like(p)
+                ).sample()
 
 
+    @torch.no_grad()
     def step(self, closure):
         """ Performs a single optimization step.
         
@@ -35,18 +42,38 @@ class BBB(pinot.Sampler):
         closure : callable
             a closure function that returns the loss
         """
+
         # just in case
         loss = None
 
-        # perturb the parameters
-        epsilon = [[
-            torch.distributions.normal.Normal(
-                torch.zeros_like(p),
-                torch.ones_like(p)
-            ).sample() for p in group['params']]
-            for group in self.optimizer.param_group]
+        for group in self.optimizer.param_groups:
+            for p in group['params']:
+                if p.grad is None:
+                    continue
 
-        
+                state = self.optimizer.state[p]
+                
+                epsilon = torch.distributions.normal.Normal(
+                        torch.zeros_like(p),
+                        torch.ones_like(p)).sample()
+                
+                mu = p.clone()
+
+         
+                # compute the kl loss term here
+                kl_loss = torch.distributions.normal.Normal(
+                        loc=mu,
+                        scale=torch.exp(state['sigma'])).log_prob(p) -\
+                          self.theta_prior.log_prob(theta)
+
+                
+
+        # do one step with perturbed weights
+        with torch.enable_grad():
+            loss = closure()
+
+
+
         
         
 
