@@ -57,16 +57,23 @@ class BBB(pinot.Sampler):
                         torch.zeros_like(p),
                         torch.ones_like(p)).sample()
                 
+                # clone mu and log_sigma
                 mu = p.clone()
+                log_sigma = state['log_sigma'].clone()
 
-         
-                # compute the kl loss term here
-                kl_loss = torch.distributions.normal.Normal(
-                        loc=mu,
-                        scale=torch.exp(state['sigma'])).log_prob(p) -\
-                          self.theta_prior.log_prob(theta)
+                with torch.enable_grad():
+                    mu.requires_grad = True
+                    log_sigma.requires_grad=True
+                    
+                    # compute the kl loss term here
+                    kl_loss = torch.distributions.normal.Normal(
+                            loc=mu,
+                            scale=torch.exp(state['sigma'])).log_prob(p) -\
+                              self.theta_prior.log_prob(theta)
 
-                
+                    
+                    d_kl_d_mu = torch.autograd(kl_loss, mu)
+                    d_kl_d_log_sigma = torch.autograd(kl_loss, log_sigma)
 
         # do one step with perturbed weights
         with torch.enable_grad():
