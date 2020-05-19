@@ -1,3 +1,3 @@
 import pinot.inference
 
-from sampler import Sampler
+from pinot.inference.sampler import Sampler
