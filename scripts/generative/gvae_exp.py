@@ -27,8 +27,6 @@ from pinot.generative.torch_gvae.utils import mask_test_edges, preprocess_graph,
 
 
 def gae_for(args):
-    print("Using {} dataset".format(args.dataset_str))
-
     # Grab some data from esol
     ds_tr = pinot.data.esol()[:10]
 
@@ -77,7 +75,7 @@ def gae_for(args):
         t = time.time()
         model.train()
         optimizer.zero_grad()
-        recovered, mu, logvar = model(features, adj_norm)
+        recovered, mu, logvar = model.encode_and_decode(features, adj_norm)
 
         # Compute the (sub-sampled) negative ELBO loss
         loss = negative_ELBO(preds=recovered, labels=adj_label,
@@ -88,6 +86,8 @@ def gae_for(args):
         optimizer.step()
 
         hidden_emb = mu.data.numpy()
+
+        # Compute the ROC score (with respect to link prediction task)
         roc_curr, ap_curr = get_roc_score(hidden_emb, adj_orig, val_edges, val_edges_false)
 
         print("Epoch:", '%04d' % (epoch + 1), "train_loss=", "{:.5f}".format(cur_loss),

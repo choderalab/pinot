@@ -13,11 +13,13 @@ class GCNModelVAE(nn.Module):
         """
         super(GCNModelVAE, self).__init__()
         self.gc1 = GraphConvolution(input_feat_dim, hidden_dim1, dropout, act=F.relu)
-        self.gc2 = GraphConvolution(hidden_dim1, hidden_dim2, dropout, act=lambda x: x)
-        self.gc3 = GraphConvolution(hidden_dim1, hidden_dim2, dropout, act=lambda x: x)
         self.dc = InnerProductDecoder(dropout, act=lambda x: x) # Decoder
+        self.output_regression = torch.nn.ModuleList([
+            GraphConvolution(hidden_dim1, hidden_dim2, dropout, act=lambda x: x),
+            GraphConvolution(hidden_dim1, hidden_dim2, dropout, act=lambda x: x),
+        ])
 
-    def parameterization(self, x, adj):
+    def forward(self, x, adj):
         """ Compute the parameters of the approximate Gaussian posterior
          distribution
         
@@ -28,33 +30,27 @@ class GCNModelVAE(nn.Module):
                 Shape (N, N)
 
         Returns:
-            (mu, logvar) (FloatTensor, FloatTensor): parameters of approximate posterior
+            z: (FloatTensor): latent encodings of the nodes
+                Shape (N, D)
         """
-        hidden1 = self.gc1(x, adj)
-        return self.gc2(hidden1, adj), self.gc3(hidden1, adj)
+        z = self.gc1(x, adj)
+        return z
 
-    def inference(self, mu, logvar):
-        """ Returns a sample from the approximate posterior distribution
-
-        Args:
-            mu (FloatTensor): mean parameter
-                Shape (N, d_z) where N is the number of nodes from the input
-                    graph
-            logvar (FloatTensor): log variance
-                Shape (N, d_z)
-
-        Returns:
-            If during training, returns a sample from N(mu, exp(logvar))
-            If during testing, returns mu
+    def condition(self, x, adj):
+        """ Compute the approximate Normal posterior distribution q(z|x, adj)
+        and associated parameters
         """
-        if self.training:
-            std = torch.exp(logvar)
-            eps = torch.randn_like(std)
-            return eps.mul(std).add_(mu)
-        else:
-            return mu
+        z = self.forward(x, adj)
+        theta = [parameter(z, adj) for parameter in self.output_regression]
+        mu  = theta[0]
+        logvar = theta[1]
+        distribution = torch.distributions.normal.Normal(
+                    loc=theta[0],
+                    scale=torch.exp(theta[1]))
 
-    def forward(self, x, adj):
+        return distribution, theta[0], theta[1]
+
+    def encode_and_decode(self, x, adj):
         """ Forward pass through the GVAE
 
         Args:
@@ -69,9 +65,9 @@ class GCNModelVAE(nn.Module):
                 mu, logvar are the parameters of the approximate Gaussian
                     posterior
         """
-        mu, logvar = self.parameterization(x, adj)
-        z = self.inference(mu, logvar)
-        return self.dc(z), mu, logvar
+        approx_posterior, mu, logvar = self.condition(x, adj)
+        z_sample = approx_posterior.rsample()
+        return self.dc(z_sample), mu, logvar
 
 
 class InnerProductDecoder(nn.Module):
