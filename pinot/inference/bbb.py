@@ -9,22 +9,49 @@ import dgl
 # =============================================================================
 # MODULE CLASSES
 # =============================================================================
-class GaussianVariationalPosteriorBayesianByBackprop(torch.nn.Module):
-    def __init__(self, base_module, initializer_std=1e-3):
-        super(GaussianVariationalPosteriorBayesianByBackprop, self).__init__()
-        self.base_module = base_module
+class BBB(pinot.Sampler):
+    """ Gaussian Variational Posterior Bayesian-by-Backprop.
 
-        # $\mu$ and $\sigma$ here are trainable parameters
-        self.mu = list(self.base_module.parameters())
-        self.n_param = len(self.mu)
-        self.sigma = [
-            torch.nn.Parameter(
-                torch.distributions.normal.Normal(
-                    torch.zeros_like(weight), initializer_std * torch.ones_like(weight)
-                ).sample()
-            )
-            for weight in self.mu
-        ]
+    """
+    def __init__(self, optimizer, initializer_std=1e-3):
+        super(BBB, self).__init__()
+        self.optimizer = optimizer
+
+        # sigma here is initialized from a Gaussian distribution
+        # with dimensions matching the parameters
+        self.sigma = [[torch.nn.Parameter(
+            torch.distributions.normal.Normal(
+                torch.zeros_like(p),
+                initializer_std * torch.ones_like(p)
+            ).sample() for p in group['params']]
+            for group in self.mu]
+
+
+    def step(self, closure):
+        """ Performs a single optimization step.
+        
+        Parameters
+        ----------
+        closure : callable
+            a closure function that returns the loss
+        """
+        # just in case
+        loss = None
+
+        # perturb the parameters
+        epsilon = [[
+            torch.distributions.normal.Normal(
+                torch.zeros_like(p),
+                torch.ones_like(p)
+            ).sample() for p in group['params']]
+            for group in self.optimizer.param_group]
+
+        
+        
+        
+
+
+
 
     def foward(self, sigma=1.0, *args, **kwargs):
         # compose the weights
