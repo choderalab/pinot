@@ -4,6 +4,7 @@
 import torch
 import abc
 import copy
+from abc import abstractmethod
 
 # =============================================================================
 # MODULE CLASSES
@@ -16,45 +17,59 @@ class Sampler(torch.optim.Optimizer, abc.ABC):
         super(Sampler, self).__init__()
    
     @abstractmethod
-    def net_ensemble(self, n_samples, *args, **kwargs):
+    def sample_params(self,  *args, **kwargs):
         pass
 
-    def posterior(self, net, g, n_samples=1, *args, **kwargs):
-        with torch.no_grad();
-            # generate an ensemble of net
-            nets = self.net_ensemble(n_samples)
-            
-            # get a list of distributions parametrized by nets
-            distributions = [
-                    net.condition(g)
-                    for net in nets]
+    @abstractmethod
+    def expectation_params(self, *args, **kwargs):
+        pass
 
-            # get the parameter of these distributions
-            # NOTE: this is not necessarily the most efficienct solution
-            # since we don't know the memory footprint of 
-            # torch.distributions
-            mus, sigmas = zip(*[
-                    (distribution.loc, distribution.scale)
-                    for distribution in distributions])
+    @torch.no_grad()
+    def condition(self, net, g, n_samples=1, *args, **kwargs):
+        """ Get the predicted distribution of measurement
+        conditioned on input.
 
-            # concat parameters together
-            # (n_samples, batch_size, measurement_dimension)
-            mu = torch.stack(mus)
-            sigma = torch.stack(sigmas)
+        Parameters
+        ----------
+        net : `pinot.Net` module
+        g : input of net
+        n_samples : int, default=1,
+            number of copies of distributions to be mixed.
 
-            # construct distribution            
-            distribution = torch.distributions.Normal.normal(
-                    loc=mu,
-                    scale=sigma)
-             
-            # make it mixture
-            distribution = torch.distributions.mixture_same_family\
-                    .MixtureSameFamily(
-                            torch.distributions.Categorical(
-                                torch.ones(mu.shape[0])),
-                            distribution)
+        """
+        # initialize a list of distributions
+        distributions = []
+        
+        for _ in range(n_samples):
+            self.sample_parameters()
+            distributions.append(net.condition(g))
 
-            return distribution
+        # get the parameter of these distributions
+        # NOTE: this is not necessarily the most efficienct solution
+        # since we don't know the memory footprint of 
+        # torch.distributions
+        mus, sigmas = zip(*[
+                (distribution.loc, distribution.scale)
+                for distribution in distributions])
+
+        # concat parameters together
+        # (n_samples, batch_size, measurement_dimension)
+        mu = torch.stack(mus)
+        sigma = torch.stack(sigmas)
+
+        # construct distribution            
+        distribution = torch.distributions.Normal.normal(
+                loc=mu,
+                scale=sigma)
+         
+        # make it mixture
+        distribution = torch.distributions.mixture_same_family\
+                .MixtureSameFamily(
+                        torch.distributions.Categorical(
+                            torch.ones(mu.shape[0])),
+                        distribution)
+
+        return distribution
 
 
         

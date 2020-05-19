@@ -5,11 +5,12 @@
 # =============================================================================
 import torch
 import dgl
+import pinot
 
 # =============================================================================
 # MODULE CLASSES
 # =============================================================================
-class BBB(torch.optim.Optimizer):
+class BBB(pinot.inference.Sampler):
     """ Gaussian Variational Posterior Bayesian-by-Backprop.
     """
     def __init__(self, optimizer, initializer_std=1e-3,
@@ -149,7 +150,7 @@ class BBB(torch.optim.Optimizer):
     def zero_grad(self):
         self.optimizer.zero_grad()
 
-    def sample_param(self):
+    def sample_params(self):
         with torch.no_grad():
             for p, log_sigma in zip(
                     *[
@@ -163,7 +164,7 @@ class BBB(torch.optim.Optimizer):
                         scale=torch.exp(log_sigma)
                     ).sample())
                 
-    def expectation_param(self):
+    def expectation_params(self):
         with torch.no_grad():
             for p, log_sigma in zip(
                     *[
