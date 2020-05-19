@@ -148,4 +148,27 @@ class BBB(torch.optim.Optimizer):
 
     def zero_grad(self):
         self.optimizer.zero_grad()
-            
+
+    def sample_param(self):
+        with torch.no_grad():
+            for p, log_sigma in zip(
+                    *[
+                        self.optimizer.param_groups[0]['params'],
+                        self.optimizer.param_groups[1]['params']
+                    ]):
+                
+                p.copy_(
+                    torch.distributions.normal.Normal(
+                        loc=self.optimizer.state[p]['mu'],
+                        scale=torch.exp(log_sigma)
+                    ).sample())
+                
+    def expectation_param(self):
+        with torch.no_grad():
+            for p, log_sigma in zip(
+                    *[
+                        self.optimizer.param_groups[0]['params'],
+                        self.optimizer.param_groups[1]['params']
+                    ]):
+                
+                p.copy_(self.optimizer.state[p]['mu'])
