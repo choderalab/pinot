@@ -23,8 +23,8 @@ import dgl
 import pinot
 from pinot.generative.torch_gvae.model import GCNModelVAE
 from pinot.generative.torch_gvae.loss import negative_ELBO
-from pinot.generative.torch_gvae.utils import mask_test_edges, preprocess_graph, get_roc_score
-
+from pinot.generative.torch_gvae.utils import mask_test_edges, get_roc_score
+from pinot.generative.utils import negative_shifted_laplacian
 
 def gae_for(args):
     # Grab some data from esol
@@ -53,7 +53,7 @@ def gae_for(args):
     adj = adj_train
 
     # Some preprocessing
-    adj_norm = preprocess_graph(adj)
+    adj_norm = negative_shifted_laplacian(adj)
     adj_label = adj_train + sp.eye(adj_train.shape[0])
     # adj_label = sparse_to_tuple(adj_label)
     adj_label = torch.FloatTensor(adj_label.toarray())
