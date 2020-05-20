@@ -30,7 +30,7 @@ class BBB(pinot.inference.Sampler):
         log_sigma_param_group = self.optimizer.param_groups[0].copy()
 
         # initialize log_sigma
-        log_sigma_param_group['params'] = [torch.distributions.normal.Normal(
+        log_sigma_param_group['params'] = [torch.distributions.lor_normal.LogNormal(
             loc=torch.zeros_like(p),
             scale=initializer_std * torch.ones_like(p)).sample()
             for p in log_sigma_param_group['params']]
