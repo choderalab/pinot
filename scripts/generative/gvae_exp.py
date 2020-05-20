@@ -7,10 +7,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--model', type=str, default='gcn_vae', help="models used")
 parser.add_argument('--seed', type=int, default=42, help='Random seed.')
 parser.add_argument('--epochs', type=int, default=200, help='Number of epochs to train.')
-parser.add_argument('--hidden1', type=int, default=32, help='Number of units in hidden layer 1.')
-parser.add_argument('--hidden2', type=int, default=16, help='Number of units in hidden layer 2.')
 parser.add_argument('--lr', type=float, default=0.01, help='Initial learning rate.')
-parser.add_argument('--dropout', type=float, default=0., help='Dropout rate (1 - keep probability).')
 
 args = parser.parse_args()
 
@@ -33,13 +30,12 @@ def gae_for(args):
     graph_data = zip(*prepare_train_test_val(ds_tr))
 
     # # Initialize the model and the optimization scheme
-    feat_dim = ds_tr[0][0].ndata["type"].shape[1] + ds_tr[0][0].ndata["h0"].shape[1]
-    model = GCNModelVAE(feat_dim, args.hidden1, args.hidden2, args.dropout)
+    feat_dim = ds_tr[0][0].ndata["h"].shape[1]
+    model = GCNModelVAE(feat_dim)
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     N_molecules = len(ds_tr)
 
     print("Processing ", N_molecules, "molecules")
-
     for epoch in range(args.epochs):
         t = time.time()
 
@@ -55,7 +51,8 @@ def gae_for(args):
             # Because torch.SparseTensor doesn't interoperate too well with numpy
             # or scipy sparse matrix, we would need to work with scipy sparse matrix
             # and convert to torch.tensor where needed
-            (adj_orig,
+            (mol_graph,
+                adj_orig,
                 adj_norm,
                 adj_label,
                 adj_train,
@@ -76,7 +73,7 @@ def gae_for(args):
             n_nodes, num_features = node_features.shape
             assert(num_features == feat_dim)
 
-            recovered, mu, logvar = model.encode_and_decode(node_features, adj_norm)
+            recovered, mu, logvar = model.encode_and_decode(mol_graph)
 
             # Compute the (sub-sampled) negative ELBO loss
             loss = negative_ELBO(preds=recovered, labels=adj_label,
@@ -109,10 +106,6 @@ def gae_for(args):
         )
 
     print("Optimization Finished!")
-
-    # roc_score, ap_score = get_roc_score(hidden_emb, adj_orig, test_edges, test_edges_false)
-    # print('Test ROC score: ' + str(roc_score))
-    # print('Test AP score: ' + str(ap_score))
 
 
 if __name__ == '__main__':

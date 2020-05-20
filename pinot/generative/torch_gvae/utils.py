@@ -83,6 +83,7 @@ def sparse_mx_to_torch_sparse_tensor(sparse_mx):
 def prepare_train_test_val(data):
     """ Prepare training, testing and validation data for GVAE
     """
+    mol_graph_arr = []
     adj_orig_arr = []
     adj_norm_arr = []
     adj_label_arr = []
@@ -99,7 +100,7 @@ def prepare_train_test_val(data):
 
     for (g, measurement) in data:
         adj = sp.coo_matrix(g.adjacency_matrix().to_dense().numpy())
-        features = torch.cat([g.ndata["type"], g.ndata["h0"]], dim=1)
+        features = g.ndata["h"]
 
         adj_orig, adj_norm, adj_label, adj_train, \
             train_edges, val_edges, val_edges_false, \
@@ -113,6 +114,7 @@ def prepare_train_test_val(data):
             / float((adj_train.shape[0] * adj_train.shape[0] \
                 - adj_train.sum()) * 2)
 
+        mol_graph_arr.append(g)
         adj_orig_arr.append(adj_orig)
         adj_norm_arr.append(adj_norm)
         adj_label_arr.append(adj_label)
@@ -127,7 +129,8 @@ def prepare_train_test_val(data):
         pos_weight_arr.append(pos_weight)
         measurement_arr.append(measurement)
 
-        return  (adj_orig_arr,
+        return  (mol_graph_arr,
+                adj_orig_arr,
                 adj_norm_arr,
                 adj_label_arr,
                 adj_train_arr,

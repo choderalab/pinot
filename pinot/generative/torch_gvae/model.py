@@ -1,25 +1,29 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
-from pinot.generative.torch_gvae.layers import GraphConvolution
+from pinot.representation.dgl_legacy import GN
 
 
 class GCNModelVAE(nn.Module):
     """Graph convolutional neural networks for VAE
     """
-    def __init__(self, input_feat_dim, hidden_dim1, hidden_dim2, dropout):
+    def __init__(self, input_feat_dim, hidden_dim1=32, \
+            hidden_dim2=32, hidden_dim3=16, dropout=0.1):
         """ Construct a VAE with GCN
         """
         super(GCNModelVAE, self).__init__()
-        self.gc1 = GraphConvolution(input_feat_dim, hidden_dim1, dropout, act=F.relu)
-        self.dc = InnerProductDecoder(dropout, act=lambda x: x) # Decoder
-        self.output_regression = torch.nn.ModuleList([
-            GraphConvolution(hidden_dim1, hidden_dim2, dropout, act=lambda x: x),
-            GraphConvolution(hidden_dim1, hidden_dim2, dropout, act=lambda x: x),
-        ])
+        self.linear = nn.Linear(input_feat_dim, hidden_dim1)
+        self.gc1 = GN(hidden_dim1, hidden_dim2)
 
-    def forward(self, x, adj):
+        # Mapping from "latent graph" to predictive distribution parameter
+        self.output_regression = nn.ModuleList([
+            GN(hidden_dim2, hidden_dim3),
+            GN(hidden_dim2, hidden_dim3),
+        ])
+        # Decoder
+        self.dc = InnerProductDecoder(dropout, act=lambda x: x)
+
+    def forward(self, g):
         """ Compute the parameters of the approximate Gaussian posterior
          distribution
         
@@ -30,18 +34,19 @@ class GCNModelVAE(nn.Module):
                 Shape (N, N)
 
         Returns:
-            z: (FloatTensor): latent encodings of the nodes
-                Shape (N, D)
+            z: (FloatTensor): the latent encodings of the nodes
+                Shape (N, hidden_dim2)
         """
-        z = self.gc1(x, adj)
+        z1 = self.linear(g.ndata["h"])
+        z = self.gc1(g, z1)
         return z
 
-    def condition(self, x, adj):
+    def condition(self, g):
         """ Compute the approximate Normal posterior distribution q(z|x, adj)
         and associated parameters
         """
-        z = self.forward(x, adj)
-        theta = [parameter(z, adj) for parameter in self.output_regression]
+        z = self.forward(g)
+        theta = [parameter.forward(g, z) for parameter in self.output_regression]
         mu  = theta[0]
         logvar = theta[1]
         distribution = torch.distributions.normal.Normal(
@@ -50,7 +55,7 @@ class GCNModelVAE(nn.Module):
 
         return distribution, theta[0], theta[1]
 
-    def encode_and_decode(self, x, adj):
+    def encode_and_decode(self, g):
         """ Forward pass through the GVAE
 
         Args:
@@ -65,7 +70,7 @@ class GCNModelVAE(nn.Module):
                 mu, logvar are the parameters of the approximate Gaussian
                     posterior
         """
-        approx_posterior, mu, logvar = self.condition(x, adj)
+        approx_posterior, mu, logvar = self.condition(g)
         z_sample = approx_posterior.rsample()
         return self.dc(z_sample), mu, logvar
 

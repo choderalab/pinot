@@ -10,6 +10,8 @@ import dgl
 import math
 import dgl
 from dgl.nn import pytorch as dgl_pytorch
+from copy import deepcopy
+
 
 # =============================================================================
 # MODULE CLASSES
