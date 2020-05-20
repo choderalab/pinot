@@ -51,3 +51,38 @@ def condition_mixture(net, g, sampler=None, n_samples=1):
                     torch.distributions.Independent(distribution, 2))
 
     return distribution
+
+def confidence_interval(distribution, percentage=0.95, n_samples=1000):
+    """ Calculate the confidence interval of a distribution.
+
+    Parameters
+    ----------
+    distribution : `torch.distributions.Distribution` object
+        the distribution to be characterized.
+        the event dimension has to be [-1, 1].
+    percentage : float, default=0.95
+        percentage of confidence interval.
+    n_samples : int, default=100
+        number of samples to be drawn for confidence interval to be 
+        calculated.
+
+    """
+    percentage = torch.tensor(percentage)
+
+    try:
+        low = distribution.icdf((1 - percentage) / 2)
+        high = distribution.icdf(1 - (1 - percentage) / 2)
+
+    except:
+        samples = distribution.sample([n_samples])
+
+        samples_sorted, idxs = torch.sort(samples, dim=0)
+
+        low_idx = int(n_samples * (1 - percentage) / 2) 
+        high_idx = int(n_samples * (1 - (1 - percentage) / 2))
+
+        low = samples_sorted[low_idx, :, :]
+        high = samples_sorted[high_idx, :, :]
+        
+    
+    return low, high
