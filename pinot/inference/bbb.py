@@ -100,8 +100,8 @@ class BBB(pinot.inference.Sampler):
                 # compute the kl loss term here
                 kl_loss = torch.distributions.normal.Normal(
                         loc=mu,
-                        scale=torch.exp(_log_sigma)).log_prob(theta) -\
-                          self.theta_prior.log_prob(theta)
+                        scale=torch.exp(_log_sigma)).log_prob(theta).sum() -\
+                          self.theta_prior.log_prob(theta).sum()
             
             d_kl_d_mu = torch.autograd.grad(
                 kl_loss, mu, retain_graph=True)[0]
