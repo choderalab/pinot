@@ -30,7 +30,7 @@ class BBB(pinot.inference.Sampler):
         log_sigma_param_group = self.optimizer.param_groups[0].copy()
 
         # initialize log_sigma
-        log_sigma_param_group['params'] = [torch.distributions.log_normal.LogNormal(
+        log_sigma_param_group['params'] = [torch.distributions.normal.Normal(
             loc=torch.zeros_like(p),
             scale=initializer_std * torch.ones_like(p)).sample()
             for p in log_sigma_param_group['params']]
@@ -137,8 +137,7 @@ class BBB(pinot.inference.Sampler):
             log_sigma.requires_grad = True
 
             log_sigma.backward(
-                state['epsilon'] * (p.grad + state['d_kl_d_theta'])/\
-                        (1 + torch.exp(-log_sigma)) +\
+                state['epsilon'] * torch.exp(log_sigma) * (p.grad + state['d_kl_d_theta']) +\
                             state['d_kl_d_log_sigma'])
             
             # modify grad
