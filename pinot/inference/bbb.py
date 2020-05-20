@@ -14,7 +14,7 @@ class BBB(pinot.inference.Sampler):
     """ Gaussian Variational Posterior Bayesian-by-Backprop.
     """
     def __init__(self, optimizer, initializer_std=1e-3,
-            theta_prior=torch.distributions.normal.Normal(0, 1)
+            theta_prior=torch.distributions.normal.Normal(0, 10.)
         ):
         
         self.optimizer = optimizer
@@ -33,7 +33,7 @@ class BBB(pinot.inference.Sampler):
         sigma_param_group['params'] = [torch.distributions.normal.Normal(
             loc=torch.zeros_like(p),
             scale=initializer_std * torch.ones_like(p)).sample()
-            for p in log_sigma_param_group['params']]
+            for p in sigma_param_group['params']]
 
         # append this to param_group
         self.optimizer.add_param_group(
@@ -79,9 +79,8 @@ class BBB(pinot.inference.Sampler):
                     torch.zeros_like(p),
                     torch.ones_like(p)).sample()
             
-            # clone mu and sigma
+            # clone mu before perturbation
             mu = p.detach().clone()
-            _sigma = sigma.detach().clone()
 
             # perturb p to get theta
             # $ \theta = \mu + \sigma \epsilon $
@@ -92,25 +91,25 @@ class BBB(pinot.inference.Sampler):
             with torch.enable_grad():
                 mu.requires_grad = True
                 theta.requires_grad = True
-                _sigma.requires_grad = True
+                sigma.requires_grad = True
                  
                 # compute the kl loss term here
                 kl_loss = torch.distributions.normal.Normal(
                         loc=mu,
-                        scale=torch.abs(_sigma)).log_prob(theta).sum() -\
+                        scale=torch.abs(sigma)).log_prob(theta).sum() -\
                           self.theta_prior.log_prob(theta).sum()
             
             d_kl_d_mu = torch.autograd.grad(
-                kl_loss, mu, retain_graph=True)[0]
+                kl_loss, mu, retain_graph=True)
             d_kl_d_sigma = torch.autograd.grad(
-                kl_loss, _sigma, retain_graph=True)[0]
+                kl_loss, sigma, retain_graph=True)
             d_kl_d_theta = torch.autograd.grad(
-                kl_loss, theta, retain_graph=False)[0]
+                kl_loss, theta, retain_graph=False)
 
             # put the results in state dicts
-            state['d_kl_d_mu'] = d_kl_d_mu
-            state['d_kl_d_sigma'] = d_kl_d_log_sigma
-            state['d_kl_d_theta'] = d_kl_d_theta
+            state['d_kl_d_mu'] = d_kl_d_mu[0]
+            state['d_kl_d_sigma'] = d_kl_d_sigma[0]
+            state['d_kl_d_theta'] = d_kl_d_theta[0]
 
             # keep track of perturbation noise for cancellation later
             state['mu'] = mu
@@ -134,11 +133,11 @@ class BBB(pinot.inference.Sampler):
             sigma.requires_grad = True
 
             sigma.backward(
-                state['epsilon'] * sigma * (p.grad + state['d_kl_d_theta']) +\
-                            state['d_kl_d_log_sigma'])
+                state['epsilon'] * (p.grad + state['d_kl_d_theta']) +\
+                            state['d_kl_d_sigma'])
             
             # modify grad
-            p.grad.add(state['d_kl_d_mu'] + state['d_kl_d_theta'])
+            p.grad.add_(state['d_kl_d_mu'] + state['d_kl_d_theta'])
         
         # update parameters based on whatever schedule
         # `self.optimizer` proposes
