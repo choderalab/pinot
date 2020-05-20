@@ -137,7 +137,8 @@ class BBB(pinot.inference.Sampler):
             log_sigma.requires_grad = True
 
             log_sigma.backward(
-                state['epsilon'] * (p.grad + state['d_kl_d_theta']) +\
+                state['epsilon'] * (p.grad + state['d_kl_d_theta'])/\
+                        (1 + torch.exp(-log_sigma)) +\
                             state['d_kl_d_log_sigma'])
             
             # modify grad
