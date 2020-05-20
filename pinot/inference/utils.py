@@ -2,7 +2,7 @@ import torch
 import pinot
 
 @torch.no_grad()
-def condition(net, g, sampler=None, n_samples=1):
+def condition_mixture(net, g, sampler=None, n_samples=1):
     """ Get the predicted distribution of measurement
     conditioned on input.
 
