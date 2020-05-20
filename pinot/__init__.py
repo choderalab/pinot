@@ -20,3 +20,4 @@ from pinot.net import Net
 
 from pinot.inference.adlala import AdLaLa
 from pinot.inference.sgld import SGLD
+from pinot.inference.bbb import BBB
