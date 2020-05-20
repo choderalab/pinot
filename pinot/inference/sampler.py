@@ -56,18 +56,18 @@ class Sampler(torch.optim.Optimizer, abc.ABC):
         # (n_samples, batch_size, measurement_dimension)
         mu = torch.stack(mus)
         sigma = torch.stack(sigmas)
-
-        # construct distribution            
-        distribution = torch.distributions.Normal.normal(
+        
+        # construct the distribution
+        distribution = torch.distributions.normal.Normal(
                 loc=mu,
                 scale=sigma)
-         
+
         # make it mixture
         distribution = torch.distributions.mixture_same_family\
                 .MixtureSameFamily(
                         torch.distributions.Categorical(
-                            torch.ones(mu.shape[0])),
-                        distribution)
+                            torch.ones(mu.shape[0],)),
+                        torch.distributions.Independent(distribution, 2))
 
         return distribution
 
