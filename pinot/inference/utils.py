@@ -20,7 +20,7 @@ def condition_mixture(net, g, sampler=None, n_samples=1):
     for _ in range(n_samples):
         if sampler is not None and hasattr(
             sampler,
-            sample_params):
+            'sample_params'):
             self.sample_params()
             
         distributions.append(net.condition(g))
