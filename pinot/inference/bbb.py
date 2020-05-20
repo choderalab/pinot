@@ -27,27 +27,27 @@ class BBB(pinot.inference.Sampler):
 
         # copy the original param group
         # this makes the hyperparameters stable
-        log_sigma_param_group = self.optimizer.param_groups[0].copy()
+        sigma_param_group = self.optimizer.param_groups[0].copy()
 
         # initialize log_sigma
-        log_sigma_param_group['params'] = [torch.distributions.normal.Normal(
+        sigma_param_group['params'] = [torch.distributions.normal.Normal(
             loc=torch.zeros_like(p),
             scale=initializer_std * torch.ones_like(p)).sample()
             for p in log_sigma_param_group['params']]
 
         # append this to param_group
         self.optimizer.add_param_group(
-                log_sigma_param_group)
+                sigma_param_group)
         
         # initialize
-        for p, log_sigma in zip(
+        for p, sigma in zip(
                 *[
                     self.optimizer.param_groups[0]['params'],
                     self.optimizer.param_groups[1]['params']
                 ]):
             
             p.grad = torch.zeros_like(p)
-            log_sigma.grad = torch.zeros_like(log_sigma)
+            sigma.grad = torch.zeros_like(sigma)
 
         self.optimizer.step()
         self.optimizer.zero_grad()
@@ -65,7 +65,7 @@ class BBB(pinot.inference.Sampler):
         # just in case
         loss = None
 
-        for p, log_sigma in zip(
+        for p, sigma in zip(
                 *[
                     self.optimizer.param_groups[0]['params'],
                     self.optimizer.param_groups[1]['params']
@@ -79,40 +79,37 @@ class BBB(pinot.inference.Sampler):
                     torch.zeros_like(p),
                     torch.ones_like(p)).sample()
             
-            # clone mu and log_sigma
+            # clone mu and sigma
             mu = p.detach().clone()
-
-            # make a copy of sigma to make sure we don't mess up the rest of
-            # the gradients
-            _log_sigma = log_sigma.detach().clone()
+            _sigma = sigma.detach().clone()
 
             # perturb p to get theta
             # $ \theta = \mu + \sigma \epsilon $
-            theta = p + epsilon * torch.exp(_log_sigma)
+            theta = p + epsilon * sigma
             p.copy_(theta)
 
             # calculate kl loss and the gradients thereof
             with torch.enable_grad():
                 mu.requires_grad = True
                 theta.requires_grad = True
-                _log_sigma.requires_grad = True
+                _sigma.requires_grad = True
                  
                 # compute the kl loss term here
                 kl_loss = torch.distributions.normal.Normal(
                         loc=mu,
-                        scale=torch.exp(_log_sigma)).log_prob(theta).sum() -\
+                        scale=torch.abs(_sigma)).log_prob(theta).sum() -\
                           self.theta_prior.log_prob(theta).sum()
             
             d_kl_d_mu = torch.autograd.grad(
                 kl_loss, mu, retain_graph=True)[0]
-            d_kl_d_log_sigma = torch.autograd.grad(
-                kl_loss, _log_sigma, retain_graph=True)[0]
+            d_kl_d_sigma = torch.autograd.grad(
+                kl_loss, _sigma, retain_graph=True)[0]
             d_kl_d_theta = torch.autograd.grad(
                 kl_loss, theta, retain_graph=False)[0]
 
             # put the results in state dicts
             state['d_kl_d_mu'] = d_kl_d_mu
-            state['d_kl_d_log_sigma'] = d_kl_d_log_sigma
+            state['d_kl_d_sigma'] = d_kl_d_log_sigma
             state['d_kl_d_theta'] = d_kl_d_theta
 
             # keep track of perturbation noise for cancellation later
@@ -123,7 +120,7 @@ class BBB(pinot.inference.Sampler):
         with torch.enable_grad():
             loss = closure()
 
-        for p, log_sigma in zip(
+        for p, sigma in zip(
                 *[
                     self.optimizer.param_groups[0]['params'],
                     self.optimizer.param_groups[1]['params']
@@ -134,10 +131,10 @@ class BBB(pinot.inference.Sampler):
             # cancel the perturbation
             p.copy_(state['mu'])
 
-            log_sigma.requires_grad = True
+            sigma.requires_grad = True
 
-            log_sigma.backward(
-                state['epsilon'] * torch.exp(log_sigma) * (p.grad + state['d_kl_d_theta']) +\
+            sigma.backward(
+                state['epsilon'] * sigma * (p.grad + state['d_kl_d_theta']) +\
                             state['d_kl_d_log_sigma'])
             
             # modify grad
@@ -152,7 +149,7 @@ class BBB(pinot.inference.Sampler):
 
     def sample_params(self):
         with torch.no_grad():
-            for p, log_sigma in zip(
+            for p, sigma in zip(
                     *[
                         self.optimizer.param_groups[0]['params'],
                         self.optimizer.param_groups[1]['params']
@@ -161,12 +158,12 @@ class BBB(pinot.inference.Sampler):
                 p.copy_(
                     torch.distributions.normal.Normal(
                         loc=self.optimizer.state[p]['mu'],
-                        scale=torch.exp(log_sigma)
+                        scale=torch.abs(sigma)
                     ).sample())
                 
     def expectation_params(self):
         with torch.no_grad():
-            for p, log_sigma in zip(
+            for p, sigma in zip(
                     *[
                         self.optimizer.param_groups[0]['params'],
                         self.optimizer.param_groups[1]['params']
