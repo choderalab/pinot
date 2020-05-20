@@ -41,7 +41,7 @@ class Sampler(torch.optim.Optimizer, abc.ABC):
         distributions = []
         
         for _ in range(n_samples):
-            self.sample_parameters()
+            self.sample_params()
             distributions.append(net.condition(g))
 
         # get the parameter of these distributions
