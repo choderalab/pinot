@@ -242,3 +242,22 @@ class AdLaLa(torch.optim.Optimizer):
 
         self.B_step(1, 1.0)  # requires gradient
         self.B_step(0, 1.0)  # requires gradient
+
+    @torch.no_grad()
+    def sample_params(self):
+        self.zero_grad()
+
+        def closure():
+            for group in self.param_groups:
+                for w in group["params"]:
+                    w.backward(torch.zeros_like(w))
+
+
+        # self.step(closure)            
+
+        self.D_step(0, 0.5)
+        self.E_step(0, 0.5)
+        self.O_step(1, 1.0)
+        self.E_step(0, 0.5)
+        self.D_step(0, 0.5)
+                    
