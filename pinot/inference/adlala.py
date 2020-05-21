@@ -7,7 +7,7 @@ import torch
 # =============================================================================
 # MODULE CLASSES
 # =============================================================================
-class AdLaLa(torch.optim.Optimizer):
+class AdLaLa(pinot.inference.Sampler):
     """ Adaptive Langevin-Langevin Integrator.
 
     Apply the following kinds of update steps to different "partitions" (i.e. param_groups)
@@ -261,3 +261,9 @@ class AdLaLa(torch.optim.Optimizer):
         self.E_step(0, 0.5)
         self.D_step(0, 0.5)
                     
+    @torch.no_grad()
+    def expectation_params(self):
+        # TODO:
+        # is there anything we can do here?
+        pass
+    
