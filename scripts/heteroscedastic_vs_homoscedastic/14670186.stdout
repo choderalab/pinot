@@ -1,0 +1,40 @@
+Sender: LSF System <lsfadmin@ls12>
+Subject: Job 14670186: <python run.py> in cluster <lila> Done
+
+Job <python run.py> was submitted from host <lilac> by user <wangy1> in cluster <lila> at Tue May 19 00:22:37 2020
+Job was executed on host(s) <4*ls12>, in queue <gpuqueue>, as user <wangy1> in cluster <lila> at Tue May 19 00:22:37 2020
+</home/wangy1> was used as the home directory.
+</data/chodera/wangyq/pinot/scripts/heteroscedastic_vs_homoscedastic> was used as the working directory.
+Started at Tue May 19 00:22:37 2020
+Terminated at Tue May 19 00:29:11 2020
+Results reported at Tue May 19 00:29:11 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+python run.py
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   678.38 sec.
+    Max Memory :                                 -
+    Average Memory :                             -
+    Total Requested Memory :                     32.00 GB
+    Delta Memory :                               -
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                19
+    Run time :                                   395 sec.
+    Turnaround time :                            394 sec.
+
+The output (if any) follows:
+
+/home/wangy1/miniconda3/envs/pinot/lib/python3.7/site-packages/torch/nn/functional.py:1340: UserWarning: nn.functional.tanh is deprecated. Use torch.tanh instead.
+  warnings.warn("nn.functional.tanh is deprecated. Use torch.tanh instead.")
+representation_hidden_units 32
+representation_hidden_units 32
+representation_hidden_units 32

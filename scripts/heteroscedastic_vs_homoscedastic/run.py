@@ -26,7 +26,7 @@ def run():
             data_tr=ds_tr,
             data_te=ds_te,
             optimizer=torch.optim.Adam(net.parameters(), 1e-3),
-            n_epochs=3000,
+            n_epochs=300,
             record_interval=1)
 
         return train_and_test

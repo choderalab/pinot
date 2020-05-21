@@ -1,4 +1,3 @@
-import pinot.inference.svgd
-import pinot.inference.adlala
-import pinot.inference.sgld
-import pinot.inference.bbb
+import pinot.inference
+
+from pinot.inference.sampler import Sampler
