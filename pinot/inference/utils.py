@@ -5,14 +5,12 @@ import pinot
 def condition_mixture(net, g, sampler=None, n_samples=1):
     """ Get the predicted distribution of measurement
     conditioned on input.
-
     Parameters
     ----------
     net : `pinot.Net` module
     g : input of net
     n_samples : int, default=1,
         number of copies of distributions to be mixed.
-
     """
     # initialize a list of distributions
     distributions = []
