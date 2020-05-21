@@ -18,12 +18,14 @@ class BBB(pinot.inference.Sampler):
             optimizer, 
             initializer_std=0.1,
             theta_prior=torch.distributions.normal.Normal(0, 1.),
-            sigma_lr=1e-5
+            sigma_lr=1e-5,
+            kl_loss_scaling=1.0
         ):
         
         self.optimizer = optimizer
         self.theta_prior = theta_prior
-
+        self.kl_loss_scaling=kl_loss_scaling
+        
         # TODO:
         # make this compilable with more than one param group
         assert len(self.optimizer.param_groups
@@ -103,7 +105,7 @@ class BBB(pinot.inference.Sampler):
                 kl_loss = torch.distributions.normal.Normal(
                         loc=mu,
                         scale=torch.exp(sigma)).log_prob(theta).sum() -\
-                          self.theta_prior.log_prob(theta).sum()
+                          self.kl_loss_scaling * self.theta_prior.log_prob(theta).sum()
             
             d_kl_d_mu = torch.autograd.grad(
                 kl_loss, mu, retain_graph=True)
