@@ -13,8 +13,6 @@ class Sampler(torch.optim.Optimizer, abc.ABC):
     """ The base class for samplers.
 
     """
-    def __init__(self):
-        super(Sampler, self).__init__()
    
     @abstractmethod
     def sample_params(self,  *args, **kwargs):
