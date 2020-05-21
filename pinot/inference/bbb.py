@@ -13,8 +13,12 @@ import pinot
 class BBB(pinot.inference.Sampler):
     """ Gaussian Variational Posterior Bayesian-by-Backprop.
     """
-    def __init__(self, optimizer, initializer_std=1e-3,
-            theta_prior=torch.distributions.normal.Normal(0, 10.)
+    def __init__(
+            self, 
+            optimizer, 
+            initializer_std=0.1,
+            theta_prior=torch.distributions.normal.Normal(0, 1.),
+            sigma_lr=1e-5
         ):
         
         self.optimizer = optimizer
@@ -32,8 +36,10 @@ class BBB(pinot.inference.Sampler):
         # initialize log_sigma
         sigma_param_group['params'] = [torch.distributions.normal.Normal(
             loc=torch.zeros_like(p),
-            scale=initializer_std * torch.ones_like(p)).sample()
+            scale=initializer_std * torch.ones_like(p)).sample().abs().log()
             for p in sigma_param_group['params']]
+
+        sigma_param_group['lr'] = sigma_lr
 
         # append this to param_group
         self.optimizer.add_param_group(
@@ -84,7 +90,7 @@ class BBB(pinot.inference.Sampler):
 
             # perturb p to get theta
             # $ \theta = \mu + \sigma \epsilon $
-            theta = p + epsilon * sigma
+            theta = p + epsilon * torch.exp(sigma)
             p.copy_(theta)
 
             # calculate kl loss and the gradients thereof
@@ -96,7 +102,7 @@ class BBB(pinot.inference.Sampler):
                 # compute the kl loss term here
                 kl_loss = torch.distributions.normal.Normal(
                         loc=mu,
-                        scale=torch.abs(sigma)).log_prob(theta).sum() -\
+                        scale=torch.exp(sigma)).log_prob(theta).sum() -\
                           self.theta_prior.log_prob(theta).sum()
             
             d_kl_d_mu = torch.autograd.grad(
@@ -133,7 +139,7 @@ class BBB(pinot.inference.Sampler):
             sigma.requires_grad = True
 
             sigma.backward(
-                state['epsilon'] * (p.grad + state['d_kl_d_theta']) +\
+                state['epsilon'] * torch.exp(sigma) * (p.grad + state['d_kl_d_theta']) +\
                             state['d_kl_d_sigma'])
             
             # modify grad
@@ -157,7 +163,7 @@ class BBB(pinot.inference.Sampler):
                 p.copy_(
                     torch.distributions.normal.Normal(
                         loc=self.optimizer.state[p]['mu'],
-                        scale=torch.abs(sigma)
+                        scale=torch.exp(sigma)
                     ).sample())
                 
     def expectation_params(self):
