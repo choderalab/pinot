@@ -53,7 +53,6 @@ class Net(torch.nn.Module):
                 layer for layer in list(self.representation.modules())\
                         if hasattr(layer, 'out_features')][-1].out_features
 
-        print('representation_hidden_units %s' % representation_hidden_units)
 
         if output_regression is None:
             # make the output regression as simple as a linear one
