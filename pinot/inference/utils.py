@@ -79,8 +79,16 @@ def confidence_interval(distribution, percentage=0.95, n_samples=1000):
         low_idx = int(n_samples * (1 - percentage) / 2) 
         high_idx = int(n_samples * (1 - (1 - percentage) / 2))
 
-        low = samples_sorted[low_idx, :, :]
-        high = samples_sorted[high_idx, :, :]
+        if sample_sorted.dim() == 3:
+            low = samples_sorted[low_idx, :, :]
+            high = samples_sorted[high_idx, :, :]
+        
+        elif sample_sorted.dim() == 2:
+            low = samples_sorted[low_idx, :]
+            high = samples_sorted[high_idx, :]
+            
+        else:
+            raise Exception('sorry, either two or three dimensions')
         
     
     return low, high
