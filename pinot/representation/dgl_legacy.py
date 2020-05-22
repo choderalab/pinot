@@ -35,11 +35,8 @@ class GN(torch.nn.Module):
         self.in_features = in_features
         self.out_features = out_features
 
-    def forward(self, g):
-        x = g.ndata["h"]
-        x = self.gn(g, x)
-        g.ndata["h"] = x
-        return g
+    def forward(self, g, x):
+        return self.gn(g, x)
 
 # =============================================================================
 # MODULE FUNCTIONS
