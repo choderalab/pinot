@@ -64,7 +64,7 @@ class Sequential(torch.nn.Module):
             pool=lambda g: dgl.sum_nodes(g, 'h')):
     
         if x is None:
-            x = g.ndata['h0']
+            x = g.ndata['h']
 
         x = self.f_in(x)
 
