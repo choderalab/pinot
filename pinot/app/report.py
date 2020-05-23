@@ -55,14 +55,14 @@ def visual(results_dict):
 
             # sort it ascending
             idxs.sort()
-
+            
             ax.plot(
                 idxs,
                 [
                     results[metric][idx]
                     for idx in idxs
                 ],
-                label=ds_name,
+                label=ds_name
             )
 
         ax.set_xlabel("epochs")
@@ -72,6 +72,64 @@ def visual(results_dict):
     plt.legend()
 
     return fig
+
+def visual_multiple(results_dicts):
+    from matplotlib import pyplot as plt
+    from matplotlib import cm as cm
+    
+    plt.rc("font", size=14)
+    plt.rc("lines", linewidth=6)
+
+    # initialize the figure
+    fig = plt.figure(figsize=(8, 3))
+
+    # get all the results
+    metrics = list(list(results_dicts[0].values())[0].keys())
+    n_metrics = len(metrics)
+
+    # loop through pod
+    for idx_metric, metric in enumerate(metrics):
+        ax = plt.subplot(1, n_metrics, idx_metric + 1)
+        
+        # loop through results
+        for idx_result, results_dict in results_dicts:
+            
+            for ds_name, results in results_dict.items():
+
+                # get all the recorded indices
+                idxs = list(
+                        [
+                            key for key in results[metric].keys() if isinstance(key, int)
+                        ])
+
+                # sort it ascending
+                idxs.sort()
+
+                ax.plot(
+                    idxs,
+                    [
+                        results[metric][idx]
+                        for idx in idxs
+                    ],
+                    label=ds_name,
+                    c=cm.tab20(idx_result)
+                    )
+
+                label = None
+                linestyle = 'dotted'
+                
+                if ds_name == 'training':
+                    label = results['#']
+                    linestyle = 'solid'
+
+        ax.set_xlabel("epochs")
+        ax.set_ylabel(metric)
+    
+    plt.legend()
+    plt.tight_layout()
+
+    return fig
+
 
 def visual_base64(results_dict):
     fig = visual(results_dict)
