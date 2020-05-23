@@ -75,8 +75,8 @@ class Sequential(torch.nn.Module):
                 x = getattr(self, exe)(x)
 
         if pool is not None:
-            g = g.local_var()
-            g.ndata['h'] = x
-            x = pool(g)
+            with g.local_scope():
+                g.ndata['h'] = x
+                x = pool(g)
 
         return x
