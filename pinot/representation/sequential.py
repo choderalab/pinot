@@ -27,14 +27,6 @@ class Sequential(torch.nn.Module):
             torch.nn.Linear(feature_units, input_units), torch.nn.Tanh()
         )
 
-        # make a pytorch function on tensors on graphs
-        def apply_atom_in_graph(fn):
-            def _fn(g):
-                g.apply_nodes(lambda node: {"h": fn(node.data["h"])})
-                return g
-
-            return _fn
-
         # parse the config
         for idx, exe in enumerate(config):
 
@@ -57,27 +49,34 @@ class Sequential(torch.nn.Module):
             elif isinstance(exe, str):
                 activation = getattr(torch.nn.functional, exe)
 
-                setattr(self, "a" + str(idx), apply_atom_in_graph(activation))
+                setattr(self, "a" + str(idx), activation)
 
                 self.exes.append("a" + str(idx))
 
             # float -> dropout
             elif isinstance(exe, float):
                 dropout = torch.nn.Dropout(exe)
-                setattr(self, "o" + str(idx), apply_atom_in_graph(dropout))
+                setattr(self, "o" + str(idx), dropout)
 
                 self.exes.append("o" + str(idx))
 
-    def forward(self, g, return_graph=False):
+    def forward(self, g, x=None, 
+            pool=lambda g: dgl.sum_nodes(g, 'h')):
+    
+        if x is None:
+            x = g.ndata['h']
 
-        g.apply_nodes(lambda nodes: {"h": self.f_in(nodes.data["h0"])})
+        x = self.f_in(x)
 
         for exe in self.exes:
-            g = getattr(self, exe)(g)
+            if exe.startswith('d'):
+                x = getattr(self, exe)(g, x)
+            else:
+                x = getattr(self, exe)(x)
 
-        if return_graph == True:
-            return g
+        if pool is not None:
+            g = g.local_var()
+            g.ndata['h'] = x
+            x = pool(g)
 
-        h_hat = dgl.sum_nodes(g, "h")
-
-        return h_hat
+        return x

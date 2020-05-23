@@ -127,7 +127,7 @@ def from_oemol(mol, use_fp=True):
     if use_fp == True:
         h_v = torch.cat([h_v, h_v_fp], dim=-1)  # (n_atoms, 117)
 
-    g.ndata["h0"] = h_v
+    g.ndata["h"] = h_v
 
     # enter bonds
     bonds = list(mol.GetBonds())
@@ -139,7 +139,8 @@ def from_oemol(mol, use_fp=True):
     g.add_edges(bonds_begin_idxs, bonds_end_idxs)
     g.add_edges(bonds_end_idxs, bonds_begin_idxs)
 
-    g.edata["type"] = torch.Tensor(bonds_types)[:, None].repeat(2, 1)
+    # no edge data for now
+    # g.edata["type"] = torch.Tensor(bonds_types)[:, None].repeat(2, 1)
 
     return g
 
@@ -166,7 +167,7 @@ def from_rdkit_mol(mol, use_fp=True):
     if use_fp == True:
         h_v = torch.cat([h_v, h_v_fp], dim=-1)  # (n_atoms, 117)
 
-    g.ndata["h0"] = h_v
+    g.ndata["h"] = h_v
 
     # enter bonds
     bonds = list(mol.GetBonds())
@@ -178,6 +179,7 @@ def from_rdkit_mol(mol, use_fp=True):
     g.add_edges(bonds_begin_idxs, bonds_end_idxs)
     g.add_edges(bonds_end_idxs, bonds_begin_idxs)
 
-    g.edata["type"] = torch.Tensor(bonds_types)[:, None].repeat(2, 1)
+    # no edge data for now
+    # g.edata["type"] = torch.Tensor(bonds_types)[:, None].repeat(2, 1)
 
     return g
