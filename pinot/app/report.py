@@ -78,22 +78,24 @@ def visual_multiple(results_dicts):
     from matplotlib import cm as cm
     
     plt.rc("font", size=14)
-    plt.rc("lines", linewidth=6)
+    plt.rc("lines", linewidth=4)
 
     # initialize the figure
-    fig = plt.figure(figsize=(8, 3))
+    fig = plt.figure(figsize=(10, 6))
 
     # get all the results
-    metrics = list(list(results_dicts[0].values())[0].keys())
+    metrics = list(list(results_dicts[0][1].values())[0].keys())
     n_metrics = len(metrics)
 
-    # loop through pod
+    # loop through metrics
     for idx_metric, metric in enumerate(metrics):
-        ax = plt.subplot(1, n_metrics, idx_metric + 1)
+        ax = plt.subplot(n_metrics, 1, idx_metric + 1)
         
         # loop through results
-        for idx_result, results_dict in results_dicts:
+        for idx_result, config_and_results_dict in enumerate(results_dicts):
             
+            config, results_dict = config_and_results_dict
+
             for ds_name, results in results_dict.items():
 
                 # get all the recorded indices
@@ -105,27 +107,33 @@ def visual_multiple(results_dicts):
                 # sort it ascending
                 idxs.sort()
 
+                label = None
+                linestyle = 'dotted'
+                
+                if ds_name == 'training':
+                    label = config['#']
+                    linestyle = 'solid'
+
                 ax.plot(
                     idxs,
                     [
                         results[metric][idx]
                         for idx in idxs
                     ],
-                    label=ds_name,
-                    c=cm.tab20(idx_result)
+                    label=label,
+                    c=cm.gist_rainbow(
+                        (float(idx_result) / len(results_dicts))
+                        ),
+                    linestyle=linestyle,
+                    alpha=0.8
                     )
 
-                label = None
-                linestyle = 'dotted'
-                
-                if ds_name == 'training':
-                    label = results['#']
-                    linestyle = 'solid'
+
 
         ax.set_xlabel("epochs")
         ax.set_ylabel(metric)
     
-    plt.legend()
+    plt.legend(bbox_to_anchor=(1.04,0), loc="lower left")
     plt.tight_layout()
 
     return fig
