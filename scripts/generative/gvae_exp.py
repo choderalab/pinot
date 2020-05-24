@@ -6,7 +6,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('--epochs', type=int, default=100, help='Number of epochs to train.')
 parser.add_argument('--split', type=list, default=[0.8, 0.2], help="train, test, validation split, default = [0.8, 0.2] (No validation)")
-parser.add_argument('--batch_size', type=int, default=1, help="batch-size, i.e, how many molecules get 'merged' to form a graph per iteration during traing")
+parser.add_argument('--batch_size', type=int, default=10, help="batch-size, i.e, how many molecules get 'merged' to form a graph per iteration during traing")
 parser.add_argument('--lr', type=float, default=0.001, help='Learning rate.')
 
 args = parser.parse_args()
@@ -38,49 +38,62 @@ def train(args):
 
     # Initialize the model and the optimization scheme
     feat_dim = train_data[0][0].ndata["h"].shape[1]
-    model = GCNModelVAE(feat_dim)
+    model = GCNModelVAE(feat_dim, log_lik_scale=1./len(batched_train_data))
     optimizer = optim.Adam(model.parameters(), args.lr)
+
+    train = Train(model, batched_train_data, optimizer, 100)
 
     for epoch in range(args.epochs):
         t = time.time()
 
         total_epoch_tr_loss = 0.
         average_accuracy = 0.
+        average_TN = 0.
+        average_TP = 0.
 
-        for g_data in batched_train_data:
+        for g, _ in batched_train_data:
             ################ DATA PREPARATION #########################
-            g = g_data[0]
             adj_mat = g.adjacency_matrix(True).to_dense()
+            ################# Optimization ############################
 
-            ################ Optimization ######################
-            model.train()
-            optimizer.zero_grad()
-            n_nodes, num_features = g.ndata["h"].shape
-            assert(num_features == feat_dim)
-            # Compute the (sub-sampled) negative ELBO loss
-            loss = model.loss(g, log_lik_scale=1./len(batched_train_data))
-            loss.backward()
-            cur_loss = loss.item()
-            optimizer.step()
-
+            loss  = model.loss(g)
             total_epoch_tr_loss += loss.detach()
-
             predicted_edges, _, _ = model.encode_and_decode(g)
             average_accuracy += 1/len(batched_train_data) *\
-                 accuracy_edge_prediction(predicted_edges, adj_mat)
-
-        print("Epoch:", '%04d' % (epoch + 1), "train_loss=", \
-            "{:.5f}".format(total_epoch_tr_loss),\
-            "avg edge reconstruction accuracy = {:.5f}".format(average_accuracy)
+                    accuracy_edge_prediction(predicted_edges, adj_mat)
+            average_TN += 1/len(batched_train_data) *\
+                    true_negative_edge_prediction(predicted_edges, adj_mat)
+            average_TP += 1/len(batched_train_data) *\
+                    true_positive_edge_prediction(predicted_edges, adj_mat)
+                    
+        print("Epoch:", '%04d' % (epoch + 1),
+            "train_loss= {:.5f}".format(total_epoch_tr_loss),\
+            ",avg accuracy (edge prediction) = {:.5f}".format(average_accuracy),
+            ",avg TN (edge prediction) = {:.5f}".format(average_TN),
+            ",avg TP (edge prediction) = {:.5f}".format(average_TP),
         )
+
+        train.train_once()
+
 
     print("Optimization Finished!")
 
+
+################ METRICS ON EDGE PREDICTION ###################
 
 def accuracy_edge_prediction(predicted_edges, adj_mat):
     pos_pred = (predicted_edges > 0.5).int()
     return torch.mean((pos_pred == adj_mat).float())
 
+def true_negative_edge_prediction(predicted_edges, adj_mat):
+    true_negatives = ((predicted_edges < 0.5) & (adj_mat==0)).int().sum()
+    negatives = (adj_mat == 0).int().sum()
+    return true_negatives.float()/negatives
+
+def true_positive_edge_prediction(predicted_edges, adj_mat):
+    true_positives = ((predicted_edges > 0.5) & (adj_mat==1)).int().sum()
+    positives = (adj_mat != 0).int().sum()
+    return true_positives.float()/positives
 
 if __name__ == '__main__':
     train(args)

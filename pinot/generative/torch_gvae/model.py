@@ -8,7 +8,8 @@ class GCNModelVAE(nn.Module):
     """Graph convolutional neural networks for VAE
     """
     def __init__(self, input_feat_dim, hidden_dim1=32, \
-            hidden_dim2=32, hidden_dim3=16, dropout=0.1):
+            hidden_dim2=32, hidden_dim3=16, dropout=0.1, \
+            log_lik_scale=1):
         """ Construct a VAE with GCN
         """
         super(GCNModelVAE, self).__init__()
@@ -21,7 +22,9 @@ class GCNModelVAE(nn.Module):
             GN(hidden_dim2, hidden_dim3),
         ])
         # Decoder
-        self.dc = InnerProductDecoder(dropout, act=lambda x: x)
+        self.dc = InnerProductDecoder(dropout)
+        # Relative weight between the KL divergence and the log likelihood term
+        self.log_lik_scale = log_lik_scale
 
     def forward(self, g):
         """ Compute the parameters of the approximate Gaussian posterior
@@ -75,7 +78,7 @@ class GCNModelVAE(nn.Module):
         return self.dc(z_sample), mu, logvar
 
 
-    def loss(self, g, y=None, log_lik_scale=0.1):
+    def loss(self, g, y=None):
         """ Compute negative ELBO loss
         """
         predicted_edges, mu, logvar = self.encode_and_decode(g)
@@ -84,7 +87,7 @@ class GCNModelVAE(nn.Module):
         loss = negative_ELBO(preds=predicted_edges,
                             labels=adj_mat,
                             mu=mu, logvar=logvar,
-                            norm=log_lik_scale)
+                            norm=self.log_lik_scale)
         return loss
 
 
