@@ -58,6 +58,7 @@ class GCNModelVAE(nn.Module):
 
         return distribution, theta[0], theta[1]
 
+    # TODO: separate between training and testing
     def encode_and_decode(self, g):
         """ Forward pass through the GVAE
 

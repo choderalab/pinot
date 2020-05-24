@@ -23,7 +23,7 @@ from pinot.generative.torch_gvae.model import GCNModelVAE
 from pinot.generative.torch_gvae.loss import negative_ELBO
 from pinot.app.experiment import Train, Test, TrainAndTest, MultipleTrainAndTest
 
-def train(args):
+def run(args):
     # Grab some data from esol
     ds = pinot.data.esol()
     
@@ -41,59 +41,37 @@ def train(args):
     model = GCNModelVAE(feat_dim, log_lik_scale=1./len(batched_train_data))
     optimizer = optim.Adam(model.parameters(), args.lr)
 
-    train = Train(model, batched_train_data, optimizer, 100)
+    # Setting up training and testing
+    train_and_test = TrainAndTest(model, batched_train_data, test_data, optimizer,
+                    [accuracy_edge_prediction, true_negative_edge_prediction, true_positive_edge_prediction],
+                    n_epochs=1)
 
-    for epoch in range(args.epochs):
-        t = time.time()
-
-        total_epoch_tr_loss = 0.
-        average_accuracy = 0.
-        average_TN = 0.
-        average_TP = 0.
-
-        for g, _ in batched_train_data:
-            ################ DATA PREPARATION #########################
-            adj_mat = g.adjacency_matrix(True).to_dense()
-            ################# Optimization ############################
-
-            loss  = model.loss(g)
-            total_epoch_tr_loss += loss.detach()
-            predicted_edges, _, _ = model.encode_and_decode(g)
-            average_accuracy += 1/len(batched_train_data) *\
-                    accuracy_edge_prediction(predicted_edges, adj_mat)
-            average_TN += 1/len(batched_train_data) *\
-                    true_negative_edge_prediction(predicted_edges, adj_mat)
-            average_TP += 1/len(batched_train_data) *\
-                    true_positive_edge_prediction(predicted_edges, adj_mat)
-                    
-        print("Epoch:", '%04d' % (epoch + 1),
-            "train_loss= {:.5f}".format(total_epoch_tr_loss),\
-            ",avg accuracy (edge prediction) = {:.5f}".format(average_accuracy),
-            ",avg TN (edge prediction) = {:.5f}".format(average_TN),
-            ",avg TP (edge prediction) = {:.5f}".format(average_TP),
-        )
-
-        train.train_once()
-
+    results = train_and_test.run()
 
     print("Optimization Finished!")
 
 
 ################ METRICS ON EDGE PREDICTION ###################
 
-def accuracy_edge_prediction(predicted_edges, adj_mat):
+def accuracy_edge_prediction(net, g, y):
+    adj_mat = g.adjacency_matrix().to_dense()
+    predicted_edges, _, _ = net.encode_and_decode(g)
     pos_pred = (predicted_edges > 0.5).int()
     return torch.mean((pos_pred == adj_mat).float())
 
-def true_negative_edge_prediction(predicted_edges, adj_mat):
+def true_negative_edge_prediction(net, g, y):
+    adj_mat = g.adjacency_matrix().to_dense()
+    predicted_edges, _, _ = net.encode_and_decode(g)
     true_negatives = ((predicted_edges < 0.5) & (adj_mat==0)).int().sum()
     negatives = (adj_mat == 0).int().sum()
     return true_negatives.float()/negatives
 
-def true_positive_edge_prediction(predicted_edges, adj_mat):
+def true_positive_edge_prediction(net, g, y):
+    adj_mat = g.adjacency_matrix().to_dense()
+    predicted_edges, _, _ = net.encode_and_decode(g)
     true_positives = ((predicted_edges > 0.5) & (adj_mat==1)).int().sum()
     positives = (adj_mat != 0).int().sum()
     return true_positives.float()/positives
 
 if __name__ == '__main__':
-    train(args)
+    run(args)
