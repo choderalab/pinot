@@ -80,6 +80,49 @@ def sparse_mx_to_torch_sparse_tensor(sparse_mx):
     return torch.sparse.FloatTensor(indices, values, shape)
 
 
+def get_train_test_val_set(raw_data, train_ratio=0.8, test_ratio=0.1):
+    assert (train_ratio + test_ratio < 1)
+    val_ratio = 1 - train_ratio - test_ratio
+    # Returns training_data, validation_data, test_data
+    
+    data = []
+
+    for g, measurement in raw_data:
+        try:
+            adj_mat_sp = g.adjacency_matrix(True)
+
+            adj_mat = adj_mat_sp.to_dense().detach()
+            pos_weight = torch.FloatTensor(
+                    [(adj_mat.shape[0] * adj_mat.shape[0] - adj_mat.sum()) \
+                    / adj_mat.sum()])
+        
+            norm = adj_mat.shape[0] * adj_mat.shape[0] \
+                    / float((adj_mat.shape[0] * adj_mat.shape[0] \
+                        - adj_mat.sum()) * 2)
+
+            data.append((g, adj_mat, pos_weight, adj_mat, measurement))
+
+        except Exception as e:
+            print(e)
+            continue
+
+    N_molecules = len(data)
+
+    N_train = int(N_molecules * train_ratio)
+    N_test = int(N_molecules * test_ratio)
+    N_val  = N_molecules - N_train - N_test
+
+    rand_indices = np.random.permutation(N_molecules)
+    train_indices = rand_indices[:N_train]
+    test_indices  = rand_indices[N_train:N_train+N_test]
+    val_indices   = rand_indices[N_train+N_test:]
+
+    train_data = [data[i] for i in train_indices]
+    test_data  = [data[i] for i in test_indices]
+    val_data   = [data[i] for i in val_indices]
+    return train_data, test_data, val_data
+
+
 def prepare_train_test_val(data):
     """ Prepare training, testing and validation data for GVAE
     """

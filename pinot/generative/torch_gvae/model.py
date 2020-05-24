@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from pinot.representation.dgl_legacy import GN
-
+from pinot.generative.torch_gvae.loss import negative_ELBO
 
 class GCNModelVAE(nn.Module):
     """Graph convolutional neural networks for VAE
@@ -73,6 +73,19 @@ class GCNModelVAE(nn.Module):
         approx_posterior, mu, logvar = self.condition(g)
         z_sample = approx_posterior.rsample()
         return self.dc(z_sample), mu, logvar
+
+
+    def loss(self, g, y=None, log_lik_scale=0.1):
+        """ Compute negative ELBO loss
+        """
+        predicted_edges, mu, logvar = self.encode_and_decode(g)
+        adj_mat = g.adjacency_matrix(True).to_dense()
+        # Compute the (sub-sampled) negative ELBO loss
+        loss = negative_ELBO(preds=predicted_edges,
+                            labels=adj_mat,
+                            mu=mu, logvar=logvar,
+                            norm=log_lik_scale)
+        return loss
 
 
 class InnerProductDecoder(nn.Module):
