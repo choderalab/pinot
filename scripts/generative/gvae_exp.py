@@ -8,6 +8,7 @@ parser.add_argument('--epochs', type=int, default=100, help='Number of epochs to
 parser.add_argument('--split', type=list, default=[0.8, 0.2], help="train, test, validation split, default = [0.8, 0.2] (No validation)")
 parser.add_argument('--batch_size', type=int, default=10, help="batch-size, i.e, how many molecules get 'merged' to form a graph per iteration during traing")
 parser.add_argument('--lr', type=float, default=0.001, help='Learning rate.')
+parser.add_argument('--html', type=str, default="results.html", help="File to save results to")
 
 args = parser.parse_args()
 
@@ -22,6 +23,7 @@ from pinot.data.utils import batch, split
 from pinot.generative.torch_gvae.model import GCNModelVAE
 from pinot.generative.torch_gvae.loss import negative_ELBO
 from pinot.app.experiment import Train, Test, TrainAndTest, MultipleTrainAndTest
+from pinot.app.report import html
 
 def run(args):
     # Grab some data from esol
@@ -44,30 +46,35 @@ def run(args):
     # Setting up training and testing
     train_and_test = TrainAndTest(model, batched_train_data, test_data, optimizer,
                     [accuracy_edge_prediction, true_negative_edge_prediction, true_positive_edge_prediction],
-                    n_epochs=1)
+                    n_epochs=args.epochs)
 
     results = train_and_test.run()
 
-    print("Optimization Finished!")
+    print("Optimization Finished! Now printing results to", args.html)
+    html_string = html(results)
+    
+    f_handle = open(args.html, 'w')
+    f_handle.write(html_string)
+    f_handle.close()
 
 
 ################ METRICS ON EDGE PREDICTION ###################
 
 def accuracy_edge_prediction(net, g, y):
-    adj_mat = g.adjacency_matrix().to_dense()
+    adj_mat = g.adjacency_matrix(True).to_dense()
     predicted_edges, _, _ = net.encode_and_decode(g)
     pos_pred = (predicted_edges > 0.5).int()
     return torch.mean((pos_pred == adj_mat).float())
 
 def true_negative_edge_prediction(net, g, y):
-    adj_mat = g.adjacency_matrix().to_dense()
+    adj_mat = g.adjacency_matrix(True).to_dense()
     predicted_edges, _, _ = net.encode_and_decode(g)
     true_negatives = ((predicted_edges < 0.5) & (adj_mat==0)).int().sum()
     negatives = (adj_mat == 0).int().sum()
     return true_negatives.float()/negatives
 
 def true_positive_edge_prediction(net, g, y):
-    adj_mat = g.adjacency_matrix().to_dense()
+    adj_mat = g.adjacency_matrix(True).to_dense()
     predicted_edges, _, _ = net.encode_and_decode(g)
     true_positives = ((predicted_edges > 0.5) & (adj_mat==1)).int().sum()
     positives = (adj_mat != 0).int().sum()
