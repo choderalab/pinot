@@ -3,7 +3,7 @@ pinot
 [//]: # (Badges)
 
 ![](https://github.com/choderalab/pinot/workflows/CI/badge.svg)
-[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/choderalab/pinot.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/choderalab/pinot/context:javascript)
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/choderalab/pinot.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/choderalab/pinot/context:python)
 
 Probabilistic Inference for NOvel Therapeutics
 
