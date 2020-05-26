@@ -53,5 +53,9 @@ class Kernel(torch.nn.Module, abc.ABC):
 
         return nll
 
+    def inference(x_tr, y_tr, x_te, sigma=1.0):
+        r""" Calculate the predictive distribution given `x_te`.
 
+
+        """
 
