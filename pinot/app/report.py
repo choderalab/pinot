@@ -55,14 +55,14 @@ def visual(results_dict):
 
             # sort it ascending
             idxs.sort()
-
+            
             ax.plot(
                 idxs,
                 [
                     results[metric][idx]
                     for idx in idxs
                 ],
-                label=ds_name,
+                label=ds_name
             )
 
         ax.set_xlabel("epochs")
@@ -72,6 +72,72 @@ def visual(results_dict):
     plt.legend()
 
     return fig
+
+def visual_multiple(results_dicts):
+    from matplotlib import pyplot as plt
+    from matplotlib import cm as cm
+    
+    plt.rc("font", size=14)
+    plt.rc("lines", linewidth=4)
+
+    # initialize the figure
+    fig = plt.figure(figsize=(10, 6))
+
+    # get all the results
+    metrics = list(list(results_dicts[0][1].values())[0].keys())
+    n_metrics = len(metrics)
+
+    # loop through metrics
+    for idx_metric, metric in enumerate(metrics):
+        ax = plt.subplot(n_metrics, 1, idx_metric + 1)
+        
+        # loop through results
+        for idx_result, config_and_results_dict in enumerate(results_dicts):
+            
+            config, results_dict = config_and_results_dict
+
+            for ds_name, results in results_dict.items():
+
+                # get all the recorded indices
+                idxs = list(
+                        [
+                            key for key in results[metric].keys() if isinstance(key, int)
+                        ])
+
+                # sort it ascending
+                idxs.sort()
+
+                label = None
+                linestyle = 'dotted'
+                
+                if ds_name == 'training':
+                    label = config['#']
+                    linestyle = 'solid'
+
+                ax.plot(
+                    idxs,
+                    [
+                        results[metric][idx]
+                        for idx in idxs
+                    ],
+                    label=label,
+                    c=cm.gist_rainbow(
+                        (float(idx_result) / len(results_dicts))
+                        ),
+                    linestyle=linestyle,
+                    alpha=0.8
+                    )
+
+
+
+        ax.set_xlabel("epochs")
+        ax.set_ylabel(metric)
+    
+    plt.legend(bbox_to_anchor=(1.04,0), loc="lower left")
+    plt.tight_layout()
+
+    return fig
+
 
 def visual_base64(results_dict):
     fig = visual(results_dict)
