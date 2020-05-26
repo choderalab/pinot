@@ -81,7 +81,7 @@ def visual_multiple(results_dicts):
     plt.rc("lines", linewidth=4)
 
     # initialize the figure
-    fig = plt.figure(figsize=(10, 6))
+    fig = plt.figure()
 
     # get all the results
     metrics = list(list(results_dicts[0][1].values())[0].keys())
@@ -185,6 +185,12 @@ def html_multiple_train_and_test(results):
 
 def html_multiple_train_and_test_2d_grid(results):
     # make sure there are only two paramter types
+    import copy
+    results = copy.deepcopy(results)
+    
+    for result in results:
+        result[0].pop('#')
+
     param_names = list(results[0][0].keys())
     assert len(param_names) == 2
     param_col_name, param_row_name = param_names
@@ -211,13 +217,13 @@ def html_multiple_train_and_test_2d_grid(results):
             # make this less ugly
 
             for result in results:
+
                 if result[0] == param_dict:
                     table[idx_row][idx_col] = html(result[1])
             
     html_string = ""
     html_string += "<table style='border: 1px solid black'>"
     
-
     # first row
     html_string += "<thread><tr style='border: 1px solid black'>"
     html_string += "<th style='border: 1px solid black'>" +\
@@ -244,3 +250,29 @@ def html_multiple_train_and_test_2d_grid(results):
 
     html_string += "</table>"
     return html_string
+
+def optimizer_translation(opt_string, lr, *args, **kwargs):
+    if opt_string.lower() == 'adam':
+        opt = lambda net: torch.optim.Adam(net.parameters(), lr)
+
+    elif opt_string.lower() == 'bbb':
+        opt = lambda net: pinot.BBB(
+                torch.optim.Adam(net.parameters(), lr),
+                0.01,
+                kl_loss_scaling=kwargs['kl_loss_scaling'])
+
+    elif opt_string.lower() == 'adlala':
+        opt = lambda net: pinot.AdLaLa(
+                [
+                    {
+                        'params': net.representation.parameters(),
+                        'h': torch.tensor(lr),
+                        'gamma': 1e-6
+                    },
+                    {
+                        'params': net._output_regression.parameters(),
+                        'h': torch.tensor(lr),
+                        'gamma': 1e-6
+                    }
+                ])
+    return opt
