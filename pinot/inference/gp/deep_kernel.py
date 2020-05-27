@@ -4,11 +4,12 @@
 import torch
 import pinot
 import abc
+from pinot.inference.gp.kernel import Kernel
 
 # =============================================================================
 # MODULE CLASSES
 # =============================================================================
-class DeepKernel(esp.gp.Kernel):
+class DeepKernel(Kernel):
     r""" A Gaussian Process Kernel with neural network representation.
 
 
@@ -32,5 +33,3 @@ class DeepKernel(esp.gp.Kernel):
                 self.representation(x_))
 
         return k
-        
-        

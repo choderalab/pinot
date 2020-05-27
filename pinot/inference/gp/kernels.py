@@ -4,11 +4,12 @@
 import torch
 import pinot
 import abc
+from pinot.inference.gp.kernel import Kernel
 
 # =============================================================================
 # MODULE CLASSES
 # =============================================================================
-class RBF(pinot.gp.Kernel):
+class RBF(Kernel):
     r""" A Gaussian Process Kernel that hosts parameters.
 
 
@@ -42,3 +43,5 @@ class RBF(pinot.gp.Kernel):
         # convariant matrix
         # (batch_size, batch_size)
         k = torch.exp(-0.5 * distance / (l ** 2))
+
+        return k

@@ -37,7 +37,7 @@ class Kernel(torch.nn.Module, abc.ABC):
 
         # $ K + \sigma ^ 2 I $
         # (batch_size, batch_size)
-        k_plus_sigma = k + sigma * torch.eye(k.shape[0])
+        k_plus_sigma = k + (sigma ** 2) * torch.eye(k.shape[0])
 
         # (batch_size, batch_size)
         k_plus_sigma_inv = torch.inverse(k_plus_sigma)
@@ -48,12 +48,16 @@ class Kernel(torch.nn.Module, abc.ABC):
                 torch.det(
                     k_plus_sigma)))
 
+        # unify the dtype
+        y = y.to(dtype=k.dtype)
+
         # ()
-        nll = torch.transpose(y, 0, 1) @  k_plus_sigma_inv @ y + k_plus_sigma_log_det
+        nll = torch.transpose(y, 0, 1) @  k_plus_sigma_inv @ y \
+            + k_plus_sigma_log_det
 
         return nll
 
-    def inference(x_tr, y_tr, x_te, sigma=1.0):
+    def inference(self, x_tr, y_tr, x_te, sigma=1.0):
         r""" Calculate the predictive distribution given `x_te`.
 
         Parameters
@@ -72,6 +76,9 @@ class Kernel(torch.nn.Module, abc.ABC):
         k_te_te = self.forward(x_te, x_te)
         k_te_tr = self.forward(x_te, x_tr)
         k_tr_te = self.forward(x_tr, x_te)
+
+        # unify the dtype
+        y_tr = y_tr.to(dtype=k_tr_tr.dtype)
 
         # (batch_size, batch_size)
         k_plus_sigma = k_tr_tr + sigma ** 2 * torch.eye(k_tr_tr.shape[0])
@@ -94,4 +101,3 @@ class Kernel(torch.nn.Module, abc.ABC):
             covariance)
 
         return distribution
-
