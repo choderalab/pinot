@@ -2,15 +2,30 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from pinot.representation.dgl_legacy import GN
-from pinot.generative.torch_gvae.loss import negative_ELBO
+from pinot.generative.torch_gvae.loss import negative_ELBO,\
+    negative_ELBO_with_node_prediction
 
 class GCNModelVAE(nn.Module):
     """Graph convolutional neural networks for VAE
     """
     def __init__(self, input_feat_dim, hidden_dim1=32, \
             hidden_dim2=32, hidden_dim3=16, dropout=0.1, \
-            log_lik_scale=1):
+            num_atom_types=100 , log_lik_scale=1):
         """ Construct a VAE with GCN
+        Args:
+            input_feature_dim: Number of input features for each atom/node
+
+            hidden_dim1: First hidden dimension, after applying one
+                linear layer
+
+            hidden_dim2: Second hidden dimension, after applying the first
+                graph convolution layer
+
+            hidden_dim_3: Third hidden dimension, after applying the second
+                graph convolution layer
+
+            num_atom_types: The number of possible atom types
+
         """
         super(GCNModelVAE, self).__init__()
         self.linear = nn.Linear(input_feat_dim, hidden_dim1)
@@ -22,7 +37,9 @@ class GCNModelVAE(nn.Module):
             GN(hidden_dim2, hidden_dim3),
         ])
         # Decoder
-        self.dc = InnerProductDecoder(dropout)
+        self.dc = EdgeAndNodeDecoder(dropout, hidden_dim3, num_atom_types)
+        self.num_atom_types = num_atom_types
+
         # Relative weight between the KL divergence and the log likelihood term
         self.log_lik_scale = log_lik_scale
 
@@ -31,11 +48,8 @@ class GCNModelVAE(nn.Module):
          distribution
         
         Args:
-            x (FloatTensor): node features
-                Shape (N, D) where N is the number of nodes in the graph
-            adj (FloatTensor): adjacency matrix
-                Shape (N, N)
-
+            g (DGLGraph)
+                The molecular graph
         Returns:
             z: (FloatTensor): the latent encodings of the nodes
                 Shape (N, hidden_dim2)
@@ -47,6 +61,24 @@ class GCNModelVAE(nn.Module):
     def condition(self, g):
         """ Compute the approximate Normal posterior distribution q(z|x, adj)
         and associated parameters
+
+        Arg:
+            g (DGLGraph)
+                The molecular graph
+        
+        Returns:
+            distribution, mu, logvar
+                distribution (torch.Distribution) 
+                    is the approximate normal distribution
+
+                mu (FloatTensor) 
+                    shape (N, hidden_dim_3) 
+                    is the mean of the approximate posterior normal distribution
+
+                logvar (FloatTensor)
+                    shape (N, hidden_dim_3)
+                    is the log variance of the approximate posterior normal distribution
+
         """
         z = self.forward(g)
         theta = [parameter.forward(g, z) for parameter in self.output_regression]
@@ -74,7 +106,9 @@ class GCNModelVAE(nn.Module):
                 mu, logvar are the parameters of the approximate Gaussian
                     posterior
         """
+        # Encode
         approx_posterior, mu, logvar = self.condition(g)
+        # Decode
         z_sample = approx_posterior.rsample()
         return self.dc(z_sample), mu, logvar
 
@@ -82,18 +116,20 @@ class GCNModelVAE(nn.Module):
     def loss(self, g, y=None):
         """ Compute negative ELBO loss
         """
-        predicted_edges, mu, logvar = self.encode_and_decode(g)
+        predicted, mu, logvar = self.encode_and_decode(g)
+        (edge_preds, node_preds) = predicted
+
         adj_mat = g.adjacency_matrix(True).to_dense()
-        # Compute the (sub-sampled) negative ELBO loss
-        loss = negative_ELBO(preds=predicted_edges,
-                            labels=adj_mat,
-                            mu=mu, logvar=logvar,
-                            norm=self.log_lik_scale)
+        node_types = g.ndata["type"]
+        node_types_one_hot =\
+            F.one_hot(node_types.flatten().long(), self.num_atom_types).float()
+        loss = negative_ELBO_with_node_prediction(edge_preds, node_preds,
+            adj_mat, node_types_one_hot, mu, logvar, self.log_lik_scale)
         return loss
 
 
 class InnerProductDecoder(nn.Module):
-    """Decoder for using inner product for prediction."""
+    """Decoder for using inner product for edge prediction."""
 
     def __init__(self, dropout, act=torch.sigmoid):
         super(InnerProductDecoder, self).__init__()
@@ -101,6 +137,37 @@ class InnerProductDecoder(nn.Module):
         self.act = act
 
     def forward(self, z):
+        """ Returns a symmetric adjacency matrix of size (N,N)
+        where A[i,j] = probability there is an edge between nodes i and j
+        """
         z = F.dropout(z, self.dropout, training=self.training)
         adj = self.act(torch.mm(z, z.t()))
         return adj
+
+
+class EdgeAndNodeDecoder(nn.Module):
+    """ Decoder that returns both a predicted adjacency matrix
+        and node identities
+    """
+    def __init__(self, dropout, feature_dim, num_atom_types, act=torch.sigmoid):
+        super(EdgeAndNodeDecoder, self).__init__()
+        self.dropout = dropout
+        self.act = act
+        self.linear = nn.Linear(feature_dim, num_atom_types)
+
+    def forward(self, z):
+        """
+        Arg:
+            z (FloatTensor):
+                Shape (N, hidden_dim)
+        Returns:
+            (adj, node_preds)
+                adj (FloatTensor): has shape (N, N) is a matrix where entry (i.j)
+                    stores the probability that there is an edge between atoms i,j
+                node_preds (FloatTensor): has shape (N, num_atom_types) where each
+                    row i stores the probability of the identity of atom i
+        """
+        z_prime = F.dropout(z, self.dropout, training=self.training)
+        adj = self.act(torch.mm(z, z.t()))
+        node_preds = F.softmax(self.linear(z), dim=1)
+        return (adj, node_preds)
