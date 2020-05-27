@@ -10,7 +10,7 @@ class GCNModelVAE(nn.Module):
     """
     def __init__(self, input_feat_dim, hidden_dim1=32, \
             hidden_dim2=32, hidden_dim3=16, dropout=0.1, \
-            num_atom_types=100 , log_lik_scale=1):
+            num_atom_types=100):
         """ Construct a VAE with GCN
         Args:
             input_feature_dim: Number of input features for each atom/node
@@ -39,9 +39,6 @@ class GCNModelVAE(nn.Module):
         # Decoder
         self.dc = EdgeAndNodeDecoder(dropout, hidden_dim3, num_atom_types)
         self.num_atom_types = num_atom_types
-
-        # Relative weight between the KL divergence and the log likelihood term
-        self.log_lik_scale = log_lik_scale
 
     def forward(self, g):
         """ Compute the parameters of the approximate Gaussian posterior
@@ -124,7 +121,7 @@ class GCNModelVAE(nn.Module):
         node_types_one_hot =\
             F.one_hot(node_types.flatten().long(), self.num_atom_types).float()
         loss = negative_ELBO_with_node_prediction(edge_preds, node_preds,
-            adj_mat, node_types_one_hot, mu, logvar, self.log_lik_scale)
+            adj_mat, node_types_one_hot, mu, logvar)
         return loss
 
 

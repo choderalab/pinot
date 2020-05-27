@@ -11,7 +11,6 @@ parser.add_argument('--lr', type=float, default=0.001, help='Learning rate.')
 parser.add_argument('--hidden_dim1', type=int, default=256, help="hidden dimension 1")
 parser.add_argument('--hidden_dim2', type=int, default=128, help="hidden dimension 2")
 parser.add_argument('--hidden_dim3', type=int, default=64, help="hidden dimension 3")
-
 parser.add_argument('--html', type=str, default="results.html", help="File to save results to")
 
 args = parser.parse_args()
@@ -48,8 +47,8 @@ def run(args):
 
     model = GCNModelVAE(feat_dim, hidden_dim1=args.hidden_dim1,
         hidden_dim2=args.hidden_dim2, hidden_dim3=args.hidden_dim3,
-        log_lik_scale=1./len(batched_train_data),
         num_atom_types=num_atom_types)
+    
     optimizer = optim.Adam(model.parameters(), args.lr)
 
     # Setting up training and testing
