@@ -43,10 +43,7 @@ class Kernel(torch.nn.Module, abc.ABC):
         k_plus_sigma_inv = torch.inverse(k_plus_sigma)
 
         # ()
-        k_plus_sigma_log_det = torch.log(
-            torch.abs(
-                torch.det(
-                    k_plus_sigma)))
+        k_plus_sigma_log_det = torch.abs(torch.logdet(k_plus_sigma))
 
         # unify the dtype
         y = y.to(dtype=k.dtype)
@@ -81,7 +78,7 @@ class Kernel(torch.nn.Module, abc.ABC):
         y_tr = y_tr.to(dtype=k_tr_tr.dtype)
 
         # (batch_size, batch_size)
-        k_plus_sigma = k_tr_tr + sigma ** 2 * torch.eye(k_tr_tr.shape[0])
+        k_plus_sigma = k_tr_tr + (sigma ** 2) * torch.eye(k_tr_tr.shape[0])
 
         # (batch_size, batch_size)
         k_plus_sigma_inv = torch.inverse(k_plus_sigma)
@@ -93,8 +90,8 @@ class Kernel(torch.nn.Module, abc.ABC):
         expectation = k_te_tr_k_plus_sigma_inv @ y_tr
 
         # (batch_size, batch_size)
-        covariance = k_te_te - k_te_tr_k_plus_sigma_inv @ k_tr_te
-
+        covariance = k_te_te - (k_te_tr_k_plus_sigma_inv @ k_tr_te)
+        
         # construct noise predictive distribution
         distribution = torch.distributions.multivariate_normal.MultivariateNormal(
             expectation.flatten(),
