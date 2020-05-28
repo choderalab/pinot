@@ -78,27 +78,6 @@ class Kernel(torch.nn.Module, abc.ABC):
 
         return nll
 
-    def mean_and_variance(self, x_tr, y_tr, x_te=None, sigma=1.0):
-        # get parameters
-        k_tr_tr, k_te_te, k_te_tr, k_tr_te, l_low, alpha\
-            = self._get_kernel_and_auxiliary_variables(
-                x_tr, y_tr, x_te, sigma=sigma)
-
-        # compute mean
-        # (batch_size_te, 1)
-        mean = k_te_tr @ alpha
-
-        # (batch_size_tr, batch_size_te)
-        v, _ = torch.triangular_solve(
-            input=k_tr_te,
-            A=l_low,
-            upper=False)
-
-        # (batch_size_te, batch_size_te)
-        variance = k_te_te - v.t() @ v
-
-        return mean, variance
-
     def condition(self, x_tr, y_tr, x_te=None, sigma=1.0):
         r""" Calculate the predictive distribution given `x_te`.
 
