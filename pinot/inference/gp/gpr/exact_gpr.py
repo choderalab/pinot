@@ -5,30 +5,29 @@ import torch
 import pinot
 import abc
 import math
+from pinot.inference.gp.gpr.base_gpr import GPR
 
 # =============================================================================
 # MODULE CLASSES
 # =============================================================================
-class Kernel(torch.nn.Module, abc.ABC):
-    r""" A Gaussian Process Kernel that hosts parameters.
-
+class ExactGPR(GPR):
+    """ Exact Gaussian process regression.
 
     """
-
-    @abc.abstractmethod
-    def forward(self, x, *args, **kwargs):
-        raise NotImplementedError
+    def __init__(self, kernel):
+        super(ExactGPR, self).__init__()
+        self.kernel = kernel
 
     def _get_kernel_and_auxiliary_variables(
-            self, x_tr, y_tr, x_te=None, sigma=1.0, epsilon=1e-5,
+            self, x_tr, y_tr, x_te=None, sigma=1.0,
         ):
 
         # compute the kernels
-        k_tr_tr = self.forward(x_tr, x_tr)
+        k_tr_tr = self._perturb(self.kernel.forward(x_tr, x_tr))
 
         if x_te is not None: # during test
-            k_te_te = self.forward(x_te, x_te)
-            k_te_tr = self.forward(x_te, x_tr)
+            k_te_te = self._perturb(self.kernel.forward(x_te, x_te))
+            k_te_tr = self._perturb(self.kernel.forward(x_te, x_tr))
             # k_tr_te = self.forward(x_tr, x_te)
             k_tr_te = k_te_tr.t() # save time
 
@@ -56,8 +55,13 @@ class Kernel(torch.nn.Module, abc.ABC):
 
         return k_tr_tr, k_te_te, k_te_tr, k_tr_te, l_low, alpha
 
+
     def loss(self, x_tr, y_tr, sigma=1.0):
         """ Compute the loss.
+
+        Note
+        ----
+        Defined to be negative Gaussian likelihood.
 
         Parameters
         ----------

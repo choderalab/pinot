@@ -4,7 +4,7 @@
 import torch
 import pinot
 import abc
-from pinot.inference.gp.kernel import Kernel
+from pinot.inference.gp.kernels.kernel import Kernel
 
 # =============================================================================
 # MODULE CLASSES
