@@ -5,7 +5,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--epochs', type=int, default=100, help='Number of epochs to train.')
-parser.add_argument('--split', type=list, default=[0.8, 0.2], help="train, test, validation split, default = [0.8, 0.2] (No validation)")
+parser.add_argument('--split', type=list, default=[0.9, 0.1, 0.], help="train, test, validation split, default = [0.8, 0.2] (No validation)")
 parser.add_argument('--batch_size', type=int, default=10, help="batch-size, i.e, how many molecules get 'merged' to form a graph per iteration during traing")
 parser.add_argument('--lr', type=float, default=0.001, help='Learning rate.')
 parser.add_argument('--hidden_dim1', type=int, default=256, help="hidden dimension 1")
@@ -33,7 +33,7 @@ def run(args):
     ds = pinot.data.esol()
     
     # Divide the molecules into train/test/val
-    train_data, test_data, _ = split(ds, [0.9, 0.1, 0])
+    train_data, test_data, _ = split(ds, args.split)
     N_molecules = len(train_data)
     # "Batching" multiple molecules into groups, each groups
     # forming a "macro-molecule" (graph)
@@ -54,7 +54,8 @@ def run(args):
     # Setting up training and testing
     train_and_test = TrainAndTest(model, batched_train_data, test_data, optimizer,
                     [accuracy_edge_prediction, true_negative_edge_prediction,\
-                        true_positive_edge_prediction, accuracy_node_prediction],
+                        true_positive_edge_prediction, accuracy_node_prediction,\
+                        negative_elbo_loss],
                     n_epochs=args.epochs)
 
     results = train_and_test.run()
@@ -65,7 +66,6 @@ def run(args):
     f_handle = open(args.html, 'w')
     f_handle.write(html_string)
     f_handle.close()
-
 
 ################ METRICS ON EDGE PREDICTION ###################
 
@@ -94,6 +94,10 @@ def accuracy_node_prediction(net, g, y):
     (_, predicted_nodes), _, _ = net.encode_and_decode(g)
     node_type_preds = torch.argmax(predicted_nodes, 1)
     return torch.mean((node_type_preds == node_types).float())
+
+def negative_elbo_loss(net, g, y):
+    return net.loss(g).detach()
+
 
 if __name__ == '__main__':
     run(args)

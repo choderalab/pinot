@@ -9,7 +9,7 @@ class GCNModelVAE(nn.Module):
     """Graph convolutional neural networks for VAE
     """
     def __init__(self, input_feat_dim, hidden_dim1=32, \
-            hidden_dim2=32, hidden_dim3=16, dropout=0.1, \
+            hidden_dim2=32, hidden_dim3=16, dropout=0.0, \
             num_atom_types=100):
         """ Construct a VAE with GCN
         Args:
@@ -87,7 +87,6 @@ class GCNModelVAE(nn.Module):
 
         return distribution, theta[0], theta[1]
 
-    # TODO: separate between training and testing
     def encode_and_decode(self, g):
         """ Forward pass through the GVAE
 
@@ -117,11 +116,11 @@ class GCNModelVAE(nn.Module):
         (edge_preds, node_preds) = predicted
 
         adj_mat = g.adjacency_matrix(True).to_dense()
-        node_types = g.ndata["type"]
+        node_types = g.ndata["type"].flatten().long()
         node_types_one_hot =\
             F.one_hot(node_types.flatten().long(), self.num_atom_types).float()
         loss = negative_ELBO_with_node_prediction(edge_preds, node_preds,
-            adj_mat, node_types_one_hot, mu, logvar)
+            adj_mat, node_types, mu, logvar) # Check one-hot
         return loss
 
 
@@ -165,6 +164,6 @@ class EdgeAndNodeDecoder(nn.Module):
                     row i stores the probability of the identity of atom i
         """
         z_prime = F.dropout(z, self.dropout, training=self.training)
-        adj = self.act(torch.mm(z, z.t()))
-        node_preds = F.softmax(self.linear(z), dim=1)
+        adj = self.act(torch.mm(z_prime, z_prime.t()))
+        node_preds = self.linear(z_prime) # Check softmax
         return (adj, node_preds)
