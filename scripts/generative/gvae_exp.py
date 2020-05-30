@@ -5,12 +5,11 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--epochs', type=int, default=100, help='Number of epochs to train.')
-parser.add_argument('--split', type=list, default=[0.8, 0.2], help="train, test, validation split, default = [0.8, 0.2] (No validation)")
+parser.add_argument('--split', type=list, default=[0.9, 0.1, 0.], help="train, test, validation split, default = [0.8, 0.2] (No validation)")
 parser.add_argument('--batch_size', type=int, default=10, help="batch-size, i.e, how many molecules get 'merged' to form a graph per iteration during traing")
 parser.add_argument('--lr', type=float, default=0.001, help='Learning rate.')
-parser.add_argument('--hidden_dim1', type=int, default=256, help="hidden dimension 1")
-parser.add_argument('--hidden_dim2', type=int, default=128, help="hidden dimension 2")
-parser.add_argument('--hidden_dim3', type=int, default=64, help="hidden dimension 3")
+parser.add_argument('--hidden_dims', type=list, default=[256, 128], help="hidden dimension 1")
+parser.add_argument('--embedding_dim', type=int, default=64, help="node embedding dimension")
 parser.add_argument('--html', type=str, default="results.html", help="File to save results to")
 
 args = parser.parse_args()
@@ -33,7 +32,7 @@ def run(args):
     ds = pinot.data.esol()
     
     # Divide the molecules into train/test/val
-    train_data, test_data, _ = split(ds, [0.9, 0.1, 0])
+    train_data, test_data, _ = split(ds, args.split)
     N_molecules = len(train_data)
     # "Batching" multiple molecules into groups, each groups
     # forming a "macro-molecule" (graph)
@@ -44,17 +43,16 @@ def run(args):
     # Initialize the model and the optimization scheme
     feat_dim = train_data[0][0].ndata["h"].shape[1]
     num_atom_types = 100
-
-    model = GCNModelVAE(feat_dim, hidden_dim1=args.hidden_dim1,
-        hidden_dim2=args.hidden_dim2, hidden_dim3=args.hidden_dim3,
-        num_atom_types=num_atom_types)
+    model = GCNModelVAE(feat_dim, gcn_hidden_dims=args.hidden_dims,
+        embedding_dim=64, num_atom_types=num_atom_types)
     
     optimizer = optim.Adam(model.parameters(), args.lr)
 
     # Setting up training and testing
     train_and_test = TrainAndTest(model, batched_train_data, test_data, optimizer,
                     [accuracy_edge_prediction, true_negative_edge_prediction,\
-                        true_positive_edge_prediction, accuracy_node_prediction],
+                        true_positive_edge_prediction, accuracy_node_prediction,\
+                        negative_elbo_loss],
                     n_epochs=args.epochs)
 
     results = train_and_test.run()
@@ -65,7 +63,6 @@ def run(args):
     f_handle = open(args.html, 'w')
     f_handle.write(html_string)
     f_handle.close()
-
 
 ################ METRICS ON EDGE PREDICTION ###################
 
@@ -94,6 +91,10 @@ def accuracy_node_prediction(net, g, y):
     (_, predicted_nodes), _, _ = net.encode_and_decode(g)
     node_type_preds = torch.argmax(predicted_nodes, 1)
     return torch.mean((node_type_preds == node_types).float())
+
+def negative_elbo_loss(net, g, y):
+    return net.loss(g).detach()
+
 
 if __name__ == '__main__':
     run(args)
