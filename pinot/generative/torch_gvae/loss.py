@@ -86,13 +86,13 @@ def negative_ELBO_with_node_prediction(edge_preds, node_preds, adj, node_types, 
     edge_preds_masked = edge_preds.clone()
     edge_preds_masked[torch.isnan(edge_preds_masked)] = 0
 
-    edge_nll = torch.sum(F.binary_cross_entropy(edge_preds_masked, adj))
+    edge_nll = torch.sum(F.binary_cross_entropy_with_logits(edge_preds_masked, adj))
     node_nll = torch.sum(F.cross_entropy(node_preds_masked, node_types))
     # see Appendix B from VAE paper:
     # Kingma and Welling. Auto-Encoding Variational Bayes. ICLR, 2014
     # https://arxiv.org/abs/1312.6114
     # 0.5 * sum(1 + log(sigma^2) - mu^2 - sigma^2)
-    # KLD = -0.5 / n_nodes * torch.sum(torch.sum(
-    #     1 + 2 * logvar - mu.pow(2) - logvar.exp().pow(2), 1))
+    KLD = -0.5 / n_nodes * torch.sum(torch.sum(
+        1 + 2 * logvar - mu.pow(2) - logvar.exp().pow(2), 1))
 
-    return node_nll # + edge_nll #+ KLD
+    return node_nll + edge_nll + KLD

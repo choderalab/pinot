@@ -8,36 +8,38 @@ from pinot.generative.torch_gvae.loss import negative_ELBO,\
 class GCNModelVAE(nn.Module):
     """Graph convolutional neural networks for VAE
     """
-    def __init__(self, input_feat_dim, hidden_dim1=32, \
-            hidden_dim2=32, hidden_dim3=16, dropout=0.0, \
-            num_atom_types=100):
+    def __init__(self, input_feat_dim, gcn_hidden_dims=[256, 128, 64],\
+        embedding_dim=64, dropout=0.0, num_atom_types=100):
         """ Construct a VAE with GCN
         Args:
             input_feature_dim: Number of input features for each atom/node
 
-            hidden_dim1: First hidden dimension, after applying one
-                linear layer
-
-            hidden_dim2: Second hidden dimension, after applying the first
-                graph convolution layer
-
-            hidden_dim_3: Third hidden dimension, after applying the second
-                graph convolution layer
+            hidden_dims: list
+                The hidden dimensions of the graph convolution layers
+            
+            embedding_dim: int
+                The dimension of the latent representation of the nodes
 
             num_atom_types: The number of possible atom types
 
         """
         super(GCNModelVAE, self).__init__()
-        self.linear = nn.Linear(input_feat_dim, hidden_dim1)
-        self.gc1 = GN(hidden_dim1, hidden_dim2)
+        # Graph convolution layers
+        assert(len(gcn_hidden_dims) > 0)
+        self.gcn_modules = []
+        for (dim_prev, dim_post) in zip([input_feat_dim] + gcn_hidden_dims[:-1],\
+                gcn_hidden_dims):
+            self.gcn_modules.append(GN(dim_prev, dim_post))
+        self.gc = nn.ModuleList(self.gcn_modules)
 
-        # Mapping from "latent graph" to predictive distribution parameter
+        # Mapping from node embedding to predictive distribution parameter
         self.output_regression = nn.ModuleList([
-            GN(hidden_dim2, hidden_dim3),
-            GN(hidden_dim2, hidden_dim3),
+            nn.Linear(gcn_hidden_dims[-1], embedding_dim),
+            nn.Linear(gcn_hidden_dims[-1], embedding_dim),
         ])
+
         # Decoder
-        self.dc = EdgeAndNodeDecoder(dropout, hidden_dim3, num_atom_types)
+        self.dc = EdgeAndNodeDecoder(dropout, embedding_dim, num_atom_types)
         self.num_atom_types = num_atom_types
 
     def forward(self, g):
@@ -51,8 +53,10 @@ class GCNModelVAE(nn.Module):
             z: (FloatTensor): the latent encodings of the nodes
                 Shape (N, hidden_dim2)
         """
-        z1 = self.linear(g.ndata["h"])
-        z = self.gc1(g, z1)
+        #z = self.linear(g.ndata["h"])
+        z = g.ndata["h"]
+        for layer in self.gc:
+            z = layer(g, z)
         return z
 
     def condition(self, g):
@@ -78,7 +82,7 @@ class GCNModelVAE(nn.Module):
 
         """
         z = self.forward(g)
-        theta = [parameter.forward(g, z) for parameter in self.output_regression]
+        theta = [parameter.forward(z) for parameter in self.output_regression]
         mu  = theta[0]
         logvar = theta[1]
         distribution = torch.distributions.normal.Normal(
@@ -127,7 +131,7 @@ class GCNModelVAE(nn.Module):
 class InnerProductDecoder(nn.Module):
     """Decoder for using inner product for edge prediction."""
 
-    def __init__(self, dropout, act=torch.sigmoid):
+    def __init__(self, dropout, act=lambda x: x):
         super(InnerProductDecoder, self).__init__()
         self.dropout = dropout
         self.act = act
@@ -145,7 +149,7 @@ class EdgeAndNodeDecoder(nn.Module):
     """ Decoder that returns both a predicted adjacency matrix
         and node identities
     """
-    def __init__(self, dropout, feature_dim, num_atom_types, act=torch.sigmoid):
+    def __init__(self, dropout, feature_dim, num_atom_types, act=lambda x: x):
         super(EdgeAndNodeDecoder, self).__init__()
         self.dropout = dropout
         self.act = act
@@ -165,5 +169,5 @@ class EdgeAndNodeDecoder(nn.Module):
         """
         z_prime = F.dropout(z, self.dropout, training=self.training)
         adj = self.act(torch.mm(z_prime, z_prime.t()))
-        node_preds = self.linear(z_prime) # Check softmax
+        node_preds = self.linear(z_prime)
         return (adj, node_preds)
