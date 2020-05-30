@@ -12,12 +12,17 @@ import dgl
 from dgl.nn import pytorch as dgl_pytorch
 from copy import deepcopy
 
+# =============================================================================
+# CONSTANT
+# =============================================================================
+DEFAULT_MODEL_KWARGS = {
+    'SAGEConv': {'aggregator_type': 'mean'}
+}
+
 
 # =============================================================================
 # MODULE CLASSES
 # =============================================================================
-
-
 class GN(torch.nn.Module):
     def __init__(
         self,
@@ -28,9 +33,13 @@ class GN(torch.nn.Module):
     ):
         super(GN, self).__init__()
 
+        if kwargs == {}:
+            if model_name in DEFAULT_MODEL_KWARGS:
+                kwargs = DEFAULT_MODEL_KWARGS[model_name]
+
         self.gn = getattr(dgl_pytorch.conv, model_name)(
-                in_features, 
-                out_features, 
+                in_features,
+                out_features,
                 **kwargs)
 
         # register these properties here for downstream handling
@@ -47,7 +56,7 @@ class GN(torch.nn.Module):
 def gn(model_name="GraphConv", kwargs={}):
 
     return lambda in_features, out_features: GN(
-            in_features=in_features, 
-            out_features=out_features, 
-            model_name=model_name, 
+            in_features=in_features,
+            out_features=out_features,
+            model_name=model_name,
             kwargs=kwargs)

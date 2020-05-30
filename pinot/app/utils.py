@@ -33,3 +33,32 @@ def train(net, ds_tr, ds_te, opt, reporters, n_epochs):
         [reporter.during(net) for reporter in reporters]
 
     [reporter.after(net) for reporter in reporters]
+
+
+def optimizer_translation(opt_string, lr, *args, **kwargs):
+
+    if opt_string.lower() == 'bbb':
+        opt = lambda net: pinot.BBB(
+                torch.optim.Adam(net.parameters(), lr),
+                0.01,
+                kl_loss_scaling=kwargs['kl_loss_scaling'])
+
+    elif opt_string.lower() == 'adlala':
+        opt = lambda net: pinot.AdLaLa(
+                [
+                    {
+                        'params': net.representation.parameters(),
+                        'h': torch.tensor(lr),
+                        'gamma': 1e-6
+                    },
+                    {
+                        'params': net._output_regression.parameters(),
+                        'h': torch.tensor(lr),
+                        'gamma': 1e-6
+                    }
+                ])
+
+    else:
+        opt = lambda net: getattr(torch.optim, opt_string.capitalize()
+            )(net.parameters(), lr)
+    return opt

@@ -163,6 +163,10 @@ class TrainAndTest:
         _str += '\n'
         _str += str(self.net)
         _str += '\n'
+        _str += '# noise model'
+        _str += '\n'
+        _str += str(self.net.noise_model)
+        _str += '\n'
         _str += '# optimizer'
         _str += '\n'
         _str += str(self.optimizer)
@@ -172,7 +176,7 @@ class TrainAndTest:
         _str += str(self.n_epochs)
         _str += '\n'
         return _str
-        
+
 
     def run(self):
         train = Train(
@@ -181,7 +185,7 @@ class TrainAndTest:
             optimizer=self.optimizer,
             n_epochs=self.n_epochs,
         )
-        
+
         train.train()
 
         self.states = train.states
@@ -209,13 +213,13 @@ class TrainAndTest:
 class MultipleTrainAndTest:
     """ A sequence of controlled experiment.
 
-    
+
     """
 
     def __init__(self, experiment_generating_fn, param_dicts):
         self.experiment_generating_fn = experiment_generating_fn
         self.param_dicts = param_dicts
-    
+
     def run(self):
         results = []
 
@@ -228,6 +232,3 @@ class MultipleTrainAndTest:
         self.results = results
 
         return self.results
-
-
-
