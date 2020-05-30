@@ -31,7 +31,7 @@ class Net(torch.nn.Module):
         one of 
             'normal-homoschedastic',
             'normal-heteroschedastic',
-            'normla-homoschedastic-fixed') 
+            'normal-homoschedastic-fixed') 
         or a function that transforms a set of parameters.
 
 

@@ -8,8 +8,10 @@ from pinot.generative.torch_gvae.loss import negative_ELBO,\
 class GCNModelVAE(nn.Module):
     """Graph convolutional neural networks for VAE
     """
-    def __init__(self, input_feat_dim, gcn_hidden_dims=[256, 128, 64],\
-        embedding_dim=64, dropout=0.0, num_atom_types=100):
+    def __init__(self, input_feat_dim, gcn_type="GraphConv", gcn_init_args ={},\
+            gcn_hidden_dims=[256, 128, 64], embedding_dim=64, dropout=0.0, \
+            num_atom_types=100, \
+            aggregation_function=lambda x: torch.sum(x, dim=0)):
         """ Construct a VAE with GCN
         Args:
             input_feature_dim: Number of input features for each atom/node
@@ -22,6 +24,9 @@ class GCNModelVAE(nn.Module):
 
             num_atom_types: The number of possible atom types
 
+            aggregation_function: function used to aggregate the node feature
+                vectors into a single graph representation
+
         """
         super(GCNModelVAE, self).__init__()
         # Graph convolution layers
@@ -29,9 +34,10 @@ class GCNModelVAE(nn.Module):
         self.gcn_modules = []
         for (dim_prev, dim_post) in zip([input_feat_dim] + gcn_hidden_dims[:-1],\
                 gcn_hidden_dims):
-            self.gcn_modules.append(GN(dim_prev, dim_post))
+            self.gcn_modules.append(GN(dim_prev, dim_post, gcn_type, gcn_init_args))
         self.gc = nn.ModuleList(self.gcn_modules)
-
+        self.aggregator = aggregation_function
+        self.embedding_dim = embedding_dim
         # Mapping from node embedding to predictive distribution parameter
         self.output_regression = nn.ModuleList([
             nn.Linear(gcn_hidden_dims[-1], embedding_dim),
@@ -43,8 +49,24 @@ class GCNModelVAE(nn.Module):
         self.num_atom_types = num_atom_types
 
     def forward(self, g):
-        """ Compute the parameters of the approximate Gaussian posterior
-         distribution
+        """ Compute the latent representation of the input graph. This
+        function is slightly different from `infer_node_representation`
+        only in that it aggregates the node features into one vector.
+        This is so that `GVAE` can be directly used as part of `Net`.
+        
+        Args:
+            g (DGLGraph)
+                The molecular graph
+        Returns:
+            z: (FloatTensor): the latent encodings of the graph
+                Shape (hidden_dim2,)
+        """
+        z = self.infer_node_representation(g)
+        
+        return self.aggregator(z)
+
+    def infer_node_representation(self, g):
+        """ Compute the latent representation of the nodes of input graph
         
         Args:
             g (DGLGraph)
@@ -53,11 +75,19 @@ class GCNModelVAE(nn.Module):
             z: (FloatTensor): the latent encodings of the nodes
                 Shape (N, hidden_dim2)
         """
-        #z = self.linear(g.ndata["h"])
         z = g.ndata["h"]
         for layer in self.gc:
             z = layer(g, z)
+            # The output of a Graph Attention Networks is of shape
+            # (N, H, D) where N is the number of nodes, H is the
+            # number of attention heads and D is the output dimension of the
+            # network.  Therefore, one need to "aggregate" the output
+            # from multiple attention heads. Certainly one way of doing so
+            # is by taking the average across the heads.
+            if len(z.shape) > 2:
+                z = torch.mean(z, dim=1) 
         return z
+
 
     def condition(self, g):
         """ Compute the approximate Normal posterior distribution q(z|x, adj)
@@ -81,7 +111,7 @@ class GCNModelVAE(nn.Module):
                     is the log variance of the approximate posterior normal distribution
 
         """
-        z = self.forward(g)
+        z = self.infer_node_representation(g)
         theta = [parameter.forward(z) for parameter in self.output_regression]
         mu  = theta[0]
         logvar = theta[1]
@@ -126,6 +156,9 @@ class GCNModelVAE(nn.Module):
         loss = negative_ELBO_with_node_prediction(edge_preds, node_preds,
             adj_mat, node_types, mu, logvar) # Check one-hot
         return loss
+
+    def get_encoder(self):
+        return self.gc
 
 
 class InnerProductDecoder(nn.Module):
