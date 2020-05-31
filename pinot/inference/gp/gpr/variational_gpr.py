@@ -14,14 +14,12 @@ class VGPR(GPR):
     """ Variational Gaussian Process regression.
 
     """
-    def __init__(self, representation, base_kernel, n_tr,
+    def __init__(self, kernel, n_tr,
             initializer_std=0.,
             noise_model='normal-homoschedastic-fixed'):
 
         super(VGPR, self).__init__()
-        self.representation = representation
-        self.base_kernel = base_kernel
-
+        self.kernel = kernel
         self.noise_model = noise_model
 
         # initialize variational paramters
@@ -56,12 +54,8 @@ class VGPR(GPR):
         mu = self.mu
         sigma = self._make_sigma()
 
-        # latent representation
-        # (N, D)
-        z = self.representation(x_tr)
-
         # latent covariance
-        k_zz = self._perturb(self.base_kernel(z))
+        k_zz = self._perturb(self.kernel(x_tr))
         k_zz_inv = torch.inverse(k_zz)
 
         # construct distribution for u
@@ -75,8 +69,9 @@ class VGPR(GPR):
         # compute KL divergence
         kl = 0.5 * (
             torch.logdet(k_zz) - \
-            torch.logdet(sigma.t() @ sigma) -\
-            1.0 * z.shape[-1] +\
+            torch.logdet(sigma.t() @ sigma) +\
+            # NOTE:
+            # here we omitted the dimension term since it doesn't matter
             torch.trace(
                 torch.matmul(
                     k_zz_inv,
@@ -105,13 +100,10 @@ class VGPR(GPR):
             loc=mu,
             scale_tril=sigma)
 
-        # get latent representation for test
-        z_te = self.representation.forward(x_te)
-
         # compute the kernels
-        k_tr_tr = self._perturb(self.base_kernel.forward(x_tr, x_tr))
-        k_te_te = self._perturb(self.base_kernel.forward(x_te, x_te))
-        k_te_tr = self._perturb(self.base_kernel.forward(x_te, x_tr))
+        k_tr_tr = self._perturb(self.kernel.forward(x_tr, x_tr))
+        k_te_te = self._perturb(self.kernel.forward(x_te, x_te))
+        k_te_tr = self._perturb(self.kernel.forward(x_te, x_tr))
         k_tr_te = k_te_tr.t() # save time
 
         # (batch_size_tr, batch_size_tr)
