@@ -69,6 +69,7 @@ class Net(torch.nn.Module):
         self.output_regression = output_regression
         self.measurement_dimension=measurement_dimension 
         self.noise_model = noise_model
+        self.representation_hidden_units = representation_hidden_units
 
     def forward(self, g):
         """ Forward pass.
