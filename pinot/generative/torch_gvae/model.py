@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import dgl
 from pinot.representation.dgl_legacy import GN
 from pinot.generative.torch_gvae.loss import negative_ELBO,\
     negative_ELBO_with_node_prediction
@@ -9,9 +10,9 @@ class GCNModelVAE(nn.Module):
     """Graph convolutional neural networks for VAE
     """
     def __init__(self, input_feat_dim, gcn_type="GraphConv", gcn_init_args ={},\
-            gcn_hidden_dims=[256, 128, 64], embedding_dim=64, dropout=0.0, \
+            gcn_hidden_dims=[256, 128], embedding_dim=64, dropout=0.0, \
             num_atom_types=100, \
-            aggregation_function=lambda x: torch.sum(x, dim=0)):
+            aggregation_function=lambda g: dgl.sum_nodes(g, "h")):
         """ Construct a VAE with GCN
         Args:
             input_feature_dim: Number of input features for each atom/node
@@ -29,7 +30,17 @@ class GCNModelVAE(nn.Module):
 
         """
         super(GCNModelVAE, self).__init__()
-        # Graph convolution layers
+
+        # Decoder
+        self.dc = EdgeAndNodeDecoder(dropout, embedding_dim, num_atom_types)
+        self.num_atom_types = num_atom_types
+
+        # Encoder
+
+        # 1. Graph convolution layers
+        # Note that we define this here because in 'Net', the model automatically
+        # finds the input dimension of the output-regressor by inspecting the
+        # last torch module of the representation layer
         assert(len(gcn_hidden_dims) > 0)
         self.gcn_modules = []
         for (dim_prev, dim_post) in zip([input_feat_dim] + gcn_hidden_dims[:-1],\
@@ -38,15 +49,12 @@ class GCNModelVAE(nn.Module):
         self.gc = nn.ModuleList(self.gcn_modules)
         self.aggregator = aggregation_function
         self.embedding_dim = embedding_dim
-        # Mapping from node embedding to predictive distribution parameter
+
+        # 2. Mapping from node embedding to predictive distribution parameter
         self.output_regression = nn.ModuleList([
             nn.Linear(gcn_hidden_dims[-1], embedding_dim),
             nn.Linear(gcn_hidden_dims[-1], embedding_dim),
         ])
-
-        # Decoder
-        self.dc = EdgeAndNodeDecoder(dropout, embedding_dim, num_atom_types)
-        self.num_atom_types = num_atom_types
 
     def forward(self, g):
         """ Compute the latent representation of the input graph. This
@@ -61,9 +69,18 @@ class GCNModelVAE(nn.Module):
             z: (FloatTensor): the latent encodings of the graph
                 Shape (hidden_dim2,)
         """
+        # Apply the graph convolution operations
         z = self.infer_node_representation(g)
-        
-        return self.aggregator(z)
+        # Find the mean of the approximate posterior distribution
+        # q(z|g)
+        z = self.output_regression[0](z)
+        # Aggregate the nodes' representations into a graph representation
+        # Note that one should use dgl.sum_nodes because this function will
+        # return a tensor with a new first dimension whose size is the number
+        # of subgraphs composing g
+        with g.local_scope():
+            g.ndata["h"] = z
+            return self.aggregator(g)
 
     def infer_node_representation(self, g):
         """ Compute the latent representation of the nodes of input graph
