@@ -21,7 +21,32 @@ def dataframe(results_dict):
         columns=metrics,
         index=ds_names)
     return df
-    
+
+def curve(results_dict):
+    curve_dict = {}
+
+    # get all the results
+    metrics = list(list(results_dict.values())[0].keys())
+    n_metrics = len(metrics)
+
+    # loop through metrics
+    for idx_metric, metric in enumerate(metrics):
+
+        # loop through the results
+        for ds_name, results in results_dict.items():
+
+            # get all the recorded indices
+            idxs = list(
+                    [
+                        key for key in results[metric].keys() if isinstance(key, int)
+                    ])
+
+            curve_dict[(metric, ds_name)] = np.array(
+                [results[metric][idx] for idx in idxs])
+
+    return curve_dict
+
+
 def markdown(results_dict):
     df = dataframe(results_dict)
     return df.to_markdown()
@@ -43,7 +68,7 @@ def visual(results_dict):
     # loop through metrics
     for idx_metric, metric in enumerate(metrics):
         ax = plt.subplot(1, n_metrics, idx_metric + 1)
-        
+
         # loop through the results
         for ds_name, results in results_dict.items():
 
@@ -55,7 +80,7 @@ def visual(results_dict):
 
             # sort it ascending
             idxs.sort()
-            
+
             ax.plot(
                 idxs,
                 [
@@ -76,7 +101,7 @@ def visual(results_dict):
 def visual_multiple(results_dicts):
     from matplotlib import pyplot as plt
     from matplotlib import cm as cm
-    
+
     plt.rc("font", size=14)
     plt.rc("lines", linewidth=4)
 
@@ -90,10 +115,10 @@ def visual_multiple(results_dicts):
     # loop through metrics
     for idx_metric, metric in enumerate(metrics):
         ax = plt.subplot(n_metrics, 1, idx_metric + 1)
-        
+
         # loop through results
         for idx_result, config_and_results_dict in enumerate(results_dicts):
-            
+
             config, results_dict = config_and_results_dict
 
             for ds_name, results in results_dict.items():
@@ -109,7 +134,7 @@ def visual_multiple(results_dicts):
 
                 label = None
                 linestyle = 'dotted'
-                
+
                 if ds_name == 'training':
                     label = config['#']
                     linestyle = 'solid'
@@ -132,7 +157,7 @@ def visual_multiple(results_dicts):
 
         ax.set_xlabel("epochs")
         ax.set_ylabel(metric)
-    
+
     plt.legend(bbox_to_anchor=(1.04,0), loc="lower left")
     plt.tight_layout()
 
@@ -155,7 +180,7 @@ def html(results_dict):
 
     if isinstance(results_dict, dict):
         results_dict = [results_dict]
-    
+
     for _results_dict in results_dict:
 
         html_string += """
@@ -180,14 +205,14 @@ def html_multiple_train_and_test(results):
         html_string += '<p><br><br><br>' + str(param) + '<p/>'
         html_string += html(result)
         html_string += '<br><br><br>'
-        
+
     return html_string
 
 def html_multiple_train_and_test_2d_grid(results):
     # make sure there are only two paramter types
     import copy
     results = copy.deepcopy(results)
-    
+
     for result in results:
         result[0].pop('#')
 
@@ -200,7 +225,7 @@ def html_multiple_train_and_test_2d_grid(results):
 
     param_col_values.sort()
     param_row_values.sort()
-    
+
 
     # initialize giant table in nested lists
     table = [['NA' for _ in param_col_values] for _ in param_row_values]
@@ -209,7 +234,7 @@ def html_multiple_train_and_test_2d_grid(results):
     for idx_col, param_col in enumerate(param_col_values):
         for idx_row, param_row in enumerate(param_row_values):
             param_dict = {
-                        param_col_name: param_col, 
+                        param_col_name: param_col,
                         param_row_name: param_row
                         }
 
@@ -220,10 +245,10 @@ def html_multiple_train_and_test_2d_grid(results):
 
                 if result[0] == param_dict:
                     table[idx_row][idx_col] = html(result[1])
-            
+
     html_string = ""
     html_string += "<table style='border: 1px solid black'>"
-    
+
     # first row
     html_string += "<thread><tr style='border: 1px solid black'>"
     html_string += "<th style='border: 1px solid black'>" +\
@@ -231,17 +256,17 @@ def html_multiple_train_and_test_2d_grid(results):
 
     for param_col in param_col_values:
         html_string += "<th style='border: 1px solid black'>" + str(param_col) + "</th>"
-    
+
     html_string += "</tr></thread>"
 
     # the rest of the rows
     for idx_row, param_row in enumerate(param_row_values):
         html_string += "<tr style='border: 1px solid black'>"
-        
+
         # html_string += "<td></td>"
 
         html_string += "<th style='border: 1px solid black'>" + param_row  + " </th>"
-        
+
         for idx_col, param_col in enumerate(param_col_values):
             html_string += "<td style='border: 1px solid black'>" + table[idx_row][idx_col] + "</td>"
 
@@ -250,29 +275,3 @@ def html_multiple_train_and_test_2d_grid(results):
 
     html_string += "</table>"
     return html_string
-
-def optimizer_translation(opt_string, lr, *args, **kwargs):
-    if opt_string.lower() == 'adam':
-        opt = lambda net: torch.optim.Adam(net.parameters(), lr)
-
-    elif opt_string.lower() == 'bbb':
-        opt = lambda net: pinot.BBB(
-                torch.optim.Adam(net.parameters(), lr),
-                0.01,
-                kl_loss_scaling=kwargs['kl_loss_scaling'])
-
-    elif opt_string.lower() == 'adlala':
-        opt = lambda net: pinot.AdLaLa(
-                [
-                    {
-                        'params': net.representation.parameters(),
-                        'h': torch.tensor(lr),
-                        'gamma': 1e-6
-                    },
-                    {
-                        'params': net._output_regression.parameters(),
-                        'h': torch.tensor(lr),
-                        'gamma': 1e-6
-                    }
-                ])
-    return opt
