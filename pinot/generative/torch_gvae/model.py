@@ -4,8 +4,7 @@ import torch.nn.functional as F
 import dgl
 from pinot.representation.dgl_legacy import GN
 from pinot.generative.torch_gvae.loss import negative_ELBO,\
-    negative_ELBO_with_node_prediction
-from pinot.generative.torch_gvae.decoder import *
+    negative_ELBO_with_node_prediction, negative_elbo
 
 class GCNModelVAE(nn.Module):
     """Graph convolutional neural networks for VAE
@@ -110,7 +109,7 @@ class GCNModelVAE(nn.Module):
             # from multiple attention heads. Certainly one way of doing so
             # is by taking the average across the heads.
             if len(z.shape) > 2:
-                z = torch.mean(z, dim=1) 
+                z = torch.mean(z, dim=1)
         return z
 
 
@@ -163,25 +162,35 @@ class GCNModelVAE(nn.Module):
         """
         # Encode
         approx_posterior, mu, logvar = self.condition(g)
-        # Decode
+        
+        # Then decode
+        # First sample latent node representations
         z_sample = approx_posterior.rsample()
-        # z_sample = mu
-        decoded_graph = self.dc(z_sample)
-        return decoded_graph, mu, logvar
+        # Create a local scope so as not to modify the original input graph
+        with g.local_scope():
+            # Create a new graph with sampled representations
+            g.ndata["h"] = z_sample
+            # Unbatch into individual subgraphs
+            gs_unbatched = dgl.unbatch(g)
+            # Decode each subgraph
+            decoded_subgraphs = [self.dc(g_sample.ndata["h"]) \
+                for g_sample in gs_unbatched]
+            return decoded_subgraphs, mu, logvar
 
 
     def loss(self, g, y=None):
         """ Compute negative ELBO loss
         """
-        predicted, mu, logvar = self.encode_and_decode(g)
-        (edge_preds, node_preds) = predicted
+        decoded_subgraphs, mu, logvar = self.encode_and_decode(g)
+        # (edge_preds, node_preds) = predicted
 
-        adj_mat = g.adjacency_matrix(True).to_dense()
-        node_types = g.ndata["type"].flatten().long()
-        node_types_one_hot =\
-            F.one_hot(node_types.flatten().long(), self.num_atom_types).float()
-        loss = negative_ELBO_with_node_prediction(edge_preds, node_preds,
-            adj_mat, node_types, mu, logvar) # Check one-hot
+        # adj_mat = g.adjacency_matrix(True).to_dense()
+        # node_types = g.ndata["type"].flatten().long()
+        # node_types_one_hot =\
+        #     F.one_hot(node_types.flatten().long(), self.num_atom_types).float()
+        # loss = negative_ELBO_with_node_prediction(edge_preds, node_preds,
+        #     adj_mat, node_types, mu, logvar) # Check one-hot
+        loss = negative_elbo(decoded_subgraphs, mu, logvar, g)
         return loss
 
     def _sum_aggregate(self, g):

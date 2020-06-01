@@ -1,7 +1,7 @@
 import torch
 import torch.nn.modules.loss
 import torch.nn.functional as F
-
+import dgl
 
 def negative_ELBO(edge_preds, adj, mu, logvar, norm):
     """Compute negative ELBO loss for Graph Variational Auto Encoders
@@ -82,8 +82,34 @@ def negative_ELBO_with_node_prediction(edge_preds, node_preds, adj, node_types, 
     # see Appendix B from VAE paper:
     # Kingma and Welling. Auto-Encoding Variational Bayes. ICLR, 2014
     # https://arxiv.org/abs/1312.6114
-    # 0.5 * sum(1 + log(sigma^2) - mu^2 - sigma^2)
     KLD = -0.5 / n_nodes * torch.sum(torch.sum(
         1 + 2 * logvar - mu.pow(2) - logvar.exp().pow(2), 1))
 
     return node_nll + edge_nll + KLD
+
+
+def negative_elbo(decoded_subgraphs, mu, logvar, g):
+    gs_unbatched = dgl.unbatch(g)
+    assert(len(decoded_subgraphs) == len(gs_unbatched))
+    loss = 0.
+    for i, subgraph in enumerate(gs_unbatched):
+        decoded_edges, decoded_nodes = decoded_subgraphs[i]
+        adj_mat = subgraph.adjacency_matrix(True).to_dense()
+        node_types = subgraph.ndata["type"].flatten().long()
+
+        node_preds_masked = decoded_nodes.clone()
+        node_preds_masked[torch.isnan(node_preds_masked)] = 0
+
+        edge_preds_masked = decoded_edges.clone()
+        edge_preds_masked[torch.isnan(edge_preds_masked)] = 0
+
+        edge_nll = torch.sum(
+            F.binary_cross_entropy_with_logits(edge_preds_masked, adj_mat))
+        node_nll = torch.sum(F.cross_entropy(node_preds_masked, node_types))
+
+        loss += edge_nll + node_nll
+
+    KLD = -0.5 / g.number_of_nodes() * torch.sum(torch.sum(
+            1 + 2 * logvar - mu.pow(2) - logvar.exp().pow(2), 1))
+
+    return loss + KLD
