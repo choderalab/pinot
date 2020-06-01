@@ -89,23 +89,27 @@ def negative_ELBO_with_node_prediction(edge_preds, node_preds, adj, node_types, 
 
 
 def negative_elbo(decoded_subgraphs, mu, logvar, g):
+    # First unbatch all the graphs into individual
+    # subgraphs
     gs_unbatched = dgl.unbatch(g)
+
     assert(len(decoded_subgraphs) == len(gs_unbatched))
     loss = 0.
     for i, subgraph in enumerate(gs_unbatched):
+        # Compute decoding loss for each individual sub-graphs
         decoded_edges, decoded_nodes = decoded_subgraphs[i]
         adj_mat = subgraph.adjacency_matrix(True).to_dense()
         node_types = subgraph.ndata["type"].flatten().long()
 
-        node_preds_masked = decoded_nodes.clone()
-        node_preds_masked[torch.isnan(node_preds_masked)] = 0
+        # node_preds_masked = decoded_nodes.clone()
+        # node_preds_masked[torch.isnan(node_preds_masked)] = 0
 
-        edge_preds_masked = decoded_edges.clone()
-        edge_preds_masked[torch.isnan(edge_preds_masked)] = 0
+        # edge_preds_masked = decoded_edges.clone()
+        # edge_preds_masked[torch.isnan(edge_preds_masked)] = 0
 
         edge_nll = torch.sum(
-            F.binary_cross_entropy_with_logits(edge_preds_masked, adj_mat))
-        node_nll = torch.sum(F.cross_entropy(node_preds_masked, node_types))
+            F.binary_cross_entropy_with_logits(decoded_edges, adj_mat))
+        node_nll = torch.sum(F.cross_entropy(decoded_nodes, node_types))
 
         loss += edge_nll + node_nll
 

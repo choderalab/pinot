@@ -75,8 +75,8 @@ def accuracy_edge_prediction(net, g, y):
     for i, subg in enumerate(unbatched_subgraphs):
         edge_pred, _ = decoded_subgraphs[i]
         adj_mat = subg.adjacency_matrix(True).to_dense()
-        acc = torch.mean(((edge_pred > 0.5 & adj_mat == 0)\
-             | (edge_pred < 0.5 & adj_mat)).float())
+        acc = torch.mean((( (edge_pred > 0.5) & (adj_mat == 1))\
+             | ((edge_pred < 0.5) & (adj_mat == 0) )).float())
         avg_acc += acc / len(unbatched_subgraphs)
     return avg_acc
 
