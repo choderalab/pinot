@@ -165,7 +165,9 @@ class GCNModelVAE(nn.Module):
         
         # Then decode
         # First sample latent node representations
-        z_sample = approx_posterior.rsample()
+        # z_sample = approx_posterior.rsample()
+        z_sample = mu
+
         # Create a local scope so as not to modify the original input graph
         with g.local_scope():
             # Create a new graph with sampled representations
