@@ -43,17 +43,26 @@ def optimizer_translation(opt_string, lr, *args, **kwargs):
                 0.01,
                 kl_loss_scaling=kwargs['kl_loss_scaling'])
 
+    elif opt_string.lower() == 'sgld':
+        opt = lambda net: pinot.SGLD(
+                net.parameters(),
+                lr)
+
     elif opt_string.lower() == 'adlala':
+        lr = torch.tensor(lr)
+        if torch.cuda.is_available():
+            lr = lr.cuda()
+
         opt = lambda net: pinot.AdLaLa(
                 [
                     {
                         'params': net.representation.parameters(),
-                        'h': torch.tensor(lr),
+                        'h': lr,
                         'gamma': 1e-6
                     },
                     {
                         'params': net._output_regression.parameters(),
-                        'h': torch.tensor(lr),
+                        'h': lr,
                         'gamma': 1e-6
                     }
                 ])

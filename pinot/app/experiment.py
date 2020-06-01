@@ -67,7 +67,7 @@ class Train:
 
         """
 
-        for epoch_idx in range(self.n_epochs):
+        for epoch_idx in range(int(self.n_epochs)):
             self.train_once()
 
             if epoch_idx % self.record_interval == 0:
@@ -129,7 +129,7 @@ class Test:
             g = dgl.batch(g)
 
             for metric in self.metrics:  # loop through the metrics
-                results[metric.__name__][state_name] = metric(self.net, g, y).detach().numpy()
+                results[metric.__name__][state_name] = metric(self.net, g, y).detach().cpu().numpy()
 
         self.results = results
         return dict(results)
