@@ -157,7 +157,9 @@ class GCNModelVAE(nn.Module):
         approx_posterior, mu, logvar = self.condition(g)
         # Decode
         z_sample = approx_posterior.rsample()
-        return self.dc(z_sample), mu, logvar
+        # z_sample = mu
+        decoded_graph = self.dc(z_sample)
+        return decoded_graph, mu, logvar
 
 
     def loss(self, g, y=None):
@@ -199,11 +201,15 @@ class EdgeAndNodeDecoder(nn.Module):
     """ Decoder that returns both a predicted adjacency matrix
         and node identities
     """
-    def __init__(self, dropout, feature_dim, num_atom_types, act=lambda x: x):
+    def __init__(self, dropout, feature_dim, num_atom_types, hidden_dim=64):
         super(EdgeAndNodeDecoder, self).__init__()
         self.dropout = dropout
-        self.act = act
-        self.linear = nn.Linear(feature_dim, num_atom_types)
+        self.hidden_dim = hidden_dim
+        self.decode_nodes = nn.Sequential(
+            nn.Linear(feature_dim, self.hidden_dim),
+            nn.ReLU(),
+            nn.Linear(self.hidden_dim, num_atom_types)
+        )
 
     def forward(self, z):
         """
@@ -218,6 +224,6 @@ class EdgeAndNodeDecoder(nn.Module):
                     row i stores the probability of the identity of atom i
         """
         z_prime = F.dropout(z, self.dropout, training=self.training)
-        adj = self.act(torch.mm(z_prime, z_prime.t()))
-        node_preds = self.linear(z_prime)
+        adj = torch.mm(z_prime, z_prime.t())
+        node_preds = self.decode_nodes(z_prime)
         return (adj, node_preds)
