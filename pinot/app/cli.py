@@ -46,9 +46,8 @@ def run(args):
 
         generative_train.train()
         # When done, save the generative model
-        print("Finished training generative model and saving ...")
         torch.save(net_representation, args.save_model)
-        print("Done!")
+        print("Finished training generative model and saving trained model")
 
     else:
         # Load the pretrained generative model
