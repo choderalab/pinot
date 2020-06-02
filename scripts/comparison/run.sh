@@ -3,7 +3,7 @@
 
 for opt in 'adam' 'bbb' 'sgld'
 do
-    for layer in 'SAGEConv' 'GraphConv' 'EdgeConv'
+    for layer in 'TAGConv' 'ChebConv'
     do
         for lr in '1e-3' '1e-4' '1e-6'
         do

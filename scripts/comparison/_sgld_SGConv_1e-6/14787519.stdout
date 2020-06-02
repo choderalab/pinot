@@ -1,0 +1,41 @@
+Sender: LSF System <lsfadmin@ls06>
+Subject: Job 14787519: <_sgld_SGConv_1e-6> in cluster <lila> Done
+
+Job <_sgld_SGConv_1e-6> was submitted from host <lt21> by user <wangy1> in cluster <lila> at Tue Jun  2 00:27:57 2020
+Job was executed on host(s) <12*ls06>, in queue <gpuqueue>, as user <wangy1> in cluster <lila> at Tue Jun  2 00:27:58 2020
+</home/wangy1> was used as the home directory.
+</data/chodera/wangyq/pinot/scripts/comparison> was used as the working directory.
+Started at Tue Jun  2 00:27:58 2020
+Terminated at Tue Jun  2 00:34:01 2020
+Results reported at Tue Jun  2 00:34:01 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+python ../../pinot/app/supervised_train.py --layer SGConv --optimizer sgld --lr 1e-6 --out _sgld_SGConv_1e-6 --n_epochs 1000
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   361.52 sec.
+    Max Memory :                                 1 GB
+    Average Memory :                             0.97 GB
+    Total Requested Memory :                     48.00 GB
+    Delta Memory :                               47.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                15
+    Run time :                                   365 sec.
+    Turnaround time :                            364 sec.
+
+The output (if any) follows:
+
+
+
+PS:
+
+Read file <14787519.stderr> for stderr output of this job.
+
