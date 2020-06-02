@@ -56,6 +56,7 @@ def load_unlabeled_data(path, size=0.1, toolkit="rdkit", seed=2666):
         # Load only a subset of the data instead
         num_mols = int(len(df_smiles) * size)
         df_smiles = df_smiles[:num_mols]
+        df_y = [None for _ in range(num_mols)]
 
         f.close()
 
@@ -72,6 +73,7 @@ def load_unlabeled_data(path, size=0.1, toolkit="rdkit", seed=2666):
             ]
             gs = [pinot.graph.from_oemol(mol) for mol in mols]
 
+        gs = list(zip(gs, df_y))
         random.seed(seed)
         random.shuffle(gs)
 
@@ -115,7 +117,6 @@ def split(ds, partition):
 
 def batch(ds, batch_size, seed=2666):
     """ Batch graphs and values after shuffling.
-    Can handle both unlabelled and labelled data
     """
     # get the numebr of data
     n_data_points = len(ds)
@@ -123,25 +124,19 @@ def batch(ds, batch_size, seed=2666):
 
     random.seed(seed)
     random.shuffle(ds)
-    if len(ds[0]) == 2:
-        gs, ys = tuple(zip(*ds))
-    else:
-        gs = ds
-        ys = None
+    gs, ys = tuple(zip(*ds))
 
     gs_batched = [
         dgl.batch(gs[idx * batch_size : (idx + 1) * batch_size])
         for idx in range(n_batches)
     ]
 
-    if ys is not None:
+    if ys[0] is not None:
         ys_batched = [
             torch.stack(ys[idx * batch_size : (idx + 1) * batch_size], dim=0)
             for idx in range(n_batches)
         ]
-        return list(zip(gs_batched, ys_batched))
     else:
-        ys_batched = [
-            None for idx in range(n_batches)
-        ]
-        return list(zip(gs_batched, ys_batched))
+        ys_batched = [None for idx in range(n_batches)]
+
+    return list(zip(gs_batched, ys_batched))
