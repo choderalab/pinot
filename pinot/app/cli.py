@@ -12,20 +12,61 @@ from pinot.generative.torch_gvae import GCNModelVAE
 # MODULE FUNCTIONS
 # =============================================================================
 def run(args):
+    net_representation = None
+    # If there are no pretrained generative model specified
+    if args.pretrained_gen_model is None:
+        print("No pretrained model is specified, training generative model",
+            "using background data")
+        # Load the background training data
+        print("Loading dataset:", args.background_data)
+        background_data = getattr(pinot.data, args.background_data)()
+        # Get the number of node features and initialize representation
+        # layer as a variational auto-encoder
+        input_feat_dim = background_data[0].ndata["h"].shape[1]
 
-    # get the entire dataset
+        batched_background_data = pinot.data.utils.batch(background_data,
+                args.batch_size_gen)
+
+        net_representation = GCNModelVAE(input_feat_dim, 
+                gcn_type=args.layer,
+                gcn_hidden_dims=args.hidden_dims_gvae,
+                embedding_dim=args.embedding_dim)
+
+        # And then train this model
+        gen_optimizer = pinot.app.utils.optimizer_translation(
+            args.optimizer_generative,
+            lr=args.lr_generative)(net_representation)
+        print("Doing training...")
+        generative_train = pinot.app.experiment.Train(
+            net_representation,
+            batched_background_data,
+            gen_optimizer,
+            args.n_epochs_generative
+        )
+
+        generative_train.train()
+        # When done, save the generative model
+        print("Finished training generative model and saving ...")
+        torch.save(net_representation, args.save_model)
+        print("Done!")
+
+    else:
+        # Load the pretrained generative model
+        print("Loading pretrained generative model")
+        net_representation = torch.load(args.pretrained_gen_model)
+        print("Finished loading!")
+
+    # Freeze the gradient if the user does not specify --free_gradient
+    if not args.free_gradient:
+        for param in net_representation.parameters():
+            param.requires_grad = False
+
+    # get the foreground data
     ds= getattr(
         pinot.data,
         args.data)()
 
-    # Get the number of node features and initialize representation
-    # layer as a variational auto-encoder
-    input_feat_dim = ds[0][0].ndata["h"].shape[1]
-    net_representation = GCNModelVAE(input_feat_dim, 
-            gcn_type=args.layer,
-            gcn_hidden_dims=args.hidden_dims_gvae,
-            embedding_dim=args.embedding_dim)
-
+    # Initialize the Net from with the generative model
     net = pinot.Net(
         net_representation,
         noise_model=args.noise_model)
@@ -56,7 +97,7 @@ def run(args):
 
     result = train_and_test.run()
 
-    os.mkdir(args.out)
+    os.makedirs(args.out, exist_ok=True)
 
     torch.save(net.state_dict(), args.out + '/model_state_dict.th')
 
@@ -80,17 +121,33 @@ def run(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--layer', default='GraphConv', type=str, help="Type of graph convolution layer")
-    parser.add_argument('--hidden_dims_gvae',nargs='+', type=int, default=[128, 128], help="Hidden dimensions of the convolution layers")
-    parser.add_argument('--embedding_dim', type=int, default=64, help="embedding dimension (dimension of the encoder's output)")
-    parser.add_argument('--noise_model', default='normal-heteroschedastic', type=str)
-    parser.add_argument('--optimizer', default='adam', type=str)
-    parser.add_argument('--out', default='result', type=str, help="Folder to print out results to")
-    parser.add_argument('--data', default='esol', help="Data set name")
-    parser.add_argument('--batch_size', default=32, type=int, help="Batch size")
-    parser.add_argument('--lr', default=1e-5, type=float, help="Learning rate")
-    parser.add_argument('--partition', default='4:1', type=str, help="Training-testing split")
-    parser.add_argument('--n_epochs', default=5, help="Number of epochs")
+    # With pretrained generative model
+    pretrained_gen_group = parser.add_argument_group("With pretrained generative model:")
+    pretrained_gen_group.add_argument('--pretrained_gen_model', default=None, type=str, help="Parameter file of pretrained generative model")
+
+    # With no pretrained generative model
+    group = parser.add_argument_group("With no pretrained generative model")
+    group.add_argument('--layer', type=str, default='GraphConv', help="Type of graph convolution layer")
+    group.add_argument('--hidden_dims_gvae',nargs='+', type=int, default=[128, 128], help="Hidden dimensions of the convolution layers")
+    group.add_argument('--embedding_dim', type=int, default=64, help="Embedding dimension (dimension of the encoder's output)")
+    group.add_argument('--background_data', type=str, default="zinc_tiny", help="Background data to pre-train generative model on")
+    group.add_argument('--n_epochs_generative', type=int, default=50, help="Number of epochs of generative model pre-training")
+    group.add_argument('--batch_size_gen', type=int, default=32, help="Batch size for training generative model")
+    group.add_argument('--optimizer_generative', type=str, default="adam", help="Optimizer for generative model pre-training")
+    group.add_argument('--lr_generative', type=float, default=1e-4, help="Learning rate for generative model pre-training")
+    group.add_argument('--save_model', type=str, default="generative_model.pkl", help="File to save generative model to")
+
+    # Settings for networks
+    net_args = parser.add_argument_group("Net settings")
+    net_args.add_argument('--free_gradient', action="store_true", help="Allow for updating gradients of pretrained generative model")
+    net_args.add_argument('--noise_model', default='normal-heteroschedastic', type=str, help="Noise model for predictive distribution")
+    net_args.add_argument('--optimizer', default='adam', type=str, help="Choice of ptimizer")
+    net_args.add_argument('--out', default='result', type=str, help="Folder to print out results to")
+    net_args.add_argument('--data', default='esol', help="Data set name")
+    net_args.add_argument('--batch_size', default=32, type=int, help="Batch size")
+    net_args.add_argument('--lr', default=1e-5, type=float, help="Learning rate")
+    net_args.add_argument('--partition', default='4:1', type=str, help="Training-testing split")
+    net_args.add_argument('--n_epochs', default=5, help="Number of epochs")
 
     args = parser.parse_args()
     run(args)

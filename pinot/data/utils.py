@@ -46,6 +46,39 @@ def from_csv(path, toolkit="rdkit", smiles_col=-1, y_cols=[-2], seed=2666):
     return _from_csv
 
 
+def load_unlabeled_data(path, size=0.1, toolkit="rdkit", seed=2666):
+    """ Read from unlabeled data set as background data
+    """
+    def _from_txt():
+        f = open(path, "r")
+        df_smiles = [line.rstrip() for line in f]
+        # Since loading the whole data set takes a lot of time
+        # Load only a subset of the data instead
+        num_mols = int(len(df_smiles) * size)
+        df_smiles = df_smiles[:num_mols]
+
+        f.close()
+
+        if toolkit == "rdkit":
+            from rdkit import Chem
+            mols = [Chem.MolFromSmiles(smiles) for smiles in df_smiles]
+            gs = [pinot.graph.from_rdkit_mol(mol) for mol in mols]
+
+        elif toolkit == "openeye":
+            from openeye import oechem
+            mols = [
+                oechem.OESmilesToMol(oechem.OEGraphMol(), smiles)
+                for smiles in df_smiles
+            ]
+            gs = [pinot.graph.from_oemol(mol) for mol in mols]
+
+        random.seed(seed)
+        random.shuffle(gs)
+
+        return gs
+
+    return _from_txt
+
 def normalize(ds):
     """ Get mean and std.
     """
@@ -82,6 +115,7 @@ def split(ds, partition):
 
 def batch(ds, batch_size, seed=2666):
     """ Batch graphs and values after shuffling.
+    Can handle both unlabelled and labelled data
     """
     # get the numebr of data
     n_data_points = len(ds)
@@ -89,16 +123,25 @@ def batch(ds, batch_size, seed=2666):
 
     random.seed(seed)
     random.shuffle(ds)
-    gs, ys = tuple(zip(*ds))
+    if len(ds[0]) == 2:
+        gs, ys = tuple(zip(*ds))
+    else:
+        gs = ds
+        ys = None
 
     gs_batched = [
         dgl.batch(gs[idx * batch_size : (idx + 1) * batch_size])
         for idx in range(n_batches)
     ]
 
-    ys_batched = [
-        torch.stack(ys[idx * batch_size : (idx + 1) * batch_size], dim=0)
-        for idx in range(n_batches)
-    ]
-
-    return list(zip(gs_batched, ys_batched))
+    if ys is not None:
+        ys_batched = [
+            torch.stack(ys[idx * batch_size : (idx + 1) * batch_size], dim=0)
+            for idx in range(n_batches)
+        ]
+        return list(zip(gs_batched, ys_batched))
+    else:
+        ys_batched = [
+            None for idx in range(n_batches)
+        ]
+        return list(zip(gs_batched, ys_batched))

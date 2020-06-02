@@ -70,9 +70,6 @@ def negative_ELBO_with_node_prediction(edge_preds, node_preds, adj, node_types, 
             shape (N, hidden_dim): The log variance of the approximate posterior distribution
             over the nodes' latent representation
 
-        norm (Float):
-            Normalizing factor for the log likelihood term in the ELBO
-    
     Returns:
         loss (Float)
             The negative ELBO
