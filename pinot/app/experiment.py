@@ -163,10 +163,11 @@ class TrainAndTest:
         _str += '\n'
         _str += str(self.net)
         _str += '\n'
-        _str += '# noise model'
-        _str += '\n'
-        _str += str(self.net.noise_model)
-        _str += '\n'
+        if hasattr(self.net, 'noise_model'):
+            _str += '# noise model'
+            _str += '\n'
+            _str += str(self.net.noise_model)
+            _str += '\n'
         _str += '# optimizer'
         _str += '\n'
         _str += str(self.optimizer)
