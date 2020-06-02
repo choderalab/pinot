@@ -1,0 +1,41 @@
+Sender: LSF System <lsfadmin@ls05>
+Subject: Job 14788396: <_gp_bbb_SAGEConv_1e-3> in cluster <lila> Done
+
+Job <_gp_bbb_SAGEConv_1e-3> was submitted from host <lx08> by user <wangy1> in cluster <lila> at Tue Jun  2 12:52:19 2020
+Job was executed on host(s) <12*ls05>, in queue <gpuqueue>, as user <wangy1> in cluster <lila> at Tue Jun  2 12:52:19 2020
+</home/wangy1> was used as the home directory.
+</data/chodera/wangyq/pinot/scripts/gp_comparison> was used as the working directory.
+Started at Tue Jun  2 12:52:19 2020
+Terminated at Tue Jun  2 13:25:21 2020
+Results reported at Tue Jun  2 13:25:21 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+python ../../pinot/app/gp_train.py --layer SAGEConv --optimizer bbb --lr 1e-3 --out _gp_bbb_SAGEConv_1e-3 --n_epochs 1000
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   2524.08 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.99 GB
+    Total Requested Memory :                     48.00 GB
+    Delta Memory :                               46.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                20
+    Run time :                                   1981 sec.
+    Turnaround time :                            1982 sec.
+
+The output (if any) follows:
+
+
+
+PS:
+
+Read file <14788396.stderr> for stderr output of this job.
+
