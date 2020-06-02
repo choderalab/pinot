@@ -74,7 +74,6 @@ def run(args):
         args.optimizer,
         lr=args.lr)(net)
 
-
     # not normalizing for now
     # y_mean, y_std, norm, unnorm = pinot.data.utils.normalize(ds)
 

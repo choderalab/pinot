@@ -101,19 +101,13 @@ def negative_elbo(decoded_subgraphs, mu, logvar, g):
         adj_mat = subgraph.adjacency_matrix(True).to_dense()
         node_types = subgraph.ndata["type"].flatten().long()
 
-        # node_preds_masked = decoded_nodes.clone()
-        # node_preds_masked[torch.isnan(node_preds_masked)] = 0
-
-        # edge_preds_masked = decoded_edges.clone()
-        # edge_preds_masked[torch.isnan(edge_preds_masked)] = 0
-
         edge_nll = torch.sum(
             F.binary_cross_entropy_with_logits(decoded_edges, adj_mat))
         node_nll = torch.sum(F.cross_entropy(decoded_nodes, node_types))
 
-        loss += edge_nll + node_nll
+        loss += node_nll + edge_nll
 
     KLD = -0.5 / g.number_of_nodes() * torch.sum(torch.sum(
             1 + 2 * logvar - mu.pow(2) - logvar.exp().pow(2), 1))
 
-    return loss + KLD
+    return loss #+ KLD

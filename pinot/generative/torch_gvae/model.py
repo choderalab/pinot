@@ -33,7 +33,6 @@ class GCNModelVAE(nn.Module):
         super(GCNModelVAE, self).__init__()
 
         # Decoder
-        # self.dc = EdgeAndNodeDecoder(embedding_dim, num_atom_types)
         self.dc = SequentialDecoder(embedding_dim, num_atom_types)
         self.num_atom_types = num_atom_types
 
@@ -165,8 +164,8 @@ class GCNModelVAE(nn.Module):
         
         # Then decode
         # First sample latent node representations
-        # z_sample = approx_posterior.rsample()
-        z_sample = mu
+        z_sample = approx_posterior.rsample()
+        # z_sample = mu
 
         # Create a local scope so as not to modify the original input graph
         with g.local_scope():
@@ -184,14 +183,6 @@ class GCNModelVAE(nn.Module):
         """ Compute negative ELBO loss
         """
         decoded_subgraphs, mu, logvar = self.encode_and_decode(g)
-        # (edge_preds, node_preds) = predicted
-
-        # adj_mat = g.adjacency_matrix(True).to_dense()
-        # node_types = g.ndata["type"].flatten().long()
-        # node_types_one_hot =\
-        #     F.one_hot(node_types.flatten().long(), self.num_atom_types).float()
-        # loss = negative_ELBO_with_node_prediction(edge_preds, node_preds,
-        #     adj_mat, node_types, mu, logvar) # Check one-hot
         loss = negative_elbo(decoded_subgraphs, mu, logvar, g)
         return loss
 
