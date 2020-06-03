@@ -56,9 +56,8 @@ def load_unlabeled_data(path, size=0.1, toolkit="rdkit", seed=2666):
         # Load only a subset of the data instead
         num_mols = int(len(df_smiles) * size)
         df_smiles = df_smiles[:num_mols]
-        df_y = [None for _ in range(num_mols)]
-
-        f.close()
+        # Create "fake" labels
+        df_y = torch.FloatTensor([1 for _ in range(num_mols)])
 
         if toolkit == "rdkit":
             from rdkit import Chem
@@ -131,12 +130,9 @@ def batch(ds, batch_size, seed=2666):
         for idx in range(n_batches)
     ]
 
-    if ys[0] is not None:
-        ys_batched = [
-            torch.stack(ys[idx * batch_size : (idx + 1) * batch_size], dim=0)
-            for idx in range(n_batches)
-        ]
-    else:
-        ys_batched = [None for idx in range(n_batches)]
+    ys_batched = [
+        torch.stack(ys[idx * batch_size : (idx + 1) * batch_size], dim=0)
+        for idx in range(n_batches)
+    ]
 
     return list(zip(gs_batched, ys_batched))

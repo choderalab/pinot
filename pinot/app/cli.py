@@ -16,13 +16,13 @@ def run(args):
     # If there are no pretrained generative model specified
     if args.pretrained_gen_model is None:
         print("No pretrained model is specified, training generative model",
-            "using background data")
+            "using background data ...")
         # Load the background training data
         print("Loading dataset:", args.background_data)
         background_data = getattr(pinot.data, args.background_data)()
         # Get the number of node features and initialize representation
         # layer as a variational auto-encoder
-        input_feat_dim = background_data[0].ndata["h"].shape[1]
+        input_feat_dim = background_data[0][0].ndata["h"].shape[1]
 
         batched_background_data = pinot.data.utils.batch(background_data,
                 args.batch_size_gen)
@@ -36,7 +36,7 @@ def run(args):
         gen_optimizer = pinot.app.utils.optimizer_translation(
             args.optimizer_generative,
             lr=args.lr_generative)(net_representation)
-        print("Doing training...")
+        print("Training generative model ...")
         generative_train = pinot.app.experiment.Train(
             net_representation,
             batched_background_data,
@@ -123,7 +123,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     # With pretrained generative model
     pretrained_gen_group = parser.add_argument_group("With pretrained generative model:")
-    pretrained_gen_group.add_argument('--pretrained_gen_model', default=None, type=str, help="Parameter file of pretrained generative model")
+    pretrained_gen_group.add_argument('--pretrained_gen_model', default=None, type=str, help="File of pretrained generative model in pkl format")
 
     # With no pretrained generative model
     group = parser.add_argument_group("With no pretrained generative model")

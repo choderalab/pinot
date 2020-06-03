@@ -5,10 +5,10 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--epochs', type=int, default=100, help='Number of epochs to train.')
-parser.add_argument('--split', type=list, default=[0.9, 0.1, 0.], help="train, test, validation split, default = [0.8, 0.2] (No validation)")
+parser.add_argument('--split',nargs='+', type=float, default=[0.9, 0.1, 0.], help="train, test, validation split, default = [0.8, 0.2] (No validation)")
 parser.add_argument('--batch_size', type=int, default=10, help="batch-size, i.e, how many molecules get 'merged' to form a graph per iteration during traing")
 parser.add_argument('--lr', type=float, default=0.001, help='Learning rate.')
-parser.add_argument('--hidden_dims', type=list, default=[256, 128], help="hidden dimension 1")
+parser.add_argument('--hidden_dims', nargs='+', type=int, default=[256, 128], help="hidden dimension 1")
 parser.add_argument('--embedding_dim', type=int, default=64, help="node embedding dimension")
 parser.add_argument('--html', type=str, default="results.html", help="File to save results to")
 
