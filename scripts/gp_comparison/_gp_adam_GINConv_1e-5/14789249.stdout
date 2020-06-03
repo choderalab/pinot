@@ -1,0 +1,41 @@
+Sender: LSF System <lsfadmin@lt09>
+Subject: Job 14789249: <_gp_adam_GINConv_1e-5> in cluster <lila> Done
+
+Job <_gp_adam_GINConv_1e-5> was submitted from host <lx13> by user <wangy1> in cluster <lila> at Tue Jun  2 22:37:34 2020
+Job was executed on host(s) <12*lt09>, in queue <gpuqueue>, as user <wangy1> in cluster <lila> at Tue Jun  2 22:39:55 2020
+</home/wangy1> was used as the home directory.
+</data/chodera/wangyq/pinot/scripts/gp_comparison> was used as the working directory.
+Started at Tue Jun  2 22:39:55 2020
+Terminated at Tue Jun  2 22:49:25 2020
+Results reported at Tue Jun  2 22:49:25 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+python ../../pinot/app/gp_train.py --layer GINConv --optimizer adam --lr 1e-5 --out _gp_adam_GINConv_1e-5 --n_epochs 1000
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   1085.93 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.93 GB
+    Total Requested Memory :                     48.00 GB
+    Delta Memory :                               46.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                31
+    Run time :                                   572 sec.
+    Turnaround time :                            711 sec.
+
+The output (if any) follows:
+
+
+
+PS:
+
+Read file <14789249.stderr> for stderr output of this job.
+

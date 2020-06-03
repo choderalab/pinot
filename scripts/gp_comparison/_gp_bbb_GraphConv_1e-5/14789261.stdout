@@ -1,0 +1,41 @@
+Sender: LSF System <lsfadmin@ls16>
+Subject: Job 14789261: <_gp_bbb_GraphConv_1e-5> in cluster <lila> Done
+
+Job <_gp_bbb_GraphConv_1e-5> was submitted from host <lx13> by user <wangy1> in cluster <lila> at Tue Jun  2 22:37:34 2020
+Job was executed on host(s) <12*ls16>, in queue <gpuqueue>, as user <wangy1> in cluster <lila> at Tue Jun  2 22:41:46 2020
+</home/wangy1> was used as the home directory.
+</data/chodera/wangyq/pinot/scripts/gp_comparison> was used as the working directory.
+Started at Tue Jun  2 22:41:46 2020
+Terminated at Tue Jun  2 23:07:06 2020
+Results reported at Tue Jun  2 23:07:06 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+python ../../pinot/app/gp_train.py --layer GraphConv --optimizer bbb --lr 1e-5 --out _gp_bbb_GraphConv_1e-5 --n_epochs 1000
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   2052.37 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.99 GB
+    Total Requested Memory :                     48.00 GB
+    Delta Memory :                               46.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                20
+    Run time :                                   1520 sec.
+    Turnaround time :                            1772 sec.
+
+The output (if any) follows:
+
+
+
+PS:
+
+Read file <14789261.stderr> for stderr output of this job.
+
