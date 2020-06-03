@@ -7,18 +7,23 @@ import os
 import numpy as np
 import torch
 from pinot.generative.torch_gvae import GCNModelVAE
+import logging
 
 # =============================================================================
 # MODULE FUNCTIONS
 # =============================================================================
 def run(args):
+    if args.info:
+        logging.basicConfig(level=logging.INFO)
+
+    logs = logging.getLogger("pinot")
     net_representation = None
     # If there are no pretrained generative model specified
     if args.pretrained_gen_model is None:
-        print("No pretrained model is specified, training generative model",
+        logs.info("No pretrained model is specified, training generative model"+
             "using background data ...")
         # Load the background training data
-        print("Loading dataset:", args.background_data)
+        logs.info("Loading dataset: " + args.background_data)
         background_data = getattr(pinot.data, args.background_data)()
         # Get the number of node features and initialize representation
         # layer as a variational auto-encoder
@@ -36,7 +41,7 @@ def run(args):
         gen_optimizer = pinot.app.utils.optimizer_translation(
             args.optimizer_generative,
             lr=args.lr_generative)(net_representation)
-        print("Training generative model ...")
+        logs.info("Training generative model ...")
         generative_train = pinot.app.experiment.Train(
             net_representation,
             batched_background_data,
@@ -47,13 +52,13 @@ def run(args):
         generative_train.train()
         # When done, save the generative model
         torch.save(net_representation, args.save_model)
-        print("Finished training generative model and saving trained model")
+        logs.info("Finished training generative model and saving trained model")
 
     else:
         # Load the pretrained generative model
-        print("Loading pretrained generative model")
+        logs.info("Loading pretrained generative model")
         net_representation = torch.load(args.pretrained_gen_model)
-        print("Finished loading!")
+        logs.info("Finished loading!")
 
     # Freeze the gradient if the user does not specify --free_gradient
     if not args.free_gradient:
@@ -119,6 +124,7 @@ def run(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+
     # With pretrained generative model
     pretrained_gen_group = parser.add_argument_group("With pretrained generative model:")
     pretrained_gen_group.add_argument('--pretrained_gen_model', default=None, type=str, help="File of pretrained generative model in pkl format")
@@ -146,6 +152,8 @@ if __name__ == '__main__':
     net_args.add_argument('--lr', default=1e-5, type=float, help="Learning rate")
     net_args.add_argument('--partition', default='4:1', type=str, help="Training-testing split")
     net_args.add_argument('--n_epochs', default=5, help="Number of epochs")
+
+    parser.add_argument('--info', action="store_true", help="INFO mode with more information printing out")
 
     args = parser.parse_args()
     run(args)

@@ -66,28 +66,29 @@ class SequentialDecoder(nn.Module):
         predictions $\hat{x}$
     """
 
-    def __init__(self, embedding_dim, num_atom_types):
+    def __init__(self, embedding_dim, num_atom_types, Dx1=64, Dx2=64,
+            Da1=64, Da2=64, hidden_dim=64):
         super(SequentialDecoder, self).__init__()
         self.embedding_dim = embedding_dim
         self.num_atom_types = num_atom_types
 
-        self.Dx1 = 64
-        self.Dx2 = 64
+        self.Dx1 = Dx1
+        self.Dx2 = Dx2
         self.z_to_zx = nn.Sequential(
             nn.Linear(embedding_dim, self.Dx1),
             nn.ReLU(),
             nn.Linear(self.Dx1, self.Dx2)
         )
 
-        self.Da1 = 64
-        self.Da2 = 64
+        self.Da1 = Da1
+        self.Da2 = Da2
         self.z_to_za = nn.Sequential(
             nn.Linear(embedding_dim, self.Da1),
             nn.ReLU(),
             nn.Linear(self.Da1, self.Da2)
         )
 
-        self.hidden_dim = 64
+        self.hidden_dim = hidden_dim
         self.zx_to_x = nn.Sequential(
             nn.Linear(self.Dx2, self.hidden_dim),
             nn.ReLU(),
@@ -101,17 +102,7 @@ class SequentialDecoder(nn.Module):
         za = self.z_to_za(z)
         # before rounding
         # (N, N)
-        # A_tilde = F.sigmoid(za @ za.T)
         A_tilde = za @ za.T
-        # round to yield predicted A
-        # (N, N)
-        A_hat = torch.where(
-            torch.gt(A_tilde, 0.5),
-            torch.ones_like(A_tilde),
-            torch.zeros_like(A_tilde))
-        # this is equivalent to one round of unnormalized message passing
-        # might need to add more
-        # (N, Dx)
         zx = A_tilde @ zx
         # predicted x
         # (N, n_classes)

@@ -5,6 +5,7 @@ import dgl
 from pinot.representation.dgl_legacy import GN
 from pinot.generative.torch_gvae.loss import negative_ELBO,\
     negative_ELBO_with_node_prediction, negative_elbo
+from pinot.generative.torch_gvae.decoder import *
 
 class GCNModelVAE(nn.Module):
     """Graph convolutional neural networks for VAE
