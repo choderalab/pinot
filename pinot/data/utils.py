@@ -46,6 +46,40 @@ def from_csv(path, toolkit="rdkit", smiles_col=-1, y_cols=[-2], seed=2666):
     return _from_csv
 
 
+def load_unlabeled_data(path, size=0.1, toolkit="rdkit", seed=2666):
+    """ Read from unlabeled data set as background data
+    """
+    def _from_txt():
+        f = open(path, "r")
+        df_smiles = [line.rstrip() for line in f]
+        # Since loading the whole data set takes a lot of time
+        # Load only a subset of the data instead
+        num_mols = int(len(df_smiles) * size)
+        df_smiles = df_smiles[:num_mols]
+        # Create "fake" labels
+        df_y = torch.FloatTensor([1 for _ in range(num_mols)])
+
+        if toolkit == "rdkit":
+            from rdkit import Chem
+            mols = [Chem.MolFromSmiles(smiles) for smiles in df_smiles]
+            gs = [pinot.graph.from_rdkit_mol(mol) for mol in mols]
+
+        elif toolkit == "openeye":
+            from openeye import oechem
+            mols = [
+                oechem.OESmilesToMol(oechem.OEGraphMol(), smiles)
+                for smiles in df_smiles
+            ]
+            gs = [pinot.graph.from_oemol(mol) for mol in mols]
+
+        gs = list(zip(gs, df_y))
+        random.seed(seed)
+        random.shuffle(gs)
+
+        return gs
+
+    return _from_txt
+
 def normalize(ds):
     """ Get mean and std.
     """

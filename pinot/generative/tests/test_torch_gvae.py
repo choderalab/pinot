@@ -14,6 +14,19 @@ def gvae():
     from pinot.generative.torch_gvae.model import GCNModelVAE
     return GCNModelVAE(16)
 
+def test_infer_node_representation():
+    import pinot
+    import dgl
+    from pinot.data import esol
+    from pinot.generative.torch_gvae.model import GCNModelVAE
+    ds = esol()[:10]
+    gs, _ = zip(*ds)
+    g = dgl.batch(gs)
+    ndims = g.ndata["h"].shape[1]
+    gvae = GCNModelVAE(ndims)
+    z = gvae.infer_node_representation(g)
+    assert z.shape[0] == g.ndata["h"].shape[0]
+
 def test_forward():
     import pinot
     import dgl
@@ -25,7 +38,7 @@ def test_forward():
     ndims = g.ndata["h"].shape[1]
     gvae = GCNModelVAE(ndims)
     z = gvae.forward(g)
-    assert z.shape[0] == g.ndata["h"].shape[0]
+    assert (z.shape == torch.Size([10, gvae.embedding_dim]))
 
 def test_inference():
     import pinot

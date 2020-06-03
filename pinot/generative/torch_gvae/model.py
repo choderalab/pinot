@@ -1,15 +1,19 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import dgl
 from pinot.representation.dgl_legacy import GN
 from pinot.generative.torch_gvae.loss import negative_ELBO,\
-    negative_ELBO_with_node_prediction
+    negative_ELBO_with_node_prediction, negative_elbo
+from pinot.generative.torch_gvae.decoder import *
 
 class GCNModelVAE(nn.Module):
     """Graph convolutional neural networks for VAE
     """
-    def __init__(self, input_feat_dim, gcn_hidden_dims=[256, 128, 64],\
-        embedding_dim=64, dropout=0.0, num_atom_types=100):
+    def __init__(self, input_feat_dim, gcn_type="GraphConv", gcn_init_args ={},\
+            gcn_hidden_dims=[256, 128], embedding_dim=64, dropout=0.0, \
+            num_atom_types=100, \
+            aggregation_function="sum"):
         """ Construct a VAE with GCN
         Args:
             input_feature_dim: Number of input features for each atom/node
@@ -22,29 +26,71 @@ class GCNModelVAE(nn.Module):
 
             num_atom_types: The number of possible atom types
 
+            aggregation_function: str ["sum", "mean"]
+                function used to aggregate the node feature
+                    vectors into a single graph representation
+
         """
         super(GCNModelVAE, self).__init__()
-        # Graph convolution layers
+
+        # Decoder
+        self.dc = SequentialDecoder(embedding_dim, num_atom_types)
+        self.num_atom_types = num_atom_types
+
+        # Encoder
+
+        # 1. Graph convolution layers
+        # Note that we define this here because in 'Net', the model automatically
+        # finds the input dimension of the output-regressor by inspecting the
+        # last torch module of the representation layer
         assert(len(gcn_hidden_dims) > 0)
         self.gcn_modules = []
         for (dim_prev, dim_post) in zip([input_feat_dim] + gcn_hidden_dims[:-1],\
                 gcn_hidden_dims):
-            self.gcn_modules.append(GN(dim_prev, dim_post))
+            self.gcn_modules.append(GN(dim_prev, dim_post, gcn_type, gcn_init_args))
         self.gc = nn.ModuleList(self.gcn_modules)
 
-        # Mapping from node embedding to predictive distribution parameter
+        if aggregation_function == "sum":
+            self.aggregator = self._sum_aggregate
+        elif aggregation_function == "mean":
+            self.aggregator = self._mean_aggregate
+
+        self.embedding_dim = embedding_dim
+
+        # 2. Mapping from node embedding to predictive distribution parameter
         self.output_regression = nn.ModuleList([
             nn.Linear(gcn_hidden_dims[-1], embedding_dim),
             nn.Linear(gcn_hidden_dims[-1], embedding_dim),
         ])
 
-        # Decoder
-        self.dc = EdgeAndNodeDecoder(dropout, embedding_dim, num_atom_types)
-        self.num_atom_types = num_atom_types
-
     def forward(self, g):
-        """ Compute the parameters of the approximate Gaussian posterior
-         distribution
+        """ Compute the latent representation of the input graph. This
+        function is slightly different from `infer_node_representation`
+        only in that it aggregates the node features into one vector.
+        This is so that `GVAE` can be directly used as part of `Net`.
+        
+        Args:
+            g (DGLGraph)
+                The molecular graph
+        Returns:
+            z: (FloatTensor): the latent encodings of the graph
+                Shape (hidden_dim2,)
+        """
+        # Apply the graph convolution operations
+        z = self.infer_node_representation(g)
+        # Find the mean of the approximate posterior distribution
+        # q(z|g)
+        z = self.output_regression[0](z)
+        # Aggregate the nodes' representations into a graph representation
+        # Note that one should use dgl.sum_nodes because this function will
+        # return a tensor with a new first dimension whose size is the number
+        # of subgraphs composing g
+        with g.local_scope():
+            g.ndata["h"] = z
+            return self.aggregator(g)
+
+    def infer_node_representation(self, g):
+        """ Compute the latent representation of the nodes of input graph
         
         Args:
             g (DGLGraph)
@@ -53,11 +99,19 @@ class GCNModelVAE(nn.Module):
             z: (FloatTensor): the latent encodings of the nodes
                 Shape (N, hidden_dim2)
         """
-        #z = self.linear(g.ndata["h"])
         z = g.ndata["h"]
         for layer in self.gc:
             z = layer(g, z)
+            # The output of a Graph Attention Networks is of shape
+            # (N, H, D) where N is the number of nodes, H is the
+            # number of attention heads and D is the output dimension of the
+            # network.  Therefore, one need to "aggregate" the output
+            # from multiple attention heads. Certainly one way of doing so
+            # is by taking the average across the heads.
+            if len(z.shape) > 2:
+                z = torch.mean(z, dim=1)
         return z
+
 
     def condition(self, g):
         """ Compute the approximate Normal posterior distribution q(z|x, adj)
@@ -81,7 +135,7 @@ class GCNModelVAE(nn.Module):
                     is the log variance of the approximate posterior normal distribution
 
         """
-        z = self.forward(g)
+        z = self.infer_node_representation(g)
         theta = [parameter.forward(z) for parameter in self.output_regression]
         mu  = theta[0]
         logvar = theta[1]
@@ -108,66 +162,33 @@ class GCNModelVAE(nn.Module):
         """
         # Encode
         approx_posterior, mu, logvar = self.condition(g)
-        # Decode
+        
+        # Then decode
+        # First sample latent node representations
         z_sample = approx_posterior.rsample()
-        return self.dc(z_sample), mu, logvar
+        # z_sample = mu
+
+        # Create a local scope so as not to modify the original input graph
+        with g.local_scope():
+            # Create a new graph with sampled representations
+            g.ndata["h"] = z_sample
+            # Unbatch into individual subgraphs
+            gs_unbatched = dgl.unbatch(g)
+            # Decode each subgraph
+            decoded_subgraphs = [self.dc(g_sample.ndata["h"]) \
+                for g_sample in gs_unbatched]
+            return decoded_subgraphs, mu, logvar
 
 
     def loss(self, g, y=None):
         """ Compute negative ELBO loss
         """
-        predicted, mu, logvar = self.encode_and_decode(g)
-        (edge_preds, node_preds) = predicted
-
-        adj_mat = g.adjacency_matrix(True).to_dense()
-        node_types = g.ndata["type"].flatten().long()
-        node_types_one_hot =\
-            F.one_hot(node_types.flatten().long(), self.num_atom_types).float()
-        loss = negative_ELBO_with_node_prediction(edge_preds, node_preds,
-            adj_mat, node_types, mu, logvar) # Check one-hot
+        decoded_subgraphs, mu, logvar = self.encode_and_decode(g)
+        loss = negative_elbo(decoded_subgraphs, mu, logvar, g)
         return loss
 
+    def _sum_aggregate(self, g):
+        return dgl.sum_nodes(g, "h")
 
-class InnerProductDecoder(nn.Module):
-    """Decoder for using inner product for edge prediction."""
-
-    def __init__(self, dropout, act=lambda x: x):
-        super(InnerProductDecoder, self).__init__()
-        self.dropout = dropout
-        self.act = act
-
-    def forward(self, z):
-        """ Returns a symmetric adjacency matrix of size (N,N)
-        where A[i,j] = probability there is an edge between nodes i and j
-        """
-        z = F.dropout(z, self.dropout, training=self.training)
-        adj = self.act(torch.mm(z, z.t()))
-        return adj
-
-
-class EdgeAndNodeDecoder(nn.Module):
-    """ Decoder that returns both a predicted adjacency matrix
-        and node identities
-    """
-    def __init__(self, dropout, feature_dim, num_atom_types, act=lambda x: x):
-        super(EdgeAndNodeDecoder, self).__init__()
-        self.dropout = dropout
-        self.act = act
-        self.linear = nn.Linear(feature_dim, num_atom_types)
-
-    def forward(self, z):
-        """
-        Arg:
-            z (FloatTensor):
-                Shape (N, hidden_dim)
-        Returns:
-            (adj, node_preds)
-                adj (FloatTensor): has shape (N, N) is a matrix where entry (i.j)
-                    stores the probability that there is an edge between atoms i,j
-                node_preds (FloatTensor): has shape (N, num_atom_types) where each
-                    row i stores the probability of the identity of atom i
-        """
-        z_prime = F.dropout(z, self.dropout, training=self.training)
-        adj = self.act(torch.mm(z_prime, z_prime.t()))
-        node_preds = self.linear(z_prime)
-        return (adj, node_preds)
+    def _mean_aggregate(self, g):
+        return dgl.mean_nodes(g, "h")
