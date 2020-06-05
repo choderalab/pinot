@@ -75,6 +75,9 @@ class Train:
 
         self.states["final"] = copy.deepcopy(self.net.state_dict())
 
+        if hasattr(self.optimizer, 'expecation_params'):
+            self.optimizer.expectation_params()
+
         return self.net
 
 

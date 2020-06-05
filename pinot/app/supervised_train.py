@@ -52,7 +52,6 @@ def run(args):
         lr=args.lr,
         kl_loss_scaling=1.0/float(len(ds_tr)))(net)
 
-
     train_and_test = pinot.app.experiment.TrainAndTest(
         net=net,
         data_tr=ds_tr,

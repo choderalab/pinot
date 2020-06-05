@@ -17,10 +17,15 @@ class ExactGPR(GPR):
     def __init__(self, kernel):
         super(ExactGPR, self).__init__()
         self.kernel = kernel
+        self.sigma = torch.nn.Parameter(
+                torch.tensor(1.0))
 
     def _get_kernel_and_auxiliary_variables(
-            self, x_tr, y_tr, x_te=None, sigma=1.0,
+            self, x_tr, y_tr, x_te=None,
         ):
+        
+        # grab sigma
+        sigma = self.sigma
 
         # compute the kernels
         k_tr_tr = self._perturb(self.kernel.forward(x_tr, x_tr))
@@ -35,7 +40,9 @@ class ExactGPR(GPR):
             k_te_te = k_te_tr = k_tr_te = k_tr_tr
 
         # (batch_size_tr, batch_size_tr)
-        k_plus_sigma = k_tr_tr + (sigma ** 2) * torch.eye(k_tr_tr.shape[0])
+        k_plus_sigma = k_tr_tr + (sigma ** 2) * torch.eye(
+                k_tr_tr.shape[0],
+                device=k_tr_tr.device)
 
         # (batch_size_tr, batch_size_tr)
         l_low = torch.cholesky(k_plus_sigma)
@@ -55,8 +62,7 @@ class ExactGPR(GPR):
 
         return k_tr_tr, k_te_te, k_te_tr, k_tr_te, l_low, alpha
 
-
-    def loss(self, x_tr, y_tr, sigma=1.0):
+    def loss(self, x_tr, y_tr):
         """ Compute the loss.
 
         Note
@@ -71,10 +77,13 @@ class ExactGPR(GPR):
             training data measurement.
 
         """
+        # point data to object
+        self._x_tr = x_tr
+        self._y_tr = y_tr
 
         # get the parameters
         k_tr_tr, k_te_te, k_te_tr, k_tr_te, l_low, alpha\
-            = self._get_kernel_and_auxiliary_variables(x_tr, y_tr, sigma=sigma)
+            = self._get_kernel_and_auxiliary_variables(x_tr, y_tr)
 
         # we return the exact nll with constant
         nll = 0.5 * (y_tr.t() @ alpha) + torch.trace(l_low)\
@@ -82,7 +91,7 @@ class ExactGPR(GPR):
 
         return nll
 
-    def condition(self, x_tr, y_tr, x_te=None, sigma=1.0):
+    def condition(self, x_te, x_tr=None, y_tr=None):
         r""" Calculate the predictive distribution given `x_te`.
 
         Parameters
@@ -96,11 +105,15 @@ class ExactGPR(GPR):
         sigma : float or torch.tensor, shape=(), default=1.0
             noise parameter.
         """
+        if x_tr is None:
+            x_tr = self._x_tr
+        if y_tr is None:
+            y_tr = self._y_tr
 
         # get parameters
         k_tr_tr, k_te_te, k_te_tr, k_tr_te, l_low, alpha\
             = self._get_kernel_and_auxiliary_variables(
-                x_tr, y_tr, x_te, sigma=sigma)
+                x_tr, y_tr, x_te)
 
         # compute mean
         # (batch_size_te, 1)
