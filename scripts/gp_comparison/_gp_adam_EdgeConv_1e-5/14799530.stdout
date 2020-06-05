@@ -1,0 +1,41 @@
+Sender: LSF System <lsfadmin@lu09>
+Subject: Job 14799530: <_gp_adam_EdgeConv_1e-5> in cluster <lila> Done
+
+Job <_gp_adam_EdgeConv_1e-5> was submitted from host <lx12> by user <wangy1> in cluster <lila> at Fri Jun  5 14:58:05 2020
+Job was executed on host(s) <12*lu09>, in queue <gpuqueue>, as user <wangy1> in cluster <lila> at Fri Jun  5 15:00:52 2020
+</home/wangy1> was used as the home directory.
+</data/chodera/wangyq/pinot/scripts/gp_comparison> was used as the working directory.
+Started at Fri Jun  5 15:00:52 2020
+Terminated at Fri Jun  5 15:14:25 2020
+Results reported at Fri Jun  5 15:14:25 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+python ../../pinot/app/gp_train.py --layer EdgeConv --optimizer adam --lr 1e-5 --out _gp_adam_EdgeConv_1e-5 --n_epochs 1000
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   1508.41 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.96 GB
+    Total Requested Memory :                     48.00 GB
+    Delta Memory :                               46.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                20
+    Run time :                                   812 sec.
+    Turnaround time :                            980 sec.
+
+The output (if any) follows:
+
+
+
+PS:
+
+Read file <14799530.stderr> for stderr output of this job.
+
