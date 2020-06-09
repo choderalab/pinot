@@ -98,11 +98,12 @@ class Test:
 
     """
 
-    def __init__(self, net, data, states, metrics=[pinot.rmse, pinot.r2]):
+    def __init__(self, net, data, states, sampler=None, metrics=[pinot.rmse, pinot.r2]):
         self.net = net  # deepcopy the model object
         self.data = data
         self.metrics = metrics
         self.states = states
+        self.sampler = sampler
 
     def test(self):
         # switch to test
@@ -118,6 +119,7 @@ class Test:
             self.net.load_state_dict(state)
 
             # concat y and y_hat in test set
+
             y = []
             g = []
             for g_, y_ in self.data:
@@ -132,7 +134,7 @@ class Test:
             g = dgl.batch(g)
 
             for metric in self.metrics:  # loop through the metrics
-                results[metric.__name__][state_name] = metric(self.net, g, y).detach().cpu().numpy()
+                results[metric.__name__][state_name] = metric(self.net, g, y, sampler=self.sampler).detach().cpu().numpy()
 
         self.results = results
         return dict(results)
@@ -148,7 +150,8 @@ class TrainAndTest:
         data_tr,
         data_te,
         optimizer,
-        metrics=[pinot.rmse, pinot.r2, pinot.avg_nll],
+        metrics=[pinot.rmse, pinot.r2, pinot.avg_nll,
+            pinot.metrics.log_sigma],
         n_epochs=100,
         record_interval=1,
     ):
@@ -195,7 +198,8 @@ class TrainAndTest:
         self.states = train.states
 
         test = Test(
-            net=self.net, data=self.data_te, metrics=self.metrics, states=self.states
+            net=self.net, data=self.data_te, metrics=self.metrics, states=self.states,
+            sampler=self.optimizer,
         )
 
         test.test()
@@ -203,7 +207,8 @@ class TrainAndTest:
         self.results_te = test.results
 
         test = Test(
-            net=self.net, data=self.data_tr, metrics=self.metrics, states=self.states
+            net=self.net, data=self.data_tr, metrics=self.metrics, states=self.states,
+            sampler=self.optimizer,
         )
 
         test.test()

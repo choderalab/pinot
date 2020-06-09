@@ -17,12 +17,17 @@ def run(args):
         layer=layer,
         config=args.config)
 
+    hidden_dim = [layer for layer in net_representation.modules()\
+            if hasattr(layer, 'out_features')][-1].out_features
+
     kernel = pinot.inference.gp.kernels.deep_kernel.DeepKernel(
             representation=net_representation,
-            base_kernel=pinot.inference.gp.kernels.rbf.RBF())
+            base_kernel=pinot.inference.gp.kernels.rbf.RBF(
+                l=torch.tensor(1.0)))
 
     gpr = pinot.inference.gp.gpr.exact_gpr.ExactGPR(
-            kernel)
+            kernel,
+            log_sigma=float(args.log_sigma))
 
     # get the entire dataset
     ds= getattr(
@@ -37,9 +42,10 @@ def run(args):
     partition = [int(x) for x in args.partition.split(':')]
     assert len(partition) == 2, 'only training and test here.'
 
-    # batch
-    ds = pinot.data.utils.batch(ds, batch_size)
     ds_tr, ds_te = pinot.data.utils.split(ds, partition)
+
+    ds_tr = pinot.data.utils.batch(ds_tr, len(ds_tr))
+    ds_te = pinot.data.utils.batch(ds_te, len(ds_te))
 
     if torch.cuda.is_available():
         ds_tr = [(g.to(torch.device('cuda:0')), y.to(torch.device('cuda:0')))
@@ -66,6 +72,16 @@ def run(args):
     os.mkdir(args.out)
 
     torch.save(gpr.state_dict(), args.out + '/model_state_dict.th')
+
+    # torch.save(gpr, args.out + '/model.th')
+
+    torch.save(gpr.condition(ds_tr[0][0]), args.out + '/distribution_tr.th')
+    torch.save(gpr.condition(ds_te[0][0]), args.out + '/distribution_te.th')
+    
+    np.save(arr=ds_tr[0][1].detach().cpu().numpy(), 
+        file=args.out + '/y_tr.npy')
+    np.save(arr=ds_te[0][1].detach().cpu().numpy(),
+        file=args.out + '/y_te.npy')
 
     with open(args.out + '/architecture.txt', 'w') as f_handle:
         f_handle.write(str(train_and_test))
@@ -101,6 +117,7 @@ if __name__ == '__main__':
     parser.add_argument('--lr', default=1e-5, type=float)
     parser.add_argument('--partition', default='4:1', type=str)
     parser.add_argument('--n_epochs', default=5)
+    parser.add_argument('--log_sigma', default=-3)
 
     args = parser.parse_args()
     run(args)

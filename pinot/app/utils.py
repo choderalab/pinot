@@ -15,10 +15,12 @@ def train_once(net, ds_tr, opt):
     """ Train the model for one batch.
     """
     for g, y in ds_tr:
-        loss = torch.sum(net.loss(g, y))
-        opt.zero_grad()
-        loss.backward()
-        opt.step()
+        def l():
+            loss = torch.sum(net.loss(g, y))
+            opt.zero_grad()
+            loss.backward()
+            return loss
+        opt.step(l)
 
     return net, opt
 
@@ -68,6 +70,6 @@ def optimizer_translation(opt_string, lr, *args, **kwargs):
                 ])
 
     else:
-        opt = lambda net: getattr(torch.optim, opt_string.capitalize()
+        opt = lambda net: getattr(torch.optim, opt_string
             )(net.parameters(), lr)
     return opt

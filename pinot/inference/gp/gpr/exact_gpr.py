@@ -14,18 +14,20 @@ class ExactGPR(GPR):
     """ Exact Gaussian process regression.
 
     """
-    def __init__(self, kernel):
+    def __init__(self, kernel, log_sigma=-3.0):
         super(ExactGPR, self).__init__()
         self.kernel = kernel
-        self.sigma = torch.nn.Parameter(
-                torch.tensor(1.0))
+
+        self.log_sigma = torch.nn.Parameter(
+                torch.tensor(
+                    log_sigma))
 
     def _get_kernel_and_auxiliary_variables(
             self, x_tr, y_tr, x_te=None,
         ):
         
         # grab sigma
-        sigma = self.sigma
+        sigma = torch.exp(self.log_sigma)
 
         # compute the kernels
         k_tr_tr = self._perturb(self.kernel.forward(x_tr, x_tr))
@@ -40,7 +42,7 @@ class ExactGPR(GPR):
             k_te_te = k_te_tr = k_tr_te = k_tr_tr
 
         # (batch_size_tr, batch_size_tr)
-        k_plus_sigma = k_tr_tr + (sigma ** 2) * torch.eye(
+        k_plus_sigma = k_tr_tr + torch.exp(self.log_sigma) * torch.eye(
                 k_tr_tr.shape[0],
                 device=k_tr_tr.device)
 
@@ -63,7 +65,7 @@ class ExactGPR(GPR):
         return k_tr_tr, k_te_te, k_te_tr, k_tr_te, l_low, alpha
 
     def loss(self, x_tr, y_tr):
-        """ Compute the loss.
+        r""" Compute the loss.
 
         Note
         ----
@@ -89,10 +91,17 @@ class ExactGPR(GPR):
         nll = 0.5 * (y_tr.t() @ alpha) + torch.trace(l_low)\
             + 0.5 * y_tr.shape[0] * math.log(2.0 * math.pi)
 
+        print(self.log_sigma)
+
         return nll
 
-    def condition(self, x_te, x_tr=None, y_tr=None):
+    def condition(self, x_te, x_tr=None, y_tr=None, sampler=None):
         r""" Calculate the predictive distribution given `x_te`.
+
+        Note
+        ----
+        Here we allow the speicifaction of sampler but won't actually
+        use it here.
 
         Parameters
         ----------
@@ -130,6 +139,11 @@ class ExactGPR(GPR):
 
         # ensure symetric
         variance = 0.5 * (variance + variance.t())
+
+        # $ p(y|X) = \int p(y|f)p(f|x) df $
+        # variance += torch.exp(self.log_sigma) * torch.eye(
+        #         *variance.shape,
+        #         device=variance.device)
 
         # construct noise predictive distribution
         distribution = torch.distributions.multivariate_normal.MultivariateNormal(
