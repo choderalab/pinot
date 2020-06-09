@@ -1,0 +1,2041 @@
+Sender: LSF System <lsfadmin@ls02>
+Subject: Job 14807170: <_gp_Adam_GraphConv_1e-3_-1> in cluster <lila> Done
+
+Job <_gp_Adam_GraphConv_1e-3_-1> was submitted from host <lx12> by user <wangy1> in cluster <lila> at Mon Jun  8 22:41:38 2020
+Job was executed on host(s) <12*ls02>, in queue <gpuqueue>, as user <wangy1> in cluster <lila> at Mon Jun  8 22:41:39 2020
+</home/wangy1> was used as the home directory.
+</data/chodera/wangyq/pinot/scripts/gp_comparison> was used as the working directory.
+Started at Mon Jun  8 22:41:39 2020
+Terminated at Mon Jun  8 22:49:20 2020
+Results reported at Mon Jun  8 22:49:20 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+python ../../pinot/app/gp_train.py --layer GraphConv --optimizer Adam --lr 1e-3 --out _gp_Adam_GraphConv_1e-3_-1 --log_sigma -1 --n_epochs 1000
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   1696.76 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.93 GB
+    Total Requested Memory :                     48.00 GB
+    Delta Memory :                               46.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                20
+    Run time :                                   462 sec.
+    Turnaround time :                            462 sec.
+
+The output (if any) follows:
+
+Parameter containing:
+tensor(-1., device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9990, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9980, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9971, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9962, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9953, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9945, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9938, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9931, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9925, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9920, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9916, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9912, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9909, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9906, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9904, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9903, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9902, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9902, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9902, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9903, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9904, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9906, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9907, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9909, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9912, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9914, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9917, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9921, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9924, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9928, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9932, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9937, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9942, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9947, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9952, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9958, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9964, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9970, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9976, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9982, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9989, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-0.9995, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0002, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0009, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0016, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0023, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0030, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0037, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0045, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0052, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0060, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0067, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0075, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0083, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0091, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0098, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0106, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0114, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0122, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0130, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0138, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0147, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0155, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0163, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0172, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0180, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0189, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0197, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0206, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0215, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0223, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0232, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0241, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0250, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0259, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0268, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0277, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0286, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0295, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0304, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0313, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0322, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0332, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0341, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0351, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0360, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0370, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0379, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0388, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0398, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0407, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0417, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0426, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0436, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0445, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0455, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0464, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0474, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0483, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0493, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0503, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0512, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0522, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0531, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0541, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0551, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0561, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0571, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0580, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0590, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0600, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0610, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0620, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0629, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0639, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0649, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0659, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0668, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0677, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0687, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0696, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0706, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0715, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0725, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0734, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0744, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0754, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0763, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0773, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0783, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0792, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0802, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0812, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0821, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0831, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0841, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0850, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0860, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0869, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0879, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0888, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0898, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0907, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0916, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0926, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0936, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0945, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0955, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0964, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0973, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0983, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.0992, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1002, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1011, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1021, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1030, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1039, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1049, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1058, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1067, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1077, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1086, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1095, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1104, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1114, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1123, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1132, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1141, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1151, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1160, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1169, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1178, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1188, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1197, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1206, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1216, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1225, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1234, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1244, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1253, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1263, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1272, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1282, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1291, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1300, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1310, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1319, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1328, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1338, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1347, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1356, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1366, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1375, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1384, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1393, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1403, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1412, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1421, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1430, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1440, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1449, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1458, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1467, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1477, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1486, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1495, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1504, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1514, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1523, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1532, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1542, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1551, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1560, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1569, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1579, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1588, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1597, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1606, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1615, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1625, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1634, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1643, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1652, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1661, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1670, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1680, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1689, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1698, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1708, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1717, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1727, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1736, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1746, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1755, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1764, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1773, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1783, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1792, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1801, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1811, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1820, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1829, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1839, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1848, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1857, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1866, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1876, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1885, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1894, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1904, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1913, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1922, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1931, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1940, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1949, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1959, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1968, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1977, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1985, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.1994, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2003, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2011, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2020, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2028, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2037, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2045, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2054, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2062, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2071, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2080, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2088, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2097, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2106, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2115, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2124, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2133, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2142, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2151, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2159, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2168, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2177, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2186, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2195, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2204, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2212, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2221, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2230, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2239, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2248, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2257, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2266, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2275, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2284, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2292, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2301, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2310, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2318, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2327, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2336, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2344, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2353, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2361, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2370, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2378, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2386, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2395, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2403, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2412, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2420, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2429, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2437, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2446, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2454, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2463, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2471, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2480, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2488, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2496, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2505, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2513, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2522, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2530, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2538, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2547, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2555, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2563, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2572, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2580, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2588, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2595, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2603, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2610, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2618, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2625, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2632, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2638, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2645, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2652, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2659, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2666, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2674, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2681, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2689, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2697, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2705, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2714, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2722, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2731, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2739, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2747, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2756, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2764, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2773, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2781, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2790, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2799, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2807, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2816, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2824, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2833, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2841, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2850, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2858, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2866, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2874, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2883, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2891, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2899, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2907, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2915, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2922, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2930, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2938, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2946, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2954, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2961, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2969, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2977, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2985, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.2993, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3000, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3008, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3016, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3023, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3031, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3039, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3046, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3054, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3062, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3069, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3077, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3085, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3093, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3101, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3109, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3117, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3125, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3132, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3140, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3147, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3155, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3162, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3170, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3177, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3184, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3192, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3199, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3207, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3214, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3221, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3229, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3237, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3244, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3252, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3260, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3267, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3275, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3282, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3290, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3297, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3305, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3313, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3320, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3327, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3335, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3342, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3349, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3357, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3364, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3372, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3379, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3386, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3393, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3400, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3408, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3415, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3422, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3429, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3436, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3443, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3450, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3457, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3463, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3469, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3475, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3480, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3486, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3491, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3496, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3502, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3507, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3513, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3519, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3524, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3531, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3537, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3543, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3549, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3556, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3563, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3570, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3577, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3584, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3591, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3598, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3606, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3613, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3620, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3627, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3634, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3642, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3649, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3656, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3663, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3670, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3677, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3683, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3690, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3697, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3704, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3711, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3718, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3725, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3732, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3739, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3746, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3752, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3759, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3766, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3773, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3780, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3786, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3793, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3800, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3806, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3813, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3819, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3825, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3832, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3838, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3845, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3851, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3858, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3864, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3870, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3877, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3883, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3889, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3896, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3902, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3908, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3915, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3921, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3927, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3934, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3940, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3946, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3952, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3958, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3964, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3971, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3977, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3983, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3989, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.3995, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4000, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4006, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4012, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4018, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4024, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4030, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4036, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4042, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4047, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4053, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4058, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4064, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4069, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4075, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4080, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4086, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4092, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4097, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4103, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4108, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4114, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4120, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4126, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4132, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4138, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4143, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4149, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4155, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4162, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4168, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4174, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4180, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4186, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4192, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4198, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4204, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4210, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4216, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4221, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4227, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4233, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4238, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4244, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4249, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4255, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4261, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4266, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4272, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4277, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4282, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4288, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4294, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4299, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4305, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4311, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4316, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4322, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4328, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4334, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4340, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4346, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4352, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4358, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4364, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4370, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4376, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4381, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4387, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4393, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4399, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4404, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4410, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4416, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4422, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4428, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4433, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4439, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4444, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4450, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4456, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4461, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4467, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4472, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4478, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4483, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4488, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4493, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4498, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4503, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4508, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4513, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4519, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4524, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4529, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4534, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4540, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4545, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4550, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4555, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4561, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4566, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4571, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4577, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4582, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4588, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4593, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4599, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4604, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4609, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4615, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4620, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4625, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4631, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4636, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4641, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4646, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4652, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4656, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4661, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4665, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4669, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4674, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4678, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4682, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4687, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4691, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4696, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4701, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4706, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4712, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4717, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4722, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4728, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4733, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4738, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4744, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4749, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4755, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4760, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4766, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4771, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4777, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4782, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4788, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4794, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4799, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4805, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4811, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4816, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4822, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4827, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4833, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4838, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4844, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4849, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4855, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4860, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4865, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4870, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4874, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4879, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4884, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4888, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4893, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4898, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4903, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4907, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4912, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4917, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4922, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4927, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4932, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4937, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4942, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4948, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4953, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4959, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4965, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4971, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4977, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4983, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4988, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.4994, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5000, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5005, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5011, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5016, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5022, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5027, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5033, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5038, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5043, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5049, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5054, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5059, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5064, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5069, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5074, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5079, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5084, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5089, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5094, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5099, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5104, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5109, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5114, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5119, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5123, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5128, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5133, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5137, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5141, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5146, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5150, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5154, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5159, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5163, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5166, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5171, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5175, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5179, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5184, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5188, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5193, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5198, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5202, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5207, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5212, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5217, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5222, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5226, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5231, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5236, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5241, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5245, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5250, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5255, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5260, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5265, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5270, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5274, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5279, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5283, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5288, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5292, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5297, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5301, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5306, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5310, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5314, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5318, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5320, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5323, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5325, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5327, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5328, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5330, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5331, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5333, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5334, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5336, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5337, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5339, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5341, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5344, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5347, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5350, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5354, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5358, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5362, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5366, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5371, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5376, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5381, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5386, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5391, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5396, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5401, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5406, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5412, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5417, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5422, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5427, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5433, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5438, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5443, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5449, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5454, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5459, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5464, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5470, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5475, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5480, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5485, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5489, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5494, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5499, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5504, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5509, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5514, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5519, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5523, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5528, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5533, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5537, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5541, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5545, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5549, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5553, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5558, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5562, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5566, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5571, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5576, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5580, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5585, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5590, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5594, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5599, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5604, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5608, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5613, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5618, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5623, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5627, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5632, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5636, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5641, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5645, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5650, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5654, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5659, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5663, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5667, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5672, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5675, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5679, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5682, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5685, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5688, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5691, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5694, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5697, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5700, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5703, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5706, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5710, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5713, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5717, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5721, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5726, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5730, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5735, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5741, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5746, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5751, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5757, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5763, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5769, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5775, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5780, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5786, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5792, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5797, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5803, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5808, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5814, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5819, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5825, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5830, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5836, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5841, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5846, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5851, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5856, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5861, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5866, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5869, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5873, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5877, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5880, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5884, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5888, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5891, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5895, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5900, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5904, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5909, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5914, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5918, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5923, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5927, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5932, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5936, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5941, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5945, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5949, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5954, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5958, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5963, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5967, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5971, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5975, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5979, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5983, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5987, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5991, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5995, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.5999, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6002, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6006, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6010, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6014, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6017, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6021, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6025, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6029, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6033, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6037, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6041, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6044, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6048, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6051, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6054, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6058, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6061, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6065, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6069, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6073, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6077, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6080, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6084, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6087, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6091, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6094, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6098, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6101, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6105, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6109, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6112, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6116, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6120, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6123, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6127, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6130, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6134, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6137, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6140, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6142, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6145, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6148, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6151, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6155, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6158, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6162, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6165, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6169, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6173, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6176, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6180, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6184, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6187, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6191, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6195, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6199, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6202, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6206, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6209, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6213, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6216, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6219, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6223, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6226, device='cuda:0', requires_grad=True)
+Parameter containing:
+tensor(-1.6230, device='cuda:0', requires_grad=True)
+
+
+PS:
+
+Read file <14807170.stderr> for stderr output of this job.
+

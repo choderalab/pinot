@@ -1,0 +1,84 @@
+Sender: LSF System <lsfadmin@lx12>
+Subject: Job 14807169: <#BSUB -q cpuqueue;#BSUB -o %J.stdout; for opt in 'Adam';do;    for layer in 'GraphConv' 'EdgeConv' 'SAGEConv' 'GINConv' 'SGConv' 'TAGConv' ;    do;        for lr in '1e-3' # '1e-4' '1e-5';        do;            for log_sigma in -1 -2 -3 -4 -5;            do;                name="_gp_"$opt"_"$layer"_"$lr"_"$log_sigma;                bsub -q gpuqueue -J $name -m "ld-gpu ls-gpu lt-gpu lg-gpu lu-gpu" -n 12 -gpu "num=1:j_exclusive=yes" -R "rusage[mem=4] span[hosts=1]" -W 0:30 -o $name/%J.stdout -eo %J.stderr python ../../pinot/app/gp_train.py --layer $layer --optimizer $opt --lr $lr --out $name --log_sigma $log_sigma --n_epochs 1000 ; done;done;done;done> in cluster <lila> Done
+
+Job <#BSUB -q cpuqueue;#BSUB -o %J.stdout; for opt in 'Adam';do;    for layer in 'GraphConv' 'EdgeConv' 'SAGEConv' 'GINConv' 'SGConv' 'TAGConv' ;    do;        for lr in '1e-3' # '1e-4' '1e-5';        do;            for log_sigma in -1 -2 -3 -4 -5;            do;                name="_gp_"$opt"_"$layer"_"$lr"_"$log_sigma;                bsub -q gpuqueue -J $name -m "ld-gpu ls-gpu lt-gpu lg-gpu lu-gpu" -n 12 -gpu "num=1:j_exclusive=yes" -R "rusage[mem=4] span[hosts=1]" -W 0:30 -o $name/%J.stdout -eo %J.stderr python ../../pinot/app/gp_train.py --layer $layer --optimizer $opt --lr $lr --out $name --log_sigma $log_sigma --n_epochs 1000 ; done;done;done;done> was submitted from host <lilac> by user <wangy1> in cluster <lila> at Mon Jun  8 22:41:33 2020
+Job was executed on host(s) <lx12>, in queue <cpuqueue>, as user <wangy1> in cluster <lila> at Mon Jun  8 22:41:33 2020
+</home/wangy1> was used as the home directory.
+</data/chodera/wangyq/pinot/scripts/gp_comparison> was used as the working directory.
+Started at Mon Jun  8 22:41:33 2020
+Terminated at Mon Jun  8 22:41:39 2020
+Results reported at Mon Jun  8 22:41:39 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#BSUB -q cpuqueue
+#BSUB -o %J.stdout
+
+for opt in 'Adam'
+do
+    for layer in 'GraphConv' 'EdgeConv' 'SAGEConv' 'GINConv' 'SGConv' 'TAGConv' 
+    do
+        for lr in '1e-3' # '1e-4' '1e-5'
+        do
+            for log_sigma in -1 -2 -3 -4 -5
+            do
+                name="_gp_"$opt"_"$layer"_"$lr"_"$log_sigma
+                bsub -q gpuqueue -J $name -m "ld-gpu ls-gpu lt-gpu lg-gpu lu-gpu" -n 12 -gpu "num=1:j_exclusive=yes" -R "rusage[mem=4] span[hosts=1]" -W 0:30 -o $name/%J.stdout -eo %J.stderr python ../../pinot/app/gp_train.py --layer $layer --optimizer $opt --lr $lr --out $name --log_sigma $log_sigma --n_epochs 1000 
+
+done
+done
+done
+done
+
+
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   0.80 sec.
+    Max Memory :                                 -
+    Average Memory :                             -
+    Total Requested Memory :                     2.00 GB
+    Delta Memory :                               -
+    Max Swap :                                   -
+    Max Processes :                              1
+    Max Threads :                                2
+    Run time :                                   6 sec.
+    Turnaround time :                            6 sec.
+
+The output (if any) follows:
+
+Job <14807170> is submitted to queue <gpuqueue>.
+Job <14807171> is submitted to queue <gpuqueue>.
+Job <14807172> is submitted to queue <gpuqueue>.
+Job <14807173> is submitted to queue <gpuqueue>.
+Job <14807174> is submitted to queue <gpuqueue>.
+Job <14807175> is submitted to queue <gpuqueue>.
+Job <14807176> is submitted to queue <gpuqueue>.
+Job <14807177> is submitted to queue <gpuqueue>.
+Job <14807178> is submitted to queue <gpuqueue>.
+Job <14807179> is submitted to queue <gpuqueue>.
+Job <14807180> is submitted to queue <gpuqueue>.
+Job <14807181> is submitted to queue <gpuqueue>.
+Job <14807182> is submitted to queue <gpuqueue>.
+Job <14807183> is submitted to queue <gpuqueue>.
+Job <14807184> is submitted to queue <gpuqueue>.
+Job <14807185> is submitted to queue <gpuqueue>.
+Job <14807186> is submitted to queue <gpuqueue>.
+Job <14807187> is submitted to queue <gpuqueue>.
+Job <14807188> is submitted to queue <gpuqueue>.
+Job <14807189> is submitted to queue <gpuqueue>.
+Job <14807190> is submitted to queue <gpuqueue>.
+Job <14807191> is submitted to queue <gpuqueue>.
+Job <14807192> is submitted to queue <gpuqueue>.
+Job <14807193> is submitted to queue <gpuqueue>.
+Job <14807194> is submitted to queue <gpuqueue>.
+Job <14807195> is submitted to queue <gpuqueue>.
+Job <14807196> is submitted to queue <gpuqueue>.
+Job <14807197> is submitted to queue <gpuqueue>.
+Job <14807198> is submitted to queue <gpuqueue>.
+Job <14807199> is submitted to queue <gpuqueue>.
