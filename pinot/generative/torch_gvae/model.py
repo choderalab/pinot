@@ -74,7 +74,7 @@ class GCNModelVAE(nn.Module):
                 The molecular graph
         Returns:
             z: (FloatTensor): the latent encodings of the graph
-                Shape (hidden_dim2,)
+                Shape (N_g, embedding_dim,)
         """
         # Apply the graph convolution operations
         z = self.infer_node_representation(g)
@@ -97,7 +97,7 @@ class GCNModelVAE(nn.Module):
                 The molecular graph
         Returns:
             z: (FloatTensor): the latent encodings of the nodes
-                Shape (N, hidden_dim2)
+                Shape (N, embedding_dim) where N is the number of nodes
         """
         z = g.ndata["h"]
         for layer in self.gc:
@@ -112,6 +112,17 @@ class GCNModelVAE(nn.Module):
                 z = torch.mean(z, dim=1)
         return z
 
+    def infer_graph_representation(self, g):
+        """ Compute the latent representation of the graph
+        Arg:
+            g (DGLGraph)
+        Returns:
+            z (FloatTensor) of shape (N_g, embedding_dim)
+        """
+        z = self.infer_node_representation(g)
+        with g.local_scope():
+            g.ndata["h"] = z
+            return self.aggregator(g)
 
     def condition(self, g):
         """ Compute the approximate Normal posterior distribution q(z|x, adj)
