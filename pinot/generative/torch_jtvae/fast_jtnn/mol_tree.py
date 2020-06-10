@@ -2,6 +2,7 @@ import rdkit
 import rdkit.Chem as Chem
 from pinot.generative.torch_jtvae.fast_jtnn.chemutils import get_clique_mol, tree_decomp, get_mol, get_smiles, set_atommap, enum_assemble, decode_stereo
 from pinot.generative.torch_jtvae.fast_jtnn.vocab import *
+import argparse
 
 class MolTreeNode(object):
 
@@ -110,17 +111,58 @@ def dfs(node, fa_idx):
     return max_depth + 1
 
 
+def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
+    """
+    Call in a loop to create terminal progress bar
+    @params:
+        iteration   - Required  : current iteration (Int)
+        total       - Required  : total iterations (Int)
+        prefix      - Optional  : prefix string (Str)
+        suffix      - Optional  : suffix string (Str)
+        decimals    - Optional  : positive number of decimals in percent complete (Int)
+        length      - Optional  : character length of bar (Int)
+        fill        - Optional  : bar fill character (Str)
+        printEnd    - Optional  : end character (e.g. "\r", "\r\n") (Str)
+    """
+    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
+    filledLength = int(length * iteration // total)
+    bar = fill * filledLength + '-' * (length - filledLength)
+    print('\r%s |%s| %s%% %s' % (prefix, bar, percent, suffix), end = printEnd)
+    # Print New Line on Complete
+    if iteration == total: 
+        print()
+
+
+
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser("mol_tree: parse SMILES into WORDS used by JT-VAE")
+    parser.add_argument("--smiles", required=True, help="File containing SMILES")
+    parser.add_argument("--vocab_out", required=True, help="Output file for the parsed vocabulary")
+
+    args = parser.parse_args()
+
     import sys
     lg = rdkit.RDLogger.logger() 
     lg.setLevel(rdkit.RDLogger.CRITICAL)
 
     cset = set()
-    for line in sys.stdin:
-        smiles = line.split()[0]
-        mol = MolTree(smiles)
-        for c in mol.nodes:
-            cset.add(c.smiles)
-    for x in cset:
-        print (x)
+    # Read all the SMILES
+    with open(args.smiles, "r") as f:
+        lines = [line.rstrip() for line in f]
+        N = len(lines)
+        f.close()
+        for i, smiles in enumerate(lines):
+            mol = MolTree(smiles)
+            # Add the "words" to the vocabulary
+            for c in mol.nodes:
+                cset.add(c.smiles)
+            
+            printProgressBar(i+1, N, "Processed", "of {} molecules".format(N))
+    
+    # Then save the vocabulary
+    with open(args.vocab_out, "w") as f:
+        for x in cset:
+            f.write(x)
+            f.write("\n")
+        f.close()
 

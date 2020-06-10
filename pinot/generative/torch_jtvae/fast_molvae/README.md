@@ -1,17 +1,17 @@
 # Accelerated Training of Junction Tree VAE
-Suppose the repository is downloaded at `$PREFIX/icml18-jtnn` directory. First set up environment variables:
 ```
-export PYTHONPATH=$PREFIX/icml18-jtnn
+export PYTHONPATH="$PWD:$PWD/pinot:$PYTHONPATH"
 ```
-The MOSES dataset is in `icml18-jtnn/data/moses` (copied from https://github.com/molecularsets/moses).
+The MOSES dataset is in `pinot/data/moses`
+And the ZINC dataset is in `pinot/data/zinc`
 
 ## Deriving Vocabulary 
 If you are running our code on a new dataset, you need to compute the vocabulary from your dataset.
 To perform tree decomposition over a set of molecules, run
 ```
-python ../fast_jtnn/mol_tree.py < ../data/moses/train.txt
+python pinot/generative/torch_jtvae/fast_jtnn/mol_tree.py --smiles /pinot/data/zinc/all.txt --vocab_out pinot/data/zinc/vocab_all.txt
 ```
-This gives you the vocabulary of cluster labels over the dataset `train.txt`. 
+This gives you the vocabulary of cluster labels over the dataset `all.txt`. 
 
 ## Training
 Step 1: Preprocess the data:

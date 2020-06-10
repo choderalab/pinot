@@ -3,13 +3,14 @@ import torch.nn as nn
 from multiprocessing import Pool
 
 import math, random, sys
-from optparse import OptionParser
+import argparse
 import pickle
 import numpy as np
 
 from pinot.generative.torch_jtvae.fast_jtnn import *
 import rdkit
 import time
+import os
 
 def tensorize(smiles, assm=True):
     mol_tree = MolTree(smiles)
@@ -54,18 +55,21 @@ if __name__ == "__main__":
     lg = rdkit.RDLogger.logger() 
     lg.setLevel(rdkit.RDLogger.CRITICAL)
 
-    parser = OptionParser()
-    parser.add_option("-t", "--train", dest="train_path")
-    parser.add_option("-n", "--split", dest="nsplits", default=100)
-    parser.add_option("-j", "--jobs", dest="njobs", default=1)
-    opts,args = parser.parse_args()
-    opts.njobs = int(opts.njobs)
+    parser = argparse.ArgumentParser("Preprocessing script to parse SMILES into molecular junction trees")
+    parser.add_argument("-t", "--train", help="Path to the file containing SMILES for training")
+    parser.add_argument("-n", "--split", default=100, help="Number of sub-data splits, use a large number if you want to experiment with smaller sub-data")
+    parser.add_argument("--out_folder", default="jt_vae_parsed_molecular_trees", help="Folder to save the parsed molecular trees")
 
-    pool = Pool(opts.njobs)
-    num_splits = int(opts.nsplits)
+    args = parser.parse_args()
 
-    with open(opts.train_path) as f:
+    num_splits = int(args.split)
+
+    with open(args.train) as f:
         data = [line.strip("\r\n ").split()[0] for line in f]
+
+    # Create an output folder if it does not already exist
+    if not os.path.isdir(args.out_folder):
+        os.makedirs(args.out_folder)
     
     print("Finished reading in", len(data), "molecules")
     start = time.time()
@@ -77,12 +81,13 @@ if __name__ == "__main__":
             printProgressBar(i+1, N, "Processed", "of {} molecules".format(N))    
 
     print("Finished processing all the data in {} seconds! Now splitting it".format(time.time()-start))
+    
     le = int((len(all_data) + num_splits - 1) / num_splits)
 
     for split_id in np.random.permutation(num_splits):
         st = split_id * le
         sub_data = all_data[st : min(st + le, len(all_data))]
 
-        with open('processed_data/tensors-%d.pkl' % split_id, 'wb') as f:
+        with open(os.path.join(args.out_folder, 'tensors-%d.pkl' % split_id), 'wb') as f:
             torch.save(sub_data, f)
 

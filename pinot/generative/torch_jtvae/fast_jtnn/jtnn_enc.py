@@ -113,11 +113,11 @@ class GraphGRU(nn.Module):
             h_nei = index_select_ND(h, 0, mess_graph)
             sum_h = h_nei.sum(dim=1)
             z_input = torch.cat([x, sum_h], dim=1)
-            z = F.sigmoid(self.W_z(z_input))
+            z = torch.sigmoid(self.W_z(z_input))
 
             r_1 = self.W_r(x).view(-1, 1, self.hidden_size)
             r_2 = self.U_r(h_nei)
-            r = F.sigmoid(r_1 + r_2)
+            r = torch.sigmoid(r_1 + r_2)
             
             gated_h = r * h_nei
             sum_gated_h = gated_h.sum(dim=1)
