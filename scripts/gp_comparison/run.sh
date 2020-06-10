@@ -1,19 +1,10 @@
 #BSUB -q cpuqueue
 #BSUB -o %J.stdout
 
-for opt in 'Adam'
+for layer in 'GraphConv' 'EdgeConv' 'SAGEConv' 'GINConv' 'SGConv' 'TAGConv' 
 do
-    for layer in 'GraphConv' 'EdgeConv' 'SAGEConv' 'GINConv' 'SGConv' 'TAGConv' 
-    do
-        for lr in '1e-3' # '1e-4' '1e-5'
-        do
-            for log_sigma in -1 -2 -3 -4 -5
-            do
-                name="_gp_"$opt"_"$layer"_"$lr"_"$log_sigma
-                bsub -q gpuqueue -J $name -m "ld-gpu ls-gpu lt-gpu lg-gpu lu-gpu" -n 12 -gpu "num=1:j_exclusive=yes" -R "rusage[mem=4] span[hosts=1]" -W 0:30 -o $name/%J.stdout -eo %J.stderr python ../../pinot/app/gp_train.py --layer $layer --optimizer $opt --lr $lr --out $name --log_sigma $log_sigma --n_epochs 1000 
+        name="_gp_"$layer
+        bsub -q gpuqueue -J $name -m "ld-gpu ls-gpu lt-gpu lg-gpu lu-gpu" -n 12 -gpu "num=1:j_exclusive=yes" -R "rusage[mem=4] span[hosts=1]" -W 0:30 -o $name/%J.stdout -eo %J.stderr python ../../pinot/app/gp_train.py --layer $layer --out $name --n_epochs 100 --lr 1e-3 --config 8 tanh 8 tanh 8 tanh
 
-done
-done
-done
 done
 
