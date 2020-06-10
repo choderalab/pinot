@@ -131,7 +131,6 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
         # get the predictive distribution
         # TODO:
         # write API for sampler
-        print(gs)
         distribution = self.net.condition(gs)
 
         # workup
@@ -158,7 +157,6 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
         self.net.train()
 
         # grab old data
-        print(self.old)
         old_data = self.slice_fn(self.data, self.old)
 
         # train the model
