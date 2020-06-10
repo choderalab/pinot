@@ -1,0 +1,69 @@
+Sender: LSF System <lsfadmin@lx12>
+Subject: Job 14799444: <#BSUB -q cpuqueue;#BSUB -o %J.stdout; for opt in 'bbb';do;    for layer in 'GraphConv' 'EdgeConv' 'SGConv' 'GINConv' 'TAGConv' 'SAGEConv';    do;        for lr in '1e-3' '1e-4' '1e-5';        do;            name="_"$opt"_"$layer"_"$lr;            bsub -q gpuqueue -J $name -m "ld-gpu ls-gpu lt-gpu lg-gpu lu-gpu" -n 12 -gpu "num=1:j_exclusive=yes" -R "rusage[mem=4] span[hosts=1]" -W 8:00 -o $name/%J.stdout -eo %J.stderr python ../../pinot/app/supervised_train.py --layer $layer --optimizer $opt --lr $lr --out $name --n_epochs 1000; done;done;done> in cluster <lila> Done
+
+Job <#BSUB -q cpuqueue;#BSUB -o %J.stdout; for opt in 'bbb';do;    for layer in 'GraphConv' 'EdgeConv' 'SGConv' 'GINConv' 'TAGConv' 'SAGEConv';    do;        for lr in '1e-3' '1e-4' '1e-5';        do;            name="_"$opt"_"$layer"_"$lr;            bsub -q gpuqueue -J $name -m "ld-gpu ls-gpu lt-gpu lg-gpu lu-gpu" -n 12 -gpu "num=1:j_exclusive=yes" -R "rusage[mem=4] span[hosts=1]" -W 8:00 -o $name/%J.stdout -eo %J.stderr python ../../pinot/app/supervised_train.py --layer $layer --optimizer $opt --lr $lr --out $name --n_epochs 1000; done;done;done> was submitted from host <lilac> by user <wangy1> in cluster <lila> at Fri Jun  5 13:41:26 2020
+Job was executed on host(s) <lx12>, in queue <cpuqueue>, as user <wangy1> in cluster <lila> at Fri Jun  5 13:41:26 2020
+</home/wangy1> was used as the home directory.
+</data/chodera/wangyq/pinot/scripts/comparison> was used as the working directory.
+Started at Fri Jun  5 13:41:26 2020
+Terminated at Fri Jun  5 13:41:27 2020
+Results reported at Fri Jun  5 13:41:27 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#BSUB -q cpuqueue
+#BSUB -o %J.stdout
+
+for opt in 'bbb'
+do
+    for layer in 'GraphConv' 'EdgeConv' 'SGConv' 'GINConv' 'TAGConv' 'SAGEConv'
+    do
+        for lr in '1e-3' '1e-4' '1e-5'
+        do
+            name="_"$opt"_"$layer"_"$lr
+            bsub -q gpuqueue -J $name -m "ld-gpu ls-gpu lt-gpu lg-gpu lu-gpu" -n 12 -gpu "num=1:j_exclusive=yes" -R "rusage[mem=4] span[hosts=1]" -W 8:00 -o $name/%J.stdout -eo %J.stderr python ../../pinot/app/supervised_train.py --layer $layer --optimizer $opt --lr $lr --out $name --n_epochs 1000
+
+done
+done
+done
+
+
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   0.65 sec.
+    Max Memory :                                 -
+    Average Memory :                             -
+    Total Requested Memory :                     2.00 GB
+    Delta Memory :                               -
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                5
+    Run time :                                   1 sec.
+    Turnaround time :                            1 sec.
+
+The output (if any) follows:
+
+Job <14799445> is submitted to queue <gpuqueue>.
+Job <14799446> is submitted to queue <gpuqueue>.
+Job <14799447> is submitted to queue <gpuqueue>.
+Job <14799448> is submitted to queue <gpuqueue>.
+Job <14799449> is submitted to queue <gpuqueue>.
+Job <14799450> is submitted to queue <gpuqueue>.
+Job <14799451> is submitted to queue <gpuqueue>.
+Job <14799452> is submitted to queue <gpuqueue>.
+Job <14799453> is submitted to queue <gpuqueue>.
+Job <14799454> is submitted to queue <gpuqueue>.
+Job <14799455> is submitted to queue <gpuqueue>.
+Job <14799456> is submitted to queue <gpuqueue>.
+Job <14799457> is submitted to queue <gpuqueue>.
+Job <14799458> is submitted to queue <gpuqueue>.
+Job <14799459> is submitted to queue <gpuqueue>.
+Job <14799460> is submitted to queue <gpuqueue>.
+Job <14799461> is submitted to queue <gpuqueue>.
+Job <14799462> is submitted to queue <gpuqueue>.
