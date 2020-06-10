@@ -13,21 +13,23 @@ def _independent(distribution):
         distribution.mean,
         distribution.variance.pow(0.5))
 
-def _slice_fn_tensor(x, idxs):
-    return x[idxs]
+def _slice_fn_tensor(data, idxs):
+    # data.shape = (N, 2)
+    # idx is a list
+    data = data[idxs]
+    assert data.dim() == 2
+    assert data.shape[-1] == 2
+    return data[:, 0][:, None], data[:, 1][:, None]
 
-def _collate_fn_tensor(x):
-    return torch.stack(x)
-
-def _collate_fn_graph(x):
-    return dgl.batch(x)
-
-def _slice_fn_graph(x, idxs):
+def _slice_fn_graph(data, idx):
+    # data is a list
+    # idx is a list
+    data = [data[idx] for idx in idxs]
+    gs, ys = list(zip(*data))
     import dgl
-    if isinstance(x, dgl.DGLBatchedGraph):
-        x = dgl.unbatch(x)
-
-    return dgl.batch([x[idx] for idx in idxs])
+    gs = dgl.batch(gs)
+    ys = torch.stack(ys, dim=0)
+    return gs, ys
 
 # =============================================================================
 # MODULE CLASSES
@@ -60,7 +62,6 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
             n_epochs_training=100,
             workup=_independent,
             slice_fn=_slice_fn_tensor,
-            collate_fn=_collate_fn_tensor,
             net_state_dict=None
         ):
 
@@ -82,7 +83,6 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
         # bookkeeping
         self.workup = workup
         self.slice_fn = slice_fn
-        self.collate_fn = collate_fn
         self.net_state_dict = net_state_dict
 
     def reset_net(self):
@@ -110,14 +110,8 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
         # set net to eval
         self.net.eval()
 
-        # grab new data
-        new_data = self.slice_fn(self.data, self.new)
-
-        # split input target
-        gs, ys = list(zip(*new_data))
-
-        # collate
-        gs = self.collate_fn(gs)
+        # slice and collate
+        gs, _ = self.slice_fn(self.data, self.new)
 
         # get the predictive distribution
         # TODO:
@@ -148,11 +142,13 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
         self.net.train()
 
         # grab old data
+        # (N, 2) for tensor
+        # N list of 2-tuple for lists
         old_data = self.slice_fn(self.data, self.old)
 
         # train the model
         self.net = pinot.app.experiment.Train(
-            data=old_data,
+            data=[old_data],
             optimizer=self.optimizer,
             n_epochs=self.n_epochs_training,
             net=self.net,
