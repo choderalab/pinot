@@ -123,7 +123,7 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
 
         # get score
         # NOTE: y best here doesn't change argmax
-        score = self.acquisition(distribution)
+        score = self.acquisition(distribution, y_best=self.y_best)
 
         # argmax
         best = torch.argmax(score)
@@ -153,6 +153,10 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
             n_epochs=self.n_epochs_training,
             net=self.net,
             record_interval=999999).train()
+
+        # grab y_max
+        gs, ys = old_data
+        self.y_best = torch.max(ys)
 
     def run(self, limit=999999):
         """ Run the model.
