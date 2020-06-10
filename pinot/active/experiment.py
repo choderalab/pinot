@@ -3,6 +3,10 @@
 # =============================================================================
 import torch
 import abc
+import dgl
+import sys
+sys.path.append('../../')
+
 import pinot
 
 # =============================================================================
@@ -23,11 +27,16 @@ def _collate_fn_graph(x):
     return dgl.batch(x)
 
 def _slice_fn_graph(x, idxs):
-    import dgl
-    if isinstance(x, dgl.DGLBatchedGraph):
+    if x.batch_size > 1:
         x = dgl.unbatch(x)
 
     return dgl.batch([x[idx] for idx in idxs])
+
+def _slice_fn_tuple(x, idxs):
+    gs, ys = x
+    graph_slices = _slice_fn_graph(gs, idxs)
+    tensor_slices = _slice_fn_tensor(ys, idxs)
+    return tuple([graph_slices, tensor_slices])
 
 # =============================================================================
 # MODULE CLASSES
@@ -71,10 +80,13 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
         self.optimizer = optimizer
         self.n_epochs_training = n_epochs_training
 
-        # data
+        # data            
         self.data = data
         self.old = []
-        self.new = list(range(len(data)))
+        if isinstance(data, tuple):
+            self.new = list(range(len(data[1])))
+        else:
+            self.new = list(range(len(data)))
 
         # acquisition
         self.acquisition = acquisition
@@ -114,14 +126,15 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
         new_data = self.slice_fn(self.data, self.new)
 
         # split input target
-        gs, ys = list(zip(*new_data))
+        gs, ys = new_data
 
         # collate
-        gs = self.collate_fn(gs)
+        # gs = self.collate_fn(gs)
 
         # get the predictive distribution
         # TODO:
         # write API for sampler
+        print(gs)
         distribution = self.net.condition(gs)
 
         # workup
@@ -148,11 +161,12 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
         self.net.train()
 
         # grab old data
+        print(self.old)
         old_data = self.slice_fn(self.data, self.old)
 
         # train the model
         self.net = pinot.app.experiment.Train(
-            data=old_data,
+            data=[old_data],
             optimizer=self.optimizer,
             n_epochs=self.n_epochs_training,
             net=self.net,
