@@ -4,9 +4,6 @@
 import torch
 import abc
 import dgl
-import sys
-sys.path.append('../../')
-
 import pinot
 
 # =============================================================================
