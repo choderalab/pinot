@@ -33,7 +33,7 @@ def _slice_fn_tuple(x, idxs):
     gs, ys = x
     graph_slices = _slice_fn_graph(gs, idxs)
     tensor_slices = _slice_fn_tensor(ys, idxs)
-    return tuple([graph_slices, tensor_slices])
+    return graph_slices, tensor_slices
 
 # =============================================================================
 # MODULE CLASSES

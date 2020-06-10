@@ -50,5 +50,5 @@ def upper_confidence_bound(distribution, y_best=0.0, kappa=0.5):
     return high
 
 def random(distribution, y_best=0.0, seed=2666):
-    torch.manual_seed(seed)
+    # torch.manual_seed(seed)
     return torch.rand(distribution.batch_shape)
