@@ -59,6 +59,9 @@ class BBB(pinot.inference.Sampler):
 
         self.optimizer.step()
         self.optimizer.zero_grad()
+    
+    def __str__(self):
+        return 'BBB_' + str(self.optimizer) 
 
     @torch.no_grad()
     def step(self, closure):

@@ -13,7 +13,7 @@ class GPR(torch.nn.Module, abc.ABC):
     """ Gaussian Process Regression.
 
     """
-    def __init__(self, epsilon=1e-6):
+    def __init__(self, epsilon=1e-5):
         super(GPR, self).__init__()
         self.epsilon = epsilon
 
@@ -33,8 +33,11 @@ class GPR(torch.nn.Module, abc.ABC):
         k : torch.tensor
             kernel to be perturbed.
         """
+
         # introduce noise along the diagnol
-        noise = self.epsilon * torch.eye(*k.shape)
+        noise = self.epsilon * torch.eye(
+                *k.shape,
+                device=k.device)
 
         return k + noise
 
