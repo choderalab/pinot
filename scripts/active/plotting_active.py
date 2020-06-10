@@ -27,7 +27,9 @@ def generate_data(trial_settings):
 
     # get results for each trial
     results = defaultdict(dict)
-    final_results = run_trials(results, ds, num_trials=1, limit=2)
+    final_results = run_trials(results, ds,
+        num_trials=trial_settings['num_trials'],
+        limit=trials_settings['limit'])
 
     # create pandas dataframe to play nice with seaborn
     best_df = pd.DataFrame.from_records(
@@ -145,11 +147,17 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--representation', type=str)
+parser.add_argument('--limit', type=int, default=10)
+parser.add_argument('--num_trials', type=int, default=100)
+
 args = parser.parse_args()
 
 trial_settings = {'layer': args.representation,
                   'config': [32, 'tanh', 32, 'tanh', 32, 'tanh'],
-                  'data': 'esol'}
+                  'data': 'esol',
+                   'num_trials': args.num_trials,
+                   'limit': args.limit}
+
 best_df = generate_data(trial_settings)
 
 # save to disk
