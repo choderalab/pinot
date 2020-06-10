@@ -23,7 +23,7 @@ def generate_data(args):
 
     # get results for each trial
     results = defaultdict(dict)
-    final_results = run_trials(results, ds, num_trials=10, limit=100)
+    final_results = run_trials(results, ds, num_trials=1, limit=2)
 
     # create pandas dataframe to play nice with seaborn
     best_df = pd.DataFrame.from_records(
@@ -143,16 +143,8 @@ def get_gpr(args):
 representations = ['GraphConv', 'EdgeConv', 'SAGEConv',
                    'GINConv', 'SGConv', 'TAGConv']
 
-args = {'noise_model': 'normal-heteroschedastic',
-        'optimizer': 'adam',
-        'config': [32, 'tanh', 32, 'tanh', 32, 'tanh'],
-        'out': 'result',
-        'data': 'esol',
-        'batch_size': 32,
-        'opt': 'Adam',
-        'lr': 1e-03,
-        'partition': '4:1',
-        'n_epochs': 40}
+args = {'config': [32, 'tanh', 32, 'tanh', 32, 'tanh'],
+        'data': 'esol'}
 
 for representation in representations:
     
