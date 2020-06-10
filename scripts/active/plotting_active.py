@@ -1,7 +1,11 @@
+import warnings
+warnings.filterwarnings("ignore")
+
 from collections import defaultdict
 
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
 
 import torch
 
@@ -12,13 +16,13 @@ import pinot.active
 ######################
 # Function definitions
 
-def generate_data(args):
+def generate_data(trial_settings):
     """
     Performs experiment loops.
     """
 
     # Load and batch data
-    ds = getattr(pinot.data, args['data'])()
+    ds = getattr(pinot.data, trial_settings['data'])()
     ds = pinot.data.utils.batch(ds, len(ds), seed=None)
 
     # get results for each trial
@@ -80,13 +84,10 @@ def run_trials(results, ds, num_trials=1, limit=5):
 
     for acq_fn in acq_fns:
 
-        print('training:', acq_fn)
-
         for i in range(num_trials):
-            print('trial:', i)
 
             # make fresh net
-            net = get_gpr(args)
+            net = get_gpr(trial_settings)
             bo = pinot.active.experiment.SingleTaskBayesianOptimizationExperiment(
                         net=net,
                         data=ds[0],
@@ -100,6 +101,7 @@ def run_trials(results, ds, num_trials=1, limit=5):
             # run experiment
             x = bo.run(limit=limit)
             results[acq_fn][i] = get_best_history(bo, actual_sol)
+    
     return results
 
 def get_best_history(bo, actual_sol):
@@ -119,15 +121,15 @@ def get_best_history(bo, actual_sol):
         best_history.append(best_so_far)
     return best_history
 
-def get_gpr(args):
+def get_gpr(trial_settings):
     """
     Retrive GP using representation provided in args.
     """
-    layer = pinot.representation.dgl_legacy.gn(model_name=args['layer'])
+    layer = pinot.representation.dgl_legacy.gn(model_name=trial_settings['layer'])
 
     net_representation = pinot.representation.Sequential(
         layer=layer,
-        config=args['config'])
+        config=trial_settings['config'])
 
     kernel = pinot.inference.gp.kernels.deep_kernel.DeepKernel(
             representation=net_representation,
@@ -139,17 +141,16 @@ def get_gpr(args):
 
 
 # Running functions
+import argparse
 
-representations = ['GraphConv', 'EdgeConv', 'SAGEConv',
-                   'GINConv', 'SGConv', 'TAGConv']
+parser = argparse.ArgumentParser()
+parser.add_argument('--representation', type=str)
+args = parser.parse_args()
 
-args = {'config': [32, 'tanh', 32, 'tanh', 32, 'tanh'],
-        'data': 'esol'}
+trial_settings = {'layer': args.representation,
+                  'config': [32, 'tanh', 32, 'tanh', 32, 'tanh'],
+                  'data': 'esol'}
+best_df = generate_data(trial_settings)
 
-for representation in representations:
-    
-    args['layer'] = representation
-    best_df = generate_data(args)
-
-    # save to disk
-    best_df.to_csv(f'best_{representation}.csv')
+# save to disk
+best_df.to_csv(f'best_{args.representation}.csv')
