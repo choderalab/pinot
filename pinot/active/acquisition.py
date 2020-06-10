@@ -48,3 +48,7 @@ def upper_confidence_bound(distribution, y_best=0.0, kappa=0.5):
     from pinot.inference.utils import confidence_interval
     _, high = confidence_interval(distribution, kappa)
     return high
+
+def random(distribution, y_best=0.0, seed=2666):
+    torch.manual_seed(seed)
+    return torch.rand(distribution.batch_shape)

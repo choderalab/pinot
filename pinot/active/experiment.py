@@ -125,9 +125,6 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
         # split input target
         gs, ys = new_data
 
-        # collate
-        # gs = self.collate_fn(gs)
-
         # get the predictive distribution
         # TODO:
         # write API for sampler
