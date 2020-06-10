@@ -168,7 +168,7 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
         self.y_best = torch.max(ys)
 
 
-    def run(self, limit=999999):
+    def run(self, limit=999999, seed=None):
         """ Run the model.
 
         Parameters
@@ -177,7 +177,7 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
 
         """
         idx = 0
-        self.blind_pick()
+        self.blind_pick(seed=seed)
 
         while idx < limit and len(self.new) > 0:
             self.train()

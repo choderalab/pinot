@@ -1,5 +1,4 @@
 """ Legacy models from DGL.
-
 """
 
 # =============================================================================
@@ -16,7 +15,9 @@ from copy import deepcopy
 # CONSTANT
 # =============================================================================
 DEFAULT_MODEL_KWARGS = {
-    'SAGEConv': {'aggregator_type': 'mean'}
+    'SAGEConv': {'aggregator_type': 'mean'},
+    'GATConv': {'num_heads': 4},
+    'TAGConv': {'k': 2}
 }
 
 
@@ -54,8 +55,12 @@ class GN(torch.nn.Module):
 # =============================================================================
 
 def gn(model_name="GraphConv", kwargs={}):
-
-    return lambda in_features, out_features: GN(
+    if model_name == "GINConv":
+        return lambda in_features, out_features: dgl_pytorch.conv.GINConv(
+                apply_func=torch.nn.Linear(in_features, out_features),
+                aggregator_type='sum')
+    else:
+        return lambda in_features, out_features: GN(
             in_features=in_features,
             out_features=out_features,
             model_name=model_name,
