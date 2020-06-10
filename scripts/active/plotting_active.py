@@ -29,7 +29,7 @@ def generate_data(trial_settings):
     results = defaultdict(dict)
     final_results = run_trials(results, ds,
         num_trials=trial_settings['num_trials'],
-        limit=trials_settings['limit'])
+        limit=trial_settings['limit'])
 
     # create pandas dataframe to play nice with seaborn
     best_df = pd.DataFrame.from_records(
