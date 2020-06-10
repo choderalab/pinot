@@ -38,7 +38,6 @@ class VGPR(GPR):
                 scale=initializer_std*torch.ones(int(n_tr*(n_tr-1)*0.5))
             ).sample())
 
-
     def _make_sigma(self):
         return torch.diag_embed(
             torch.exp(self.sigma_diag)).masked_scatter(
@@ -51,10 +50,6 @@ class VGPR(GPR):
         """ ELBO.
 
         """
-        # point data to object
-        self._x_tr = x_tr
-        self._y_tr = y_tr
-
         # get the variational parameters
         mu = self.mu
         sigma = self._make_sigma()
@@ -92,16 +87,10 @@ class VGPR(GPR):
 
         return nll + kl
 
-    def condition(self, x_te, x_tr=None, y_tr=None, n_samples=100):
+    def condition(self, x_tr, y_tr, x_te, n_samples=100):
         """ Predictive distribution.
 
         """
-        # restore training data
-        if x_tr is None:
-            x_tr = self._x_tr
-        if y_tr is None:
-            y_tr = self._y_tr
-
         # get variational parameters
         mu = self.mu
         sigma = self._make_sigma()

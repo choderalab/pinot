@@ -79,11 +79,6 @@ def run(args):
         args.optimizer,
         lr=args.lr)(net)
 
-    # get the entire dataset
-    ds= getattr(
-        pinot.data,
-        args.data)()
-
     # not normalizing for now
     # y_mean, y_std, norm, unnorm = pinot.data.utils.normalize(ds)
 
@@ -95,19 +90,6 @@ def run(args):
     # batch
     ds = pinot.data.utils.batch(ds, batch_size)
     ds_tr, ds_te = pinot.data.utils.split(ds, partition)
-
-    if torch.cuda.is_available():
-        ds_tr = [(g.to(torch.device('cuda:0')), y.to(torch.device('cuda:0')))
-                for g, y in ds_tr]
-        ds_te = [(g.to(torch.device('cuda:0')), y.to(torch.device('cuda:0')))
-                for g, y in ds_te]
-
-        net = net.to(torch.device('cuda:0'))
-
-    optimizer = pinot.app.utils.optimizer_translation(
-        args.optimizer,
-        lr=args.lr,
-        kl_loss_scaling=1.0/float(len(ds_tr)))(net)
 
     train_and_test = pinot.app.experiment.TrainAndTest(
         net=net,

@@ -67,16 +67,13 @@ class Train:
 
         """
 
-        for epoch_idx in range(int(self.n_epochs)):
+        for epoch_idx in range(self.n_epochs):
             self.train_once()
 
             if epoch_idx % self.record_interval == 0:
                 self.states[epoch_idx] = copy.deepcopy(self.net.state_dict())
 
         self.states["final"] = copy.deepcopy(self.net.state_dict())
-
-        if hasattr(self.optimizer, 'expecation_params'):
-            self.optimizer.expectation_params()
 
         return self.net
 
@@ -98,12 +95,11 @@ class Test:
 
     """
 
-    def __init__(self, net, data, states, sampler=None, metrics=[pinot.rmse, pinot.r2]):
+    def __init__(self, net, data, states, metrics=[pinot.rmse, pinot.r2]):
         self.net = net  # deepcopy the model object
         self.data = data
         self.metrics = metrics
         self.states = states
-        self.sampler = sampler
 
     def test(self):
         # switch to test
@@ -119,7 +115,6 @@ class Test:
             self.net.load_state_dict(state)
 
             # concat y and y_hat in test set
-
             y = []
             g = []
             for g_, y_ in self.data:
@@ -134,7 +129,7 @@ class Test:
             g = dgl.batch(g)
 
             for metric in self.metrics:  # loop through the metrics
-                results[metric.__name__][state_name] = metric(self.net, g, y, sampler=self.sampler).detach().cpu().numpy()
+                results[metric.__name__][state_name] = metric(self.net, g, y).detach().numpy()
 
         self.results = results
         return dict(results)
@@ -150,8 +145,7 @@ class TrainAndTest:
         data_tr,
         data_te,
         optimizer,
-        metrics=[pinot.rmse, pinot.r2, pinot.avg_nll,
-            pinot.metrics.log_sigma],
+        metrics=[pinot.rmse, pinot.r2, pinot.avg_nll],
         n_epochs=100,
         record_interval=1,
     ):
@@ -169,7 +163,7 @@ class TrainAndTest:
         _str += '\n'
         _str += str(self.net)
         _str += '\n'
-        if hasattr(self.net, 'noise_model'):
+        if hasattr(self.net, "noise_model"):
             _str += '# noise model'
             _str += '\n'
             _str += str(self.net.noise_model)
@@ -198,8 +192,7 @@ class TrainAndTest:
         self.states = train.states
 
         test = Test(
-            net=self.net, data=self.data_te, metrics=self.metrics, states=self.states,
-            sampler=self.optimizer,
+            net=self.net, data=self.data_te, metrics=self.metrics, states=self.states
         )
 
         test.test()
@@ -207,8 +200,7 @@ class TrainAndTest:
         self.results_te = test.results
 
         test = Test(
-            net=self.net, data=self.data_tr, metrics=self.metrics, states=self.states,
-            sampler=self.optimizer,
+            net=self.net, data=self.data_tr, metrics=self.metrics, states=self.states
         )
 
         test.test()
