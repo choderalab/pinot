@@ -23,7 +23,7 @@ def run(args):
     kernel = pinot.inference.gp.kernels.deep_kernel.DeepKernel(
             representation=net_representation,
             base_kernel=pinot.inference.gp.kernels.rbf.RBF(
-                l=torch.tensor(1.0)))
+                scale=torch.zeros(hidden_dim)))
 
     gpr = pinot.inference.gp.gpr.exact_gpr.ExactGPR(
             kernel,
@@ -55,9 +55,11 @@ def run(args):
 
         gpr = gpr.to(torch.device('cuda:0'))
 
+
     optimizer = pinot.app.utils.optimizer_translation(
         args.optimizer,
         lr=args.lr,
+        weight_decay=0.01,
         kl_loss_scaling=1.0/float(len(ds_tr)))(gpr)
 
     train_and_test = pinot.app.experiment.TrainAndTest(
@@ -105,7 +107,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--layer', default='GraphConv', type=str)
     parser.add_argument('--noise_model', default='normal-heteroschedastic', type=str)
-    parser.add_argument('--optimizer', default='adam', type=str)
+    parser.add_argument('--optimizer', default='Adam', type=str)
     parser.add_argument(
         '--config',
         nargs='*',

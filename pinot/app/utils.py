@@ -70,6 +70,10 @@ def optimizer_translation(opt_string, lr, *args, **kwargs):
                 ])
 
     else:
-        opt = lambda net: getattr(torch.optim, opt_string
-            )(net.parameters(), lr)
+        if 'weight_decay' in kwargs:
+            opt = lambda net: getattr(torch.optim, opt_string
+                )(net.parameters(), lr, weight_decay=kwargs['weight_decay'])
+        else:
+            opt = lambda net: getattr(torch.optim, opt_string
+                )(net.parameters(), lr)
     return opt

@@ -69,8 +69,8 @@ def avg_nll(net, g, y, sampler=None):
         distribution = net.condition(g)
         distribution = torch.distributions.normal.Normal(
                 distribution.mean,
-                torch.diag(distribution.covariance_matrix
-                    ))
+                distribution.variance.pow(0.5))
+
         return -distribution.log_prob(y.flatten()).mean()
 
     y = y.cpu()

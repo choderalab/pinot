@@ -17,10 +17,11 @@ class ExactGPR(GPR):
     def __init__(self, kernel, log_sigma=-3.0):
         super(ExactGPR, self).__init__()
         self.kernel = kernel
-
+        
         self.log_sigma = torch.nn.Parameter(
                 torch.tensor(
                     log_sigma))
+
 
     def _get_kernel_and_auxiliary_variables(
             self, x_tr, y_tr, x_te=None,
