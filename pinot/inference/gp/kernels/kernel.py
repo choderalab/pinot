@@ -18,7 +18,7 @@ class Kernel(torch.nn.Module, abc.ABC):
         noise added to kernel.
 
     """
-    def __init__(self, epsilon=1e-6):
+    def __init__(self, epsilon=1e-5):
         super(Kernel, self).__init__()
         self.epsilon = epsilon
 

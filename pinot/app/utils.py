@@ -15,12 +15,10 @@ def train_once(net, ds_tr, opt):
     """ Train the model for one batch.
     """
     for g, y in ds_tr:
-        def l():
-            loss = torch.sum(net.loss(g, y))
-            opt.zero_grad()
-            loss.backward()
-            return loss
-        opt.step(l)
+        loss = torch.sum(net.loss(g, y))
+        opt.zero_grad()
+        loss.backward()
+        opt.step()
 
     return net, opt
 
@@ -45,35 +43,22 @@ def optimizer_translation(opt_string, lr, *args, **kwargs):
                 0.01,
                 kl_loss_scaling=kwargs['kl_loss_scaling'])
 
-    elif opt_string.lower() == 'sgld':
-        opt = lambda net: pinot.SGLD(
-                net.parameters(),
-                lr)
-
     elif opt_string.lower() == 'adlala':
-        lr = torch.tensor(lr)
-        if torch.cuda.is_available():
-            lr = lr.cuda()
-
         opt = lambda net: pinot.AdLaLa(
                 [
                     {
                         'params': net.representation.parameters(),
-                        'h': lr,
+                        'h': torch.tensor(lr),
                         'gamma': 1e-6
                     },
                     {
                         'params': net._output_regression.parameters(),
-                        'h': lr,
+                        'h': torch.tensor(lr),
                         'gamma': 1e-6
                     }
                 ])
 
     else:
-        if 'weight_decay' in kwargs:
-            opt = lambda net: getattr(torch.optim, opt_string
-                )(net.parameters(), lr, weight_decay=kwargs['weight_decay'])
-        else:
-            opt = lambda net: getattr(torch.optim, opt_string
-                )(net.parameters(), lr)
+        opt = lambda net: getattr(torch.optim, opt_string.capitalize()
+            )(net.parameters(), lr)
     return opt
