@@ -1,4 +1,4 @@
-#=============================================================================
+# =============================================================================
 # IMPORTS
 # =============================================================================
 import torch
@@ -9,15 +9,20 @@ from pinot.inference.gp.kernels.kernel import Kernel
 # =============================================================================
 # MODULE CLASSES
 # =============================================================================
-class RBF(Kernel):
-    r""" A Gaussian Process Kernel that hosts parameters.
+class Matern52(Kernel):
+    r"""Matern52 kernel.
 
-    Note
-    ----
-    l could be either of shape 1 or hidden dim
+    $$
+
+    k_\text{m52}(x, x') =
+    (1 + \sqrt{5r ^ 2} + 5/3 r^2)
+    \operatorname{exp}(-\sqrt{-5r ^ 2})
+
+    $$
+
     """
     def __init__(self, scale=0.0, variance=0.0):
-        super(RBF, self).__init__()
+        super(Matern52, self).__init__()
         self.scale = torch.nn.Parameter(
                 torch.tensor(scale))
         self.variance = torch.nn.Parameter(
@@ -43,9 +48,14 @@ class RBF(Kernel):
 
         # (batch_size, batch_size)
         distance = self.distance(x, x_)
+        distance_sq = distance ** 2
 
         # convariant matrix
         # (batch_size, batch_size)
-        k = torch.exp(self.variance) * torch.exp(-0.5 * distance)
+        k = torch.exp(self.variance) * (
+                1.0\
+              + torch.sqrt(5.0 * distance_sq)\
+              + (5.0 / 3.0) * distance_sq)\
+              * torch.exp(-torch.sqrt(5.0 * distance_sq))
 
         return k
