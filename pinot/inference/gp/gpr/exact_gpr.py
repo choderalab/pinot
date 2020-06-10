@@ -14,13 +14,21 @@ class ExactGPR(GPR):
     """ Exact Gaussian process regression.
 
     """
-    def __init__(self, kernel):
+    def __init__(self, kernel, log_sigma=-3.0):
         super(ExactGPR, self).__init__()
         self.kernel = kernel
+        
+        self.log_sigma = torch.nn.Parameter(
+                torch.tensor(
+                    log_sigma))
+
 
     def _get_kernel_and_auxiliary_variables(
-            self, x_tr, y_tr, x_te=None, sigma=1.0,
+            self, x_tr, y_tr, x_te=None,
         ):
+        
+        # grab sigma
+        sigma = torch.exp(self.log_sigma)
 
         # compute the kernels
         k_tr_tr = self._perturb(self.kernel.forward(x_tr, x_tr))
@@ -35,7 +43,9 @@ class ExactGPR(GPR):
             k_te_te = k_te_tr = k_tr_te = k_tr_tr
 
         # (batch_size_tr, batch_size_tr)
-        k_plus_sigma = k_tr_tr + (sigma ** 2) * torch.eye(k_tr_tr.shape[0])
+        k_plus_sigma = k_tr_tr + torch.exp(self.log_sigma) * torch.eye(
+                k_tr_tr.shape[0],
+                device=k_tr_tr.device)
 
         # (batch_size_tr, batch_size_tr)
         l_low = torch.cholesky(k_plus_sigma)
@@ -55,9 +65,8 @@ class ExactGPR(GPR):
 
         return k_tr_tr, k_te_te, k_te_tr, k_tr_te, l_low, alpha
 
-
-    def loss(self, x_tr, y_tr, sigma=1.0):
-        """ Compute the loss.
+    def loss(self, x_tr, y_tr):
+        r""" Compute the loss.
 
         Note
         ----
@@ -71,19 +80,29 @@ class ExactGPR(GPR):
             training data measurement.
 
         """
+        # point data to object
+        self._x_tr = x_tr
+        self._y_tr = y_tr
 
         # get the parameters
         k_tr_tr, k_te_te, k_te_tr, k_tr_te, l_low, alpha\
-            = self._get_kernel_and_auxiliary_variables(x_tr, y_tr, sigma=sigma)
+            = self._get_kernel_and_auxiliary_variables(x_tr, y_tr)
 
         # we return the exact nll with constant
         nll = 0.5 * (y_tr.t() @ alpha) + torch.trace(l_low)\
             + 0.5 * y_tr.shape[0] * math.log(2.0 * math.pi)
 
+        print(self.log_sigma)
+
         return nll
 
-    def condition(self, x_tr, y_tr, x_te=None, sigma=1.0):
+    def condition(self, x_te, x_tr=None, y_tr=None, sampler=None):
         r""" Calculate the predictive distribution given `x_te`.
+
+        Note
+        ----
+        Here we allow the speicifaction of sampler but won't actually
+        use it here.
 
         Parameters
         ----------
@@ -96,11 +115,15 @@ class ExactGPR(GPR):
         sigma : float or torch.tensor, shape=(), default=1.0
             noise parameter.
         """
+        if x_tr is None:
+            x_tr = self._x_tr
+        if y_tr is None:
+            y_tr = self._y_tr
 
         # get parameters
         k_tr_tr, k_te_te, k_te_tr, k_tr_te, l_low, alpha\
             = self._get_kernel_and_auxiliary_variables(
-                x_tr, y_tr, x_te, sigma=sigma)
+                x_tr, y_tr, x_te)
 
         # compute mean
         # (batch_size_te, 1)
@@ -117,6 +140,11 @@ class ExactGPR(GPR):
 
         # ensure symetric
         variance = 0.5 * (variance + variance.t())
+
+        # $ p(y|X) = \int p(y|f)p(f|x) df $
+        # variance += torch.exp(self.log_sigma) * torch.eye(
+        #         *variance.shape,
+        #         device=variance.device)
 
         # construct noise predictive distribution
         distribution = torch.distributions.multivariate_normal.MultivariateNormal(
