@@ -122,7 +122,6 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
         distribution = self.workup(distribution)
 
         # get score
-        # NOTE: y best here doesn't change argmax
         score = self.acquisition(distribution, y_best=self.y_best)
 
         # argmax
