@@ -2,6 +2,10 @@
 # IMPORTS
 # =============================================================================
 import torch
+from botorch.acquisition.objective import IdentityMCObjective
+from botorch.sampling.samplers import SobolQMCNormalSampler
+from torch.quasirandom import SobolEngine
+import math
 
 # =============================================================================
 # MODULE FUNCTIONS
@@ -74,6 +78,8 @@ def q_upper_confidence_bound(model, gs, q=10, kappa=0.5,
         design points `X`, where `batch_shape'` is the broadcasted batch shape of
         model and input `X`.
     """
+    SobolEngine.MAX_DIM = 5000
+    
     def UCB(model, gs):
         posterior = model.posterior(gs)
         samples = model.sampler(posterior)

@@ -47,7 +47,7 @@ class Sequential(torch.nn.Module):
 
             # str -> activation
             elif isinstance(exe, str):
-                activation = getattr(torch.nn.functional, exe)
+                activation = getattr(torch, exe) # torch.nn.functional
 
                 setattr(self, "a" + str(idx), activation)
 
