@@ -128,7 +128,7 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
         # get the predictive distribution
         # TODO:
         # write API for sampler
-        distribution = self.net.condition(gs)
+        distribution = self.net.posterior(gs)
 
         # workup
         distribution = self.workup(distribution)
