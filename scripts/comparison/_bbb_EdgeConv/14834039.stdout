@@ -1,0 +1,41 @@
+Sender: LSF System <lsfadmin@lt13>
+Subject: Job 14834039: <_bbb_EdgeConv> in cluster <lila> Done
+
+Job <_bbb_EdgeConv> was submitted from host <lt04> by user <wangy1> in cluster <lila> at Thu Jun 11 15:41:35 2020
+Job was executed on host(s) <12*lt13>, in queue <gpuqueue>, as user <wangy1> in cluster <lila> at Thu Jun 11 15:41:36 2020
+</home/wangy1> was used as the home directory.
+</data/chodera/wangyq/pinot/scripts/comparison> was used as the working directory.
+Started at Thu Jun 11 15:41:36 2020
+Terminated at Thu Jun 11 16:22:07 2020
+Results reported at Thu Jun 11 16:22:07 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+python ../../pinot/app/train_old.py --layer EdgeConv --optimizer bbb --lr 1e-3 --out _bbb_EdgeConv --n_epochs 500 --config 32 tanh 32 tanh 32 tanh
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   2756.17 sec.
+    Max Memory :                                 1 GB
+    Average Memory :                             1.00 GB
+    Total Requested Memory :                     48.00 GB
+    Delta Memory :                               47.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                20
+    Run time :                                   2433 sec.
+    Turnaround time :                            2432 sec.
+
+The output (if any) follows:
+
+
+
+PS:
+
+Read file <14834039.stderr> for stderr output of this job.
+

@@ -1,0 +1,16 @@
+/home/wangy1/miniconda3/envs/pinot/lib/python3.7/site-packages/torch/nn/functional.py:1558: UserWarning: nn.functional.tanh is deprecated. Use torch.tanh instead.
+  warnings.warn("nn.functional.tanh is deprecated. Use torch.tanh instead.")
+Traceback (most recent call last):
+  File "../../pinot/app/train_old.py", line 104, in <module>
+    run(args)
+  File "../../pinot/app/train_old.py", line 62, in run
+    result = train_and_test.run()
+  File "/data/chodera/wangyq/pinot/pinot/app/experiment.py", line 204, in run
+    test.test()
+  File "/data/chodera/wangyq/pinot/pinot/app/experiment.py", line 137, in test
+    results[metric.__name__][state_name] = metric(self.net, g, y, sampler=self.sampler).detach().cpu().numpy()
+  File "/data/chodera/wangyq/pinot/pinot/metrics.py", line 78, in avg_nll
+    return -net.condition(g, sampler=sampler).log_prob(y).mean() / y.shape[0]
+  File "/home/wangy1/miniconda3/envs/pinot/lib/python3.7/site-packages/torch/distributions/normal.py", line 76, in log_prob
+    return -((value - self.loc) ** 2) / (2 * var) - log_scale - math.log(math.sqrt(2 * math.pi))
+RuntimeError: expected device cpu but got device cuda:0
