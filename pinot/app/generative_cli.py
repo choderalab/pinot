@@ -12,7 +12,7 @@ import logging
 # =============================================================================
 # MODULE FUNCTIONS
 # =============================================================================
-def negative_elbo_loss(net, g, y):
+def negative_elbo_loss(net, g, y, sampler=None):
     return net.loss(g).detach()
 
 def run(args):
