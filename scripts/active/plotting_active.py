@@ -147,8 +147,8 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--representation', type=str)
-parser.add_argument('--limit', type=int, default=10)
-parser.add_argument('--num_trials', type=int, default=100)
+parser.add_argument('--num_trials', type=int, default=10)
+parser.add_argument('--limit', type=int, default=100)
 
 args = parser.parse_args()
 

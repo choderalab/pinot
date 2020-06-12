@@ -7,6 +7,7 @@ to construct a model.
 # =============================================================================
 import dgl
 import torch
+import gpytorch
 
 # =============================================================================
 # MODULE FUNCTIONS
@@ -206,8 +207,18 @@ class GPyTorchNet(torch.nn.Module):
     def posterior(self, g):
         """ Compute the output distribution.
         """
+        # put output_regression in eval mode
+        self.output_regression.eval()
+        # graph representation $\mathcal{G}$
+        # ->
+        # latent representation $h$
+        h = self.representation.forward(g)
 
-        distribution = self.forward(g)
+        # latent representation $h$
+        # ->
+        # parameters $\theta$ using __call__
+        distribution = self.output_regression(h)
+
         if self.noise_model == 'normal-heteroschedastic':
             pass
 
@@ -239,5 +250,8 @@ class GPyTorchNet(torch.nn.Module):
     def loss(self, g, y):
         """ Compute the loss with a input graph and a set of parameters.
         """
+        # loss for GPs - the marginal log likelihood
+        mll = gpytorch.mlls.ExactMarginalLogLikelihood(self.output_regression.likelihood,
+                                                       self.output_regression)
         distribution = self.posterior(g)
-        return -distribution.log_prob(y)
+        return -mll(distribution, y)
