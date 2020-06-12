@@ -207,11 +207,11 @@ class GPyTorchNet(torch.nn.Module):
         """ Compute the output distribution.
         """
 
+        distribution = self.forward(g)
         if self.noise_model == 'normal-heteroschedastic':
-            distribution = self.forward(g)
+            pass
 
         elif self.noise_model == 'normal-homoschedastic':
-            distribution = self.forward(g)
 
             # initialize a `SIGMA` if there isn't one
             if not hasattr(self, 'SIGMA'):
@@ -223,7 +223,6 @@ class GPyTorchNet(torch.nn.Module):
                     scale=self.SIGMA)
 
         elif self.noise_model == 'normal-homoschedastic-fixed':
-            distribution = self.forward(g)
             distribution = torch.distributions.normal.Normal(
                     loc=distribution.mean,
                     scale=torch.ones((1, self.measurement_dimension)))
