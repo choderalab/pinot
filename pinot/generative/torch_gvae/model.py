@@ -33,35 +33,36 @@ class GCNModelVAE(nn.Module):
         """
         super(GCNModelVAE, self).__init__()
 
-        # Decoder
+        # 2. Decoder
         self.dc = SequentialDecoder(embedding_dim, num_atom_types)
         self.num_atom_types = num_atom_types
 
         # Encoder
+        # 1b. Mapping from node embedding to predictive distribution parameter
+        self.gcn_hidden_dims = gcn_hidden_dims
+        self.embedding_dim = embedding_dim
+        self.output_regression = nn.ModuleList([
+            nn.Linear(gcn_hidden_dims[-1], embedding_dim),
+            nn.Linear(gcn_hidden_dims[-1], embedding_dim),
+        ])
 
-        # 1. Graph convolution layers
+        # 1a. Graph convolution layers
         # Note that we define this here because in 'Net', the model automatically
         # finds the input dimension of the output-regressor by inspecting the
-        # last torch module of the representation layer
-        assert(len(gcn_hidden_dims) > 0)
-        self.gcn_modules = []
-        for (dim_prev, dim_post) in zip([input_feat_dim] + gcn_hidden_dims[:-1],\
-                gcn_hidden_dims):
-            self.gcn_modules.append(GN(dim_prev, dim_post, gcn_type, gcn_init_args))
-        self.gc = nn.ModuleList(self.gcn_modules)
+        # last torch module of the representation layer. And the dimension of the 
+        # output of `GCNModelVAE.forward` should match the input dimension to `Net`
 
         if aggregation_function == "sum":
             self.aggregator = self._sum_aggregate
         elif aggregation_function == "mean":
             self.aggregator = self._mean_aggregate
 
-        self.embedding_dim = embedding_dim
-
-        # 2. Mapping from node embedding to predictive distribution parameter
-        self.output_regression = nn.ModuleList([
-            nn.Linear(gcn_hidden_dims[-1], embedding_dim),
-            nn.Linear(gcn_hidden_dims[-1], embedding_dim),
-        ])
+        assert(len(gcn_hidden_dims) > 0)
+        self.gcn_modules = []
+        for (dim_prev, dim_post) in zip([input_feat_dim] + gcn_hidden_dims[:-1],\
+                gcn_hidden_dims):
+            self.gcn_modules.append(GN(dim_prev, dim_post, gcn_type, gcn_init_args))
+        self.gc = nn.ModuleList(self.gcn_modules)
 
     def forward(self, g):
         """ Compute the latent representation of the input graph. This
@@ -73,14 +74,12 @@ class GCNModelVAE(nn.Module):
             g (DGLGraph)
                 The molecular graph
         Returns:
-            z: (FloatTensor): the latent encodings of the graph
-                Shape (hidden_dim2,)
+            z: List(FloatTensor): the latent encodings of the sub-graphs
+                composing batch g. Each latent encoding in this list has 
+                dimension gcn_hidden_dims[-1]
         """
         # Apply the graph convolution operations
         z = self.infer_node_representation(g)
-        # Find the mean of the approximate posterior distribution
-        # q(z|g)
-        z = self.output_regression[0](z)
         # Aggregate the nodes' representations into a graph representation
         # Note that one should use dgl.sum_nodes because this function will
         # return a tensor with a new first dimension whose size is the number
@@ -192,3 +191,9 @@ class GCNModelVAE(nn.Module):
 
     def _mean_aggregate(self, g):
         return dgl.mean_nodes(g, "h")
+
+    def infer_graph_representation(self, g):
+        h = self.infer_node_representation(g)
+        with g.local_scope():
+            g.ndata["h"] = h
+            return self.aggregator(g)

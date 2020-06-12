@@ -37,8 +37,8 @@ def test_forward():
     g = dgl.batch(gs)
     ndims = g.ndata["h"].shape[1]
     gvae = GCNModelVAE(ndims)
-    z = gvae.forward(g)
-    assert (z.shape == torch.Size([10, gvae.embedding_dim]))
+    z = gvae(g)
+    assert (z.shape == torch.Size([10, gvae.gcn_hidden_dims[-1]]))
 
 def test_inference():
     import pinot
