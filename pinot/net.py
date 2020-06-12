@@ -253,5 +253,5 @@ class GPyTorchNet(torch.nn.Module):
         # loss for GPs - the marginal log likelihood
         mll = gpytorch.mlls.ExactMarginalLogLikelihood(self.output_regression.likelihood,
                                                        self.output_regression)
-        distribution = self.posterior(g)
+        distribution = self.forward(g)
         return -mll(distribution, y)
