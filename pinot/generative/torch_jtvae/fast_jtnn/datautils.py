@@ -44,38 +44,37 @@ class PairTreeFolder(object):
             del data, batches, dataset, dataloader
 
 class MolTreeFolder(object):
-
-    def __init__(self, data_folder, vocab, batch_size, num_workers=4, shuffle=True, assm=True, replicate=None):
-        self.data_folder = data_folder
-        self.data_files = [fn for fn in os.listdir(data_folder)]
+    def __init__(self, data_file, vocab, batch_size, num_workers=4, shuffle=True, assm=True, replicate=None):
+        self.data_file = data_file
         self.batch_size = batch_size
         self.vocab = vocab
         self.num_workers = num_workers
         self.shuffle = shuffle
         self.assm = assm
-
+        
+        ################## Construct a data loader ###################
         if replicate is not None: #expand is int
             self.data_files = self.data_files * replicate
 
-    def __iter__(self):
-        for fn in self.data_files:
-            fn = os.path.join(self.data_folder, fn)
-            data = torch.load(fn)
+        data = torch.load(self.data_file)
 
-            if self.shuffle: 
-                random.shuffle(data) #shuffle data before batch
+        # if self.shuffle: 
+        #     random.shuffle(data) #shuffle data before batch
+        # Get the trees and labels
+        trees, y = tuple(zip(*data))
 
-            batches = [data[i : i + self.batch_size] for i in range(0, len(data), self.batch_size)]
-            if len(batches[-1]) < self.batch_size:
-                batches.pop()
+        tree_batches = [trees[i : i + self.batch_size] for i in range(0, len(trees), self.batch_size)]
+        # if len(tree_batches[-1]) < self.batch_size:
+        #     batches.pop()
 
-            dataset = MolTreeDataset(batches, self.vocab, self.assm)
-            dataloader = DataLoader(dataset, batch_size=1, shuffle=False, num_workers=self.num_workers, collate_fn=lambda x:x[0])
+        y_batches = [y[i : i + self.batch_size] for i in range(0, len(y), self.batch_size)]
 
-            for b in dataloader:
-                yield b
 
-            del data, batches, dataset, dataloader
+        dataset = MolTreeDataset(tree_batches, y_batches, self.vocab, self.assm)
+        self.dataloader = DataLoader(dataset, batch_size=1, shuffle=False, num_workers=self.num_workers, collate_fn=lambda x:x[0])
+
+    def getDataLoader(self):
+        return self.dataloader
 
 class PairTreeDataset(Dataset):
 
@@ -93,8 +92,9 @@ class PairTreeDataset(Dataset):
 
 class MolTreeDataset(Dataset):
 
-    def __init__(self, data, vocab, assm=True):
+    def __init__(self, data, label, vocab, assm=True):
         self.data = data
+        self.label = label
         self.vocab = vocab
         self.assm = assm
 
@@ -102,7 +102,7 @@ class MolTreeDataset(Dataset):
         return len(self.data)
     
     def __getitem__(self, idx):
-        return tensorize(self.data[idx], self.vocab, assm=self.assm)
+        return (tensorize(self.data[idx], self.vocab, assm=self.assm), self.label[idx])
 
 def tensorize(tree_batch, vocab, assm=True):
     set_batch_nodeID(tree_batch, vocab)

@@ -12,8 +12,13 @@ import rdkit
 import time
 import os
 
-def tensorize(smiles, assm=True):
+def make_tree(smiles, assm=True):
     mol_tree = MolTree(smiles)
+    
+    cset = set()
+    for c in mol_tree.nodes:
+        cset.add(c.smiles)
+
     mol_tree.recover()
     if assm:
         mol_tree.assemble()
@@ -25,7 +30,7 @@ def tensorize(smiles, assm=True):
     for node in mol_tree.nodes:
         del node.mol
 
-    return mol_tree
+    return mol_tree, cset
 
 
 # Print iterations progress
@@ -56,38 +61,44 @@ if __name__ == "__main__":
     lg.setLevel(rdkit.RDLogger.CRITICAL)
 
     parser = argparse.ArgumentParser("Preprocessing script to parse SMILES into molecular junction trees")
-    parser.add_argument("-t", "--train", help="Path to the file containing SMILES for training")
-    parser.add_argument("-n", "--split", default=100, help="Number of sub-data splits, use a large number if you want to experiment with smaller sub-data")
-    parser.add_argument("--out_folder", default="jt_vae_parsed_molecular_trees", help="Folder to save the parsed molecular trees")
+    parser.add_argument("--smiles", help="Path to the file containing SMILES for training")
+    parser.add_argument("--trees_out", default="jt_trees.pkl", help="File to save the parsed molecular trees")
+    parser.add_argument("--vocab_out", required=True, help="Output file for the parsed vocabulary")
+    parser.add_argument("--labelled", action="store_true", default=False, help="Flag as labelled data set")
 
     args = parser.parse_args()
 
-    num_splits = int(args.split)
-
-    with open(args.train) as f:
-        data = [line.strip("\r\n ").split()[0] for line in f]
-
-    # Create an output folder if it does not already exist
-    if not os.path.isdir(args.out_folder):
-        os.makedirs(args.out_folder)
+    smiles = []
+    with open(args.smiles) as f:
+        for line in f:
+            l = line.rstrip()
+            if args.labelled:
+                smile, y = tuple(l.split(","))
+                smiles.append((smile, y))
+            else:
+                smile = l
+                smiles.append((smile, 0))
     
-    print("Finished reading in", len(data), "molecules")
+    print("Finished reading in", len(smiles), "molecules")
     start = time.time()
-    all_data = []
-    N = len(data)
-    for i, smile in enumerate(data):
-        all_data.append(tensorize(smile))
-        if i % 100 == 0:
-            printProgressBar(i+1, N, "Processed", "of {} molecules".format(N))    
+    trees = []
+    N = len(smiles)
+    wset  = set()
+    for i, (smile,y) in enumerate(smiles):
+        tree, cset = make_tree(smile)
+        trees.append((tree, y)) # Construct junction trees
+        wset.update(cset) # Add to the grow set of WORDS
+        printProgressBar(i+1, N, "Processed", "of {} molecules".format(N))    
 
-    print("Finished processing all the data in {} seconds! Now splitting it".format(time.time()-start))
-    
-    le = int((len(all_data) + num_splits - 1) / num_splits)
+    print("Finished processing all the data in {} seconds!".format(time.time()-start))
+    print("Now saving the parsed trees and vocabulary to specified files")
+    with open(args.trees_out, 'wb') as f:
+        torch.save(trees, f)
+        f.close()
 
-    for split_id in np.random.permutation(num_splits):
-        st = split_id * le
-        sub_data = all_data[st : min(st + le, len(all_data))]
-
-        with open(os.path.join(args.out_folder, 'tensors-%d.pkl' % split_id), 'wb') as f:
-            torch.save(sub_data, f)
+    with open(args.vocab_out, "w") as f:
+        for x in wset:
+            f.write(x)
+            f.write("\n")
+        f.close()
 

@@ -15,49 +15,49 @@ from pinot.generative.torch_jtvae.fast_jtnn import *
 import rdkit
 
 lg = rdkit.RDLogger.logger() 
-lg.setLevel(rdkit.RDLogger.CRITICAL)
+# lg.setLevel(rdkit.RDLogger.CRITICAL)
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--train', required=True)
-parser.add_argument('--vocab', required=True)
-parser.add_argument('--save_dir', required=True)
-parser.add_argument('--load_epoch', type=int, default=0)
+parser.add_argument('--train', required=True, help="path to FILE containing parsed junction trees")
+parser.add_argument('--vocab', required=True, help="path to FILE containing learned words")
+parser.add_argument('--save_dir', required=True, help="path to FOLDER to store learned model")
+parser.add_argument('--load_epoch', type=int, default=0, help="(if available) the trained model to continue training")
 
-parser.add_argument('--hidden_size', type=int, default=450)
-parser.add_argument('--batch_size', type=int, default=32)
-parser.add_argument('--latent_size', type=int, default=56)
+parser.add_argument('--hidden_size', type=int, default=450, help="embedding size of the sub-molecular words")
+parser.add_argument('--batch_size', type=int, default=32, help="batch size during training")
+parser.add_argument('--latent_size', type=int, default=56, help="embedding size of the molecular representation, consisting of the molecular Graph representation and the Tree representation")
 parser.add_argument('--depthT', type=int, default=20)
 parser.add_argument('--depthG', type=int, default=3)
 
-parser.add_argument('--lr', type=float, default=1e-3)
-parser.add_argument('--clip_norm', type=float, default=50.0)
+parser.add_argument('--lr', type=float, default=1e-3, help="learning rate for optimizer")
+parser.add_argument('--clip_norm', type=float, default=50.0, help="gradient clipping constant")
 parser.add_argument('--beta', type=float, default=0.0)
 parser.add_argument('--step_beta', type=float, default=0.002)
 parser.add_argument('--max_beta', type=float, default=1.0)
 parser.add_argument('--warmup', type=int, default=40000)
 
-parser.add_argument('--epoch', type=int, default=20)
+parser.add_argument('--epoch', type=int, default=20, help="number of training epochs")
 parser.add_argument('--anneal_rate', type=float, default=0.9)
 parser.add_argument('--anneal_iter', type=int, default=40000)
 parser.add_argument('--kl_anneal_iter', type=int, default=2000)
-parser.add_argument('--print_iter', type=int, default=50)
-parser.add_argument('--save_iter', type=int, default=5000)
+parser.add_argument('--print_iter', type=int, default=50, help="report interval")
+parser.add_argument('--save_iter', type=int, default=5000, help="saving interval")
 
 args = parser.parse_args()
-print (args)
 
-vocab = [x.rstrip() for x in open(args.vocab, "r")] 
+# Obtain the vocabulary (assume it has been produced by mol_tree.py)
+vocab = [x.rstrip() for x in open(args.vocab, "r")]
 vocab = Vocab(vocab)
 
+# Initialize the model and weights
 model = JTNNVAE(vocab, args.hidden_size, args.latent_size, args.depthT, args.depthG)
-print (model)
-
 for param in model.parameters():
     if param.dim() == 1:
         nn.init.constant_(param, 0)
     else:
         nn.init.xavier_normal_(param)
 
+# Continue training from a specified epoch (if available)
 if args.load_epoch > 0:
     model.load_state_dict(torch.load(args.save_dir + "/model.iter-" + str(args.load_epoch)))
 
@@ -73,10 +73,13 @@ total_step = args.load_epoch
 beta = args.beta
 meters = np.zeros(4)
 
+loader = MolTreeFolder(args.train, vocab, args.batch_size).getDataLoader()
+
 for epoch in range(args.epoch):
     epoch_loss = 0.
-    loader = MolTreeFolder(args.train, vocab, args.batch_size, num_workers=4)
-    for batch in loader:
+    # Why would we re-initialize the MolTreeFolder for every epoch
+    # This would add a lot of time to training
+    for batch, y in loader:
         total_step += 1
         # try:
         optimizer.zero_grad()
