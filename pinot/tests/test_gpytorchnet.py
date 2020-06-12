@@ -12,7 +12,7 @@ def test_initialize():
     net_representation = pinot.representation.Sequential(
         layer, [32, "tanh", 32, "tanh", 32, "tanh"],
     )
-    net = pinot.Net(net_representation)
+    net = pinot.net.GPyTorchNet(net_representation, exactgp)
 
 
 def test_forward():
