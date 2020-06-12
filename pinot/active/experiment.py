@@ -40,7 +40,6 @@ def _slice_fn_tuple(x, idxs):
 # =============================================================================
 class ActiveLearningExperiment(torch.nn.Module, abc.ABC):
     """ Implements active learning experiment base class.
-
     """
     def __init__(self):
         super(ActiveLearningExperiment, self).__init__()
