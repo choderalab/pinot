@@ -137,7 +137,7 @@ def get_gpr(trial_settings):
             kernel)
     return gpr
 
-if __name__ == 'main':
+if __name__ == '__main__':
 
     # Running functions
     import argparse
