@@ -126,19 +126,33 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
         # split input target
         gs, ys = new_data
 
+        # get the predictive distribution
+        # TODO:
+        # write API for sampler
+        distribution = self.net.condition(gs)
+
+
         if self.q:
+
+            # define inner sequential acquisition function
+            def EI(obj, best_f):
+                return (obj - best_f)
+
+
             # batch acquisition
-            indices, qucb_samples = self.acquisition(self.net, gs, q=self.q)
+            indices, qucb_samples = self.acquisition(
+                posterior=self.net.condition(gs),
+                batch_size=gs.batch_size,
+                sequential_acq=EI,
+                q=self.q,
+                num_samples=1000,
+                best_f=0.3
+            )
             
             # argmax sample batch
             best = indices[torch.argmax(qucb_samples)]
 
         else:
-            # get the predictive distribution
-            # TODO:
-            # write API for sampler
-            distribution = self.net.condition(gs)
-
             # workup
             distribution = self.workup(distribution)
 

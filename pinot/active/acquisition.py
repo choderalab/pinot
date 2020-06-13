@@ -57,48 +57,56 @@ def random(distribution, y_best=0.0, seed=2666):
     # torch.manual_seed(seed)
     return torch.rand(distribution.batch_shape)
 
-def q_upper_confidence_bound(model, gs, q=4, kappa=0.5,
-                             num_samples=1000,
-                             sampler=SobolQMCNormalSampler,
-                             objective=IdentityMCObjective,
-                             y_best=None):
-    """Evaluate MC-based batch Upper Confidence Bound on the candidate set `gs`.
-
-    Uses a reparameterization to extend UCB to qUCB for q > 1 (See Appendix A
-    of [Wilson2017reparam].)
-
-    `qUCB = E(max(mu + |Y_tilde - mu|))`, where `Y_tilde ~ N(mu, beta pi/2 Sigma)`
-    and `f(X)` has distribution `N(mu, Sigma)`.
-
-    Args:
-        X: A `batch_shape x q x d`-dim Tensor of t-batches with `q` `d`-dim design
-            points each.
-
-    Returns:
-        A `batch_shape'`-dim Tensor of Upper Confidence Bound values at the given
-        design points `X`, where `batch_shape'` is the broadcasted batch shape of
-        model and input `X`.
+def monte_carlo_acq(posterior, batch_size, sequential_acq=None, q=10,
+                    num_samples=1000,
+                    sampler_fn=SobolQMCNormalSampler,
+                    objective=IdentityMCObjective(),
+                    **kwargs):
     """
-    SobolEngine.MAX_DIM = 5000
+    Runs Monte Carlo acquisition over provided `sequential_fn`
     
-    def UCB(model, gs):
-        posterior = model.posterior(gs)
-        samples = model.sampler(posterior)
-        obj = model.objective(samples)
-        mean = obj.mean(dim=0)
-        return mean + model.kappa_prime * (obj - mean).abs()
+    Parameters
+    ----------
+    posterior : GPyTorchPosterior
+        Output of running net.posterior(gs).
+    batch_size : int
+        Batch size (i.e., gs.batch_size).
+    sequential_acq : Python function
+        Sequential acquisition function applied to Monte Carlo samples.
+    q : int
+        Size of the batch samples to be acquired.
+    num_samples : int
+        Number of times to sample from posterior.
+    sampler_fn : BoTorch Sampler
+        The sampler used to draw base samples. Defaults to SobolQMCNormalSampler.
+    objective : BoTorch MCAquisitionObjective
+        Monte Carlo objective under which the samples are evaluated.
+        Default is IdentityMCObjective.
+    **kwargs 
+        Parameters to pass through to the `sequential_acq`
     
-    model.sampler = sampler(num_samples)
-    model.objective = objective()
-    model.kappa_prime = math.sqrt(kappa * math.pi / 2)
+    Returns
+    -------
+    indices : Torch Tensor of int
+        The Tensor containing the indices of each sampled batch.
+    q_samples : Torch Tensor of float
+        The values associated with the `sequential_acq` from the Monte Carlo samples.
+    """
+    # establish sampler
+    SobolEngine.MAXDIM = 5000
+    sampler = sampler_fn(num_samples, collapse_batch_dims=True)
     
-    ucb_samples = torch.zeros((num_samples, gs.batch_size, q))
+    # perform monte carlo sampling
+    seq_samples = torch.zeros((num_samples, batch_size, q))
     for q_idx in range(q):
-        ucb_samples[:,:,q_idx] = UCB(model, gs)
+        samples = sampler(posterior)
+        obj = objective(samples)
+        # evaluate samples using inner acq function
+        seq_samples[:,:,q_idx] = sequential_acq(obj, **kwargs)
 
-    # get batch samples
-    indices = torch.randint(gs.batch_size, ucb_samples.shape[-2:])
-    qucb_samples = torch.gather(ucb_samples, 1, indices.expand(ucb_samples.shape))
-    qucb_samples = qucb_samples.max(dim=-1)[0].mean(dim=0)
+    # form batch with monte carlo samples
+    indices = torch.randint(batch_size, seq_samples.shape[-2:])
+    q_samples = torch.gather(seq_samples, 1, indices.expand(seq_samples.shape))
+    q_samples = q_samples.max(dim=-1)[0].mean(dim=0)
 
-    return indices, qucb_samples
+    return indices, q_samples
