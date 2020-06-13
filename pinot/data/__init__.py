@@ -16,3 +16,8 @@ moses_small = utils.load_unlabeled_data(os.path.dirname(utils.__file__) + "/mose
 
 zinc_full = utils.load_unlabeled_data(os.path.dirname(utils.__file__) + "/zinc/all.txt", size=1)
 moses_full = utils.load_unlabeled_data(os.path.dirname(utils.__file__) + "/moses/all.txt", size=1)
+
+covid = utils.from_csv(
+    os.path.dirname(utils.__file__) + "/covid.csv",
+    smiles_col=7,
+    y_col= 10)
