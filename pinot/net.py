@@ -1,13 +1,11 @@
 """ Combine representation, parameterization, and distribution class
 to construct a model.
-
 """
 # =============================================================================
 # IMPORTS
 # =============================================================================
 import dgl
 import torch
-import gpytorch
 
 # =============================================================================
 # MODULE FUNCTIONS
@@ -18,8 +16,6 @@ class Net(torch.nn.Module):
     """ An object that combines the representation and parameter
     learning, puts into a predicted distribution and calculates the
     corresponding divergence.
-
-
     Attributes
     ----------
     representation: a `pinot.representation` module
@@ -34,8 +30,6 @@ class Net(torch.nn.Module):
             'normal-heteroschedastic',
             'normal-homoschedastic-fixed') 
         or a function that transforms a set of parameters.
-
-
     """
 
     def __init__(
@@ -87,7 +81,7 @@ class Net(torch.nn.Module):
        
         return theta
 
-    def condition(self, g):
+    def _condition(self, g):
         """ Compute the output distribution.
         """
 
@@ -124,6 +118,49 @@ class Net(torch.nn.Module):
                     self.noise_model[kwargs])
 
 
+        return distribution
+
+    def condition(self, g, sampler=None, n_samples=64):
+        """ Compute the output distribution with sampled weights.
+        """
+        if sampler is None:
+            return self._condition(g)
+
+        if not hasattr(sampler, 'sample_params'):
+            return self._condition(g)
+
+        # initialize a list of distributions
+        distributions = []
+
+        for _ in range(n_samples):
+            sampler.sample_params()
+            distributions.append(self._condition(g))
+
+        # get the parameter of these distributions
+        # NOTE: this is not necessarily the most efficienct solution
+        # since we don't know the memory footprint of 
+        # torch.distributions
+        mus, sigmas = zip(*[
+                (distribution.loc, distribution.scale)
+                for distribution in distributions])
+
+        # concat parameters together
+        # (n_samples, batch_size, measurement_dimension)
+        mu = torch.stack(mus).cpu() # distribution no cuda
+        sigma = torch.stack(sigmas).cpu()
+
+        # construct the distribution
+        distribution = torch.distributions.normal.Normal(
+                loc=mu,
+                scale=sigma)
+
+        # make it mixture
+        distribution = torch.distributions.mixture_same_family\
+                .MixtureSameFamily(
+                        torch.distributions.Categorical(
+                            torch.ones(mu.shape[0],)),
+                        torch.distributions.Independent(distribution, 2))
+       
         return distribution
 
     def loss(self, g, y):
