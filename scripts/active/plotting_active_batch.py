@@ -10,7 +10,7 @@ from tqdm import tqdm
 import torch
 
 import pinot
-import pinot.active
+from pinot.active.acquisition import BTModel, SeqAcquire, MCAcquire
 
 
 ######################
@@ -24,6 +24,7 @@ def generate_data(trial_settings):
     # Load and batch data
     ds = getattr(pinot.data, trial_settings['data'])()
     ds = pinot.data.utils.batch(ds, len(ds), seed=None)
+    ds = [tuple([i.to(torch.device('cuda:0')) for i in ds[0]])]
 
     # get results for each trial
     results = defaultdict(dict)
@@ -79,22 +80,27 @@ def run_trials(results, ds, trial_settings):
     -------
     results
     """
-    
-    # get the real result
-    actual_sol = ds[0][1].squeeze().numpy()
-    
     # acquistion functions to be tested
-    acq_fns = [pinot.active.acquisition.expected_improvement,
-               pinot.active.acquisition.probability_of_improvement,
-               pinot.active.acquisition.upper_confidence_bound
-               pinot.active.acquisition.variance,
-               pinot.active.acquisition.random]
+    acq_fns = ['ei', 'pi', 'ucb', 'random']
 
     for acq_fn in acq_fns:
+
+        if acq_fn == 'ucb':
+            acq_fn = SeqAcquire(acq_fn=acq_fn, beta=0.5)
+        else:
+            acq_fn = SeqAcquire(acq_fn=acq_fn)
+
+        acq_fn = MCAcquire(sequential_acq=acq_fn,
+                           batch_size=ds[0][0].batch_size,
+                           q=trial_settings['q'],
+                           num_samples=trial_settings['num_samples'])
+
         for i in range(trial_settings['num_trials']):
 
             # make fresh net and optimizer
-            net = get_gpr(trial_settings)
+            net = BTModel(get_gpr(trial_settings))
+            net.to(torch.device('cuda:0'))
+
             optimizer = pinot.app.utils.optimizer_translation(
                 opt_string=trial_settings['optimizer_name'],
                 lr=trial_settings['lr'],
@@ -108,6 +114,7 @@ def run_trials(results, ds, trial_settings):
                         data=ds[0],
                         optimizer=optimizer(net),
                         acquisition=acq_fn,
+                        q=trial_settings['q'],
                         n_epochs_training=10,
                         slice_fn = pinot.active.experiment._slice_fn_tuple,
                         collate_fn = pinot.active.experiment._collate_fn_graph
@@ -137,34 +144,32 @@ def get_gpr(trial_settings):
             kernel)
     return gpr
 
-if __name__ == 'main':
+# Running functions
+import argparse
 
-    # Running functions
-    import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument('--representation', type=str)
+parser.add_argument('--num_trials', type=int, default=10)
+parser.add_argument('--limit', type=int, default=100)
+parser.add_argument('--optimizer', type=str, default='Adam')
+parser.add_argument('--lr', type=float, default=1e-3)
+parser.add_argument('--q', type=int, default=1)
+parser.add_argument('--num_samples', type=float, default=500)
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--representation', type=str)
-    parser.add_argument('--num_trials', type=int, default=2)
-    parser.add_argument('--limit', type=int, default=2)
-    parser.add_argument('--optimizer', type=str, default='Adam')
-    parser.add_argument('--lr', type=float, default=1e-3)
+args = parser.parse_args()
 
-    args = parser.parse_args()
+trial_settings = {'layer': args.representation,
+                  'config': [32, 'tanh', 32, 'tanh', 32, 'tanh'],
+                  'data': 'esol',
+                  'num_trials': args.num_trials,
+                  'num_samples': args.num_samples,
+                  'limit': args.limit,
+                  'optimizer_name': args.optimizer,
+                  'lr': args.lr,
+                  'q': args.q}
 
-    # optimizers = {'Adam': lambda net: torch.optim.Adam(net.parameters, args.lr),
-    #               'BBB': lambda net: pinot.BBB(
-    #                 torch.optim.Adam(net.parameters(), args.lr),
-    #                 0.01)}
+print(trial_settings)
+best_df = generate_data(trial_settings)
 
-    trial_settings = {'layer': args.representation,
-                      'config': [32, 'tanh', 32, 'tanh', 32, 'tanh'],
-                      'data': 'esol',
-                      'num_trials': args.num_trials,
-                      'limit': args.limit,
-                      'optimizer_name': args.optimizer,
-                      'lr': args.lr}
-
-    best_df = generate_data(trial_settings)
-
-    # save to disk
-    best_df.to_csv(f'best_{args.representation}_{args.optimizer}.csv')
+# save to disk
+best_df.to_csv(f'best_{args.representation}_{args.optimizer}_q{args.q}.csv')
