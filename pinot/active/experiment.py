@@ -66,6 +66,7 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
             q=1,
             sequential_acq=None,
             num_samples=1000,
+            early_stopping=True,
             workup=_independent,
             slice_fn=_slice_fn_tensor,
             collate_fn=_collate_fn_tensor,
@@ -100,6 +101,10 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
             err_msg = 'If q > 1, a sequential acquisition function must be provided.'
             raise ValueError(err_msg)
 
+        # early stopping
+        self.early_stopping = early_stopping
+        self.best_possible = torch.max(self.data[1])
+
         # bookkeeping
         self.workup = workup
         self.slice_fn = slice_fn
@@ -124,6 +129,25 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
         self.old.append(self.new.pop(best))
         return best
 
+    def train(self):
+        """ Train the model with new data.
+
+        """
+        # reset
+        self.reset_net()
+
+        # set to train status
+        self.net.train()
+
+        # train the model
+        self.net = pinot.app.experiment.Train(
+            data=[self.old_data],
+            optimizer=self.optimizer,
+            n_epochs=self.n_epochs_training,
+            net=self.net,
+            record_interval=999999).train()
+
+
     def acquire(self):
         """ Acquire new training data.
 
@@ -131,11 +155,8 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
         # set net to eval
         self.net.eval()
 
-        # grab new data
-        new_data = self.slice_fn(self.data, self.new)
-
         # split input target
-        gs, ys = new_data
+        gs, ys = self.new_data
 
         # get the predictive distribution
         # TODO:
@@ -169,34 +190,22 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
             # argmax
             best = torch.argmax(score).unsqueeze(0)
 
-        # grab
         # pop from the back so you don't disrupt the order
         best = best.sort(descending=True).values
         self.old.extend([self.new.pop(b) for b in best])
 
-    def train(self):
-        """ Train the model with new data.
 
+    def update_data(self):
+        """ Update the internal data using old and new.
         """
-        # reset
-        self.reset_net()
-
-        # set to train status
-        self.net.train()
+        # grab new data
+        self.new_data = self.slice_fn(self.data, self.new)
 
         # grab old data
-        old_data = self.slice_fn(self.data, self.old)
+        self.old_data = self.slice_fn(self.data, self.old)
 
-        # train the model
-        self.net = pinot.app.experiment.Train(
-            data=[old_data],
-            optimizer=self.optimizer,
-            n_epochs=self.n_epochs_training,
-            net=self.net,
-            record_interval=999999).train()
-
-        # grab y_max
-        gs, ys = old_data
+        # set y_max
+        gs, ys = self.old_data
         self.y_best = torch.max(ys)
 
 
@@ -210,10 +219,16 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
         """
         idx = 0
         self.blind_pick(seed=seed)
+        self.update_data()
 
         while idx < limit and len(self.new) > 0:
             self.train()
             self.acquire()
+            self.update_data()
+
+            if self.early_stopping and self.y_best == self.best_possible:
+                break
+
             idx += 1
 
         return self.old
