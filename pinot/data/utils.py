@@ -14,17 +14,28 @@ import random
 
 
 def from_csv(path, toolkit="rdkit", smiles_col=-1, y_cols=[-2], seed=2666,
-        delimiter=None):
+        **kwargs):
     """ Read csv from file.
     """
 
     def _from_csv():
-        df = pd.read_csv(path, error_bad_lines=False, delimiter=delimiter)
+        df = pd.read_csv(
+            path,
+            error_bad_lines=False,
+            **kwargs)
         df_smiles = df.iloc[:, smiles_col]
         df_y = df.iloc[:, y_cols]
 
         if toolkit == "rdkit":
             from rdkit import Chem
+
+            df_smiles = [str(x) for x in df_smiles]
+
+            idxs = [idx for idx in range(len(df_smiles)
+                ) if 'nan' not in df_smiles[idx]]
+
+
+            df_smiles = [df_smiles[idx] for idx in idxs]
 
             mols = [Chem.MolFromSmiles(smiles) for smiles in df_smiles]
             gs = [pinot.graph.from_rdkit_mol(mol) for mol in mols]
@@ -38,7 +49,7 @@ def from_csv(path, toolkit="rdkit", smiles_col=-1, y_cols=[-2], seed=2666,
             ]
             gs = [pinot.graph.from_oemol(mol) for mol in mols]
 
-        ds = list(zip(gs, list(torch.tensor(df_y.values, dtype=torch.float32))))
+        ds = list(zip(gs, list(torch.tensor(df_y.values[idxs], dtype=torch.float32))))
         random.seed(seed)
         random.shuffle(ds)
 
