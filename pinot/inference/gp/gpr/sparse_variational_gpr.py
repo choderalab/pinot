@@ -12,7 +12,6 @@ from pinot.inference.gp.gpr.base_gpr import GPR
 # =============================================================================
 class SVGPR(GPR):
     """ Sparse Variational Gaussian Process regression.
-
     """
     def __init__(self, kernel, n_inducing_points):
         super(VGPR, self).__init__()

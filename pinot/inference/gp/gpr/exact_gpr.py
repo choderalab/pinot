@@ -16,10 +16,11 @@ class ExactGPR(GPR):
     def __init__(self, kernel, log_sigma=-3.0):
         super(ExactGPR, self).__init__()
         self.kernel = kernel
-
+        
         self.log_sigma = torch.nn.Parameter(
                 torch.tensor(
                     log_sigma))
+
 
     def _get_kernel_and_auxiliary_variables(
             self, x_tr, y_tr, x_te=None,
@@ -86,6 +87,8 @@ class ExactGPR(GPR):
         # we return the exact nll with constant
         nll = 0.5 * (y_tr.t() @ alpha) + torch.trace(l_low)\
             + 0.5 * y_tr.shape[0] * math.log(2.0 * math.pi)
+
+        print(self.log_sigma)
 
         return nll
 
