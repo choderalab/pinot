@@ -24,6 +24,7 @@ def generate_data(trial_settings):
     # Load and batch data
     ds = getattr(pinot.data, trial_settings['data'])()
     ds = pinot.data.utils.batch(ds, len(ds), seed=None)
+    ds = [tuple([i.to(torch.device('cuda:0')) for i in ds[0]])]
 
     # get results for each trial
     results = defaultdict(dict)
@@ -81,20 +82,21 @@ def run_trials(results, ds, trial_settings):
     """
     
     # get the real result
-    actual_sol = ds[0][1].squeeze().numpy()
+    ys = ds[0][1]
+    actual_sol = torch.max(ys).item()
     
     # acquistion functions to be tested
-    acq_fns = [pinot.active.acquisition.expected_improvement,
-               pinot.active.acquisition.probability_of_improvement,
-               pinot.active.acquisition.upper_confidence_bound
-               pinot.active.acquisition.variance,
-               pinot.active.acquisition.random]
+    acq_fns = {'Expected Improvement': pinot.active.acquisition.expected_improvement,
+               'Probability of Improvement': pinot.active.acquisition.probability_of_improvement,
+               'Upper Confidence Bound': pinot.active.acquisition.upper_confidence_bound,
+               'Uncertainty': pinot.active.acquisition.uncertainty,
+               'Random': pinot.active.acquisition.random}
 
-    for acq_fn in acq_fns:
+    for acq_name, acq_fn in acq_fns.items():
         for i in range(trial_settings['num_trials']):
 
             # make fresh net and optimizer
-            net = get_gpr(trial_settings)
+            net = get_gpr(trial_settings).to(torch.device('cuda:0'))
             optimizer = pinot.app.utils.optimizer_translation(
                 opt_string=trial_settings['optimizer_name'],
                 lr=trial_settings['lr'],
@@ -115,7 +117,13 @@ def run_trials(results, ds, trial_settings):
 
             # run experiment
             x = bo.run(limit=trial_settings['limit'])
-            results[acq_fn][i] = np.maximum.accumulate(x)
+
+            # record results; pad if experiment stopped early
+            # candidates_acquired = limit + 1 because we begin with a blind pick
+            results_data = actual_sol*np.ones(trial_settings['limit'] + 1)
+            results_data[:len(x)] = np.maximum.accumulate(ys[x].cpu().squeeze())
+
+            results[acq_name][i] = results_data
     
     return results
 

@@ -80,18 +80,27 @@ def run_trials(results, ds, trial_settings):
     -------
     results
     """
-    # acquistion functions to be tested
-    acq_fns = ['ei', 'pi', 'ucb', 'random']
+    gs, ys = ds[0]
+    actual_sol = torch.max(ys).item()
 
-    for acq_fn in acq_fns:
+    # acquistion functions to be tested
+    acq_names = {'Expected Improvement': 'ei',
+                 'Probability of Improvement': 'pi',
+                 'Upper Confidence Bound': 'ucb',
+                 'Random': 'random'}
+
+    for acq_name, acq_fn in acq_fns.items():
+        print(acq_name)
 
         if acq_fn == 'ucb':
             acq_fn = SeqAcquire(acq_fn=acq_fn, beta=0.5)
+        elif acq_fn == 'pi':
+            acq_fn = SeqAcquire(acq_fn=acq_fn, tau=1e-3)
         else:
             acq_fn = SeqAcquire(acq_fn=acq_fn)
 
         acq_fn = MCAcquire(sequential_acq=acq_fn,
-                           batch_size=ds[0][0].batch_size,
+                           batch_size=gs.batch_size,
                            q=trial_settings['q'],
                            num_samples=trial_settings['num_samples'])
 
@@ -105,8 +114,8 @@ def run_trials(results, ds, trial_settings):
                 opt_string=trial_settings['optimizer_name'],
                 lr=trial_settings['lr'],
                 weight_decay=0.01,
-                kl_loss_scaling=1.0/float(len(ds[0][1]))
-                )
+                kl_loss_scaling=1.0/float(len(ys))
+            )
 
             # instantiate experiment
             bo = pinot.active.experiment.SingleTaskBayesianOptimizationExperiment(
@@ -122,7 +131,16 @@ def run_trials(results, ds, trial_settings):
 
             # run experiment
             x = bo.run(limit=trial_settings['limit'])
-            results[acq_fn][i] = np.maximum.accumulate(x)
+
+            # record results; pad if experiment stopped early
+            # candidates_acquired = q * limit + 1 because we begin with a blind pick
+            num_candidates_acquired = trial_settings['q']*trial_settings['limit'] + 1
+            results_data = actual_sol * np.ones(num_candidates_acquired)
+            results_data[:len(x)] = np.maximum.accumulate(ys[x].cpu().squeeze())
+            
+            print(results_data)
+
+            results[acq_name][i] = results_data
     
     return results
 
