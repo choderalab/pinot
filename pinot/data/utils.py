@@ -13,12 +13,13 @@ import random
 # =============================================================================
 
 
-def from_csv(path, toolkit="rdkit", smiles_col=-1, y_cols=[-2], seed=2666):
+def from_csv(path, toolkit="rdkit", smiles_col=-1, y_cols=[-2], seed=2666,
+        delimiter=None):
     """ Read csv from file.
     """
 
     def _from_csv():
-        df = pd.read_csv(path)
+        df = pd.read_csv(path, error_bad_lines=False, delimiter=delimiter)
         df_smiles = df.iloc[:, smiles_col]
         df_y = df.iloc[:, y_cols]
 
