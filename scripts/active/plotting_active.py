@@ -28,9 +28,10 @@ def generate_data(trial_settings):
     # get results for each trial
     results = defaultdict(dict)
     final_results = run_trials(results, ds,
-        optimizer=trial_settings['optimizer'],
+        optimizer_name=trial_settings['optimizer_name'],
         num_trials=trial_settings['num_trials'],
-        limit=trial_settings['limit'])
+        limit=trial_settings['limit'],
+        lr=trial_settings['lr'])
 
     # create pandas dataframe to play nice with seaborn
     best_df = pd.DataFrame.from_records(
@@ -57,7 +58,7 @@ def generate_data(trial_settings):
 
     return best_df
 
-def run_trials(results, ds, optimizer, num_trials=1, limit=5):
+def run_trials(results, ds, optimizer_name, lr, num_trials=1, limit=5):
     """
     Plot the results of an active training loop
     
@@ -91,6 +92,14 @@ def run_trials(results, ds, optimizer, num_trials=1, limit=5):
 
             # make fresh net
             net = get_gpr(trial_settings)
+            
+            optimizer = pinot.app.utils.optimizer_translation(
+                optimizer_name,
+                lr=lr,
+                weight_decay=0.01,
+                kl_loss_scaling=1.0/float(len(ds[0][1]))
+                )
+            
             bo = pinot.active.experiment.SingleTaskBayesianOptimizationExperiment(
                         net=net,
                         data=ds[0],
@@ -147,24 +156,25 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--representation', type=str)
-parser.add_argument('--num_trials', type=int, default=10)
-parser.add_argument('--limit', type=int, default=100)
+parser.add_argument('--num_trials', type=int, default=2)
+parser.add_argument('--limit', type=int, default=2)
 parser.add_argument('--optimizer', type=str, default='Adam')
 parser.add_argument('--lr', type=float, default=1e-3)
 
 args = parser.parse_args()
 
-optimizers = {'Adam': lambda net: torch.optim.Adam(net.parameters, args.lr),
-              'BBB': lambda net: pinot.BBB(
-                torch.optim.Adam(net.parameters(), args.lr),
-                0.01)}
+# optimizers = {'Adam': lambda net: torch.optim.Adam(net.parameters, args.lr),
+#               'BBB': lambda net: pinot.BBB(
+#                 torch.optim.Adam(net.parameters(), args.lr),
+#                 0.01)}
 
 trial_settings = {'layer': args.representation,
                   'config': [32, 'tanh', 32, 'tanh', 32, 'tanh'],
                   'data': 'esol',
                   'num_trials': args.num_trials,
                   'limit': args.limit,
-                  'optimizer': optimizers[args.optimizer]}
+                  'optimizer_name': args.optimizer,
+                  'lr': args.lr}
 
 best_df = generate_data(trial_settings)
 

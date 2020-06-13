@@ -4,7 +4,8 @@ import torch
 class ExactGPModel(gpytorch.models.ExactGP):
     def __init__(self, likelihood=gpytorch.likelihoods.GaussianLikelihood(),
                  mean_module=gpytorch.means.ConstantMean, prior=None,
-                 kernel=gpytorch.kernels.RBFKernel):
+                 kernel=gpytorch.kernels.RBFKernel,
+                 ard_num_dims=None):
         """
         Takes as input configuration args
 
@@ -16,7 +17,9 @@ class ExactGPModel(gpytorch.models.ExactGP):
         """
         super(ExactGPModel, self).__init__(None, None, likelihood)
         self.num_outputs = 1
-        self.covar_module = gpytorch.kernels.ScaleKernel(kernel())
+        self.covar_module = gpytorch.kernels.ScaleKernel(
+            kernel(ard_num_dims=ard_num_dims)
+        )
         self.mean_module = mean_module()
         
         if prior:

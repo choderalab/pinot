@@ -11,12 +11,16 @@ from pinot.inference.gp.kernels.kernel import Kernel
 # =============================================================================
 class RBF(Kernel):
     r""" A Gaussian Process Kernel that hosts parameters.
-
-
+    Note
+    ----
+    l could be either of shape 1 or hidden dim
     """
-    def __init__(self, l=1.0):
+    def __init__(self, scale=0.0, variance=0.0):
         super(RBF, self).__init__()
-        self.l = l
+        self.scale = torch.nn.Parameter(
+                torch.tensor(scale))
+        self.variance = torch.nn.Parameter(
+                torch.tensor(variance))
 
     def distance(self, x, x_):
         return torch.norm(
@@ -24,24 +28,23 @@ class RBF(Kernel):
                 p=2,
                 dim=2)
 
-    def forward(self, x, x_=None, l=None):
+    def forward(self, x, x_=None):
         # replicate x if there's no x_
         if x_ is None:
             x_ = x
 
-        # set l to default if there's no l
-        if l is None:
-            l = self.l
-
         # for now, only allow two dimension
         assert x.dim() == 2
         assert x_.dim() == 2
+
+        x = x * torch.exp(self.scale)
+        x_ = x_ * torch.exp(self.scale)
 
         # (batch_size, batch_size)
         distance = self.distance(x, x_)
 
         # convariant matrix
         # (batch_size, batch_size)
-        k = torch.exp(-0.5 * distance / (l ** 2))
+        k = torch.exp(self.variance) * torch.exp(-0.5 * distance)
 
         return k

@@ -63,6 +63,7 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
             acquisition,
             optimizer,
             n_epochs_training=100,
+            q=None,
             workup=_independent,
             slice_fn=_slice_fn_tensor,
             collate_fn=_collate_fn_tensor,
@@ -86,6 +87,7 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
 
         # acquisition
         self.acquisition = acquisition
+        self.q = q
 
         # bookkeeping
         self.workup = workup
@@ -124,22 +126,32 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
         # split input target
         gs, ys = new_data
 
-        # get the predictive distribution
-        # TODO:
-        # write API for sampler
-        distribution = self.net.posterior(gs)
+        if self.q:
+            # batch acquisition
+            indices, qucb_samples = self.acquisition(self.net, gs, q=self.q)
+            
+            # argmax sample batch
+            best = indices[torch.argmax(qucb_samples)]
 
-        # workup
-        distribution = self.workup(distribution)
+        else:
+            # get the predictive distribution
+            # TODO:
+            # write API for sampler
+            distribution = self.net.condition(gs)
 
-        # get score
-        score = self.acquisition(distribution, y_best=self.y_best)
+            # workup
+            distribution = self.workup(distribution)
 
-        # argmax
-        best = torch.argmax(score)
+            # get score
+            score = self.acquisition(distribution, y_best=self.y_best)
+
+            # argmax
+            best = torch.argmax(score).unsqueeze(0)
 
         # grab
-        self.old.append(self.new.pop(best))
+        # pop from the back so you don't disrupt the order
+        best = best.sort(descending=True).values
+        self.old.extend([self.new.pop(b) for b in best])
 
     def train(self):
         """ Train the model with new data.

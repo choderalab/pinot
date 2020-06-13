@@ -195,7 +195,7 @@ class GPyTorchNet(torch.nn.Module):
         # graph representation $\mathcal{G}$
         # ->
         # latent representation $h$
-        h = self.representation.forward(g)
+        h = self.scale(self.representation.forward(g))
 
         # latent representation $h$
         # ->
@@ -203,6 +203,12 @@ class GPyTorchNet(torch.nn.Module):
         theta = self.output_regression.forward(h)
        
         return theta
+
+    def scale(self, x):
+        x = x - x.min(0)[0]
+        x = 2 * (x / x.max(0)[0]) - 1
+        return x
+
 
     def posterior(self, g):
         """ Compute the output distribution.
@@ -212,7 +218,7 @@ class GPyTorchNet(torch.nn.Module):
         # graph representation $\mathcal{G}$
         # ->
         # latent representation $h$
-        h = self.representation.forward(g)
+        h = self.scale(self.representation.forward(g))
 
         # latent representation $h$
         # ->

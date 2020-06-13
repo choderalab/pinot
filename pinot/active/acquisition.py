@@ -57,10 +57,11 @@ def random(distribution, y_best=0.0, seed=2666):
     # torch.manual_seed(seed)
     return torch.rand(distribution.batch_shape)
 
-def q_upper_confidence_bound(model, gs, q=10, kappa=0.5,
+def q_upper_confidence_bound(model, gs, q=4, kappa=0.5,
                              num_samples=1000,
                              sampler=SobolQMCNormalSampler,
-                             objective=IdentityMCObjective):
+                             objective=IdentityMCObjective,
+                             y_best=None):
     """Evaluate MC-based batch Upper Confidence Bound on the candidate set `gs`.
 
     Uses a reparameterization to extend UCB to qUCB for q > 1 (See Appendix A
