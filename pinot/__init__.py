@@ -1,6 +1,8 @@
 import pinot
 import pinot.graph
 import pinot.data
+import pinot.active
+
 from pinot.metrics import *
 
 import pinot.app
