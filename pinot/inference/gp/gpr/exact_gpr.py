@@ -88,8 +88,6 @@ class ExactGPR(GPR):
         nll = 0.5 * (y_tr.t() @ alpha) + torch.trace(l_low)\
             + 0.5 * y_tr.shape[0] * math.log(2.0 * math.pi)
 
-        print(self.log_sigma)
-
         return nll
 
     def condition(self, x_te, x_tr=None, y_tr=None, sampler=None):
