@@ -63,11 +63,14 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
             acquisition,
             optimizer,
             n_epochs_training=100,
-            q=None,
+            q=1,
+            sequential_acq=None,
+            num_samples=1000,
             workup=_independent,
             slice_fn=_slice_fn_tensor,
             collate_fn=_collate_fn_tensor,
-            net_state_dict=None
+            net_state_dict=None,
+            **kwargs
         ):
 
         super(SingleTaskBayesianOptimizationExperiment, self).__init__()
@@ -87,7 +90,15 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
 
         # acquisition
         self.acquisition = acquisition
+        # batch acquisition stuff
         self.q = q
+        self.sequential_acq = sequential_acq
+        self.num_samples = num_samples
+        self.kwargs_acq = kwargs
+
+        if self.q > 1 and not self.sequential_acq:
+            err_msg = 'If q > 1, a sequential acquisition function must be provided.'
+            raise ValueError(err_msg)
 
         # bookkeeping
         self.workup = workup
@@ -132,21 +143,17 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
         distribution = self.net.condition(gs)
 
 
-        if self.q:
-
-            # define inner sequential acquisition function
-            def EI(obj, best_f):
-                return (obj - best_f)
-
+        if self.q > 1:
 
             # batch acquisition
             indices, qucb_samples = self.acquisition(
                 posterior=self.net.condition(gs),
                 batch_size=gs.batch_size,
-                sequential_acq=EI,
+                y_best=self.y_best,
+                sequential_acq=self.sequential_acq,
                 q=self.q,
-                num_samples=1000,
-                best_f=0.3
+                num_samples=self.num_samples,
+                **self.kwargs_acq
             )
             
             # argmax sample batch

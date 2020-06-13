@@ -57,7 +57,8 @@ def random(distribution, y_best=0.0, seed=2666):
     # torch.manual_seed(seed)
     return torch.rand(distribution.batch_shape)
 
-def monte_carlo_acq(posterior, batch_size, sequential_acq=None, q=10,
+def monte_carlo_acq(posterior, batch_size, y_best=0.0,
+                    sequential_acq=None, q=10,
                     num_samples=1000,
                     sampler_fn=SobolQMCNormalSampler,
                     objective=IdentityMCObjective(),
@@ -94,7 +95,9 @@ def monte_carlo_acq(posterior, batch_size, sequential_acq=None, q=10,
     """
     # establish sampler
     SobolEngine.MAXDIM = 5000
-    sampler = sampler_fn(num_samples, collapse_batch_dims=True)
+    sampler = sampler_fn(num_samples,
+        collapse_batch_dims=True,
+        resample=True)
     
     # perform monte carlo sampling
     seq_samples = torch.zeros((num_samples, batch_size, q))
@@ -102,7 +105,10 @@ def monte_carlo_acq(posterior, batch_size, sequential_acq=None, q=10,
         samples = sampler(posterior)
         obj = objective(samples)
         # evaluate samples using inner acq function
-        seq_samples[:,:,q_idx] = sequential_acq(obj, **kwargs)
+        seq_samples[:,:,q_idx] = sequential_acq(
+            obj=obj,
+            y_best=y_best,
+            **kwargs)
 
     # form batch with monte carlo samples
     indices = torch.randint(batch_size, seq_samples.shape[-2:])
