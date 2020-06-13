@@ -20,4 +20,4 @@ moses_full = utils.load_unlabeled_data(os.path.dirname(utils.__file__) + "/moses
 covid = utils.from_csv(
     os.path.dirname(utils.__file__) + "/covid.csv",
     smiles_col=7,
-    y_col= 10)
+    y_cols = [10])
