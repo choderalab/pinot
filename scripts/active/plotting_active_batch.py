@@ -128,11 +128,8 @@ def run_trials(results, ds, trial_settings):
             )
 
             # run experiment
-            gc.collect()
             x = bo.run(limit=trial_settings['limit'])
             print(x)
-            gc.collect()
-            torch.cuda.ipc_collect()
 
             # record results; pad if experiment stopped early
             # candidates_acquired = q * limit + 1 because we begin with a blind pick
