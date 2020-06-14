@@ -22,7 +22,8 @@ class SVGPR(GPR):
             log_sigma=-3.0,
             n_inducing_points=100,
             initializer_std=0.1,
-            kl_loss_scaling=1.0):
+            kl_loss_scaling=1.0,
+            grid_boundary=1):
         super(SVGPR, self).__init__()
         self.kernel = kernel
 
@@ -33,8 +34,8 @@ class SVGPR(GPR):
         # (n_inducing_points, hidden_dimension)
         self.x_u = torch.nn.Parameter(
             torch.distributions.uniform.Uniform(
-                -1 * torch.ones(n_inducing_points, in_features),
-                1 * torch.ones(n_inducing_points, in_features)).sample())
+                -1 * grid_boundary * torch.ones(n_inducing_points, in_features),
+                1 * grid_boundary * torch.ones(n_inducing_points, in_features)).sample())
 
         # to ensure lower cholesky
         self.f_u_s_diag = torch.nn.Parameter(
@@ -51,9 +52,11 @@ class SVGPR(GPR):
         self.f_u_mu = torch.nn.Parameter(
             torch.distributions.normal.Normal(
                 loc=torch.zeros(n_inducing_points, 1),
-                scale=initializer_std*torch.ones(n_inducing_points)).sample())
+                scale=initializer_std*torch.ones(n_inducing_points, 1)).sample())
 
         self.n_inducing_points = n_inducing_points
+
+        self.kl_loss_scaling = kl_loss_scaling
 
     def _f_u_s(self):
 
@@ -149,39 +152,39 @@ class SVGPR(GPR):
         v = (v + torch.exp(self.log_sigma) * torch.eye(v.shape[-1]))
         L = torch.cholesky(v)
 
+
+        self.prior_tril = prior_tril
+        self.prior_mean = prior_mean
+
         return m_all, L
 
     def condition(self, x_te):
         m_all, L = self.forward(x_te)
-
-        print('m_all', m_all.shape)
-        print('L', L.shape)
-
-        return torch.distributions.multivariate_normal.MultivariateNormal(
-            loc=m_all,
+        distribution = torch.distributions.multivariate_normal.MultivariateNormal(
+            loc=m_all.flatten(),
             scale_tril=L)
+
+        return distribution
 
     def loss(self, x_te, y_te):
 
-
         distribution = self.condition(x_te)
 
-        nll = distribution.log_prob(y_te)
+        nll = -distribution.log_prob(y_te).sum()
 
         log_p_u = self.exp_log_full_gaussian(
             self.f_u_mu,
             self._f_u_s(),
-            prior_mean,
-            prior_tril)
+            self.prior_mean,
+            self.prior_tril)
 
         log_q_u = -self.entropy_full_gaussian(
             self.f_u_mu,
             self._f_u_s())
 
-        loss = nll + log_q_u - log_p_u
+        loss = nll + self.kl_loss_scaling * (log_q_u - log_p_u)
 
         return loss
-
 
 
     @staticmethod
