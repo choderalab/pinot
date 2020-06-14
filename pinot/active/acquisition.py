@@ -89,8 +89,6 @@ class MCAcquire:
             sequential_acq,
             batch_size, q=10,
             num_samples=1000,
-            sampler_fn=SobolQMCNormalSampler,
-            objective=IdentityMCObjective
         ):
         """
         Runs Monte Carlo acquisition over provided `sequential_fn`
@@ -116,10 +114,6 @@ class MCAcquire:
         self.sequential_acq = sequential_acq
         self.q = q
         self.num_samples = num_samples
-        self.sampler = sampler_fn(self.num_samples,
-                                  collapse_batch_dims=True,
-                                  resample=True)
-        self.objective = objective()
 
     def __call__(self, posterior, batch_size, y_best):
         """
@@ -137,28 +131,26 @@ class MCAcquire:
         q_samples : Torch Tensor of float
             The values associated with the `sequential_acq` from the Monte Carlo samples.
         """
-        # establish sampler
-        SobolEngine.MAXDIM = 5000
+        # sample from posterior
+        seq_samples = posterior.sample(torch.Size([self.q, self.num_samples])).squeeze(-1)
+
+        # shuffle within outer dimension of qth row to obtain random baches
+        indices = torch.randint(batch_size, (self.q, batch_size))
+        q_samples = torch.stack([row[:,indices[idx]] for idx, row in enumerate(torch.unbind(seq_samples))])
+
+        if collapse_batch:
+            # collapse individuals within each batch
+            q_samples = q_samples.reshape(q_samples.shape[0] * q_samples.shape[1], q_samples.shape[2])
+            # apply sequential acquisition function on joint distribution over batch
+            scores = self.sequential_acq(q_samples, beta=0.95, axis=0)
+
+        else:
+            # apply sequential acquisition function on in parallel over batch
+            scores = self.sequential_acq(q_samples, beta=0.95, axis=1)
+            # find max expectation of acquisition function within batch
+            scores = scores.max(axis=0).values
         
-        # perform monte carlo sampling
-        seq_samples = torch.zeros((self.num_samples,
-                                   batch_size,
-                                   self.q))
-        for q_idx in range(self.q):
-            
-            samples = self.sampler(posterior)
-            obj = self.objective(samples)
-
-            # evaluate samples using inner acq function
-            seq_samples[:,:,q_idx] = self.sequential_acq(obj=obj,
-                                                         y_best=y_best)
-
-        # form batch with monte carlo samples
-        indices = torch.randint(batch_size, seq_samples.shape[-2:])
-        q_samples = torch.gather(seq_samples, 1, indices.expand(seq_samples.shape))
-        q_samples = q_samples.max(dim=-1)[0].mean(dim=0)
-
-        return indices, q_samples
+        return indices, scores
 
 
 class SeqAcquire:
@@ -181,6 +173,8 @@ class SeqAcquire:
                 self.acq_fn = self.PI
             elif acq_fn == 'ucb':
                 self.acq_fn = self.UCB
+            elif acq_fn == 'uncertainty':
+                self.acq_fn = self.VAR
             elif acq_fn == 'random':
                 self.acq_fn = self.RAND
             else:
@@ -191,24 +185,30 @@ class SeqAcquire:
 
         self.kwargs = kwargs
 
-    def __call__(self, obj, y_best=0.0):
-        return self.acq_fn(obj=obj, y_best=y_best, **self.kwargs)
+    def __call__(self, samples, y_best=0.0):
+        return self.acq_fn(samples=samples, y_best=y_best, **self.kwargs)
 
-    def EI(self, obj, y_best):
-        return obj - y_best
+    def PI(self, samples, axis=0, y_best=0.0):
+        return (samples > y_best).float().mean(axis=axis)
 
-    def UCB(self, obj, beta, y_best=0.0):
-        beta_prime = math.sqrt(beta * math.pi / 2)
-        mean = obj.mean(dim=0)
-        return mean + beta_prime * (obj - mean).abs()
+    def EI(self, samples, axis=0, y_best=0.0):
+        return (samples - y_best).mean(axis=axis)
 
-    def PI(self, obj, tau, y_best=0.0):
-        max_obj = obj.max(dim=-1)[0]
-        return torch.sigmoid((max_obj - y_best) / tau).mean(dim=0)
+    def VAR(self, samples, axis=0, y_best=0.0):
+        return samples.var(axis=axis)
 
-    def RAND(self, obj, y_best=0.0):
-        return torch.rand(obj.shape)
+    def RAND(self, samples, axis=0, y_best=0.0):
+        return torch.rand(samples.shape[1])
 
+    def UCB(self, samples, beta, axis=0, y_best=0.0):
+
+        samples_sorted, idxs = torch.sort(samples, dim=0)
+        high_idx = int(len(samples) * (1 - (1 - beta) / 2))
+        if axis == 0:
+            high = samples_sorted[high_idx,:]
+        else:
+            high = samples_sorted[:,high_idx,:]
+        return high
 
 class BTModel(nn.Module):
     r"""Wrapping the pinot gpr model for BoTorch."""
@@ -238,7 +238,8 @@ class BTModel(nn.Module):
         """
         self.gpr.eval()
         out = self.gpr.condition(X)
-        gptorch_mvn = MultivariateNormal(out.mean, out.covariance_matrix)
+        gptorch_mvn = MultivariateNormal(out.mean,
+                                         out.covariance_matrix)
         return GPyTorchPosterior(gptorch_mvn)
     
     def loss(self, g, y):

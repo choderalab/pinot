@@ -82,18 +82,17 @@ def run_trials(results, ds, trial_settings):
     actual_sol = torch.max(ys).item()
 
     # acquistion functions to be tested
-    acq_fns = {'Expected Improvement': 'ei',
+    acq_fns = {'Upper Confidence Bound': 'ucb',
                'Probability of Improvement': 'pi',
-               'Upper Confidence Bound': 'ucb',
-               'Random': 'random'}
+               'Expected Improvement': 'ei',
+               # 'Random': 'random'
+               }
 
     for acq_name, acq_fn in acq_fns.items():
         print(acq_name)
 
         if acq_fn == 'ucb':
             acq_fn = SeqAcquire(acq_fn=acq_fn, beta=0.5)
-        elif acq_fn == 'pi':
-            acq_fn = SeqAcquire(acq_fn=acq_fn, tau=1e-3)
         else:
             acq_fn = SeqAcquire(acq_fn=acq_fn)
 
@@ -106,7 +105,7 @@ def run_trials(results, ds, trial_settings):
             print(i)
             # make fresh net and optimizer
             net = BTModel(get_gpr(trial_settings))
-            net.to(torch.device('cuda:0'))
+            net = net.to(torch.device('cuda:0'))
 
             optimizer = pinot.app.utils.optimizer_translation(
                 opt_string=trial_settings['optimizer_name'],

@@ -164,12 +164,12 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
         if self.q > 1:
 
             # batch acquisition
-            indices, qucb_samples = self.acquisition(posterior=distribution,
-                                                     batch_size=gs.batch_size,
-                                                     y_best=self.y_best)
+            indices, q_samples = self.acquisition(posterior=distribution,
+                                                  batch_size=gs.batch_size,
+                                                  y_best=self.y_best)
             
             # argmax sample batch
-            best = indices[torch.argmax(qucb_samples)]
+            best = indices[:,torch.argmax(q_samples)].squeeze()
 
         else:
             # workup
@@ -179,7 +179,7 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
             score = self.acquisition(distribution, y_best=self.y_best)
 
             # argmax
-            best = torch.argmax(score).unsqueeze(0)
+            best = torch.argmax(score)
 
         # pop from the back so you don't disrupt the order
         best = best.sort(descending=True).values
@@ -216,8 +216,6 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
             self.train()
             self.acquire()
             self.update_data()
-            torch.cuda.ipc_collect()
-            gc.collect()
 
             if self.early_stopping and self.y_best == self.best_possible:
                 break
