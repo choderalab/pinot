@@ -1,6 +1,4 @@
-import warnings
-warnings.filterwarnings("ignore")
-
+import gc
 from collections import defaultdict
 
 import numpy as np
@@ -84,10 +82,10 @@ def run_trials(results, ds, trial_settings):
     actual_sol = torch.max(ys).item()
 
     # acquistion functions to be tested
-    acq_names = {'Expected Improvement': 'ei',
-                 'Probability of Improvement': 'pi',
-                 'Upper Confidence Bound': 'ucb',
-                 'Random': 'random'}
+    acq_fns = {'Expected Improvement': 'ei',
+               'Probability of Improvement': 'pi',
+               'Upper Confidence Bound': 'ucb',
+               'Random': 'random'}
 
     for acq_name, acq_fn in acq_fns.items():
         print(acq_name)
@@ -105,7 +103,7 @@ def run_trials(results, ds, trial_settings):
                            num_samples=trial_settings['num_samples'])
 
         for i in range(trial_settings['num_trials']):
-
+            print(i)
             # make fresh net and optimizer
             net = BTModel(get_gpr(trial_settings))
             net.to(torch.device('cuda:0'))
@@ -130,7 +128,11 @@ def run_trials(results, ds, trial_settings):
             )
 
             # run experiment
+            gc.collect()
             x = bo.run(limit=trial_settings['limit'])
+            print(x)
+            gc.collect()
+            torch.cuda.ipc_collect()
 
             # record results; pad if experiment stopped early
             # candidates_acquired = q * limit + 1 because we begin with a blind pick
@@ -138,8 +140,6 @@ def run_trials(results, ds, trial_settings):
             results_data = actual_sol * np.ones(num_candidates_acquired)
             results_data[:len(x)] = np.maximum.accumulate(ys[x].cpu().squeeze())
             
-            print(results_data)
-
             results[acq_name][i] = results_data
     
     return results

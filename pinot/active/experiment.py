@@ -1,10 +1,12 @@
 # =============================================================================
 # IMPORTS
 # =============================================================================
+import gc
 import torch
 import abc
 import dgl
 import pinot
+from pinot.active.acquisition import MCAcquire
 
 # =============================================================================
 # HELPER FUNCTIONS
@@ -64,14 +66,12 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
             optimizer,
             n_epochs_training=100,
             q=1,
-            sequential_acq=None,
             num_samples=1000,
             early_stopping=True,
             workup=_independent,
             slice_fn=_slice_fn_tensor,
             collate_fn=_collate_fn_tensor,
             net_state_dict=None,
-            **kwargs
         ):
 
         super(SingleTaskBayesianOptimizationExperiment, self).__init__()
@@ -93,13 +93,11 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
         self.acquisition = acquisition
         # batch acquisition stuff
         self.q = q
-        self.sequential_acq = sequential_acq
         self.num_samples = num_samples
-        self.kwargs_acq = kwargs
 
-        if self.q > 1 and not self.sequential_acq:
-            err_msg = 'If q > 1, a sequential acquisition function must be provided.'
-            raise ValueError(err_msg)
+        # if self.q > 1 and not isinstance(self.acquisition, MCAcquire):
+        #     err_msg = 'If q > 1, an object of type `pinot.active.acquisition.MCAcquire` must be provided.'
+        #     raise ValueError(err_msg)
 
         # early stopping
         self.early_stopping = early_stopping
@@ -163,19 +161,12 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
         # write API for sampler
         distribution = self.net.condition(gs)
 
-
         if self.q > 1:
 
             # batch acquisition
-            indices, qucb_samples = self.acquisition(
-                posterior=self.net.condition(gs),
-                batch_size=gs.batch_size,
-                y_best=self.y_best,
-                sequential_acq=self.sequential_acq,
-                q=self.q,
-                num_samples=self.num_samples,
-                **self.kwargs_acq
-            )
+            indices, qucb_samples = self.acquisition(posterior=distribution,
+                                                     batch_size=gs.batch_size,
+                                                     y_best=self.y_best)
             
             # argmax sample batch
             best = indices[torch.argmax(qucb_samples)]
@@ -225,6 +216,8 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
             self.train()
             self.acquire()
             self.update_data()
+            torch.cuda.ipc_collect()
+            gc.collect()
 
             if self.early_stopping and self.y_best == self.best_possible:
                 break
