@@ -15,7 +15,7 @@ import pinot.generative
 
 
 from pinot.net import Net
-
+from pinot.semisupervised import SemiSupervisedNet
 
 
 from pinot.inference.adlala import AdLaLa
