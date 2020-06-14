@@ -35,8 +35,11 @@ class GCNModelVAE(nn.Module):
         super(GCNModelVAE, self).__init__()
         if act == "tanh":
             self.activation = torch.tanh
-        if act == "relu":
+        elif act == "relu":
             self.activation = torch.nn.ReLU()
+        elif act == "none":
+            self.activation = self.identity
+
 
         # 2. Decoder
         self.dc = SequentialDecoder(embedding_dim, num_atom_types)
@@ -73,6 +76,11 @@ class GCNModelVAE(nn.Module):
             else:
                 self.gcn_modules.append(GN(dim_prev, dim_post, gcn_type, gcn_init_args))
         self.gc = nn.ModuleList(self.gcn_modules)
+
+        # This module is not used
+        # However, it is defined here to ensure interoperability betwee
+        # `GCNModelVAE` and `Net`
+        self.place_holder = nn.Linear(1, gcn_hidden_dims[-1])
 
     def forward(self, g):
         """ Compute the latent representation of the input graph. This
@@ -207,4 +215,7 @@ class GCNModelVAE(nn.Module):
         h = self.infer_node_representation(g)
         with g.local_scope():
             g.ndata["h"] = h
-            return self.aggregator(g)    
+            return self.aggregator(g)
+
+    def identity(self, h):
+        return h
