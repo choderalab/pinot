@@ -9,7 +9,28 @@ class SemiSupervisedNet(pinot.Net):
             output_regression=None,
             measurement_dimension=1,
             noise_model='normal-heteroschedastic',
+            hidden_dim=64,
             unsup_scale=1):
+
+        self.hidden_dim = hidden_dim
+        # grab the last dimension of `representation`
+        representation_hidden_units = [
+                layer for layer in list(self.representation.modules())\
+                        if hasattr(layer, 'out_features')][-1].out_features
+        
+        if output_regression is None:
+            # make the output regression as simple as a linear one
+            # if nothing is specified
+            self._output_regression = torch.nn.ModuleList(
+                    [
+                        torch.nn.Sequential(
+                            torch.nn.Linear(representation_hidden_units, self.hidden_dim),
+                            torch.nn.Linear(self.hidden_dim, measurement_dimension)
+                        ) for _ in range(2) # now we hard code # of parameters
+                    ])
+
+            def output_regression(theta):
+                return [f(theta) for f in self._output_regression]
 
         super(SemiSupervisedNet, self).__init__(
             representation, output_regression, measurement_dimension, noise_model)
