@@ -13,7 +13,8 @@ import random
 # =============================================================================
 
 
-def from_csv(path, toolkit="rdkit", smiles_col=-1, y_cols=[-2], seed=2666, scale=1.0,
+def from_csv(path, toolkit="rdkit", smiles_col=-1, y_cols=[-2], seed=2666,
+        scale=1.0, dropna=False,
         **kwargs):
     """ Read csv from file.
     """
@@ -24,7 +25,9 @@ def from_csv(path, toolkit="rdkit", smiles_col=-1, y_cols=[-2], seed=2666, scale
             error_bad_lines=False,
             **kwargs)
 
-        df = df.dropna(axis=0, subset=[df.columns[y_cols[0]]])
+        if dropna is True:
+            df = df.dropna(axis=0, subset=[df.columns[y_cols[0]]])
+
 
         df_smiles = df.iloc[:, smiles_col]
         df_y = df.iloc[:, y_cols]
