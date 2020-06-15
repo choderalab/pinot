@@ -92,13 +92,14 @@ def run_trials(results, ds, trial_settings):
         print(acq_name)
 
         if acq_fn == 'ucb':
-            acq_fn = SeqAcquire(acq_fn=acq_fn, beta=0.5)
+            acq_fn = SeqAcquire(acq_fn=acq_fn, beta=0.95)
         else:
             acq_fn = SeqAcquire(acq_fn=acq_fn)
 
         acq_fn = MCAcquire(sequential_acq=acq_fn,
                            batch_size=gs.batch_size,
                            q=trial_settings['q'],
+                           collapse_batch=True,
                            num_samples=trial_settings['num_samples'])
 
         for i in range(trial_settings['num_trials']):

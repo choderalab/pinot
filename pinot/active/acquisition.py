@@ -89,6 +89,7 @@ class MCAcquire:
             sequential_acq,
             batch_size, q=10,
             num_samples=1000,
+            collapse_batch=False
         ):
         """
         Runs Monte Carlo acquisition over provided `sequential_fn`
@@ -114,6 +115,7 @@ class MCAcquire:
         self.sequential_acq = sequential_acq
         self.q = q
         self.num_samples = num_samples
+        self.collapse_batch = collapse_batch
 
     def __call__(self, posterior, batch_size, y_best):
         """
@@ -138,15 +140,15 @@ class MCAcquire:
         indices = torch.randint(batch_size, (self.q, batch_size))
         q_samples = torch.stack([row[:,indices[idx]] for idx, row in enumerate(torch.unbind(seq_samples))])
 
-        if collapse_batch:
+        if self.collapse_batch:
             # collapse individuals within each batch
             q_samples = q_samples.reshape(q_samples.shape[0] * q_samples.shape[1], q_samples.shape[2])
             # apply sequential acquisition function on joint distribution over batch
-            scores = self.sequential_acq(q_samples, beta=0.95, axis=0)
+            scores = self.sequential_acq(q_samples, axis=0)
 
         else:
             # apply sequential acquisition function on in parallel over batch
-            scores = self.sequential_acq(q_samples, beta=0.95, axis=1)
+            scores = self.sequential_acq(q_samples, axis=1)
             # find max expectation of acquisition function within batch
             scores = scores.max(axis=0).values
         
@@ -179,14 +181,14 @@ class SeqAcquire:
                 self.acq_fn = self.RAND
             else:
                 raise ValueError(f"""{acq_fn} is not an available function.
-                    Only available functions are 'ei', 'pi', 'ucb', 'variance', or 'random'.""")
+                    Only available functions are 'ei', 'pi', 'ucb', 'uncertainty', or 'random'.""")
         else:
             self.acq_fn = acq_fn
 
         self.kwargs = kwargs
 
-    def __call__(self, samples, y_best=0.0):
-        return self.acq_fn(samples=samples, y_best=y_best, **self.kwargs)
+    def __call__(self, samples, axis, y_best=0.0):
+        return self.acq_fn(samples=samples, axis=axis, y_best=y_best, **self.kwargs)
 
     def PI(self, samples, axis=0, y_best=0.0):
         return (samples > y_best).float().mean(axis=axis)
@@ -201,7 +203,6 @@ class SeqAcquire:
         return torch.rand(samples.shape[1])
 
     def UCB(self, samples, beta, axis=0, y_best=0.0):
-
         samples_sorted, idxs = torch.sort(samples, dim=0)
         high_idx = int(len(samples) * (1 - (1 - beta) / 2))
         if axis == 0:

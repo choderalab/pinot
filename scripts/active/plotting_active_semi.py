@@ -12,6 +12,11 @@ import torch
 import pinot
 import pinot.active
 
+from pinot.semi import (SemiSupervisedNet,
+					    batch_semi_supervised,
+					    prepare_semi_supervised_training_data,
+					    prepare_semi_supervised_data_from_labelled_data)
+
 
 ######################
 # Function definitions

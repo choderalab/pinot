@@ -66,6 +66,7 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
             optimizer,
             n_epochs_training=100,
             q=1,
+            k=1,
             num_samples=1000,
             early_stopping=True,
             workup=_independent,
@@ -93,6 +94,7 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
         self.acquisition = acquisition
         # batch acquisition stuff
         self.q = q
+        self.k = k
         self.num_samples = num_samples
 
         # if self.q > 1 and not isinstance(self.acquisition, MCAcquire):
@@ -179,7 +181,7 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
             score = self.acquisition(distribution, y_best=self.y_best)
 
             # argmax
-            best = torch.argmax(score)
+            best = torch.topk(score, self.k).indices
 
         # pop from the back so you don't disrupt the order
         best = best.sort(descending=True).values
