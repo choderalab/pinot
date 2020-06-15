@@ -13,6 +13,9 @@ class SemiSupervisedNet(pinot.Net):
 
         super(SemiSupervisedNet, self).__init__(
             representation, output_regression, measurement_dimension, noise_model)
+        # unsupervised scale is to balance between the supervised and unsupervised
+        # loss term. It should be r if one synthesizes the semi-supervised data
+        # using prepare_semi_supeprvised_data_from_labelled_data
         self.unsup_scale = unsup_scale
     
     def loss(self, g, y):
