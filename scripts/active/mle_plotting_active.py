@@ -103,6 +103,7 @@ def run_trials(results, ds, trial_settings):
                         collate_fn = pinot.active.experiment._collate_fn_graph
             )
 
+
             # run experiment
             x = bo.run(limit=trial_settings['limit'])
 
@@ -144,8 +145,10 @@ def get_net(trial_settings):
         layer=layer,
         config=trial_settings['config'])
 
-    net = pinot.Net(net_representation)
     
+    net = pinot.Net(
+            net_representation)
+
     return net
 
 if __name__ == '__main__':
