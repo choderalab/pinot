@@ -258,5 +258,5 @@ if __name__ == '__main__':
 
     # save to disk
     if args.index_provided:
-        filename = f'{args.net}_{args.representation}_{args.optimizer}_{args.strategy}_q{args.q}_{args.index}.csv'
+        filename = f'{args.net}_{args.representation}_{args.optimizer}_{args.data}_{args.strategy}_q{args.q}_{args.index}.csv'
     best_df.to_csv(filename)
