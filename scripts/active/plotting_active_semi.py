@@ -10,30 +10,72 @@ from tqdm import tqdm
 import torch
 
 import pinot
-import pinot.active
 
-from pinot.semi import (SemiSupervisedNet,
-					    batch_semi_supervised,
-					    prepare_semi_supervised_training_data,
-					    prepare_semi_supervised_data_from_labelled_data)
+from pinot.data import esol, zinc_tiny, zinc_small, moses_tiny
 
+from pinot.generative.torch_gvae.model import GCNModelVAE
+from pinot.generative.torch_gvae.loss import (negative_ELBO,
+                                              negative_ELBO_with_node_prediction)
+from pinot.semisupervised import (SemiSupervisedNet,
+                                  batch_semi_supervised,
+                                  prepare_semi_supervised_training_data,
+                                  prepare_semi_supervised_data_from_labelled_data)
 
 ######################
 # Function definitions
+def get_semisupervised_data(trial_settings):
+    """
+    Get data from ESOL, generate semisupervised data, and get feature dimension size.
+    """
+    start = time.time()
+    labelled_data = pinot.data.esol()
+    unlabelled_data = zinc_tiny()
+    # unlabelled_data = zinc_small()
 
-def generate_data(trial_settings):
+    end = time.time()
+    print("Loaded {} molecules from esol and {} unlabelled molecules in {} seconds".format(len(labelled_data), len(unlabelled_data), end-start))
+
+    # Split the labelled data into train and test portion
+    train_labeled, test_labeled = pinot.data.utils.split(labeled_data, [0.8, 0.2])
+
+    # Prepare mini batching on the unlabelled data
+    batch_size = 32
+    batched_unlabeled_data = pinot.data.utils.batch(unlabeled_data, batch_size)
+    batched_train_labeled_data = pinot.data.utils.batch(train_labeled, batch_size)
+    batched_test_labeled_data = pinot.data.utils.batch(test_labeled, batch_size)
+
+    # Mix labelled and unlabelled data
+    # One hack is to mask out some of ys in ESOL
+    semi_supervised_data = prepare_semi_supervised_training_data(unlabeled_data, train_labeled)
+    feat_dim = batched_unlabeled_data[0][0].ndata['h'].shape[1]
+    return semi_supervised_data, feat_dim
+
+def get_net(feat_dim):
+    """
+    Initialize the model and the optimization scheme
+    """
+    num_atom_types = 100
+    gvae = GCNModelVAE(feat_dim, gcn_type="GraphConv",
+                       # gcn_init_args={"num_heads":5},
+                       gcn_hidden_dims=[64, 64],
+                       embedding_dim=32, num_atom_types=num_atom_types)
+    SemiNet = SemiSupervisedNet(gvae)
+    return SemiNet
+
+def perform_bayes_opt(trial_settings):
     """
     Performs experiment loops.
     """
 
     # Load and batch data
-    ds = getattr(pinot.data, trial_settings['data'])()
-    ds = pinot.data.utils.batch(ds, len(ds), seed=None)
-    ds = [tuple([i.to(torch.device('cuda:0')) for i in ds[0]])]
+    semi_supervised_data, feat_dim = get_semisupervised_data(train_settings)
 
     # get results for each trial
     results = defaultdict(dict)
-    final_results = run_trials(results, ds, trial_settings)
+    final_results = run_trials(results,
+                               semi_supervised_data,
+                               feat_dim,
+                               trial_settings)
 
     # create pandas dataframe to play nice with seaborn
     best_df = pd.DataFrame.from_records(
@@ -50,7 +92,7 @@ def generate_data(trial_settings):
 
     return best_df
 
-def run_trials(results, ds, trial_settings):
+def run_trials(results, ds, feat_dim, trial_settings):
     """
     Plot the results of an active training loop
     
@@ -68,7 +110,6 @@ def run_trials(results, ds, trial_settings):
     -------
     results
     """
-    
     # get the real result
     ys = ds[0][1]
     actual_sol = torch.max(ys).item()
@@ -87,7 +128,7 @@ def run_trials(results, ds, trial_settings):
             print(i)
 
             # make fresh net and optimizer
-            net = get_gpr(trial_settings).to(torch.device('cuda:0'))
+            net = get_net(feat_dim).to(torch.device('cuda:0'))
 
             optimizer = pinot.app.utils.optimizer_translation(
                 opt_string=trial_settings['optimizer_name'],
@@ -102,7 +143,7 @@ def run_trials(results, ds, trial_settings):
                         data=ds[0],
                         optimizer=optimizer(net),
                         acquisition=acq_fn,
-                        n_epochs_training=10,
+                        n_epochs_training=100,
                         k=trial_settings['k'],
                         slice_fn = pinot.active.experiment._slice_fn_tuple,
                         collate_fn = pinot.active.experiment._collate_fn_graph
@@ -167,7 +208,7 @@ if __name__ == '__main__':
     parser.add_argument('--num_trials', type=int, default=2)
     parser.add_argument('--limit', type=int, default=2)
     parser.add_argument('--optimizer', type=str, default='Adam')
-    parser.add_argument('--lr', type=float, default=1e-3)
+    parser.add_argument('--lr', type=float, default=1e-4)
     parser.add_argument('--k', type=int, default=1)
 
     args = parser.parse_args()
@@ -181,7 +222,7 @@ if __name__ == '__main__':
                       'lr': args.lr,
                       'k': args.k}
 
-    best_df = generate_data(trial_settings)
+    best_df = perform_bayes_opt(trial_settings)
 
     # save to disk
     filename = f'best_{args.representation}_{args.optimizer}_greedy_k{args.k}.csv'

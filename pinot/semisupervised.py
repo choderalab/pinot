@@ -118,8 +118,8 @@ def batch_semi_supervised(ds, batch_size, seed=2666):
     return list(zip(gs_batched, ys_batched))
 
 
-def prepare_semi_supervised_training_data(unlabelled_data, labelled_data, batch_size=32):
-    # Mix t
+def prepare_semi_supervised_training_data(unlabelled_data, labelled_data):
+    # Mix labelled and unlabelled data together
     semi_supervised_data = []
     
     for (g, y) in unlabelled_data:
@@ -127,7 +127,6 @@ def prepare_semi_supervised_training_data(unlabelled_data, labelled_data, batch_
     for (g, y) in labelled_data:
         semi_supervised_data.append((g, y))
         
-    semi_supervised_data = batch_semi_supervised(semi_supervised_data, batch_size)
     return semi_supervised_data
 
 
@@ -146,3 +145,18 @@ def prepare_semi_supervised_data_from_labelled_data(labelled_data, r=0.2, seed=2
         else:
             semi_data.append((g, None))
     return semi_data, small_labelled_data
+
+
+def train_and_test_semisupervised(model, optimizer, semi_train_data, train_labelled, test_labelled, n_epochs=100):
+    semi_train = Train(net=model, data=semi_train_data, optimizer=optimizer, n_epochs=n_epochs)
+    semi_train.train()
+
+    # Measure trained labelled data
+    train_metrics = Test(net=model, data=train_labelled, states=semi_train.states, metrics=[pinot.rmse, pinot.r2, pinot.avg_nll])
+    semi_supervised_train_results = train_metrics.test()
+
+    # Measure metrics on labelled data
+    test_metrics = Test(net=model, data=test_labelled, states=semi_train.states, metrics=[pinot.rmse, pinot.r2, pinot.avg_nll])
+    semi_supervised_test_results = test_metrics.test()
+    
+    return semi_supervised_train_results, semi_supervised_test_results, semi_train.states

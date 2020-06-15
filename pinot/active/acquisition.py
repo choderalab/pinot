@@ -89,7 +89,7 @@ class MCAcquire:
             sequential_acq,
             batch_size, q=10,
             num_samples=1000,
-            collapse_batch=False
+            marginalize_batch=False
         ):
         """
         Runs Monte Carlo acquisition over provided `sequential_fn`
@@ -115,7 +115,7 @@ class MCAcquire:
         self.sequential_acq = sequential_acq
         self.q = q
         self.num_samples = num_samples
-        self.collapse_batch = collapse_batch
+        self.marginalize_batch = marginalize_batch
 
     def __call__(self, posterior, batch_size, y_best):
         """
@@ -140,7 +140,7 @@ class MCAcquire:
         indices = torch.randint(batch_size, (self.q, batch_size))
         q_samples = torch.stack([row[:,indices[idx]] for idx, row in enumerate(torch.unbind(seq_samples))])
 
-        if self.collapse_batch:
+        if self.marginalize_batch:
             # collapse individuals within each batch
             q_samples = q_samples.reshape(q_samples.shape[0] * q_samples.shape[1], q_samples.shape[2])
             # apply sequential acquisition function on joint distribution over batch

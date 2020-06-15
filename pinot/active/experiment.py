@@ -13,8 +13,8 @@ from pinot.active.acquisition import MCAcquire
 # =============================================================================
 def _independent(distribution):
     return torch.distributions.normal.Normal(
-        distribution.mean,
-        distribution.variance.pow(0.5))
+        distribution.mean.flatten(),
+        distribution.variance.flatten().pow(0.5))
 
 def _slice_fn_tensor(x, idxs):
     return x[idxs]
@@ -28,7 +28,6 @@ def _collate_fn_graph(x):
 def _slice_fn_graph(x, idxs):
     if x.batch_size > 1:
         x = dgl.unbatch(x)
-
     return dgl.batch([x[idx] for idx in idxs])
 
 def _slice_fn_tuple(x, idxs):
@@ -64,9 +63,9 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
             data,
             acquisition,
             optimizer,
-            n_epochs_training=100,
+            n_epochs=100,
+            strategy='sequential',
             q=1,
-            k=1,
             num_samples=1000,
             early_stopping=True,
             workup=_independent,
@@ -80,7 +79,7 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
         # model
         self.net = net
         self.optimizer = optimizer
-        self.n_epochs_training = n_epochs_training
+        self.n_epochs = n_epochs
 
         # data            
         self.data = data
@@ -92,9 +91,9 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
 
         # acquisition
         self.acquisition = acquisition
+        self.strategy = strategy
         # batch acquisition stuff
         self.q = q
-        self.k = k
         self.num_samples = num_samples
 
         # if self.q > 1 and not isinstance(self.acquisition, MCAcquire):
@@ -143,7 +142,7 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
         self.net = pinot.app.experiment.Train(
             data=[self.old_data],
             optimizer=self.optimizer,
-            n_epochs=self.n_epochs_training,
+            n_epochs=self.n_epochs,
             net=self.net,
             record_interval=999999).train()
 
@@ -163,7 +162,7 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
         # write API for sampler
         distribution = self.net.condition(gs)
 
-        if self.q > 1:
+        if self.strategy == 'batch':
 
             # batch acquisition
             indices, q_samples = self.acquisition(posterior=distribution,
@@ -181,10 +180,11 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
             score = self.acquisition(distribution, y_best=self.y_best)
 
             # argmax
-            best = torch.topk(score, self.k).indices
+            best = torch.topk(score, self.q).indices
 
         # pop from the back so you don't disrupt the order
         best = best.sort(descending=True).values
+        # print(len(self.new), best)
         self.old.extend([self.new.pop(b) for b in best])
 
 
@@ -202,19 +202,19 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
         self.y_best = torch.max(ys)
 
 
-    def run(self, limit=999999, seed=None):
+    def run(self, num_rounds=999999, seed=None):
         """ Run the model.
 
         Parameters
         ----------
-        limit : int, default=99999
+        rounds : int, default=99999
 
         """
         idx = 0
         self.blind_pick(seed=seed)
         self.update_data()
 
-        while idx < limit and len(self.new) > 0:
+        while idx < num_rounds and len(self.new) > 0:
             self.train()
             self.acquire()
             self.update_data()
