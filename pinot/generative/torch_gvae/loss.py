@@ -95,11 +95,12 @@ def negative_elbo(decoded_subgraphs, mu, logvar, g):
 
     assert(len(decoded_subgraphs) == len(gs_unbatched))
     loss = 0.
+    print(decoded_subgraphs)
     for i, subgraph in enumerate(gs_unbatched):
         # Compute decoding loss for each individual sub-graphs
         decoded_edges, decoded_nodes = decoded_subgraphs[i]
         adj_mat = subgraph.adjacency_matrix(True).to_dense()
-        node_types = subgraph.ndata["type"].flatten().long()
+        node_types = subgraph.ndata["type"].flatten().long() # .to(torch.device('cuda:0'))
 
         edge_nll = torch.sum(
             F.binary_cross_entropy_with_logits(decoded_edges, adj_mat))

@@ -122,7 +122,7 @@ class MCAcquire:
         Parameters
         ----------
         posterior : GPyTorchPosterior
-            Output of running net.posterior(gs).        
+            Output of running net.posterior(gs).
 
         Returns
         -------

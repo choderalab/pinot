@@ -11,6 +11,16 @@ import torch
 
 import pinot
 from pinot.active.acquisition import BTModel, SeqAcquire, MCAcquire
+from pinot.generative.torch_gvae.model import GCNModelVAE
+
+import sys
+sys.path.append('../../pinot/active/')
+
+import experiment
+
+sys.path.append('../../pinot/')
+import semisupervised
+
 
 ######################
 # Function definitions
@@ -37,7 +47,13 @@ class ActivePlot():
         self.acquisition = acquisition
         self.marginalize_batch = marginalize_batch
         self.num_samples = num_samples
-        self.q = q        
+        self.q = q
+
+        # handle semi
+        if self.net != 'semi':
+            self.bo = experiment.BayesOptExperiment
+        else:
+            self.bo = experiment.SemiSupervisedBayesOptExperiment
 
         # housekeeping
         self.device = torch.device(device)
@@ -71,18 +87,6 @@ class ActivePlot():
 
         return best_df
 
-
-    def generate_data(self):
-        """
-        Generate data, put on GPU if possible.
-        """
-        # Load and batch data
-        ds = getattr(pinot.data, self.data)()
-        ds = pinot.data.utils.batch(ds, len(ds), seed=None)
-        ds = [tuple([i.to(self.device) for i in ds[0]])]
-        return ds
-
-
     def run_trials(self, ds):
         """
         Plot the results of an active training loop
@@ -103,8 +107,11 @@ class ActivePlot():
         """
         
         # get the real solution
+        ds = self.generate_data()
         gs, ys = ds[0]
+        self.feat_dim = gs.ndata['h'].shape[1]
         actual_sol = torch.max(ys).item()
+        
         acq_fn = self.get_acquisition(gs)
         
         # acquistion functions to be tested
@@ -121,17 +128,16 @@ class ActivePlot():
                 )
             
             # instantiate experiment
-            bo = pinot.active.experiment.SingleTaskBayesianOptimizationExperiment(
-                net=net,
-                data=ds[0],
-                optimizer=optimizer(net),
-                acquisition=acq_fn,
-                n_epochs=self.num_epochs,
-                strategy=self.strategy,
-                q=self.q,
-                slice_fn = pinot.active.experiment._slice_fn_tuple,
-                collate_fn = pinot.active.experiment._collate_fn_graph
-                )
+            bo = self.bo(net=net,
+                         data=ds[0],
+                         optimizer=optimizer(net),
+                         acquisition=acq_fn,
+                         n_epochs=self.num_epochs,
+                         strategy=self.strategy,
+                         q=self.q,
+                         slice_fn=experiment._slice_fn_tuple, # pinot.active.
+                         collate_fn=experiment._collate_fn_graph # pinot.active.
+                         )
 
             # run experiment
             x = bo.run(num_rounds=self.num_rounds)
@@ -147,6 +153,16 @@ class ActivePlot():
             self.results[self.acquisition][i] = results_data
 
         return self.results
+
+    def generate_data(self):
+        """
+        Generate data, put on GPU if possible.
+        """
+        # Load and batch data
+        ds = getattr(pinot.data, self.data)()
+        ds = pinot.data.utils.batch(ds, len(ds), seed=None)
+        ds = [tuple([i.to(self.device) for i in ds[0]])]
+        return ds
 
     def get_acquisition(self, gs):
         """ Retrieve acquisition function and prepare for BO Experiment
@@ -165,7 +181,7 @@ class ActivePlot():
         
         if self.strategy == 'batch':
             acq_fn = batch_acquisitions[self.acquisition]
-            acq_fn = MCAcquire(sequential_acq=acq_fn, batch_size=gs.batch_size,
+            acq_fn = MCAcquire(sequential_acq=acq_fn, batch_size=self.batch_size,
                                q=self.q,
                                marginalize_batch=self.marginalize_batch,
                                num_samples=self.num_samples)
@@ -193,6 +209,15 @@ class ActivePlot():
 
         elif self.net == 'mle':
             net = pinot.Net(net_representation)
+
+        elif self.net == 'semi':
+            gvae = GCNModelVAE(input_feat_dim=self.feat_dim,
+                               gcn_type=self.layer,
+                               # gcn_init_args={"num_heads":5},
+                               gcn_hidden_dims=[64, 64],
+                               embedding_dim=32,
+                               num_atom_types=100)
+            net = semisupervised.SemiSupervisedNet(gvae) # TODO pinot.
 
         if self.strategy == 'batch':
             net = BTModel(net)

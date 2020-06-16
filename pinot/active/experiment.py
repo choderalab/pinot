@@ -6,7 +6,9 @@ import torch
 import abc
 import dgl
 import pinot
-from pinot.active.acquisition import MCAcquire
+from pinot.semisupervised import (batch_semi_supervised,
+                                  prepare_semi_supervised_data,
+                                  prepare_semi_supervised_data_from_labeled_data)
 
 # =============================================================================
 # HELPER FUNCTIONS
@@ -53,7 +55,7 @@ class ActiveLearningExperiment(torch.nn.Module, abc.ABC):
     def acquire(self, *args, **kwargs):
         raise NotImplementedError
 
-class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
+class BayesOptExperiment(ActiveLearningExperiment):
     """ Implements active learning experiment with single task target.
 
     """
@@ -74,7 +76,7 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
             net_state_dict=None,
         ):
 
-        super(SingleTaskBayesianOptimizationExperiment, self).__init__()
+        super(BayesOptExperiment, self).__init__()
 
         # model
         self.net = net
@@ -225,3 +227,76 @@ class SingleTaskBayesianOptimizationExperiment(ActiveLearningExperiment):
             idx += 1
 
         return self.old
+
+class SemiSupervisedBayesOptExperiment(BayesOptExperiment):
+    """ Implements active learning experiment with single task target.
+
+    """
+    def __init__(
+            self,
+            net,
+            data,
+            acquisition,
+            optimizer,
+            n_epochs=100,
+            strategy='sequential',
+            q=1,
+            num_samples=1000,
+            early_stopping=True,
+            workup=_independent,
+            slice_fn=_slice_fn_tensor,
+            collate_fn=_collate_fn_tensor,
+            net_state_dict=None,
+        ):
+
+        super(SemiSupervisedBayesOptExperiment, self).__init__(
+            net=net,
+            data=data,
+            acquisition=acquisition,
+            optimizer=optimizer,
+            n_epochs=n_epochs,
+            strategy=strategy,
+            q=q,
+            num_samples=num_samples,
+            early_stopping=early_stopping,
+            workup=workup,
+            slice_fn=slice_fn,
+            collate_fn=collate_fn,
+            net_state_dict=net_state_dict,            
+            )
+
+    def train(self):
+        """ Train the model with new data.
+
+        """
+        # combine new (unlabeled!) and old (labeled!)
+        # Flatten the labeled_data and remove labels to be ready
+        semi_supervised_data = prepare_semi_supervised_data(
+            self.flatten_data(self.new_data),
+            self.flatten_data(self.old_data)
+            )
+        # NOTE that we have to use a special version of batch here because torch.tensor doesn't take in None
+        batched_semi_supervised_data = batch_semi_supervised(semi_supervised_data,
+                                                             batch_size=len(semi_supervised_data))
+
+        # reset
+        self.reset_net()
+
+        # set to train status
+        self.net.train()
+
+        # train the model
+        self.net = pinot.app.experiment.Train(
+            data=batched_semi_supervised_data,
+            optimizer=self.optimizer,
+            n_epochs=self.n_epochs,
+            net=self.net,
+            record_interval=999999).train()
+
+    def flatten_data(self, data):
+        gs, ys = data
+        # if gs.batch_size > 1:
+        gs = dgl.unbatch(gs)
+            
+        flattened_data = list(zip(gs, list(ys)))
+        return flattened_data

@@ -1,6 +1,10 @@
 import pinot
 import pinot.graph
 import pinot.data
+
+from pinot.net import Net
+from pinot.semisupervised import SemiSupervisedNet
+
 import pinot.active
 
 from pinot.metrics import *
@@ -14,11 +18,6 @@ import pinot.representation
 import pinot.inference
 import pinot.regression
 import pinot.generative
-
-
-from pinot.net import Net
-
-
 
 from pinot.inference.adlala import AdLaLa
 from pinot.inference.sgld import SGLD

@@ -27,176 +27,216 @@ def get_semisupervised_data(trial_settings):
     """
     Get data from ESOL, generate semisupervised data, and get feature dimension size.
     """
-    start = time.time()
     labelled_data = pinot.data.esol()
-    unlabelled_data = zinc_tiny()
-    # unlabelled_data = zinc_small()
 
-    end = time.time()
-    print("Loaded {} molecules from esol and {} unlabelled molecules in {} seconds".format(len(labelled_data), len(unlabelled_data), end-start))
-
-    # Split the labelled data into train and test portion
-    train_labeled, test_labeled = pinot.data.utils.split(labeled_data, [0.8, 0.2])
+    # Prepare semi-supervised data by randomly removing (1-r) of labels
+    r = 0.2
+    unlabelled_data, labelled_data = prepare_semi_supeprvised_data_from_labelled_data(train_labelled, r)
 
     # Prepare mini batching on the unlabelled data
     batch_size = 32
-    batched_unlabeled_data = pinot.data.utils.batch(unlabeled_data, batch_size)
-    batched_train_labeled_data = pinot.data.utils.batch(train_labeled, batch_size)
-    batched_test_labeled_data = pinot.data.utils.batch(test_labeled, batch_size)
+    batched_labelled_data = batch(labelled_data, batch_size)
+    batched_unlabelled_data = batch(unlabelled_data, batch_size)
+    feat_dim = batched_unlabelled_data[0][0].ndata["h"].shape[1]
 
-    # Mix labelled and unlabelled data
-    # One hack is to mask out some of ys in ESOL
-    semi_supervised_data = prepare_semi_supervised_training_data(unlabeled_data, train_labeled)
-    feat_dim = batched_unlabeled_data[0][0].ndata['h'].shape[1]
     return semi_supervised_data, feat_dim
 
-def get_net(feat_dim):
-    """
-    Initialize the model and the optimization scheme
-    """
-    num_atom_types = 100
-    gvae = GCNModelVAE(feat_dim, gcn_type="GraphConv",
-                       # gcn_init_args={"num_heads":5},
-                       gcn_hidden_dims=[64, 64],
-                       embedding_dim=32, num_atom_types=num_atom_types)
-    SemiNet = SemiSupervisedNet(gvae)
-    return SemiNet
+######################
+# Function definitions
 
-def perform_bayes_opt(trial_settings):
-    """
-    Performs experiment loops.
-    """
+class ActivePlot():
 
-    # Load and batch data
-    semi_supervised_data, feat_dim = get_semisupervised_data(train_settings)
+    def __init__(self, net, layer, config,
+                 lr, optimizer_type,
+                 data, strategy, acquisition, marginalize_batch, num_samples, q,
+                 device, num_trials, num_rounds, num_epochs):        
+        
+        # net config
+        self.net = net
+        self.layer = layer
+        self.config = config
 
-    # get results for each trial
-    results = defaultdict(dict)
-    final_results = run_trials(results,
-                               semi_supervised_data,
-                               feat_dim,
-                               trial_settings)
+        # optimizer config
+        self.lr = lr
+        self.optimizer_type = optimizer_type
+        
+        # experiment config
+        self.data = data
+        self.strategy = strategy
+        self.acquisition = acquisition
+        self.marginalize_batch = marginalize_batch
+        self.num_samples = num_samples
+        self.q = q        
 
-    # create pandas dataframe to play nice with seaborn
-    best_df = pd.DataFrame.from_records(
-        [
-            (acq_fn, trial, step, best)
-            for acq_fn, trial_dict in dict(final_results).items()
-            for trial, best_history in trial_dict.items()
-            for step, best in enumerate(best_history)
-        ],
-        columns=['Acquisition Function', 'Trial', 'Step', 'Best Solubility']
-    )
+        # housekeeping
+        self.device = torch.device(device)
+        self.num_trials = num_trials
+        self.num_rounds = num_rounds
+        self.num_epochs = num_epochs
 
-    best_df = cumulative_regret(ds, best_df)
+        # instantiate results dictionary
+        self.results = defaultdict(dict)
 
-    return best_df
 
-def run_trials(results, ds, feat_dim, trial_settings):
-    """
-    Plot the results of an active training loop
-    
-    Parameters
-    ----------
-    results : defaultdict of dict
-        Empty dict in which to store results.
-    ds : list of tuple
-        Output of `pinot.data` and batched. Contains DGLGraph gs and Tensor ys.
-    num_trials : int
-        number of times to run each acquisition function
-    limit : int
-        Number of runs of bayesian optimization.
-    Returns
-    -------
-    results
-    """
-    # get the real result
-    ys = ds[0][1]
-    actual_sol = torch.max(ys).item()
-    
-    # acquistion functions to be tested
-    acq_fns = {'Expected Improvement': pinot.active.acquisition.expected_improvement,
-               'Probability of Improvement': pinot.active.acquisition.probability_of_improvement,
-               'Upper Confidence Bound': pinot.active.acquisition.upper_confidence_bound,
-               # 'Uncertainty': pinot.active.acquisition.uncertainty,
-               # 'Random': pinot.active.acquisition.random
-               }
+    def generate(self):
+        """
+        Performs experiment loops.
+        """
+        ds = self.generate_data()
 
-    for acq_name, acq_fn in acq_fns.items():
-        print(acq_name)
-        for i in range(trial_settings['num_trials']):
-            print(i)
+        # get results for each trial
+        final_results = self.run_trials(ds)
 
+        # create pandas dataframe to play nice with seaborn
+        best_df = pd.DataFrame.from_records(
+            [
+                (acq_fn, trial, step, best)
+                for acq_fn, trial_dict in dict(final_results).items()
+                for trial, best_history in trial_dict.items()
+                for step, best in enumerate(best_history)
+            ],
+            columns=['Acquisition Function', 'Trial', 'Datapoints Acquired', 'Best Solubility']
+        )
+
+        return best_df
+
+
+    def generate_data(self):
+        """
+        Generate data, put on GPU if possible.
+        """
+        # Load and batch data
+        ds = getattr(pinot.data, self.data)()
+        ds = pinot.data.utils.batch(ds, len(ds), seed=None)
+        ds = [tuple([i.to(self.device) for i in ds[0]])]
+        return ds
+
+
+    def run_trials(self, ds):
+        """
+        Plot the results of an active training loop
+        
+        Parameters
+        ----------
+        results : defaultdict of dict
+            Empty dict in which to store results.
+        ds : list of tuple
+            Output of `pinot.data` and batched. Contains DGLGraph gs and Tensor ys.
+        num_trials : int
+            number of times to run each acquisition function
+        limit : int
+            Number of runs of bayesian optimization.
+        Returns
+        -------
+        results
+        """
+        
+        # get the real solution
+        gs, ys = ds[0]
+        actual_sol = torch.max(ys).item()
+        acq_fn = self.get_acquisition(gs)
+        
+        # acquistion functions to be tested
+        for i in range(self.num_trials):
+            
             # make fresh net and optimizer
-            net = get_net(feat_dim).to(torch.device('cuda:0'))
-
+            net = self.get_net().to(self.device)
+            
             optimizer = pinot.app.utils.optimizer_translation(
-                opt_string=trial_settings['optimizer_name'],
-                lr=trial_settings['lr'],
+                opt_string=self.optimizer_type,
+                lr=self.lr,
                 weight_decay=0.01,
                 kl_loss_scaling=1.0/float(len(ds[0][1]))
                 )
-
+            
             # instantiate experiment
             bo = pinot.active.experiment.SingleTaskBayesianOptimizationExperiment(
-                        net=net,
-                        data=ds[0],
-                        optimizer=optimizer(net),
-                        acquisition=acq_fn,
-                        n_epochs_training=100,
-                        k=trial_settings['k'],
-                        slice_fn = pinot.active.experiment._slice_fn_tuple,
-                        collate_fn = pinot.active.experiment._collate_fn_graph
-            )
+                net=net,
+                data=ds[0],
+                optimizer=optimizer(net),
+                acquisition=acq_fn,
+                n_epochs=self.num_epochs,
+                strategy=self.strategy,
+                q=self.q,
+                slice_fn = pinot.active.experiment._slice_fn_tuple,
+                collate_fn = pinot.active.experiment._collate_fn_graph
+                )
 
             # run experiment
-            x = bo.run(limit=trial_settings['limit'])
+            x = bo.run(num_rounds=self.num_rounds)
 
-            # record results; pad if experiment stopped early
+            # pad if experiment stopped early
             # candidates_acquired = limit + 1 because we begin with a blind pick
-            results_shape = trial_settings['limit'] * trial_settings['k'] + 1
+            results_shape = self.num_rounds * self.q + 1
             results_data = actual_sol*np.ones(results_shape)
             results_data[:len(x)] = np.maximum.accumulate(ys[x].cpu().squeeze())
-            print(len(x), results_data[-1])
+            
+            # print(len(x), results_data[-1])
+            # record results
+            self.results[self.acquisition][i] = results_data
 
-            results[acq_name][i] = results_data
-    
-    return results
+        return self.results
 
-def cumulative_regret(ds, best_df):
-    """
-    Compute the cumulative regret across each trial.
-    """
-    # compute cumulative regret
-    actual_best = max(ds[0][1].squeeze())
-    best_df['Regret'] = actual_best.item() - best_df['Best Solubility']
+    def get_acquisition(self, gs):
+        """ Retrieve acquisition function and prepare for BO Experiment
+        """
+        batch_acquisitions = {'Expected Improvement': SeqAcquire(acq_fn='ei'),
+                              'Probability of Improvement': SeqAcquire(acq_fn='pi'),
+                              'Upper Confidence Bound': SeqAcquire(acq_fn='ucb', beta=0.95),
+                              'Uncertainty': SeqAcquire(acq_fn='uncertainty'),
+                              'Random': SeqAcquire(acq_fn='random')}
 
-    cum_regret_all = []
-    for acq_fn in best_df['Acquisition Function'].unique():
-        sums = best_df[best_df['Acquisition Function'] == acq_fn].groupby(['Step', 'Trial']).sum()
-        cum_regret = sums['Regret'].unstack('Trial').cumsum()
-        cum_regret_all.append(cum_regret.melt().values[:,1])
-    cum_regret_all = np.concatenate(cum_regret_all)
-    best_df['Cumulative Regret'] = cum_regret_all
-    return best_df
+        sequential_acquisitions = {'Expected Improvement': pinot.active.acquisition.expected_improvement,
+                                   'Probability of Improvement': pinot.active.acquisition.probability_of_improvement,
+                                   'Upper Confidence Bound': pinot.active.acquisition.expected_improvement,
+                                   'Uncertainty': pinot.active.acquisition.expected_improvement,
+                                   'Random': pinot.active.acquisition.expected_improvement}
+        
+        if self.strategy == 'batch':
+            acq_fn = batch_acquisitions[self.acquisition]
+            acq_fn = MCAcquire(sequential_acq=acq_fn, batch_size=gs.batch_size,
+                               q=self.q,
+                               marginalize_batch=self.marginalize_batch,
+                               num_samples=self.num_samples)
+        else:
+            acq_fn = sequential_acquisitions[self.acquisition]
 
-def get_gpr(trial_settings):
-    """
-    Retrive GP using representation provided in args.
-    """
-    layer = pinot.representation.dgl_legacy.gn(model_name=trial_settings['layer'])
+        return acq_fn
 
-    net_representation = pinot.representation.Sequential(
-        layer=layer,
-        config=trial_settings['config'])
 
-    kernel = pinot.inference.gp.kernels.deep_kernel.DeepKernel(
-            representation=net_representation,
-            base_kernel=pinot.inference.gp.kernels.rbf.RBF())
+    def get_net(self):
+        """
+        Retrive Net using representation provided in args.
+        """
+        layer = pinot.representation.dgl_legacy.gn(model_name=self.layer)
 
-    gpr = pinot.inference.gp.gpr.exact_gpr.ExactGPR(
-            kernel)
-    return gpr
+        net_representation = pinot.representation.Sequential(
+            layer=layer,
+            config=self.config)
+
+        if self.net == 'gp':
+            kernel = pinot.inference.gp.kernels.deep_kernel.DeepKernel(
+                    representation=net_representation,
+                    base_kernel=pinot.inference.gp.kernels.rbf.RBF())
+            net = pinot.inference.gp.gpr.exact_gpr.ExactGPR(kernel)
+
+        elif self.net == 'mle':
+            net = pinot.Net(net_representation)
+
+        elif self.net == 'semi':
+            gvae = GCNModelVAE(input_feat_dim=self.feat_dim,
+                               gcn_type=self.layer,
+                               # gcn_init_args={"num_heads":5},
+                               gcn_hidden_dims=[64, 64],
+                               embedding_dim=32,
+                               num_atom_types=100)
+            net = SemiSupervisedNet(gvae)
+
+        if self.strategy == 'batch':
+            net = BTModel(net)
+
+        return net
+
 
 if __name__ == '__main__':
 
@@ -204,26 +244,57 @@ if __name__ == '__main__':
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--representation', type=str)
-    parser.add_argument('--num_trials', type=int, default=2)
-    parser.add_argument('--limit', type=int, default=2)
+    parser.add_argument('--net', type=str, default='gp')
+    parser.add_argument('--representation', type=str, default='GraphConv')
+
+    parser.add_argument('--lr', type=float, default=1e-3)
     parser.add_argument('--optimizer', type=str, default='Adam')
-    parser.add_argument('--lr', type=float, default=1e-4)
-    parser.add_argument('--k', type=int, default=1)
+    
+    parser.add_argument('--data', type=str, default='esol')
+    parser.add_argument('--strategy', type=str, default='sequential')
+    parser.add_argument('--acquisition', type=str, default='Expected Improvement')
+    parser.add_argument('--marginalize_batch', type=bool, default=True)
+    parser.add_argument('--num_samples', type=int, default=1000)
+    parser.add_argument('--q', type=int, default=1)
+
+    parser.add_argument('--device', type=str, default='cuda:0')
+    parser.add_argument('--num_trials', type=int, default=1)
+    parser.add_argument('--num_rounds', type=int, default=50)
+    parser.add_argument('--num_epochs', type=int, default=10)
+    
+    parser.add_argument('--index_provided', type=bool, default=True)
+    parser.add_argument('--index', type=int, default=0)
 
     args = parser.parse_args()
 
-    trial_settings = {'layer': args.representation,
-                      'config': [32, 'tanh', 32, 'tanh', 32, 'tanh'],
-                      'data': 'esol',
-                      'num_trials': args.num_trials,
-                      'limit': args.limit,
-                      'optimizer_name': args.optimizer,
-                      'lr': args.lr,
-                      'k': args.k}
+    Plot = ActivePlot(
+        # net config
+        net=args.net,
+        layer=args.representation,
+        config=[32, 'tanh', 32, 'tanh', 32, 'tanh'],
+        
+        # optimizer config
+        optimizer_type=args.optimizer,
+        lr=args.lr,
 
-    best_df = perform_bayes_opt(trial_settings)
+        # experiment config
+        data=args.data,
+        strategy=args.strategy,
+        acquisition=args.acquisition,
+        marginalize_batch=args.marginalize_batch,
+        num_samples=args.num_samples,
+        q=args.q,
+
+        # housekeeping
+        device=args.device,
+        num_trials=args.num_trials,
+        num_rounds=args.num_rounds,
+        num_epochs=args.num_epochs,
+        )
+
+    best_df = Plot.generate()
 
     # save to disk
-    filename = f'best_{args.representation}_{args.optimizer}_greedy_k{args.k}.csv'
+    if args.index_provided:
+        filename = f'{args.net}_{args.representation}_{args.optimizer}_{args.data}_{args.strategy}_q{args.q}_{args.index}.csv'
     best_df.to_csv(filename)
