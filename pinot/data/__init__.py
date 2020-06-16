@@ -36,3 +36,9 @@ moonshot = utils.from_csv(
     y_cols=[6],
     scale=0.01,
 )
+
+moonshot_meta = utils.from_csv(
+    os.path.dirname(utils.__file__) + "/moonshot.csv",
+    smiles_col=0,
+    y_cols=[3, 4, 5, 6, 7, 8, 9, 10, 11],
+    scale=0.01)

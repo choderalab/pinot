@@ -5,17 +5,20 @@ from pinot.generative.torch_gvae.loss import negative_elbo
 import numpy as np
 
 class SemiSupervisedNet(pinot.Net):
-    def __init__(self, representation,         
+    def __init__(self, representation,
             output_regression=None,
             measurement_dimension=1,
             noise_model='normal-heteroschedastic',
             hidden_dim=64,
             unsup_scale=1):
 
+        super(SemiSupervisedNet, self).__init__(
+            representation, output_regression, measurement_dimension, noise_model)
+
         self.hidden_dim = hidden_dim
         # grab the last dimension of `representation`
         representation_hidden_units = [
-                layer for layer in list(self.representation.modules())\
+                layer for layer in list(representation.modules())\
                         if hasattr(layer, 'out_features')][-1].out_features
         
         if output_regression is None:
@@ -32,8 +35,7 @@ class SemiSupervisedNet(pinot.Net):
             def output_regression(theta):
                 return [f(theta) for f in self._output_regression]
 
-        super(SemiSupervisedNet, self).__init__(
-            representation, output_regression, measurement_dimension, noise_model)
+        self.output_regression = output_regression
         # unsupervised scale is to balance between the supervised and unsupervised
         # loss term. It should be r if one synthesizes the semi-supervised data
         # using prepare_semi_supeprvised_data_from_labelled_data
@@ -67,8 +69,7 @@ class SemiSupervisedNet(pinot.Net):
             dist_y = self.compute_pred_distribution_from_rep(h_not_none)
             supervised_loss = -dist_y.log_prob(y_not_none)
             
-        return unsup_loss*self.unsup_scale + supervised_loss.sum() 
-
+        return unsup_loss*self.unsup_scale + supervised_loss.sum()
 
     def compute_pred_distribution_from_rep(self, h):
         theta = self.output_regression(h)
