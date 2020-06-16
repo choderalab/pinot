@@ -172,6 +172,89 @@ class Net(torch.nn.Module):
         return -distribution.log_prob(y)
 
 
+class MultiTaskNet():
+    """ An object that combines the representation and parameter
+    learning, puts into a predicted distribution and calculates the
+    corresponding divergence.
+    Attributes
+    ----------
+    representation: a `pinot.representation` module
+        the model that translates graphs to latent representations
+    output_regression: a `torch.nn.Module` or None,
+        Prototype of the network to use for the head; inputs
+        the latent dimension and output the number of parameter;s for
+        `self.distribution_class`
+    noise_model: either a string (
+        one of 
+            'normal-homoschedastic',
+            'normal-heteroschedastic',
+            'normal-homoschedastic-fixed') 
+        or a function that transforms a set of parameters.
+    """
+    def __init__(self, net_class, representation, num_nets,
+                 noise_model='normal-heteroschedastic'):
+        """
+        Parameters
+        ----------
+        net_class : pinot.Net class
+        """
+        super(MultiTaskNet, self).__init__()
+        
+        self.representation = representation
+        self.num_nets = num_nets
+        self.nets = nn.ModuleList([net_class(self.representation)]*self.num_nets)
+        self.noise_model = noise_model
+        
+    def forward(self, g, mask):
+        """ Forward pass.
+        """
+        return self.apply('forward', mask, g=g)
+        
+    def condition(self, g, sampler=None):
+        """ Compute the output distribution with sampled weights.
+        """
+        mask = torch.ones(self.num_nets, dtype=torch.bool)
+        print(mask)
+        return self.apply('condition', mask, g=g, sampler=sampler)
+    
+    def loss(self, g, y, mask):
+        """ Compute the loss with a input graph and a set of parameters.
+        """
+        losses = torch.stack(self.apply('loss', mask, g=g, y=y))
+        return losses.sum()
+
+    def apply(self, func, mask, **kwargs):
+        return [getattr(net, func)(**kwargs)
+                for i, net in enumerate(self.nets)
+                if mask[i]]
+
+    def train(self):
+        for net in self.nets:
+            net.train()
+            
+    def eval(self):
+        for net in self.nets:
+            net.eval()
+            
+    def parameters(self):
+        params = []
+        for net in self.nets:
+            params.extend(list(net.parameters()))
+        return params
+    
+    def named_children(self):
+        named_children = []
+        for net in self.nets:
+            named_children.extend(list(net.named_children()))
+        return named_children
+    
+    def state_dict(self):
+        return self.nets.state_dict()
+    
+    def load_state_dict(self, state_dict):
+        self.nets.load_state_dict(state_dict)
+
+
 class GPyTorchNet(torch.nn.Module):
     """ An object that combines the representation and parameter
     learning, puts into a predicted distribution and calculates the

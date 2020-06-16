@@ -57,8 +57,8 @@ class SemiSupervisedGaussianProcess(SemiSupervisedNet):
         # loss term. It should be r if one synthesizes the semi-supervised data
         # using prepare_semi_supeprvised_data_from_labelled_data
         self.unsup_scale = unsup_scale
-    
-    def loss(self, g, y):
+
+    def forward(self, g):
         # Copy exact_GPR for now
         # Store all the h's whose y is not None
         # Store the y's that is not None
@@ -72,11 +72,30 @@ class SemiSupervisedGaussianProcess(SemiSupervisedNet):
 
         # Do decode and elbo loss
         theta = [parameter.forward(h_node) for parameter in self.representation.output_regression]
-        mu  = theta[0]
-        logvar = theta[1]
+        return theta
+
+
+    def loss(self, g, y):
+        """ Compute the loss with a input graph and a set of parameters.
+        """
+        # Copy exact_GPR for now
+        # Store all the h's whose y is not None
+        # Store the y's that is not None
+        h_node = self.representation.infer_node_representation(g) # We always call this
+
+        # Feed h -> into baseKernel
+
+        # Get ys that are not None, and the corresponding h
+        # Feed that into GP
+        # Store all the gs,
+
+        # Do decode and elbo loss
+        theta = [parameter.forward(h_node) for parameter in self.representation.output_regression]
+
+        mu, logvar = theta
         approx_posterior = torch.distributions.normal.Normal(
-                    loc=theta[0],
-                    scale=torch.exp(theta[1]))
+                    loc=mu,
+                    scale=torch.exp(logvar))
 
         z_sample = approx_posterior.rsample()
         # Compute unsupervised loss
@@ -85,7 +104,9 @@ class SemiSupervisedGaussianProcess(SemiSupervisedNet):
         h_graph = self.compute_graph_representation_from_node_representation(g, h_node)
 
         # Get the indices of the labelled data
-        not_none_ind =[i for i in range(len(y)) if y[i] != None]
+        if len(y.shape) == 1:
+            y = y.unsqueeze(0)
+        not_none_ind = [i for i in range(len(y)) if y[i] != None]
         supervised_loss = torch.tensor(0.)
 
         # Suppose that the first loop of semi-supervised bayesian optimization presents
@@ -99,6 +120,7 @@ class SemiSupervisedGaussianProcess(SemiSupervisedNet):
         if sum(not_none_ind) != 0:
             # Only compute supervised loss for the labelled data
             # Using GPs
+            print(h_graph)
             h_not_none = h_graph[not_none_ind, :]
             y_not_none = [y[idx] for idx in not_none_ind]
             y_not_none = torch.tensor(y_not_none).unsqueeze(1).to(y_not_none[0].device)
@@ -180,9 +202,11 @@ class SemiSupervisedGaussianProcess(SemiSupervisedNet):
 
         return k_tr_tr, k_te_te, k_te_tr, k_tr_te, l_low, alpha
 
+
     def condition(self, g, x_tr=None, y_tr=None, sampler=None):
         x_te = self.representation(g)
         return self._condition(x_te, x_tr, y_tr, sampler)
+
 
     def _condition(self, x_te, x_tr=None, y_tr=None, sampler=None):
         r""" Calculate the predictive distribution given `x_te`.
