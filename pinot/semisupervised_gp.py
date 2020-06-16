@@ -5,8 +5,9 @@ from pinot.generative.torch_gvae.loss import negative_elbo
 import numpy as np
 import math
 from pinot.inference.gp.kernels.rbf import RBF
+from pinot.semisupervised import SemiSupervisedNet
 
-class SemiSupervisedGaussianProcess(pinot.Net):
+class SemiSupervisedGaussianProcess(SemiSupervisedNet):
     def __init__(self, representation,
             kernel=None,
             output_regression=None,
@@ -17,7 +18,7 @@ class SemiSupervisedGaussianProcess(pinot.Net):
             unsup_scale=1):
 
         super(SemiSupervisedGaussianProcesses, self).__init__(
-            representation, output_regression, measurement_dimension, noise_model)
+            representation, output_regression, measurement_dimension, noise_model, hidden_dim, unsup_scale)
 
         if not hasattr(representation, "infer_node_representation"):
             print("The current implementation requires representation to have a infer_node_representation function")
@@ -84,15 +85,23 @@ class SemiSupervisedGaussianProcess(pinot.Net):
         h_graph = self.compute_graph_representation_from_node_representation(g, h_node)
 
         # Get the indices of the labelled data
-        not_none_ind = [i for i in range(len(y)) if y[i] != None]
+        not_none_ind =[i for i in range(len(y)) if y[i] != None]
         supervised_loss = torch.tensor(0.)
+
+        # Suppose that the first loop of semi-supervised bayesian optimization presents
+        # no labels, the loss_GP will not be invoked, next call to condition will
+        # result in error because `self._x_tr` is not set without calls
+        # to `loss_GP`
+        if not hasattr(self, "_x_tr"):
+            self._x_tr = h_graph
+            self._y_tr = y
 
         if sum(not_none_ind) != 0:
             # Only compute supervised loss for the labelled data
             # Using GPs
             h_not_none = h_graph[not_none_ind, :]
             y_not_none = [y[idx] for idx in not_none_ind]
-            y_not_none = torch.tensor(y_not_none).unsqueeze(1)
+            y_not_none = torch.tensor(y_not_none).unsqueeze(1).to(y_not_none[0].device)
             # dist_y = self.compute_pred_distribution_from_rep(h_not_none)
             # supervised_loss = -dist_y.log_prob(y_not_none)
             gp_loss = self.loss_GP(h_not_none, y_not_none)
@@ -261,7 +270,6 @@ class SemiSupervisedGaussianProcess(pinot.Net):
                     scale=torch.ones((1, self.measurement_dimension)))
 
         return distribution
-
 
     def compute_unsupervised_loss(self, g, z_sample, mu, logvar):
         with g.local_scope():

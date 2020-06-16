@@ -110,7 +110,6 @@ class SemiSupervisedNet(pinot.Net):
             # Decode each subgraph
             decoded_subgraphs = [self.representation.dc(g_sample.ndata["h"])
                                  for g_sample in gs_unbatched]
-            # print(mu, logvar) # .to(g.ndata["h"].device)
             unsup_loss = negative_elbo(decoded_subgraphs, mu, logvar, g)
             return unsup_loss
 
