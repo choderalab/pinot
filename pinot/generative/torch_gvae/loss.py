@@ -95,7 +95,7 @@ def negative_elbo(decoded_subgraphs, mu, logvar, g):
 
     assert(len(decoded_subgraphs) == len(gs_unbatched))
     loss = 0.
-    print(decoded_subgraphs)
+    # print(decoded_subgraphs)
     for i, subgraph in enumerate(gs_unbatched):
         # Compute decoding loss for each individual sub-graphs
         decoded_edges, decoded_nodes = decoded_subgraphs[i]
