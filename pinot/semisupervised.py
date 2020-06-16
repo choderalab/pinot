@@ -3,6 +3,8 @@ import torch
 import dgl
 from pinot.generative.torch_gvae.loss import negative_elbo
 import numpy as np
+import sys
+
 
 class SemiSupervisedNet(pinot.Net):
     def __init__(self, representation,
@@ -12,66 +14,63 @@ class SemiSupervisedNet(pinot.Net):
             hidden_dim=64,
             unsup_scale=1):
 
-        super(SemiSupervisedNet, self).__init__(
-            representation, output_regression, measurement_dimension, noise_model)
+        if not hasattr(representation, "infer_node_representation"):
+            print("Representation needs to have infer_node_representation function")
+            sys.exit(1)
 
-        self.hidden_dim = hidden_dim
         # grab the last dimension of `representation`
         representation_hidden_units = [
                 layer for layer in list(representation.modules())\
                         if hasattr(layer, 'out_features')][-1].out_features
         
         if output_regression is None:
-            # make the output regression as simple as a linear one
+            # make the output regression as a 2-layer network
             # if nothing is specified
-            self._output_regression = torch.nn.ModuleList(
+            _output_regression = torch.nn.ModuleList(
                     [
                         torch.nn.Sequential(
-                            torch.nn.Linear(representation_hidden_units, self.hidden_dim),
-                            torch.nn.Linear(self.hidden_dim, measurement_dimension)
-                        ) for _ in range(2) # now we hard code # of parameters
+                            torch.nn.Linear(representation_hidden_units, hidden_dim),
+                            torch.nn.ReLU(),
+                            torch.nn.Linear(hidden_dim, measurement_dimension),
+                            torch.nn.ReLU()
+                        ) for _ in range(2) # mean and logvar
                     ])
 
             def output_regression(theta):
-                return [f(theta) for f in self._output_regression]
+                return [f(theta) for f in _output_regression]
+        
+        super(SemiSupervisedNet, self).__init__(
+            representation, output_regression, measurement_dimension, noise_model)
 
-        self.output_regression = output_regression
+        self.hidden_dim = hidden_dim
         # unsupervised scale is to balance between the supervised and unsupervised
         # loss term. It should be r if one synthesizes the semi-supervised data
-        # using prepare_semi_supeprvised_data_from_labelled_data
+        # using prepare_semi_supeprvised_data_from_labeled_data
         self.unsup_scale = unsup_scale
     
     def loss(self, g, y):
-        h = self.representation.infer_node_representation(g) # We always call this
+        # Compute the node representation
+        h_node = self.representation.infer_node_representation(g) # We always call this
 
-        # Do decode and elbo loss
-        theta = [parameter.forward(h) for parameter in self.representation.output_regression]
-        mu  = theta[0]
-        logvar = theta[1]
-        approx_posterior = torch.distributions.normal.Normal(
-                    loc=theta[0],
-                    scale=torch.exp(theta[1]))
-
-        z_sample = approx_posterior.rsample()
         # Compute unsupervised loss
-        # Create a local scope so as not to modify the original input graph
-        unsup_loss = self.compute_unsupervised_loss(g, z_sample, mu, logvar)     
-        h = self.compute_graph_representation_from_node_representation(g, h)
+        unsup_loss = self.representation.decode_and_compute_loss(h_node)  
 
-        # Get the indices of the labelled data
+        # Compute the graph representation
+        h_graph    = self.representation.graph_h_from_node_h(g, h_node)
+
+        # Get the indices of the labeled data
         not_none_ind =[i for i in range(len(y)) if y[i] != None]
         supervised_loss = torch.tensor(0)
-        if sum(not_none_ind) != 0:
-            # Only compute supervised loss for the labelled data
-            h_not_none = h[not_none_ind, :]
+        if len(not_none_ind) != 0:
+            # Only compute supervised loss for the labeled data
+            h_not_none = h_graph[not_none_ind, :]
             y_not_none = [y[idx] for idx in not_none_ind]
             y_not_none = torch.tensor(y_not_none).unsqueeze(1)
-            dist_y = self.compute_pred_distribution_from_rep(h_not_none)
-            supervised_loss = -dist_y.log_prob(y_not_none)
+            supervised_loss = self.compute_supervised_loss(h_not_none, y_not_none)
             
         return unsup_loss*self.unsup_scale + supervised_loss.sum()
 
-    def compute_pred_distribution_from_rep(self, h):
+    self compute_supervised_loss(self, h, y):
         theta = self.output_regression(h)
         distribution = None
         if self.noise_model == 'normal-heteroschedastic':
@@ -98,22 +97,5 @@ class SemiSupervisedNet(pinot.Net):
                     loc=mu, 
                     scale=torch.ones((1, self.measurement_dimension)))
 
-        return distribution
-
-    def compute_unsupervised_loss(self, g, z_sample, mu, logvar):
-        with g.local_scope():
-            # Create a new graph with sampled representations
-            g.ndata["h"] = z_sample
-            # Unbatch into individual subgraphs
-            gs_unbatched = dgl.unbatch(g)
-            # Decode each subgraph
-            decoded_subgraphs = [self.representation.dc(g_sample.ndata["h"]) \
-                for g_sample in gs_unbatched]
-            unsup_loss = negative_elbo(decoded_subgraphs, mu, logvar, g)
-            return unsup_loss
-
-    def compute_graph_representation_from_node_representation(self, g, h):
-        with g.local_scope():
-            g.ndata["h"] = h
-            h = self.representation.aggregator(g)
-            return h
+        # negative log likelihood
+        return -distribution.log_prob(y)
