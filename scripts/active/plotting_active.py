@@ -20,6 +20,7 @@ import experiment
 
 sys.path.append('../../pinot/')
 import semisupervised
+import semisupervised_gp
 
 
 ######################
@@ -181,7 +182,7 @@ class ActivePlot():
         
         if self.strategy == 'batch':
             acq_fn = batch_acquisitions[self.acquisition]
-            acq_fn = MCAcquire(sequential_acq=acq_fn, batch_size=self.batch_size,
+            acq_fn = MCAcquire(sequential_acq=acq_fn, batch_size=gs.batch_size,
                                q=self.q,
                                marginalize_batch=self.marginalize_batch,
                                num_samples=self.num_samples)
@@ -218,6 +219,15 @@ class ActivePlot():
                                embedding_dim=32,
                                num_atom_types=100)
             net = semisupervised.SemiSupervisedNet(gvae) # TODO pinot.
+
+        elif self.net == 'semi_gp':
+            gvae = GCNModelVAE(input_feat_dim=self.feat_dim,
+                               gcn_type=self.layer,
+                               # gcn_init_args={"num_heads":5},
+                               gcn_hidden_dims=[64, 64],
+                               embedding_dim=32,
+                               num_atom_types=100)
+            net = semisupervised_gp.SemiSupervisedGaussianProcess(gvae)
 
         if self.strategy == 'batch':
             net = BTModel(net)
