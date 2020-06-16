@@ -17,7 +17,7 @@ class SemiSupervisedGaussianProcess(SemiSupervisedNet):
             hidden_dim=64,
             unsup_scale=1):
 
-        super(SemiSupervisedGaussianProcesses, self).__init__(
+        super(SemiSupervisedGaussianProcess, self).__init__(
             representation, output_regression, measurement_dimension, noise_model, hidden_dim, unsup_scale)
 
         if not hasattr(representation, "infer_node_representation"):
