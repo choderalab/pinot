@@ -91,15 +91,15 @@ def negative_ELBO_with_node_prediction(edge_preds, node_preds, adj, node_types, 
 def negative_elbo(decoded_subgraphs, mu, logvar, g):
     # First unbatch all the graphs into individual
     # subgraphs
+    device = g.ndata['h'].device
     gs_unbatched = dgl.unbatch(g)
 
     assert(len(decoded_subgraphs) == len(gs_unbatched))
     loss = 0.
-    # print(decoded_subgraphs)
     for i, subgraph in enumerate(gs_unbatched):
         # Compute decoding loss for each individual sub-graphs
         decoded_edges, decoded_nodes = decoded_subgraphs[i]
-        adj_mat = subgraph.adjacency_matrix(True).to_dense()
+        adj_mat = subgraph.adjacency_matrix(True).to_dense().to(device)
         node_types = subgraph.ndata["type"].flatten().long() # .to(torch.device('cuda:0'))
 
         edge_nll = torch.sum(
