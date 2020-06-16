@@ -21,17 +21,94 @@ class ExactGPR(GPR):
                 torch.tensor(
                     log_sigma))
 
+    # =============================================================================
+    # GRAPH REPRESENTATION FUNCTIONS
+    # =============================================================================
 
     def _get_kernel_and_auxiliary_variables(
             self, x_tr, y_tr, x_te=None,
         ):
+
+        # create latent representations
+        h_tr = self.kernel.representation(x_tr)
+        if x_te is not None:
+            h_te = self.kernel.representation(x_te)
+        else:
+            h_te = None
+
+        k_tr_tr, k_te_te, k_te_tr, k_tr_te, l_low, alpha\
+            = self._get_kernel_and_auxiliary_variables_from_representation(
+                h_tr=h_tr,
+                y_tr=y_tr,
+                h_te=h_te)
+
+        return k_tr_tr, k_te_te, k_te_tr, k_tr_te, l_low, alpha
+
+
+    def loss(self, x_tr, y_tr):
+        r""" Compute the loss.
+        Note
+        ----
+        Defined to be negative Gaussian likelihood.
+        Parameters
+        ----------
+        x_tr : torch.tensor, shape=(batch_size, ...)
+            training data.
+        y_tr : torch.tensor, shape=(batch_size, 1)
+            training data measurement.
+        """
+        # point data to object
+        self._h_tr = self.kernel.representation(x_tr)
+        self._y_tr = y_tr
+
+        # get the parameters
+        k_tr_tr, k_te_te, k_te_tr, k_tr_te, l_low, alpha\
+            = self._get_kernel_and_auxiliary_variables_from_representation(self._h_tr, y_tr)
+
+        # we return the exact nll with constant
+        nll = 0.5 * (y_tr.t() @ alpha) + torch.trace(l_low)\
+            + 0.5 * y_tr.shape[0] * math.log(2.0 * math.pi)
+
+        return nll
+
+
+    def condition(self, x_te, x_tr=None, y_tr=None, sampler=None):
+        r""" Calculate the predictive distribution given `x_te`.
+        Note
+        ----
+        Here we allow the speicifaction of sampler but won't actually
+        use it here.
+        Parameters
+        ----------
+        x_tr : torch.tensor, shape=(batch_size, ...)
+            training data.
+        y_tr : torch.tensor, shape=(batch_size, 1)
+            training data measurement.
+        x_te : torch.tensor, shape=(batch_size, ...)
+            test data.
+        sigma : float or torch.tensor, shape=(), default=1.0
+            noise parameter.
+        """
+        h_te = self.kernel.representation(x_te)
+        h_tr = self.kernel.representation(x_tr) if x_tr is not None else None
+
+        distribution = self.condition_from_representation(h_te=h_te, h_tr=h_tr, y_tr=y_tr, sampler=sampler)
+        return distribution
+
+    # =============================================================================
+    # HIDDEN REPRESENTATION FUNCTIONS
+    # =============================================================================
+
+    def _get_kernel_and_auxiliary_variables_from_representation(
+            self, h_tr, y_tr, h_te=None,
+        ):
         
         # compute the kernels
-        k_tr_tr = self._perturb(self.kernel.forward(x_tr, x_tr))
+        k_tr_tr = self._perturb(self.kernel.base_kernel.forward(h_tr, h_tr))
 
-        if x_te is not None: # during test
-            k_te_te = self._perturb(self.kernel.forward(x_te, x_te))
-            k_te_tr = self._perturb(self.kernel.forward(x_te, x_tr))
+        if h_te is not None: # during test
+            k_te_te = self._perturb(self.kernel.base_kernel.forward(h_te, h_te))
+            k_te_tr = self._perturb(self.kernel.base_kernel.forward(h_te, h_tr))
             # k_tr_te = self.forward(x_tr, x_te)
             k_tr_te = k_te_tr.t() # save time
 
@@ -61,7 +138,8 @@ class ExactGPR(GPR):
 
         return k_tr_tr, k_te_te, k_te_tr, k_tr_te, l_low, alpha
 
-    def loss(self, x_tr, y_tr):
+
+    def loss_from_representation(self, h_tr, y_tr):
         r""" Compute the loss.
         Note
         ----
@@ -74,12 +152,12 @@ class ExactGPR(GPR):
             training data measurement.
         """
         # point data to object
-        self._x_tr = x_tr
+        self._h_tr = h_tr
         self._y_tr = y_tr
 
         # get the parameters
         k_tr_tr, k_te_te, k_te_tr, k_tr_te, l_low, alpha\
-            = self._get_kernel_and_auxiliary_variables(x_tr, y_tr)
+            = self._get_kernel_and_auxiliary_variables_from_representation(h_tr, y_tr)
 
         # we return the exact nll with constant
         nll = 0.5 * (y_tr.t() @ alpha) + torch.trace(l_low)\
@@ -87,7 +165,7 @@ class ExactGPR(GPR):
 
         return nll
 
-    def condition(self, x_te, x_tr=None, y_tr=None, sampler=None):
+    def condition_from_representation(self, h_te, h_tr=None, y_tr=None, sampler=None):
         r""" Calculate the predictive distribution given `x_te`.
         Note
         ----
@@ -104,15 +182,15 @@ class ExactGPR(GPR):
         sigma : float or torch.tensor, shape=(), default=1.0
             noise parameter.
         """
-        if x_tr is None:
-            x_tr = self._x_tr
+        if h_tr is None:
+            h_tr = self._h_tr
         if y_tr is None:
             y_tr = self._y_tr
 
         # get parameters
         k_tr_tr, k_te_te, k_te_tr, k_tr_te, l_low, alpha\
-            = self._get_kernel_and_auxiliary_variables(
-                x_tr, y_tr, x_te)
+            = self._get_kernel_and_auxiliary_variables_from_representation(
+                h_tr, y_tr, h_te)
 
         # compute mean
         # (batch_size_te, 1)

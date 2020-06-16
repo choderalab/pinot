@@ -104,7 +104,7 @@ class SemiSupervisedGaussianProcess(SemiSupervisedNet):
         h_graph = self.compute_graph_representation_from_node_representation(g, h_node)
 
         # Get the indices of the labelled data
-        if len(y.shape) == 1:
+        if len(y.shape) <= 1:
             y = y.unsqueeze(0)
         not_none_ind = [i for i in range(len(y)) if y[i] != None]
         supervised_loss = torch.tensor(0.)
@@ -117,10 +117,9 @@ class SemiSupervisedGaussianProcess(SemiSupervisedNet):
             self._x_tr = h_graph
             self._y_tr = y
 
-        if sum(not_none_ind) != 0:
+        if len(not_none_ind) != 0:
             # Only compute supervised loss for the labelled data
             # Using GPs
-            print(h_graph)
             h_not_none = h_graph[not_none_ind, :]
             y_not_none = [y[idx] for idx in not_none_ind]
             y_not_none = torch.tensor(y_not_none).unsqueeze(1).to(y_not_none[0].device)

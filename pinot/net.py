@@ -172,7 +172,7 @@ class Net(torch.nn.Module):
         return -distribution.log_prob(y)
 
 
-class MultiTaskNet():
+class MultiTaskNet(nn.Module):
     """ An object that combines the representation and parameter
     learning, puts into a predicted distribution and calculates the
     corresponding divergence.
@@ -188,7 +188,7 @@ class MultiTaskNet():
         one of 
             'normal-homoschedastic',
             'normal-heteroschedastic',
-            'normal-homoschedastic-fixed') 
+            'normal-homoschedastic-fixed')
         or a function that transforms a set of parameters.
     """
     def __init__(self, net_class, representation, num_nets,
@@ -202,57 +202,77 @@ class MultiTaskNet():
         
         self.representation = representation
         self.num_nets = num_nets
-        self.nets = nn.ModuleList([net_class(self.representation)]*self.num_nets)
+        self.nets = nn.ModuleList([net_class(self.representation) for _ in range(self.num_nets)])
         self.noise_model = noise_model
         
     def forward(self, g, mask):
         """ Forward pass.
         """
-        return self.apply('forward', mask, g=g)
-        
+        return self.apply('forward', mask, g)
+
     def condition(self, g, sampler=None):
         """ Compute the output distribution with sampled weights.
         """
+        self.eval()
         mask = torch.ones(self.num_nets, dtype=torch.bool)
-        print(mask)
-        return self.apply('condition', mask, g=g, sampler=sampler)
-    
+        return self.apply('condition', mask, g, sampler=sampler)
+
     def loss(self, g, y, mask):
         """ Compute the loss with a input graph and a set of parameters.
         """
-        losses = torch.stack(self.apply('loss', mask, g=g, y=y))
-        return losses.sum()
+        losses = torch.stack(self.apply('loss', mask, g, y))
+        return losses.mean()
 
-    def apply(self, func, mask, **kwargs):
-        return [getattr(net, func)(**kwargs)
-                for i, net in enumerate(self.nets)
-                if mask[i]]
+    def apply(self, func, mask, *args, **kwargs):
+        """ Splits function across each task.
+        """
+        results = []
+        
+        # for each task
+        for i in range(self.num_nets):
+            
+            # retrieve mask
+            task_mask = mask[:,i]
+            
+            # mask the arguments
+            task_args = self._mask_task_args(task_mask, i, *args)
+            task_kwargs = self._mask_task_kwargs(task_mask, i, **kwargs)
+            
+            # run the function
+            result = getattr(self.nets[i], func)(*task_args, **task_kwargs)
+            results.append(result)
 
-    def train(self):
-        for net in self.nets:
-            net.train()
-            
-    def eval(self):
-        for net in self.nets:
-            net.eval()
-            
-    def parameters(self):
-        params = []
-        for net in self.nets:
-            params.extend(list(net.parameters()))
-        return params
+        return results
     
-    def named_children(self):
-        named_children = []
-        for net in self.nets:
-            named_children.extend(list(net.named_children()))
-        return named_children
-    
-    def state_dict(self):
-        return self.nets.state_dict()
-    
-    def load_state_dict(self, state_dict):
-        self.nets.load_state_dict(state_dict)
+    def _mask_task_kwargs(self, task_mask, i, **kwargs):
+        task_kwargs = {}
+        for k, v in kwargs.items():
+            if isinstance(v, dgl.DGLGraph):
+                v = self._mask_graph(v, task_mask)
+                task_kwargs[k] = v
+            elif isinstance(v, torch.Tensor):
+                v = self._mask_tensor(v, task_mask, i)
+                task_kwargs[k] = v
+        return task_kwargs
+        
+    def _mask_task_args(self, task_mask, i, *args):
+        task_args = []
+        for v in args:
+            if isinstance(v, dgl.DGLGraph):
+                v = self._mask_graph(v, task_mask)
+                task_args.append(v)
+            elif isinstance(v, torch.Tensor):
+                v = self._mask_tensor(v, task_mask, i)
+                task_args.append(v)
+        return task_args
+
+    def _mask_graph(self, x, mask):
+        if x.batch_size > 1:
+            x = dgl.unbatch(x)
+        return dgl.batch([x[i] for i, _ in enumerate(x) if mask[i]])
+
+    def _mask_tensor(self, x, mask, idx):
+        return x[mask, idx].unsqueeze(-1)
 
 
 class GPyTorchNet(torch.nn.Module):
