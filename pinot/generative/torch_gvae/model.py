@@ -12,6 +12,7 @@ class GCNModelVAE(nn.Module):
     """
     def __init__(self, input_feat_dim, gcn_type="GraphConv", gcn_init_args={},\
             gcn_hidden_dims=[128, 128], embedding_dim=64, dropout=0.0, \
+            regression_hidden_dim=64,
             num_atom_types=100, \
             aggregation_function="sum",
             act="tanh"):
@@ -40,7 +41,6 @@ class GCNModelVAE(nn.Module):
         elif act == "none":
             self.activation = self.identity
 
-
         # 2. Decoder
         self.dc = SequentialDecoder(embedding_dim, num_atom_types)
         self.num_atom_types = num_atom_types
@@ -49,9 +49,14 @@ class GCNModelVAE(nn.Module):
         # 1b. Mapping from node embedding to predictive distribution parameter
         self.gcn_hidden_dims = gcn_hidden_dims
         self.embedding_dim = embedding_dim
-        self.output_regression = nn.ModuleList([
-            nn.Linear(gcn_hidden_dims[-1], embedding_dim),
-            nn.Linear(gcn_hidden_dims[-1], embedding_dim),
+        self.regression_hidden_dim = regression_hidden_dim
+        self.output_regression = nn.ModuleList(
+        [
+            torch.nn.Sequential(
+                torch.nn.Linear(self.gcn_hidden_dims[-1], regression_hidden_dim),
+                torch.nn.Tanh(),
+                torch.nn.Linear(regression_hidden_dim, embedding_dim),
+            ) for _ in range(2) # mean and logvar
         ])
 
         # 1a. Graph convolution layers
@@ -211,11 +216,35 @@ class GCNModelVAE(nn.Module):
     def _mean_aggregate(self, g):
         return dgl.mean_nodes(g, "h")
 
-    def infer_graph_representation(self, g):
-        h = self.infer_node_representation(g)
+    def graph_h_from_node_h(self, g, h_node):
         with g.local_scope():
-            g.ndata["h"] = h
+            g.ndata["h"] = h_node
             return self.aggregator(g)
 
     def identity(self, h):
         return h
+
+    def decode_and_compute_loss(self, g, h_node):
+        theta = [parameter.forward(h_node) for parameter in self.output_regression]
+        mu  = theta[0]
+        logvar = theta[1]
+        approx_posterior = torch.distributions.normal.Normal(
+                    loc=theta[0],
+                    scale=torch.exp(theta[1]))
+
+        z_sample = approx_posterior.rsample()
+        decoded_subgraphs = self.decode(g, z_sample)
+        loss = negative_elbo(decoded_subgraphs, mu, logvar, g)
+        return loss
+        
+    def decode(self, g, z_sample):
+        # Create a local scope so as not to modify the original input graph
+        with g.local_scope():
+            # Create a new graph with sampled representations
+            g.ndata["h"] = z_sample
+            # Unbatch into individual subgraphs
+            gs_unbatched = dgl.unbatch(g)
+            # Decode each subgraph
+            decoded_subgraphs = [self.dc(g_sample.ndata["h"]) \
+                for g_sample in gs_unbatched]
+            return decoded_subgraphs

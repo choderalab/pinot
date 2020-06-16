@@ -17,31 +17,31 @@ class SemiSupervisedNet(pinot.Net):
         if not hasattr(representation, "infer_node_representation"):
             print("Representation needs to have infer_node_representation function")
             sys.exit(1)
+    
 
         # grab the last dimension of `representation`
-        representation_hidden_units = [
+        self.representation_hidden_units = [
                 layer for layer in list(representation.modules())\
                         if hasattr(layer, 'out_features')][-1].out_features
+    
+        super(SemiSupervisedNet, self).__init__(
+            representation, output_regression, measurement_dimension, noise_model)
         
         if output_regression is None:
             # make the output regression as a 2-layer network
             # if nothing is specified
-            _output_regression = torch.nn.ModuleList(
+            self._output_regression = torch.nn.ModuleList(
                     [
                         torch.nn.Sequential(
-                            torch.nn.Linear(representation_hidden_units, hidden_dim),
-                            torch.nn.ReLU(),
+                            torch.nn.Linear(self.representation_hidden_units, hidden_dim),
+                            torch.nn.Tanh(),
                             torch.nn.Linear(hidden_dim, measurement_dimension),
-                            torch.nn.ReLU()
                         ) for _ in range(2) # mean and logvar
                     ])
 
             def output_regression(theta):
-                return [f(theta) for f in _output_regression]
-        
-        super(SemiSupervisedNet, self).__init__(
-            representation, output_regression, measurement_dimension, noise_model)
-
+                return [f(theta) for f in self._output_regression]
+                
         self.hidden_dim = hidden_dim
         # unsupervised scale is to balance between the supervised and unsupervised
         # loss term. It should be r if one synthesizes the semi-supervised data
@@ -50,27 +50,27 @@ class SemiSupervisedNet(pinot.Net):
     
     def loss(self, g, y):
         # Compute the node representation
-        h_node = self.representation.infer_node_representation(g) # We always call this
-
+        h = self.representation.infer_node_representation(g) # We always call this
         # Compute unsupervised loss
-        unsup_loss = self.representation.decode_and_compute_loss(h_node)  
+        unsup_loss = self.representation.decode_and_compute_loss(g, h)  
+        # Compute the graph representation from node representation
+        h    = self.representation.graph_h_from_node_h(g, h)
+        
+        not_none_ind =[i for i in range(len(y)) if y[i] is not None]
+        supervised_loss = torch.tensor(0.)
 
-        # Compute the graph representation
-        h_graph    = self.representation.graph_h_from_node_h(g, h_node)
-
-        # Get the indices of the labeled data
-        not_none_ind =[i for i in range(len(y)) if y[i] != None]
-        supervised_loss = torch.tensor(0)
         if len(not_none_ind) != 0:
             # Only compute supervised loss for the labeled data
-            h_not_none = h_graph[not_none_ind, :]
+            h_not_none = h[not_none_ind, :]
             y_not_none = [y[idx] for idx in not_none_ind]
             y_not_none = torch.tensor(y_not_none).unsqueeze(1)
             supervised_loss = self.compute_supervised_loss(h_not_none, y_not_none)
-            
-        return unsup_loss*self.unsup_scale + supervised_loss.sum()
 
-    self compute_supervised_loss(self, h, y):
+        total_loss = supervised_loss.sum() + unsup_loss*self.unsup_scale 
+
+        return total_loss
+
+    def compute_supervised_loss(self, h, y):
         theta = self.output_regression(h)
         distribution = None
         if self.noise_model == 'normal-heteroschedastic':
