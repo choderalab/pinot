@@ -27,160 +27,173 @@ class SVGPR(GPR):
         super(SVGPR, self).__init__()
         self.kernel = kernel
 
+        # trainable noise
         self.log_sigma = torch.nn.Parameter(
                 torch.tensor(
                     log_sigma))
 
         # (n_inducing_points, hidden_dimension)
-        self.x_u = torch.nn.Parameter(
+        self.x_tr = torch.nn.Parameter(
             torch.distributions.uniform.Uniform(
-                -1 * grid_boundary * torch.ones(n_inducing_points, in_features),
-                1 * grid_boundary * torch.ones(n_inducing_points, in_features)).sample())
+                -1 * grid_boundary * torch.ones(
+                    n_inducing_points,
+                    in_features),
+                1 * grid_boundary * torch.ones(
+                    n_inducing_points,
+                    in_features)).sample())
 
-        # to ensure lower cholesky
-        self.f_u_s_diag = torch.nn.Parameter(
-            torch.distributions.normal.Normal(
-                loc=torch.zeros(n_inducing_points),
-                scale=initializer_std*torch.ones(n_inducing_points)).sample())
-
-        self.f_u_s_tril = torch.nn.Parameter(
-            torch.distributions.normal.Normal(
-                loc=torch.zeros(int(n_inducing_points*(n_inducing_points-1)*0.5)),
-                scale=initializer_std*torch.ones(int(n_inducing_points*(n_inducing_points-1)*0.5))
-            ).sample())
-
-        self.f_u_mu = torch.nn.Parameter(
+        self.y_tr_mu = torch.nn.Parameter(
             torch.distributions.normal.Normal(
                 loc=torch.zeros(n_inducing_points, 1),
-                scale=initializer_std*torch.ones(n_inducing_points, 1)).sample())
+                scale=initializer_std*torch.ones(n_inducing_points, 1)
+                ).sample())
+
+        # to ensure lower cholesky
+        self.y_tr_diag = torch.nn.Parameter(
+            torch.distributions.normal.Normal(
+                loc=torch.zeros(n_inducing_points),
+                scale=initializer_std*torch.ones(
+                    n_inducing_points)).sample())
+
+        self.y_tr_tril = torch.nn.Parameter(
+            torch.zeros(int(n_inducing_points*(n_inducing_points-1)*0.5)))
 
         self.n_inducing_points = n_inducing_points
 
         self.kl_loss_scaling = kl_loss_scaling
 
-    def _f_u_s(self):
+    def _y_tr_s(self):
 
-        f_u_s_diag = torch.diag_embed(torch.exp(self.f_u_s_diag))
+        y_tr_diag = torch.diag_embed(torch.exp(self.y_tr_diag))
 
         mask = torch.gt(
-            torch.range(0, self.f_u_s_diag.shape[0]-1)[:, None],
-            torch.range(0, self.f_u_s_diag.shape[0]-1)[None, :])
+            torch.range(0, self.y_tr_diag.shape[0]-1)[:, None],
+            torch.range(0, self.y_tr_diag.shape[0]-1)[None, :])
 
-        f_u_s = f_u_s_diag.masked_scatter(
+        y_tr_s = y_tr_diag.masked_scatter(
             mask,
-            self.f_u_s_tril)
+            self.y_tr_tril)
 
-        return f_u_s
+        return y_tr_s
 
-    def _kuu(self):
-        return self._perturb(self.kernel.base_kernel(self.x_u, self.x_u))
+    def _k_tr_tr(self):
+        return self._perturb(
+            self.kernel.base_kernel(
+                self.x_tr,
+                self.x_tr))
 
-    def _kuf(self, x_te):
-        return self._perturb(self.kernel.base_kernel(
-            self.x_u, self.kernel.representation(x_te)))
+    def _k_tr_te(self, x_te):
+        return self._perturb(
+            self.kernel.base_kernel(
+                self.x_tr,
+                self.kernel.representation(x_te)))
 
-    def _kfu(self, x_te):
-        return self._kuf(x_te).t()
+    def _k_te_tr(self, x_te):
+        return self._k_tr_te(x_te).t()
 
-    def _kff(self, x_te):
+    def _k_te_te(self, x_te):
         return self._perturb(self.kernel.forward(x_te, x_te))
-
-    def _forward_prep(self):
-
-        kuu = self._kuu()
-
-        prior_tril = torch.cholesky(kuu)
-        prior_mean = torch.zeros(self.n_inducing_points, 1)
-
-        k_inv_mu, _ = torch.triangular_solve(
-            self.f_u_mu,
-            prior_tril,
-            upper=False)
-
-        k_inv_s, _ = torch.triangular_solve(
-            self._f_u_s(),
-            prior_tril,
-            upper=False)
-
-        return prior_tril, prior_mean, k_inv_mu, k_inv_s
 
     def forward(self, x_te):
         """ Forward pass.
 
         """
 
-
+        # get the kernels
         (
-            kuu,
-            kfu,
-            kuf,
-            kff
+            k_tr_tr,
+            k_tr_te,
+            k_te_tr,
+            k_te_te
         ) = (
-            self._kuu(),
-            self._kfu(x_te),
-            self._kuf(x_te),
-            self._kff(x_te)
+            self._k_tr_tr(),
+            self._k_tr_te(x_te),
+            self._k_te_tr(x_te),
+            self._k_te_te(x_te)
         )
 
 
-        # (n_inducing_points, n_inducing_points)
-        prior_tril, prior_mean, k_inv_mu, k_inv_s = self._forward_prep()
+        # (n_tr, 1)
+        k_tr_tr_inv_mu, _ = torch.triangular_solve(
+            input=self.y_tr_mu,
+            A=k_tr_tr)
 
-        LKinvKuf, _ = torch.triangular_solve(
-            kuf,
-            prior_tril,
-            upper=False)
+        # (n_te, 1)
+        predictive_mean = k_te_tr @ k_tr_tr_inv_mu
 
+        # (n_te, n_te)
+        k_tr_tr_inv_at_k_tr_te, _ = torch.triangular_solve(
+            input=k_tr_te,
+            A=k_tr_tr)
 
-        kfu_kuu_inv_kuf = LKinvKuf.t() @ LKinvKuf
+        # (n_te, n_te)
+        k_te_tr_at_k_tr_tr_inv_at_k_tr_te\
+            = k_te_tr @ k_tr_tr_inv_at_k_tr_te
 
+        # (n_tr, n_tr) # lower
+        s_tr = self._y_tr_s()
 
-        LKinvUmean, _ = torch.triangular_solve(
-                self.f_u_mu, prior_tril, upper=False)
+        # (n_tr, n_tr)
+        a_tr = s_tr @ s_tr.t()
 
+        # (n_tr, n_te)
+        a_tr_at_k_tr_tr_inv_at_k_tr_te\
+            = a_tr @ k_tr_tr_inv_at_k_tr_te
 
-        m_all = torch.einsum('ab,ac->cb', LKinvUmean, LKinvKuf)
+        # (n_tr, n_te)
+        k_tr_tr_inv_at_a_tr_at_k_tr_tr_inv_at_k_tr_te, _\
+            = torch.triangular_solve(
+                input=a_tr_at_k_tr_tr_inv_at_k_tr_te,
+                A=k_tr_tr)
 
-        LLSu, _ = torch.triangular_solve(self._f_u_s(), prior_tril, upper=False)
-        LSuKuuf = torch.matmul(LLSu.t(), LKinvKuf)
-        kfuuSukuuf = LSuKuuf.t() @ LSuKuuf
+        # (n_te, n_te)
+        k_te_tr_at_k_tr_tr_inv_at_a_tr_at_k_tr_tr_inv_at_k_tr_te\
+            = k_te_tr @ k_tr_tr_inv_at_a_tr_at_k_tr_tr_inv_at_k_tr_te
 
-        v1 = kff
-        v2 = kfu_kuu_inv_kuf
-        v3 = kfuuSukuuf
-        v = v1 - v2 + v3
-        v = (v + torch.exp(self.log_sigma) * torch.eye(v.shape[-1]))
-        L = torch.cholesky(v)
+        # (n_te, n_te)
+        predictive_cov\
+            = k_te_te\
+            - k_te_tr_at_k_tr_tr_inv_at_k_tr_te\
+            + k_te_tr_at_k_tr_tr_inv_at_a_tr_at_k_tr_tr_inv_at_k_tr_te
 
+        # add noise
+        # (n_te, n_te)
+        predictive_cov += torch.exp(
+            self.log_sigma
+            ) * torch.eye(
+                predictive_cov.shape[-1],
+                device=predictive_cov.device)
 
-        self.prior_tril = prior_tril
-        self.prior_mean = prior_mean
-
-        return m_all, L
+        return predictive_mean, predictive_cov
 
     def condition(self, x_te):
-        m_all, L = self.forward(x_te)
+        predictive_mean, predictive_cov = self.forward(x_te)
+
+
         distribution = torch.distributions.multivariate_normal.MultivariateNormal(
-            loc=m_all.flatten(),
-            scale_tril=L)
+            loc=predictive_mean.flatten(),
+            covariance_matrix=predictive_cov)
 
         return distribution
 
     def loss(self, x_te, y_te):
+        # define prior
+        prior_mean = torch.zeros(self.n_inducing_points, 1)
+        prior_tril = self._k_tr_tr().cholesky()
 
         distribution = self.condition(x_te)
 
         nll = -distribution.log_prob(y_te).sum()
 
         log_p_u = self.exp_log_full_gaussian(
-            self.f_u_mu,
-            self._f_u_s(),
-            self.prior_mean,
-            self.prior_tril)
+            x_te,
+            self._y_tr_s(),
+            prior_mean,
+            prior_tril)
 
         log_q_u = -self.entropy_full_gaussian(
-            self.f_u_mu,
-            self._f_u_s())
+            self.y_tr_mu,
+            self._y_tr_s())
 
         loss = nll + self.kl_loss_scaling * (log_q_u - log_p_u)
 
