@@ -69,7 +69,7 @@ class SemiSupervisedNet(pinot.Net):
             dist_y = self.compute_pred_distribution_from_rep(h_not_none)
             supervised_loss = -dist_y.log_prob(y_not_none)
             
-        return unsup_loss*self.unsup_scale + supervised_loss.sum() 
+        return unsup_loss*self.unsup_scale + supervised_loss.sum()
 
 
     def compute_pred_distribution_from_rep(self, h):

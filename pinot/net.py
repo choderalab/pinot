@@ -214,14 +214,14 @@ class MultiTaskNet(nn.Module):
         """ Compute the output distribution with sampled weights.
         """
         self.eval()
-        mask = torch.ones(self.num_nets, dtype=torch.bool)
+        mask = torch.ones((g.batch_size, self.num_nets), dtype=torch.bool)
         return self.apply('condition', mask, g, sampler=sampler)
 
     def loss(self, g, y, mask):
         """ Compute the loss with a input graph and a set of parameters.
         """
         losses = torch.stack(self.apply('loss', mask, g, y))
-        return losses.mean()
+        return losses.sum()
 
     def apply(self, func, mask, *args, **kwargs):
         """ Splits function across each task.

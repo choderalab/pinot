@@ -68,6 +68,8 @@ class BayesOptExperiment(ActiveLearningExperiment):
             n_epochs=100,
             strategy='sequential',
             q=1,
+            epsilon=0.1,
+            epsilon_decay=0.0,
             num_samples=1000,
             early_stopping=True,
             workup=_independent,
@@ -96,6 +98,8 @@ class BayesOptExperiment(ActiveLearningExperiment):
         self.strategy = strategy
         # batch acquisition stuff
         self.q = q
+        self.epsilon = epsilon
+        self.epsilon_decay = epsilon_decay
         self.num_samples = num_samples
 
         # if self.q > 1 and not isinstance(self.acquisition, MCAcquire):
@@ -183,6 +187,15 @@ class BayesOptExperiment(ActiveLearningExperiment):
 
             # argmax
             best = torch.topk(score, self.q).indices
+
+        if self.epsilon:
+            explore = torch.rand(best.shape) < self.epsilon
+
+            if explore.any():
+                explore_indices = torch.randint(len(self.new), (len(best),)).to(best.device)
+                best[explore] = explore_indices[explore]
+                # decay epsilon
+                self.epsilon = self.epsilon * self.epsilon_decay
 
         # pop from the back so you don't disrupt the order
         best = best.sort(descending=True).values
