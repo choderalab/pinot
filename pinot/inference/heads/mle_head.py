@@ -3,13 +3,13 @@
 # =============================================================================
 import dgl
 import torch
-import abc
-
+import pinot
+from pinot.inference.heads.base_head import BaseHead
 
 # =============================================================================
 # MODULE CLASSES
 # =============================================================================
-class MaximumLikelihoodEstimationHead(Head):
+class MaximumLikelihoodEstimationHead(BaseHead):
     """ Head for MaximumLikelihoodEstimation (MLE).
 
     Methods

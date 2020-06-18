@@ -12,7 +12,7 @@ import abc
 # =============================================================================
 # BASE CLASSES
 # =============================================================================
-class NetBase(torch.nn.Module, abc.ABC):
+class BaseNet(torch.nn.Module, abc.ABC):
     """ Base class for `Net` object that inputs graphs and outputs
     distributions and is trainable.
 
@@ -23,7 +23,7 @@ class NetBase(torch.nn.Module, abc.ABC):
 
     """
     def __init__(self, head, *args, **kwargs):
-        super(NetBase, self).__init__()
+        super(BaseNet, self).__init__()
 
         # bookkeeping
         self.head = head
@@ -49,7 +49,7 @@ class NetBase(torch.nn.Module, abc.ABC):
         return nll
 
 
-class Net(NetBase):
+class Net(BaseNet):
     """ An object that combines the representation and parameter
     learning, puts into a predicted distribution and calculates the
     corresponding divergence.

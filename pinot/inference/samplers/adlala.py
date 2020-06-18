@@ -3,11 +3,12 @@
 # =============================================================================
 import torch
 import pinot
+from pinot.inference.samplers.base_sampler import BaseSampler
 
 # =============================================================================
 # MODULE CLASSES
 # =============================================================================
-class AdLaLa(pinot.inference.Sampler):
+class AdLaLa(BaseSampler):
     """ Adaptive Langevin-Langevin Integrator.
 
     Apply the following kinds of update steps to different "partitions" (i.e. param_groups)
@@ -253,17 +254,16 @@ class AdLaLa(pinot.inference.Sampler):
                     w.backward(torch.zeros_like(w))
 
 
-        # self.step(closure)            
+        # self.step(closure)
 
         self.D_step(0, 0.5)
         self.E_step(0, 0.5)
         self.O_step(1, 1.0)
         self.E_step(0, 0.5)
         self.D_step(0, 0.5)
-                    
+
     @torch.no_grad()
     def expectation_params(self):
         # TODO:
         # is there anything we can do here?
         pass
-    
