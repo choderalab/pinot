@@ -45,8 +45,13 @@ class ExactGaussianProcessHead(GaussianProcessHead):
     """ Exact Gaussian Process.
 
     """
-    def __init__(self, representation_hidden_units, kernel):
+    def __init__(self, representation_hidden_units, kernel=None):
         super(ExactGaussianProcessHead, self).__init__()
+
+        if kernel is None:
+            kernel = pinot.inference.kernels.rbf.RBF
+
+        # put representation hidden units
         self.kernel = kernel(representation_hidden_units)
 
     def _get_kernel_and_auxiliary_variables(
@@ -54,11 +59,11 @@ class ExactGaussianProcessHead(GaussianProcessHead):
         ):
 
         # compute the kernels
-        k_tr_tr = self._perturb(self.forward(x_tr, x_tr))
+        k_tr_tr = self._perturb(self.kernel.forward(x_tr, x_tr))
 
         if x_te is not None: # during test
-            k_te_te = self._perturb(self.forward(x_te, x_te))
-            k_te_tr = self._perturb(self.forward(x_te, x_tr))
+            k_te_te = self._perturb(self.kernel.forward(x_te, x_te))
+            k_te_tr = self._perturb(self.kernel.forward(x_te, x_tr))
             # k_tr_te = self.forward(x_tr, x_te)
             k_tr_te = k_te_tr.t() # save time
 

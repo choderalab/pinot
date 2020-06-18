@@ -38,8 +38,12 @@ class BaseNet(torch.nn.Module, abc.ABC):
         """
         # if there is a special loss function implemented in the head,
         # use that instead
+
         if hasattr(self.head, 'loss'):
-            return self.head.loss(g, y)
+            # get latent representation
+            h = self.representation(g)
+
+            return self.head.loss(h, y)
 
         # no sampling in training phase
         distribution = self.condition(g, sampler=None, *args, **kwargs)
@@ -146,11 +150,3 @@ class Net(BaseNet):
                         torch.distributions.Independent(distribution, 2))
 
         return distribution
-
-    def loss(self, g, y):
-        """ Compute the loss with a input graph and a set of parameters.
-        """
-        # no sampler in training
-        distribution = self.condition(g, sampler=None)
-
-        return -distribution.log_prob(y)

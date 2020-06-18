@@ -9,7 +9,7 @@ import math
 # =============================================================================
 # MODULE CLASSES
 # =============================================================================
-class Kernel(torch.nn.Module, abc.ABC):
+class BaseKernel(torch.nn.Module, abc.ABC):
     r""" A Gaussian Process Kernel that hosts parameters.
 
     Parameters
@@ -19,7 +19,7 @@ class Kernel(torch.nn.Module, abc.ABC):
 
     """
     def __init__(self, epsilon=1e-6):
-        super(Kernel, self).__init__()
+        super(BaseKernel, self).__init__()
         self.epsilon = epsilon
 
     @abc.abstractmethod
