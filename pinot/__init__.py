@@ -16,7 +16,7 @@ import pinot.generative
 
 from pinot.net import Net
 from pinot.semisupervised import SemiSupervisedNet
-
+from pinot.semisupervisedGP import SemiSupervisedGaussianProcesses
 
 from pinot.inference.adlala import AdLaLa
 from pinot.inference.sgld import SGLD

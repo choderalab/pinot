@@ -7,6 +7,8 @@ import numpy as np
 import torch
 import dgl
 import random
+import os
+import sys
 
 # =============================================================================
 # MODULE FUNCTIONS
@@ -64,12 +66,18 @@ def from_csv(path, toolkit="rdkit", smiles_col=-1, y_cols=[-2], seed=2666, scale
 def load_unlabeled_data(path, size=0.1, toolkit="rdkit", seed=2666):
     """ Read from unlabeled data set as background data
     """
+    if not os.path.exists(path):
+        print(path, "does not exist!")
+        sys.exit(1)
+
     def _from_txt():
         f = open(path, "r")
         df_smiles = [line.rstrip() for line in f]
-        # Since loading the whole data set takes a lot of time
-        # Load only a subset of the data instead
+        random.seed(seed)
+        random.shuffle(df_smiles)
+
         num_mols = int(len(df_smiles) * size)
+        # Use only a subset of the data
         df_smiles = df_smiles[:num_mols]
         # Create "fake" labels
         df_y = torch.FloatTensor([1 for _ in range(num_mols)])
@@ -88,12 +96,10 @@ def load_unlabeled_data(path, size=0.1, toolkit="rdkit", seed=2666):
             gs = [pinot.graph.from_oemol(mol) for mol in mols]
 
         gs = list(zip(gs, df_y))
-        random.seed(seed)
-        random.shuffle(gs)
-
         return gs
 
     return _from_txt
+
 
 def normalize(ds):
     """ Get mean and std.
