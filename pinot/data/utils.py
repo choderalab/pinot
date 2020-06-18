@@ -179,7 +179,7 @@ def batch_semi_supervised(ds, batch_size, seed=2666):
     return list(zip(gs_batched, ys_batched))
 
 
-def prepare_semi_supervised_training_data(unlabelled_data, labelled_data, batch_size=32):
+def prepare_semi_supervised_data(unlabelled_data, labelled_data, batch_size=32):
     """ Create a semi-supervised data by mixing unlabelled and labelled
     data. An example of labelled data can be readily accessed via
     `pinot.data.zinc_tiny()`
@@ -195,7 +195,7 @@ def prepare_semi_supervised_training_data(unlabelled_data, labelled_data, batch_
     return semi_supervised_data
 
 
-def prepare_semi_supeprvised_data_from_labelled_data(labelled_data, r=0.2, seed=2666):
+def prepare_semi_supeprvised_data_from_labeled_data(labelled_data, r=0.2, seed=2666):
     """ Create semi-supervised data from labelled data by randomly removing the
     labels for (1-r) of the data points. 
 
