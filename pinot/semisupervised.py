@@ -17,16 +17,21 @@ class SemiSupervisedNet(pinot.Net):
         if not hasattr(representation, "infer_node_representation"):
             print("Representation needs to have infer_node_representation function")
             sys.exit(1)
-    
 
-        # grab the last dimension of `representation`
-        self.representation_hidden_units = [
-                layer for layer in list(representation.modules())\
-                        if hasattr(layer, 'out_features')][-1].out_features
+        
+        if not hasattr(representation, "graph_h_from_node_h"):
+            print("Representation needs to have graph_h_from_node_h function")
+            sys.exit(1)
+    
     
         super(SemiSupervisedNet, self).__init__(
             representation, output_regression, measurement_dimension, noise_model)
         
+        # grab the last dimension of `representation`
+        self.representation_hidden_units = [
+                layer for layer in list(representation.modules())\
+                        if hasattr(layer, 'out_features')][-1].out_features
+
         if output_regression is None:
             # make the output regression as a 2-layer network
             # if nothing is specified
@@ -41,7 +46,8 @@ class SemiSupervisedNet(pinot.Net):
 
             def output_regression(theta):
                 return [f(theta) for f in self._output_regression]
-                
+
+        self.output_regression = output_regression
         self.hidden_dim = hidden_dim
         # unsupervised scale is to balance between the supervised and unsupervised
         # loss term. It should be r if one synthesizes the semi-supervised data
@@ -49,6 +55,9 @@ class SemiSupervisedNet(pinot.Net):
         self.unsup_scale = unsup_scale
     
     def loss(self, g, y):
+        """ Compute the loss function
+
+        """
         # Compute the node representation
         h = self.representation.infer_node_representation(g) # We always call this
         # Compute unsupervised loss
@@ -71,6 +80,17 @@ class SemiSupervisedNet(pinot.Net):
         return total_loss
 
     def compute_supervised_loss(self, h, y):
+        """ Compute supervised loss
+
+        Args:
+            h (FloatTensor)
+
+            y (FloatTensor)
+
+        Returns:
+            Compute the negative log likelihood
+        
+        """
         theta = self.output_regression(h)
         distribution = None
         if self.noise_model == 'normal-heteroschedastic':
