@@ -151,3 +151,69 @@ def batch(ds, batch_size, seed=2666):
     ]
 
     return list(zip(gs_batched, ys_batched))
+
+
+def batch_semi_supervised(ds, batch_size, seed=2666):
+    """ Very similar to batch, but should be used when the 
+    data contains None (data for semi-supervised training)
+    because torch.tensor(arr) throws an error when arr
+    contains any None
+    """
+    n_data_points = len(ds)
+    n_batches = n_data_points // batch_size  # drop the rest
+
+    np.random.seed(seed)
+    np.random.shuffle(ds)
+    gs, ys = tuple(zip(*ds))
+
+    gs_batched = [
+        dgl.batch(gs[idx * batch_size : (idx + 1) * batch_size])
+        for idx in range(n_batches)
+    ]
+
+    ys_batched = [
+        list(ys[idx * batch_size : (idx + 1) * batch_size])
+        for idx in range(n_batches)
+    ]
+
+    return list(zip(gs_batched, ys_batched))
+
+
+def prepare_semi_supervised_training_data(unlabelled_data, labelled_data, batch_size=32):
+    """ Create a semi-supervised data by mixing unlabelled and labelled
+    data. An example of labelled data can be readily accessed via
+    `pinot.data.zinc_tiny()`
+    """
+    semi_supervised_data = []
+    
+    for (g, y) in unlabelled_data:
+        semi_supervised_data.append((g, None))
+    for (g, y) in labelled_data:
+        semi_supervised_data.append((g, y))
+        
+    semi_supervised_data = batch_semi_supervised(semi_supervised_data, batch_size)
+    return semi_supervised_data
+
+
+def prepare_semi_supeprvised_data_from_labelled_data(labelled_data, r=0.2, seed=2666):
+    """ Create semi-supervised data from labelled data by randomly removing the
+    labels for (1-r) of the data points. 
+
+    Returns:
+        semi_data: the semi-supervised data with the same number of
+            data points as labelled_data. However, only a fraction r
+            of the points have labels
+
+        small_labelled_data: the fraction r of the points with labels
+    """
+    semi_data = []
+    small_labelled_data = []
+    
+    np.random.seed(seed)
+    for (g,y) in labelled_data:
+        if np.random.rand() < r:
+            semi_data.append((g, y))
+            small_labelled_data.append((g,y))
+        else:
+            semi_data.append((g, None))
+    return semi_data, small_labelled_data
