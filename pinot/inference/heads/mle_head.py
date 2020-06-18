@@ -59,6 +59,7 @@ class MaximumLikelihoodEstimationHead(BaseHead):
 
         # bookkeeping
         self.noise_model = noise_model
+        self.output_regression = output_regression
 
 
     def condition(self, h):
@@ -73,13 +74,13 @@ class MaximumLikelihoodEstimationHead(BaseHead):
         theta = self.output_regression(h)
 
         if self.noise_model == 'normal-heteroschedastic':
-            mu, log_sigma = self.forward(g)
+            mu, log_sigma = theta
             distribution = torch.distributions.normal.Normal(
                     loc=mu,
                     scale=torch.exp(log_sigma))
 
         elif self.noise_model == 'normal-homoschedastic':
-            mu, _ = self.forward(g)
+            mu, _ = theta
 
             # initialize a `LOG_SIMGA` if there isn't one
             if not hasattr(self, 'LOG_SIGMA'):
@@ -91,7 +92,7 @@ class MaximumLikelihoodEstimationHead(BaseHead):
                     scale=torch.exp(self.LOG_SIGMA))
 
         elif self.noise_model == 'normal-homoschedastic-fixed':
-            mu, _ = self.forward(g)
+            mu, _ = theta
             distribution = torch.distributions.normal.Normal(
                     loc=mu,
                     scale=torch.ones((1, self.measurement_dimension)))

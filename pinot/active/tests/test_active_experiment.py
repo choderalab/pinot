@@ -25,7 +25,7 @@ def bo():
 
     return pinot.active.experiment.SingleTaskBayesianOptimizationExperiment(
         net=net,
-        data=torch.stack([x, y], dim=1),
+        data=torch.cat([x, y], dim=1),
         optimizer=torch.optim.Adam(net.parameters(), 1e-3),
         acquisition=pinot.active.acquisition.probability_of_improvement,
         n_epochs_training=10)

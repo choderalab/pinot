@@ -8,6 +8,7 @@ to construct a model.
 import dgl
 import torch
 import abc
+import pinot
 
 # =============================================================================
 # BASE CLASSES
@@ -71,7 +72,7 @@ class Net(BaseNet):
         **head_kwargs
     ):
 
-        super(Net, self).__init__()
+        super(Net, self).__init__(head=head)
         self.representation = representation
 
 
