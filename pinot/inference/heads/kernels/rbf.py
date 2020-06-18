@@ -16,10 +16,22 @@ class RBF(Kernel):
     ----
     l could be either of shape 1 or hidden dim
     """
-    def __init__(self, scale=0.0, variance=0.0):
+    def __init__(
+            self,
+            representation_hidden_units,
+            scale=0.0, variance=0.0, ard=True):
+
         super(RBF, self).__init__()
-        self.scale = torch.nn.Parameter(
-                torch.tensor(scale))
+
+        if ard is True:
+            self.scale = torch.nn.Parameter(
+                    torch.tensor(scale))
+
+        else:
+            self.scale = torch.nn.Parameter(
+                scale * torch.ones(representation_hidden_units)
+            )
+        
         self.variance = torch.nn.Parameter(
                 torch.tensor(variance))
 
