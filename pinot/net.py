@@ -62,7 +62,7 @@ class Net(torch.nn.Module):
                 return [f(theta) for f in self._output_regression]
 
         self.output_regression = output_regression
-        self.measurement_dimension=measurement_dimension 
+        self.measurement_dimension = measurement_dimension 
         self.noise_model = noise_model
         self.representation_hidden_units = representation_hidden_units
 
@@ -117,10 +117,9 @@ class Net(torch.nn.Module):
             distribution = self.noise_model[distribution](
                     self.noise_model[kwargs])
 
-
         return distribution
 
-    def condition(self, g, sampler=None, n_samples=64):
+    def condition(self, g, y=None, sampler=None, n_samples=64):
         """ Compute the output distribution with sampled weights.
         """
         if sampler is None:
@@ -166,8 +165,11 @@ class Net(torch.nn.Module):
     def loss(self, g, y):
         """ Compute the loss with a input graph and a set of parameters.
         """
-
-        distribution = self.condition(g)
+        try:
+            distribution = self.condition(g)
+        except AttributeError:
+            # ExactGP lacking training data
+            distribution = self.condition(g, y)
 
         return -distribution.log_prob(y)
 

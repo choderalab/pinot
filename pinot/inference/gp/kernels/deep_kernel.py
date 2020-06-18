@@ -14,19 +14,15 @@ class DeepKernel(Kernel):
     """
     def __init__(self, representation, base_kernel):
         super(DeepKernel, self).__init__()
-        self.representation = representation
         self.base_kernel = base_kernel
 
-    def forward(self, x, x_=None):
+    def forward(self, h, h_=None):
         r""" Forward function that simply calls the base kernel
-        after representation.
+        from the representation.
         """
+        if h_ is None:
+            h_ = h
 
-        if x_ is None:
-            x_ = x
-
-        k = self.base_kernel.forward(
-                self.representation(x),
-                self.representation(x_))
+        k = self.base_kernel.forward(h, h_)
 
         return k
