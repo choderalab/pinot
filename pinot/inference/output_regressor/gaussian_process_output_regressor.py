@@ -185,40 +185,50 @@ class ExactGaussianProcessOuputRegressor(GaussianProcessOutputRegressor):
         return nll
 
 
-class VariationalGaussianProcessOuputRegressor(
-        GaussianProcessHead,
-        gpytorch.models.ApproximateGP):
+class VariationalGaussianProcessOuputRegressor(GaussianProcessHead):
     """ Variational Gaussian Process.
 
     """
     def __init__(self, inducing_points, kernel=None):
-        if kernel is None:
-            kernel = gpytorch.kernels.RBFKernel()
+        super(VariationalGaussianProcessOuputRegressor, self).__init__()
 
-        variational_distribution = gpytorch.variational\
-            .CholeskyVariationalDistribution(
-                inducing_points.size(-1))
+        class _VariationalGP(gpytorch.models.ApproximateGP):
 
-        variational_strategy = gpytorch.variational\
-            .VariationalStrategy(
-                self,
-                inducing_points,
-                variational_distribution,
-                learn_inducing_points=True
-            )
+            def __init__(inducing_points, kernel):
 
-        super().__init__(variaitonal_strategy)
-        self.mean_module = gpytorch.means.ConstantMean()
-        self.covar_module = gpytorch.kernels.ScaleKernel(
-            kernel)
-        self.likelihood = likelihood
+                if kernel is None:
+                    kernel = gpytorch.kernels.RBFKernel()
+
+                variational_distribution = gpytorch.variational\
+                    .CholeskyVariationalDistribution(
+                        inducing_points.size(-1))
+
+                variational_strategy = gpytorch.variational\
+                    .VariationalStrategy(
+                        self,
+                        inducing_points,
+                        variational_distribution,
+                        learn_inducing_points=True
+                    )
+
+                super().__init__(variaitonal_strategy)
+                self.mean_module = gpytorch.means.ConstantMean()
+                self.covar_module = gpytorch.kernels.ScaleKernel(
+                    kernel)
+                self.likelihood = likelihood
+
+        self.gp = _VariationalGP(inducing_points, kernel=kernel)
+
+        self.likelihood = gpytorch.likelihoods.GaussianLikelihood()
+        self.objective_function = gpytorch.mlls.VariationalELBO
 
     def condition(self, x):
-        mean_x = self.mean_module(x)
-        covar_x = self.covar_module(x)
+        mean_x = self.gp.mean_module(x)
+        covar_x = self.gp.covar_module(x)
         return gpytorch.distributions.MultivariateNormal(
             mean_x,
             covar_x)
 
     def loss(self, x, y):
-        raise NotImplementedError
+        distribution = self.condition(x)
+        return -self.objective_function(distribution, y)

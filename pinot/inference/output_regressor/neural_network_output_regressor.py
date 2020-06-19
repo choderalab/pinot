@@ -4,7 +4,7 @@
 import dgl
 import torch
 import pinot
-from pinot.inference.heads.base_head import BaseHead
+from pinot.inference.heads.base_output_regressor import BaseOutputRegressor
 
 # =============================================================================
 # MODULE CLASSES

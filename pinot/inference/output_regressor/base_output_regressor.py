@@ -17,7 +17,7 @@ class BaseOutputRegressor(torch.nn.Module):
 
     """
     def __init__(self):
-        super(BaseHead, self).__init__()
+        super(BaseOutputRegressor, self).__init__()
 
     @abc.abstractmethod
     def condition(self, h, *args, **kwargs):
