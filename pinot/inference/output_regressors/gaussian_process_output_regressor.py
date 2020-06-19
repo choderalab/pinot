@@ -7,6 +7,7 @@ import abc
 import math
 from pinot.inference.output_regressors.base_output_regressor\
     import BaseOutputRegressor
+import gpytorch
 
 # =============================================================================
 # BASE CLASSES
@@ -194,12 +195,25 @@ class VariationalGaussianProcessOuputRegressor(GaussianProcessOutputRegressor):
     """ Variational Gaussian Process.
 
     """
-    def __init__(self, inducing_points, kernel=None):
+    def __init__(
+            self,
+            in_features,
+            n_inducing_points=100,
+            inducing_points_boundary=1.0,
+            num_data=1,
+            kernel=None):
         super(VariationalGaussianProcessOuputRegressor, self).__init__()
+
+        # construct inducing points
+        inducing_points = torch.distributions.uniform.Uniform(
+            -1 * inducing_points_boundary * torch.ones(
+                n_inducing_points, in_features),
+            1 * inducing_points_boundary * torch.ones(
+                n_inducing_points, in_features)).sample()
 
         class _VariationalGP(gpytorch.models.ApproximateGP):
 
-            def __init__(inducing_points, kernel):
+            def __init__(self, inducing_points, kernel):
 
                 if kernel is None:
                     kernel = gpytorch.kernels.RBFKernel()
@@ -213,19 +227,23 @@ class VariationalGaussianProcessOuputRegressor(GaussianProcessOutputRegressor):
                         self,
                         inducing_points,
                         variational_distribution,
-                        learn_inducing_points=True
+                        learn_inducing_locations=True
                     )
 
-                super().__init__(variaitonal_strategy)
+                super().__init__(variational_strategy)
                 self.mean_module = gpytorch.means.ConstantMean()
                 self.covar_module = gpytorch.kernels.ScaleKernel(
                     kernel)
-                self.likelihood = likelihood
 
-        self.gp = _VariationalGP(inducing_points, kernel=kernel)
+        self.gp = _VariationalGP(
+            inducing_points=inducing_points,
+            kernel=kernel)
 
         self.likelihood = gpytorch.likelihoods.GaussianLikelihood()
-        self.objective_function = gpytorch.mlls.VariationalELBO
+        self.objective_function = gpytorch.mlls.VariationalELBO(
+            likelihood=self.likelihood,
+            model=self.gp,
+            num_data=num_data)
 
     def condition(self, x):
         mean_x = self.gp.mean_module(x)
