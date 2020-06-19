@@ -27,7 +27,10 @@ def condition_mixture(net, g, sampler=None, n_samples=1):
     # since we don't know the memory footprint of
     # torch.distributions
     mus, sigmas = zip(
-        *[(distribution.loc, distribution.scale) for distribution in distributions]
+        *[
+            (distribution.loc, distribution.scale)
+            for distribution in distributions
+        ]
     )
 
     # concat parameters together

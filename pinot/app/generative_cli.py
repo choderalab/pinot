@@ -28,7 +28,9 @@ def run(args):
     input_feat_dim = background_data[0][0].ndata["h"].shape[1]
 
     train_data, test_data = pinot.data.utils.split(background_data, args.split)
-    batched_train_data = pinot.data.utils.batch(train_data, args.batch_size_gen)
+    batched_train_data = pinot.data.utils.batch(
+        train_data, args.batch_size_gen
+    )
 
     net_representation = GCNModelVAE(
         input_feat_dim,
@@ -80,7 +82,10 @@ def run(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--layer", type=str, default="GraphConv", help="Type of graph convolution layer"
+        "--layer",
+        type=str,
+        default="GraphConv",
+        help="Type of graph convolution layer",
     )
     parser.add_argument(
         "--hidden_dims_gvae",

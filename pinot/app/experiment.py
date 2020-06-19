@@ -98,7 +98,9 @@ class Test:
 
     """
 
-    def __init__(self, net, data, states, sampler=None, metrics=[pinot.rmse, pinot.r2]):
+    def __init__(
+        self, net, data, states, sampler=None, metrics=[pinot.rmse, pinot.r2]
+    ):
         self.net = net  # deepcopy the model object
         self.data = data
         self.metrics = metrics
@@ -135,7 +137,10 @@ class Test:
 
             for metric in self.metrics:  # loop through the metrics
                 results[metric.__name__][state_name] = (
-                    metric(self.net, g, y, sampler=self.sampler).detach().cpu().numpy()
+                    metric(self.net, g, y, sampler=self.sampler)
+                    .detach()
+                    .cpu()
+                    .numpy()
                 )
 
         self.results = results

@@ -58,8 +58,16 @@ def optimizer_translation(opt_string, lr, *args, **kwargs):
 
         opt = lambda net: pinot.AdLaLa(
             [
-                {"params": net.representation.parameters(), "h": lr, "gamma": 1e-6},
-                {"params": net._output_regression.parameters(), "h": lr, "gamma": 1e-6},
+                {
+                    "params": net.representation.parameters(),
+                    "h": lr,
+                    "gamma": 1e-6,
+                },
+                {
+                    "params": net._output_regression.parameters(),
+                    "h": lr,
+                    "gamma": 1e-6,
+                },
             ]
         )
 
@@ -69,5 +77,7 @@ def optimizer_translation(opt_string, lr, *args, **kwargs):
                 net.parameters(), lr, weight_decay=kwargs["weight_decay"]
             )
         else:
-            opt = lambda net: getattr(torch.optim, opt_string)(net.parameters(), lr)
+            opt = lambda net: getattr(torch.optim, opt_string)(
+                net.parameters(), lr
+            )
     return opt

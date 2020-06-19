@@ -5,7 +5,9 @@ import torch
 import pinot
 import abc
 import math
-from pinot.inference.output_regressors.base_output_regressor import BaseOutputRegressor
+from pinot.inference.output_regressors.base_output_regressor import (
+    BaseOutputRegressor,
+)
 import gpytorch
 
 # =============================================================================
@@ -89,10 +91,14 @@ class ExactGaussianProcessOutputRegressor(GaussianProcessOutputRegressor):
         l_up = l_low.t()
 
         # (batch_size_tr. 1)
-        l_low_over_y, _ = torch.triangular_solve(input=y_tr, A=l_low, upper=False)
+        l_low_over_y, _ = torch.triangular_solve(
+            input=y_tr, A=l_low, upper=False
+        )
 
         # (batch_size_tr, 1)
-        alpha, _ = torch.triangular_solve(input=l_low_over_y, A=l_up, upper=True)
+        alpha, _ = torch.triangular_solve(
+            input=l_low_over_y, A=l_up, upper=True
+        )
 
         return k_tr_tr, k_te_te, k_te_tr, k_tr_te, l_low, alpha
 
@@ -211,8 +217,12 @@ class VariationalGaussianProcessOuputRegressor(GaussianProcessOutputRegressor):
 
         # construct inducing points
         inducing_points = torch.distributions.uniform.Uniform(
-            -1 * inducing_points_boundary * torch.ones(n_inducing_points, in_features),
-            1 * inducing_points_boundary * torch.ones(n_inducing_points, in_features),
+            -1
+            * inducing_points_boundary
+            * torch.ones(n_inducing_points, in_features),
+            1
+            * inducing_points_boundary
+            * torch.ones(n_inducing_points, in_features),
         ).sample()
 
         class _VariationalGP(gpytorch.models.ApproximateGP):
@@ -236,7 +246,9 @@ class VariationalGaussianProcessOuputRegressor(GaussianProcessOutputRegressor):
                 self.mean_module = gpytorch.means.ConstantMean()
                 self.covar_module = gpytorch.kernels.ScaleKernel(kernel)
 
-        self.gp = _VariationalGP(inducing_points=inducing_points, kernel=kernel)
+        self.gp = _VariationalGP(
+            inducing_points=inducing_points, kernel=kernel
+        )
 
         self.likelihood = gpytorch.likelihoods.GaussianLikelihood()
         self.objective_function = gpytorch.mlls.VariationalELBO(

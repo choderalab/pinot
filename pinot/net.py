@@ -131,7 +131,10 @@ class Net(BaseNet):
         # since we don't know the memory footprint of
         # torch.distributions
         mus, sigmas = zip(
-            *[(distribution.loc, distribution.scale) for distribution in distributions]
+            *[
+                (distribution.loc, distribution.scale)
+                for distribution in distributions
+            ]
         )
 
         # concat parameters together

@@ -20,7 +20,9 @@ class MultiTaskNet(pinot.Net):
         **kwargs
     ):
 
-        super(MultiTaskNet, self).__init__(representation, output_regressor, **kwargs)
+        super(MultiTaskNet, self).__init__(
+            representation, output_regressor, **kwargs
+        )
         self.output_regressors = torch.nn.ModuleDict()
 
     def condition(self, g, l=None, sampler=None):
@@ -39,9 +41,9 @@ class MultiTaskNet(pinot.Net):
             if str(assay) not in self.heads:
 
                 # get the type of self.head, and instantiate it
-                self.output_regressors[str(assay)] = type(self.output_regressor)(
-                    self.representation_out_features
-                )
+                self.output_regressors[str(assay)] = type(
+                    self.output_regressor
+                )(self.representation_out_features)
 
                 # move to cuda if the parent net is
                 if next(self.parameters()).is_cuda:
@@ -52,7 +54,9 @@ class MultiTaskNet(pinot.Net):
 
             # get distribution for each input
             assay_y = y[:, assay].view(-1, 1)
-            distribution = super(MultiTaskNet, self).condition(g, sampler=sampler)
+            distribution = super(MultiTaskNet, self).condition(
+                g, sampler=sampler
+            )
 
             # mask distribution
             assay_mask = l[:, assay]

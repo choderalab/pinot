@@ -42,7 +42,8 @@ class BBB(BaseSampler):
         # initialize log_sigma
         sigma_param_group["params"] = [
             torch.distributions.normal.Normal(
-                loc=torch.zeros_like(p), scale=initializer_std * torch.ones_like(p)
+                loc=torch.zeros_like(p),
+                scale=initializer_std * torch.ones_like(p),
             )
             .sample()
             .abs()
@@ -116,15 +117,22 @@ class BBB(BaseSampler):
 
                 # compute the kl loss term here
                 kl_loss = (
-                    torch.distributions.normal.Normal(loc=mu, scale=torch.exp(sigma))
+                    torch.distributions.normal.Normal(
+                        loc=mu, scale=torch.exp(sigma)
+                    )
                     .log_prob(theta)
                     .sum()
-                    - self.kl_loss_scaling * self.theta_prior.log_prob(theta).sum()
+                    - self.kl_loss_scaling
+                    * self.theta_prior.log_prob(theta).sum()
                 )
 
             d_kl_d_mu = torch.autograd.grad(kl_loss, mu, retain_graph=True)
-            d_kl_d_sigma = torch.autograd.grad(kl_loss, sigma, retain_graph=True)
-            d_kl_d_theta = torch.autograd.grad(kl_loss, theta, retain_graph=False)
+            d_kl_d_sigma = torch.autograd.grad(
+                kl_loss, sigma, retain_graph=True
+            )
+            d_kl_d_theta = torch.autograd.grad(
+                kl_loss, theta, retain_graph=False
+            )
 
             # put the results in state dicts
             state["d_kl_d_mu"] = d_kl_d_mu[0]
@@ -154,7 +162,9 @@ class BBB(BaseSampler):
             sigma.requires_grad = True
 
             sigma.backward(
-                state["epsilon"] * torch.exp(sigma) * (p.grad + state["d_kl_d_theta"])
+                state["epsilon"]
+                * torch.exp(sigma)
+                * (p.grad + state["d_kl_d_theta"])
                 + state["d_kl_d_sigma"]
             )
 
@@ -179,7 +189,8 @@ class BBB(BaseSampler):
 
                 p.copy_(
                     torch.distributions.normal.Normal(
-                        loc=self.optimizer.state[p]["mu"], scale=torch.exp(sigma)
+                        loc=self.optimizer.state[p]["mu"],
+                        scale=torch.exp(sigma),
                     ).sample()
                 )
 

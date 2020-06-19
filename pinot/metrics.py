@@ -31,7 +31,9 @@ def mse(net, g, y, sampler=None):
 
 def _rmse(y, y_hat):
     assert y.numel() == y_hat.numel()
-    return torch.sqrt(torch.nn.functional.mse_loss(y.flatten(), y_hat.flatten()))
+    return torch.sqrt(
+        torch.nn.functional.mse_loss(y.flatten(), y_hat.flatten())
+    )
 
 
 def rmse(net, g, y, sampler=None):

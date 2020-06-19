@@ -59,13 +59,16 @@ def batch_semi_supervised(ds, batch_size, seed=2666):
     ]
 
     ys_batched = [
-        list(ys[idx * batch_size : (idx + 1) * batch_size]) for idx in range(n_batches)
+        list(ys[idx * batch_size : (idx + 1) * batch_size])
+        for idx in range(n_batches)
     ]
 
     return list(zip(gs_batched, ys_batched))
 
 
-def prepare_semi_supervised_data_from_labeled_data(labeled_data, r=0.2, seed=2666):
+def prepare_semi_supervised_data_from_labeled_data(
+    labeled_data, r=0.2, seed=2666
+):
     """
     r is the ratio of labelled data turning into unlabelled
     """

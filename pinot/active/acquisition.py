@@ -129,14 +129,17 @@ class MCAcquire:
             The values associated with the `sequential_acq` from the Monte Carlo samples.
         """
         # sample from posterior
-        seq_samples = posterior.sample(torch.Size([self.q, self.num_samples])).squeeze(
-            -1
-        )
+        seq_samples = posterior.sample(
+            torch.Size([self.q, self.num_samples])
+        ).squeeze(-1)
 
         # shuffle within outer dimension of qth row to obtain random baches
         indices = torch.randint(batch_size, (self.q, batch_size))
         q_samples = torch.stack(
-            [row[:, indices[idx]] for idx, row in enumerate(torch.unbind(seq_samples))]
+            [
+                row[:, indices[idx]]
+                for idx, row in enumerate(torch.unbind(seq_samples))
+            ]
         )
 
         if self.marginalize_batch:
@@ -192,7 +195,9 @@ class SeqAcquire:
         self.kwargs = kwargs
 
     def __call__(self, samples, axis, y_best=0.0):
-        return self.acq_fn(samples=samples, axis=axis, y_best=y_best, **self.kwargs)
+        return self.acq_fn(
+            samples=samples, axis=axis, y_best=y_best, **self.kwargs
+        )
 
     def PI(self, samples, axis=0, y_best=0.0):
         return (samples > y_best).float().mean(axis=axis)

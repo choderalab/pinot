@@ -57,7 +57,9 @@ def run(args):
         generative_train.train()
         # When done, save the generative model
         torch.save(net_representation, args.save_model)
-        logs.info("Finished training generative model and saving trained model")
+        logs.info(
+            "Finished training generative model and saving trained model"
+        )
 
     else:
         # Load the pretrained generative model
@@ -76,7 +78,9 @@ def run(args):
     # Initialize the Net from with the generative model
     net = pinot.Net(net_representation, noise_model=args.noise_model)
 
-    optimizer = pinot.app.utils.optimizer_translation(args.optimizer, lr=args.lr)(net)
+    optimizer = pinot.app.utils.optimizer_translation(
+        args.optimizer, lr=args.lr
+    )(net)
 
     # get the entire dataset
     ds = getattr(pinot.data, args.data)()
@@ -155,7 +159,10 @@ if __name__ == "__main__":
     # With no pretrained generative model
     group = parser.add_argument_group("With no pretrained generative model")
     group.add_argument(
-        "--layer", type=str, default="GraphConv", help="Type of graph convolution layer"
+        "--layer",
+        type=str,
+        default="GraphConv",
+        help="Type of graph convolution layer",
     )
     group.add_argument(
         "--hidden_dims_gvae",
@@ -224,11 +231,18 @@ if __name__ == "__main__":
         "--optimizer", default="adam", type=str, help="Choice of ptimizer"
     )
     net_args.add_argument(
-        "--out", default="result", type=str, help="Folder to print out results to"
+        "--out",
+        default="result",
+        type=str,
+        help="Folder to print out results to",
     )
     net_args.add_argument("--data", default="esol", help="Data set name")
-    net_args.add_argument("--batch_size", default=32, type=int, help="Batch size")
-    net_args.add_argument("--lr", default=1e-5, type=float, help="Learning rate")
+    net_args.add_argument(
+        "--batch_size", default=32, type=int, help="Batch size"
+    )
+    net_args.add_argument(
+        "--lr", default=1e-5, type=float, help="Learning rate"
+    )
     net_args.add_argument(
         "--partition", default="4:1", type=str, help="Training-testing split"
     )

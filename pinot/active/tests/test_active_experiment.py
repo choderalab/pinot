@@ -21,7 +21,9 @@ def bo():
     y = f(x)
 
     net = pinot.Net(
-        representation=torch.nn.Sequential(torch.nn.Linear(1, 50), torch.nn.Tanh())
+        representation=torch.nn.Sequential(
+            torch.nn.Linear(1, 50), torch.nn.Tanh()
+        )
     )
 
     return pinot.active.experiment.BayesOptExperiment(

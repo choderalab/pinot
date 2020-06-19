@@ -25,7 +25,9 @@ def run(args):
 
     kernel = pinot.inference.gp.kernels.deep_kernel.DeepKernel(
         representation=net_representation,
-        base_kernel=pinot.inference.gp.kernels.rbf.RBF(scale=torch.zeros(hidden_dim)),
+        base_kernel=pinot.inference.gp.kernels.rbf.RBF(
+            scale=torch.zeros(hidden_dim)
+        ),
     )
 
     gpr = pinot.inference.gp.gpr.exact_gpr.ExactGPR(
@@ -86,8 +88,12 @@ def run(args):
     torch.save(gpr.condition(ds_tr[0][0]), args.out + "/distribution_tr.th")
     torch.save(gpr.condition(ds_te[0][0]), args.out + "/distribution_te.th")
 
-    np.save(arr=ds_tr[0][1].detach().cpu().numpy(), file=args.out + "/y_tr.npy")
-    np.save(arr=ds_te[0][1].detach().cpu().numpy(), file=args.out + "/y_te.npy")
+    np.save(
+        arr=ds_tr[0][1].detach().cpu().numpy(), file=args.out + "/y_tr.npy"
+    )
+    np.save(
+        arr=ds_te[0][1].detach().cpu().numpy(), file=args.out + "/y_te.npy"
+    )
 
     with open(args.out + "/architecture.txt", "w") as f_handle:
         f_handle.write(str(train_and_test))
@@ -107,7 +113,9 @@ def run(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--layer", default="GraphConv", type=str)
-    parser.add_argument("--noise_model", default="normal-heteroschedastic", type=str)
+    parser.add_argument(
+        "--noise_model", default="normal-heteroschedastic", type=str
+    )
     parser.add_argument("--optimizer", default="Adam", type=str)
     parser.add_argument(
         "--config", nargs="*", default=[32, "tanh", 32, "tanh", 32, "tanh"]

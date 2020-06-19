@@ -4,7 +4,9 @@
 import dgl
 import torch
 import pinot
-from pinot.inference.output_regressors.base_output_regressor import BaseOutputRegressor
+from pinot.inference.output_regressors.base_output_regressor import (
+    BaseOutputRegressor,
+)
 
 # =============================================================================
 # MODULE CLASSES
@@ -100,6 +102,8 @@ class NeuralNetworkOutputRegressor(BaseOutputRegressor):
         else:
             assert isinstance(self.noise_model, dict)
 
-            distribution = self.noise_model[distribution](self.noise_model[kwargs])
+            distribution = self.noise_model[distribution](
+                self.noise_model[kwargs]
+            )
 
         return distribution

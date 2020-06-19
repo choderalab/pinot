@@ -85,13 +85,17 @@ class SequentialDecoder(nn.Module):
         self.Dx1 = Dx1
         self.Dx2 = Dx2
         self.z_to_zx = nn.Sequential(
-            nn.Linear(embedding_dim, self.Dx1), nn.ReLU(), nn.Linear(self.Dx1, self.Dx2)
+            nn.Linear(embedding_dim, self.Dx1),
+            nn.ReLU(),
+            nn.Linear(self.Dx1, self.Dx2),
         )
 
         self.Da1 = Da1
         self.Da2 = Da2
         self.z_to_za = nn.Sequential(
-            nn.Linear(embedding_dim, self.Da1), nn.ReLU(), nn.Linear(self.Da1, self.Da2)
+            nn.Linear(embedding_dim, self.Da1),
+            nn.ReLU(),
+            nn.Linear(self.Da1, self.Da2),
         )
 
         self.hidden_dim = hidden_dim

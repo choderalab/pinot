@@ -40,7 +40,11 @@ def from_csv(
 
             df_smiles = [str(x) for x in df_smiles]
 
-            idxs = [idx for idx in range(len(df_smiles)) if "nan" not in df_smiles[idx]]
+            idxs = [
+                idx
+                for idx in range(len(df_smiles))
+                if "nan" not in df_smiles[idx]
+            ]
 
             df_smiles = [df_smiles[idx] for idx in idxs]
 
@@ -57,7 +61,14 @@ def from_csv(
             gs = [pinot.graph.from_oemol(mol) for mol in mols]
 
         ds = list(
-            zip(gs, list(torch.tensor(scale * df_y.values[idxs], dtype=torch.float32)))
+            zip(
+                gs,
+                list(
+                    torch.tensor(
+                        scale * df_y.values[idxs], dtype=torch.float32
+                    )
+                ),
+            )
         )
         random.seed(seed)
         random.shuffle(ds)

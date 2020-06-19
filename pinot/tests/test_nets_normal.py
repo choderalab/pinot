@@ -14,9 +14,9 @@ def test_shallow_normal():
     opt = torch.optim.LBFGS(net.parameters(), line_search_fn="strong_wolfe")
 
     # set target as a sample drawn from normal distrtibution
-    y = torch.distributions.normal.Normal(torch.tensor(0.0), torch.tensor(1.0)).sample(
-        [1024, 1]
-    )
+    y = torch.distributions.normal.Normal(
+        torch.tensor(0.0), torch.tensor(1.0)
+    ).sample([1024, 1])
 
     for _ in range(10):
 
@@ -28,6 +28,10 @@ def test_shallow_normal():
 
         opt.step(l)
 
-    npt.assert_almost_equal(net.condition(x).loc.detach().numpy(), 0.0, decimal=1)
+    npt.assert_almost_equal(
+        net.condition(x).loc.detach().numpy(), 0.0, decimal=1
+    )
 
-    npt.assert_almost_equal(net.condition(x).scale.detach().numpy(), 1.0, decimal=1)
+    npt.assert_almost_equal(
+        net.condition(x).scale.detach().numpy(), 1.0, decimal=1
+    )

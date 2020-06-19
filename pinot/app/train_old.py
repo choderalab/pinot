@@ -82,7 +82,9 @@ def run(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--layer", default="GraphConv", type=str)
-    parser.add_argument("--noise_model", default="normal-heteroschedastic", type=str)
+    parser.add_argument(
+        "--noise_model", default="normal-heteroschedastic", type=str
+    )
     parser.add_argument("--optimizer", default="adam", type=str)
     parser.add_argument(
         "--config", nargs="*", default=[32, "tanh", 32, "tanh", 32, "tanh"]

@@ -6,7 +6,10 @@ import torch
 import abc
 import dgl
 import pinot
-from pinot.generative.utils import batch_semi_supervised, prepare_semi_supervised_data
+from pinot.generative.utils import (
+    batch_semi_supervised,
+    prepare_semi_supervised_data,
+)
 
 # =============================================================================
 # HELPER FUNCTIONS
@@ -169,7 +172,9 @@ class BayesOptExperiment(ActiveLearningExperiment):
 
             # batch acquisition
             indices, q_samples = self.acquisition(
-                posterior=distribution, batch_size=gs.batch_size, y_best=self.y_best
+                posterior=distribution,
+                batch_size=gs.batch_size,
+                y_best=self.y_best,
             )
 
             # argmax sample batch
