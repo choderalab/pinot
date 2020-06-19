@@ -1,3 +1,3 @@
-import pinot.multitask
-import pinot.multitask.multitask_net
-import pinot.multitask.utils
+from . import multitask_net
+from . import experiment
+from .multitask_net import MultiTaskNet

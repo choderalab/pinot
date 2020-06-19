@@ -1,4 +1,5 @@
 from pinot.app.experiment import Train
+import torch
 
 class MultiTaskTrain(Train):
     """ Training experiment when heads need to be masked for each task.
@@ -32,7 +33,7 @@ class MultiTaskTrain(Train):
         for l, g, y in self.data:
 
             def l():
-                loss = torch.sum(self.net.loss(g, l, y))
+                loss = self.net.loss(g, y)
                 self.optimizer.zero_grad()
                 loss.backward()
                 return loss

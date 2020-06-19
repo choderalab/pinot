@@ -1,4 +1,6 @@
 import pinot
+import gpytorch
+import torch
 
 class MultiTaskNet(pinot.Net):
     """ An object that combines the representation and parameter
@@ -14,27 +16,29 @@ class MultiTaskNet(pinot.Net):
     def __init__(
         self,
         representation,
-        output_regressor=pinot.inference.heads.mle_head.MaximumLikelihoodEstimationHead,
+        output_regressor=pinot.inference.output_regressors.NeuralNetworkOutputRegressor,
         **kwargs
     ):
 
         super(MultiTaskNet, self).__init__(representation, output_regressor, **kwargs)
         self.output_regressors = torch.nn.ModuleDict()
 
-    def condition(self, g, l=None, sampler=None):
+    def condition_train(self, g, l=None, sampler=None):
         """ Compute the output distribution with sampled weights.
         """
         if l is None:
-            l = np.ones(len(self.output_regressors), dtype=torch.bool)
+            l = torch.ones((g.batch_size, len(self.output_regressors)), dtype=torch.bool)
+
+        h = self.representation(g)
 
         # find which assays are being used
         assays = torch.arange(l.shape[1])[l.any(axis=0)]
-        assay_distributions = []
+        distributions = []
         
         for assay in assays:
             
             # if we already instantiated the head
-            if str(assay) not in self.heads:
+            if str(assay) not in self.output_regressors:
                 
                 # get the type of self.head, and instantiate it
                 self.output_regressors[str(assay)] = type(self.output_regressor)(self.representation_out_features)
@@ -44,20 +48,12 @@ class MultiTaskNet(pinot.Net):
                     self.output_regressors[str(assay)].cuda()
                 
             # switch to head for that assay
-            self.head = self.heads[str(assay)]
+            self.output_regressor = self.output_regressors[str(assay)]
 
             # get distribution for each input
-            assay_y = y[:,assay].view(-1, 1)
-            distribution = super(MultiTaskNet, self).condition(g, sampler=sampler)
-
-            # mask distribution
-            assay_mask = l[:,assay]
-            assay_distribution = torch.distributions.normal.Normal(
-                distribution.loc[assay_mask],
-                distribution.scale[assay_mask])
-            
-            assay_distributions.append(assay_distribution)
-        return assay_distributions
+            distribution = self.output_regressor.condition(h, sampler=sampler)            
+            distributions.append(distribution)
+        return distributions
             
     def loss(self, g, y):
         """ Compute the loss with a input graph and a set of parameters.

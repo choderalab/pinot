@@ -196,36 +196,3 @@ class SeqAcquire:
         else:
             high = samples_sorted[:,high_idx,:]
         return high
-
-class BTModel(nn.Module):
-    r"""Wrapping the pinot gpr model for BoTorch."""
-    
-    def __init__(self, gpr):
-        super(BTModel, self).__init__()
-        self.gpr = gpr
-        self.num_outputs = 1 # needs to be 1 for most of these functions
-
-    def condition(self, X):
-        r"""Computes the posterior over model outputs at the provided points.
-        Args:
-            X: A `b x q x d`-dim Tensor, where `d` is the dimension of the
-                feature space, `q` is the number of points considered jointly,
-                and `b` is the batch dimension.
-            output_indices: A list of indices, corresponding to the outputs over
-                which to compute the posterior (if the model is multi-output).
-                Can be used to speed up computation if only a subset of the
-                model's outputs are required for optimization. If omitted,
-                computes the posterior over all model outputs.
-            observation_noise: If True, add observation noise to the posterior.
-        Returns:
-            A `Posterior` object, representing a batch of `b` joint distributions
-            over `q` points and `m` outputs each.
-        """
-        self.gpr.eval()
-        out = self.gpr.condition(X)
-        gptorch_mvn = MultivariateNormal(out.mean,
-                                         out.covariance_matrix)
-        return GPyTorchPosterior(gptorch_mvn)
-    
-    def loss(self, g, y):
-        return self.gpr.loss(g, y)

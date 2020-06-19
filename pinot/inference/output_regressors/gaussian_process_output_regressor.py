@@ -43,7 +43,7 @@ class GaussianProcessOutputRegressor(BaseOutputRegressor):
 # =============================================================================
 # MODULE CLASSES
 # =============================================================================
-class ExactGaussianProcessOuputRegressor(GaussianProcessOutputRegressor):
+class ExactGaussianProcessOutputRegressor(GaussianProcessOutputRegressor):
     """ Exact Gaussian Process.
 
     """
@@ -52,7 +52,7 @@ class ExactGaussianProcessOuputRegressor(GaussianProcessOutputRegressor):
             in_features,
             kernel=None,
             ):
-        super(ExactGaussianProcessOuputRegressor, self).__init__()
+        super(ExactGaussianProcessOutputRegressor, self).__init__()
 
         if kernel is None:
             kernel = pinot.inference.kernels.rbf.RBF
@@ -191,7 +191,7 @@ class ExactGaussianProcessOuputRegressor(GaussianProcessOutputRegressor):
         return nll
 
 
-class VariationalGaussianProcessOuputRegressor(GaussianProcessOutputRegressor):
+class VariationalGaussianProcessOutputRegressor(GaussianProcessOutputRegressor):
     """ Variational Gaussian Process.
 
     """
@@ -202,7 +202,7 @@ class VariationalGaussianProcessOuputRegressor(GaussianProcessOutputRegressor):
             inducing_points_boundary=1.0,
             num_data=1,
             kernel=None):
-        super(VariationalGaussianProcessOuputRegressor, self).__init__()
+        super(VariationalGaussianProcessOutputRegressor, self).__init__()
 
         # construct inducing points
         inducing_points = torch.distributions.uniform.Uniform(
