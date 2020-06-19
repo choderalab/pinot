@@ -12,17 +12,16 @@ class SemiSupervisedNet(pinot.Net):
             measurement_dimension=1,
             noise_model='normal-heteroschedastic',
             hidden_dim=64,
-            unsup_scale=1):
+            unsup_scale=1,
+            cuda=True):
 
         if not hasattr(representation, "infer_node_representation"):
             print("Representation needs to have infer_node_representation function")
             sys.exit(1)
 
-        
         if not hasattr(representation, "graph_h_from_node_h"):
             print("Representation needs to have graph_h_from_node_h function")
             sys.exit(1)
-    
     
         super(SemiSupervisedNet, self).__init__(
             representation, output_regression, measurement_dimension, noise_model)
@@ -53,30 +52,36 @@ class SemiSupervisedNet(pinot.Net):
         # loss term. It should be r if one synthesizes the semi-supervised data
         # using prepare_semi_supeprvised_data_from_labeled_data
         self.unsup_scale = unsup_scale
+        self.cuda = cuda
+
+        # Move to CUDA if available
+        self.device = torch.device("cuda:0" if cuda else "cpu:0")
+        self.representation.to(self.device)
+        self._output_regression.to(self.device)
     
     def loss(self, g, y):
         """ Compute the loss function
 
         """
+        # Move to CUDA if available
+        g.to(self.device)
         # Compute the node representation
         h = self.representation.infer_node_representation(g) # We always call this
         # Compute unsupervised loss
-        unsup_loss = self.representation.decode_and_compute_loss(g, h)  
+        unsup_loss = self.representation.decode_and_compute_loss(g, h)
         # Compute the graph representation from node representation
         h    = self.representation.graph_h_from_node_h(g, h)
         
-        not_none_ind =[i for i in range(len(y)) if y[i] is not None]
         supervised_loss = torch.tensor(0.)
-
-        if len(not_none_ind) != 0:
+        if len(y[~torch.isnan(y)]) != 0:
             # Only compute supervised loss for the labeled data
-            h_not_none = h[not_none_ind, :]
-            y_not_none = [y[idx] for idx in not_none_ind]
-            y_not_none = torch.tensor(y_not_none).unsqueeze(1)
+            h_not_none = h[~torch.isnan(y).flatten(), :]
+            y_not_none = y[~torch.isnan(y)].unsqueeze(1)
+            # Convert to cuda if available
+            y_not_none = y_not_none.to(self.device)
             supervised_loss = self.compute_supervised_loss(h_not_none, y_not_none)
 
         total_loss = supervised_loss.sum() + unsup_loss*self.unsup_scale 
-
         return total_loss
 
     def compute_supervised_loss(self, h, y):

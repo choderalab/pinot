@@ -17,10 +17,11 @@ class SemiSupervisedGaussianProcesses(SemiSupervisedNet):
             noise_model='normal-heteroschedastic',
             log_sigma=-3.0,
             hidden_dim=64,
-            unsup_scale=1):
+            unsup_scale=1, 
+            cuda=True):
 
         super(SemiSupervisedGaussianProcesses, self).__init__(
-            representation, output_regression, measurement_dimension, noise_model, hidden_dim, unsup_scale)
+            representation, output_regression, measurement_dimension, noise_model, hidden_dim, unsup_scale, cuda)
 
         if not hasattr(representation, "infer_node_representation"):
             print("The current implementation requires representation to have a infer_node_representation function")
@@ -29,12 +30,12 @@ class SemiSupervisedGaussianProcesses(SemiSupervisedNet):
         self.hidden_dim = hidden_dim
         self.log_sigma = torch.nn.Parameter(
                 torch.tensor(
-                    log_sigma))
+                    log_sigma)).to(self.device)
 
         if kernel is None:
-            self.kernel = RBF()
+            self.kernel = RBF().to(self.device)
         else:
-            self.kernel = kernel
+            self.kernel = kernel.to(self.device)
 
     def compute_supervised_loss(self, x_tr, y_tr):
         r""" Compute the supervised loss with Gaussian Processes
@@ -48,6 +49,7 @@ class SemiSupervisedGaussianProcesses(SemiSupervisedNet):
         y_tr : torch.tensor, shape=(batch_size, 1)
             training data measurement.
         """
+
         # point data to object
         self._x_tr = x_tr
         self._y_tr = y_tr
@@ -108,6 +110,7 @@ class SemiSupervisedGaussianProcesses(SemiSupervisedNet):
         return k_tr_tr, k_te_te, k_te_tr, k_tr_te, l_low, alpha
 
     def condition(self, g, x_tr=None, y_tr=None, sampler=None):
+        g.to(self.device)
         x_te = self.representation(g)
         return self._condition(x_te, x_tr, y_tr, sampler)
 
