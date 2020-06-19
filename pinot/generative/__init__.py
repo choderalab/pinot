@@ -1,2 +1,1 @@
-import pinot.generative
-import pinot.generative.utils
+from pinot.generative import utils

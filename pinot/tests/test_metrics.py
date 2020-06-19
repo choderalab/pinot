@@ -20,7 +20,9 @@ def test_mse_and_rmse():
 
         npt.assert_almost_equal(
             np.mean((x - y) ** 2),
-            pinot.metrics._mse(torch.tensor(x), torch.tensor(y)).detach().numpy(),
+            pinot.metrics._mse(torch.tensor(x), torch.tensor(y))
+            .detach()
+            .numpy(),
         )
 
         npt.assert_almost_equal(
@@ -28,7 +30,9 @@ def test_mse_and_rmse():
             .pow(0.5)
             .detach()
             .numpy(),
-            pinot.metrics._rmse(torch.tensor(x), torch.tensor(y)).detach().numpy(),
+            pinot.metrics._rmse(torch.tensor(x), torch.tensor(y))
+            .detach()
+            .numpy(),
         )
 
 
@@ -39,5 +43,6 @@ def test_r2():
     y = x
 
     npt.assert_almost_equal(
-        pinot.metrics._r2(torch.tensor(x), torch.tensor(y)).detach().numpy(), 1.0
+        pinot.metrics._r2(torch.tensor(x), torch.tensor(y)).detach().numpy(),
+        1.0,
     )

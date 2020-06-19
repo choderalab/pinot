@@ -1,12 +1,13 @@
-#=============================================================================
+# =============================================================================
 # IMPORTS
 # =============================================================================
 import torch
 import pinot
 import abc
 import math
-from pinot.inference.output_regressors.base_output_regressor\
-    import BaseOutputRegressor
+from pinot.inference.output_regressors.base_output_regressor import (
+    BaseOutputRegressor,
+)
 import gpytorch
 
 # =============================================================================
@@ -16,6 +17,7 @@ class GaussianProcessOutputRegressor(BaseOutputRegressor):
     """ Gaussian Process Regression.
 
     """
+
     def __init__(self, epsilon=1e-5):
         super(GaussianProcessOutputRegressor, self).__init__()
         self.epsilon = epsilon
@@ -34,11 +36,10 @@ class GaussianProcessOutputRegressor(BaseOutputRegressor):
         """
 
         # introduce noise along the diagnol
-        noise = self.epsilon * torch.eye(
-                *k.shape,
-                device=k.device)
+        noise = self.epsilon * torch.eye(*k.shape, device=k.device)
 
         return k + noise
+
 
 # =============================================================================
 # MODULE CLASSES
@@ -47,11 +48,17 @@ class ExactGaussianProcessOutputRegressor(GaussianProcessOutputRegressor):
     """ Exact Gaussian Process.
 
     """
+
     def __init__(
+<<<<<<< HEAD
             self,
             in_features,
             kernel=None,
             ):
+=======
+        self, in_features, kernel=None,
+    ):
+>>>>>>> f469527d16f5385a75c59ea65b54d8db06942da1
         super(ExactGaussianProcessOutputRegressor, self).__init__()
 
         if kernel is None:
@@ -66,25 +73,25 @@ class ExactGaussianProcessOutputRegressor(GaussianProcessOutputRegressor):
         self.in_features = in_features
 
     def _get_kernel_and_auxiliary_variables(
-            self, x_tr, y_tr, x_te=None, sigma=1.0, epsilon=1e-5,
-        ):
+        self, x_tr, y_tr, x_te=None, sigma=1.0, epsilon=1e-5,
+    ):
 
         # compute the kernels
         k_tr_tr = self._perturb(self.kernel.forward(x_tr, x_tr))
 
-        if x_te is not None: # during test
+        if x_te is not None:  # during test
             k_te_te = self._perturb(self.kernel.forward(x_te, x_te))
             k_te_tr = self._perturb(self.kernel.forward(x_te, x_tr))
             # k_tr_te = self.forward(x_tr, x_te)
-            k_tr_te = k_te_tr.t() # save time
+            k_tr_te = k_te_tr.t()  # save time
 
-        else: # during train
+        else:  # during train
             k_te_te = k_te_tr = k_tr_te = k_tr_tr
 
         # (batch_size_tr, batch_size_tr)
         k_plus_sigma = k_tr_tr + (sigma ** 2) * torch.eye(
-            k_tr_tr.shape[0],
-            device=k_tr_tr.device)
+            k_tr_tr.shape[0], device=k_tr_tr.device
+        )
 
         # (batch_size_tr, batch_size_tr)
         l_low = torch.cholesky(k_plus_sigma)
@@ -92,15 +99,13 @@ class ExactGaussianProcessOutputRegressor(GaussianProcessOutputRegressor):
 
         # (batch_size_tr. 1)
         l_low_over_y, _ = torch.triangular_solve(
-            input=y_tr,
-            A=l_low,
-            upper=False)
+            input=y_tr, A=l_low, upper=False
+        )
 
         # (batch_size_tr, 1)
         alpha, _ = torch.triangular_solve(
-            input=l_low_over_y,
-            A=l_up,
-            upper=True)
+            input=l_low_over_y, A=l_up, upper=True
+        )
 
         return k_tr_tr, k_te_te, k_te_tr, k_tr_te, l_low, alpha
 
@@ -129,19 +134,21 @@ class ExactGaussianProcessOutputRegressor(GaussianProcessOutputRegressor):
             y_tr = self._y_tr
 
         # get parameters
-        k_tr_tr, k_te_te, k_te_tr, k_tr_te, l_low, alpha\
-            = self._get_kernel_and_auxiliary_variables(
-                x_tr, y_tr, x_te)
+        (
+            k_tr_tr,
+            k_te_te,
+            k_te_tr,
+            k_tr_te,
+            l_low,
+            alpha,
+        ) = self._get_kernel_and_auxiliary_variables(x_tr, y_tr, x_te)
 
         # compute mean
         # (batch_size_te, 1)
         mean = k_te_tr @ alpha
 
         # (batch_size_tr, batch_size_te)
-        v, _ = torch.triangular_solve(
-            input=k_tr_te,
-            A=l_low,
-            upper=False)
+        v, _ = torch.triangular_solve(input=k_tr_te, A=l_low, upper=False)
 
         # (batch_size_te, batch_size_te)
         variance = k_te_te - v.t() @ v
@@ -156,8 +163,8 @@ class ExactGaussianProcessOutputRegressor(GaussianProcessOutputRegressor):
 
         # construct noise predictive distribution
         distribution = torch.distributions.multivariate_normal.MultivariateNormal(
-            mean.flatten(),
-            variance)
+            mean.flatten(), variance
+        )
 
         return distribution
 
@@ -181,12 +188,21 @@ class ExactGaussianProcessOutputRegressor(GaussianProcessOutputRegressor):
         self._y_tr = y_tr
 
         # get the parameters
-        k_tr_tr, k_te_te, k_te_tr, k_tr_te, l_low, alpha\
-            = self._get_kernel_and_auxiliary_variables(x_tr, y_tr)
+        (
+            k_tr_tr,
+            k_te_te,
+            k_te_tr,
+            k_tr_te,
+            l_low,
+            alpha,
+        ) = self._get_kernel_and_auxiliary_variables(x_tr, y_tr)
 
         # we return the exact nll with constant
-        nll = 0.5 * (y_tr.t() @ alpha) + torch.trace(l_low)\
+        nll = (
+            0.5 * (y_tr.t() @ alpha)
+            + torch.trace(l_low)
             + 0.5 * y_tr.shape[0] * math.log(2.0 * math.pi)
+        )
 
         return nll
 
@@ -195,6 +211,7 @@ class VariationalGaussianProcessOutputRegressor(GaussianProcessOutputRegressor):
     """ Variational Gaussian Process.
 
     """
+
     def __init__(
             self,
             in_features,
@@ -206,51 +223,48 @@ class VariationalGaussianProcessOutputRegressor(GaussianProcessOutputRegressor):
 
         # construct inducing points
         inducing_points = torch.distributions.uniform.Uniform(
-            -1 * inducing_points_boundary * torch.ones(
-                n_inducing_points, in_features),
-            1 * inducing_points_boundary * torch.ones(
-                n_inducing_points, in_features)).sample()
+            -1
+            * inducing_points_boundary
+            * torch.ones(n_inducing_points, in_features),
+            1
+            * inducing_points_boundary
+            * torch.ones(n_inducing_points, in_features),
+        ).sample()
 
         class _VariationalGP(gpytorch.models.ApproximateGP):
-
             def __init__(self, inducing_points, kernel):
 
                 if kernel is None:
                     kernel = gpytorch.kernels.RBFKernel()
 
-                variational_distribution = gpytorch.variational\
-                    .CholeskyVariationalDistribution(
-                        inducing_points.size(-1))
+                variational_distribution = gpytorch.variational.CholeskyVariationalDistribution(
+                    inducing_points.size(-1)
+                )
 
-                variational_strategy = gpytorch.variational\
-                    .VariationalStrategy(
-                        self,
-                        inducing_points,
-                        variational_distribution,
-                        learn_inducing_locations=True
-                    )
+                variational_strategy = gpytorch.variational.VariationalStrategy(
+                    self,
+                    inducing_points,
+                    variational_distribution,
+                    learn_inducing_locations=True,
+                )
 
                 super().__init__(variational_strategy)
                 self.mean_module = gpytorch.means.ConstantMean()
-                self.covar_module = gpytorch.kernels.ScaleKernel(
-                    kernel)
+                self.covar_module = gpytorch.kernels.ScaleKernel(kernel)
 
         self.gp = _VariationalGP(
-            inducing_points=inducing_points,
-            kernel=kernel)
+            inducing_points=inducing_points, kernel=kernel
+        )
 
         self.likelihood = gpytorch.likelihoods.GaussianLikelihood()
         self.objective_function = gpytorch.mlls.VariationalELBO(
-            likelihood=self.likelihood,
-            model=self.gp,
-            num_data=num_data)
+            likelihood=self.likelihood, model=self.gp, num_data=num_data
+        )
 
     def condition(self, x):
         mean_x = self.gp.mean_module(x)
         covar_x = self.gp.covar_module(x)
-        return gpytorch.distributions.MultivariateNormal(
-            mean_x,
-            covar_x)
+        return gpytorch.distributions.MultivariateNormal(mean_x, covar_x)
 
     def loss(self, x, y):
         distribution = self.condition(x)

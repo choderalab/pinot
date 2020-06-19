@@ -60,23 +60,22 @@ class Sequential(torch.nn.Module):
 
                 self.exes.append("o" + str(idx))
 
-    def forward(self, g, x=None, 
-            pool=lambda g: dgl.sum_nodes(g, 'h')):
-    
+    def forward(self, g, x=None, pool=lambda g: dgl.sum_nodes(g, "h")):
+
         if x is None:
-            x = g.ndata['h']
+            x = g.ndata["h"]
 
         x = self.f_in(x)
 
         for exe in self.exes:
-            if exe.startswith('d'):
+            if exe.startswith("d"):
                 x = getattr(self, exe)(g, x)
             else:
                 x = getattr(self, exe)(x)
 
         if pool is not None:
             with g.local_scope():
-                g.ndata['h'] = x
+                g.ndata["h"] = x
                 x = pool(g)
 
         return x

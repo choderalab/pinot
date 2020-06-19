@@ -13,21 +13,24 @@ import random
 # =============================================================================
 
 
-def from_csv(path, toolkit="rdkit", smiles_col=-1, y_cols=[-2], seed=2666,
-        scale=1.0, dropna=False,
-        **kwargs):
+def from_csv(
+    path,
+    toolkit="rdkit",
+    smiles_col=-1,
+    y_cols=[-2],
+    seed=2666,
+    scale=1.0,
+    dropna=False,
+    **kwargs
+):
     """ Read csv from file.
     """
 
     def _from_csv():
-        df = pd.read_csv(
-            path,
-            error_bad_lines=False,
-            **kwargs)
+        df = pd.read_csv(path, error_bad_lines=False, **kwargs)
 
         if dropna is True:
             df = df.dropna(axis=0, subset=[df.columns[y_cols[0]]])
-
 
         df_smiles = df.iloc[:, smiles_col]
         df_y = df.iloc[:, y_cols]
@@ -37,9 +40,11 @@ def from_csv(path, toolkit="rdkit", smiles_col=-1, y_cols=[-2], seed=2666,
 
             df_smiles = [str(x) for x in df_smiles]
 
-            idxs = [idx for idx in range(len(df_smiles)
-                ) if 'nan' not in df_smiles[idx]]
-
+            idxs = [
+                idx
+                for idx in range(len(df_smiles))
+                if "nan" not in df_smiles[idx]
+            ]
 
             df_smiles = [df_smiles[idx] for idx in idxs]
 
@@ -55,7 +60,16 @@ def from_csv(path, toolkit="rdkit", smiles_col=-1, y_cols=[-2], seed=2666,
             ]
             gs = [pinot.graph.from_oemol(mol) for mol in mols]
 
-        ds = list(zip(gs, list(torch.tensor(scale * df_y.values[idxs], dtype=torch.float32))))
+        ds = list(
+            zip(
+                gs,
+                list(
+                    torch.tensor(
+                        scale * df_y.values[idxs], dtype=torch.float32
+                    )
+                ),
+            )
+        )
         random.seed(seed)
         random.shuffle(ds)
 
@@ -67,6 +81,7 @@ def from_csv(path, toolkit="rdkit", smiles_col=-1, y_cols=[-2], seed=2666,
 def load_unlabeled_data(path, size=0.1, toolkit="rdkit", seed=2666):
     """ Read from unlabeled data set as background data
     """
+
     def _from_txt():
         f = open(path, "r")
         df_smiles = [line.rstrip() for line in f]
@@ -79,11 +94,13 @@ def load_unlabeled_data(path, size=0.1, toolkit="rdkit", seed=2666):
 
         if toolkit == "rdkit":
             from rdkit import Chem
+
             mols = [Chem.MolFromSmiles(smiles) for smiles in df_smiles]
             gs = [pinot.graph.from_rdkit_mol(mol) for mol in mols]
 
         elif toolkit == "openeye":
             from openeye import oechem
+
             mols = [
                 oechem.OESmilesToMol(oechem.OEGraphMol(), smiles)
                 for smiles in df_smiles
@@ -97,6 +114,7 @@ def load_unlabeled_data(path, size=0.1, toolkit="rdkit", seed=2666):
         return gs
 
     return _from_txt
+
 
 def normalize(ds):
     """ Get mean and std.

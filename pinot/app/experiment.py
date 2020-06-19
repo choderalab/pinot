@@ -75,7 +75,7 @@ class Train:
 
         self.states["final"] = copy.deepcopy(self.net.state_dict())
 
-        if hasattr(self.optimizer, 'expecation_params'):
+        if hasattr(self.optimizer, "expecation_params"):
             self.optimizer.expectation_params()
 
         return self.net
@@ -98,7 +98,9 @@ class Test:
 
     """
 
-    def __init__(self, net, data, states, sampler=None, metrics=[pinot.rmse, pinot.r2]):
+    def __init__(
+        self, net, data, states, sampler=None, metrics=[pinot.rmse, pinot.r2]
+    ):
         self.net = net  # deepcopy the model object
         self.data = data
         self.metrics = metrics
@@ -134,10 +136,16 @@ class Test:
             g = dgl.batch(g)
 
             for metric in self.metrics:  # loop through the metrics
-                results[metric.__name__][state_name] = metric(self.net, g, y, sampler=self.sampler).detach().cpu().numpy()
+                results[metric.__name__][state_name] = (
+                    metric(self.net, g, y, sampler=self.sampler)
+                    .detach()
+                    .cpu()
+                    .numpy()
+                )
 
         self.results = results
         return dict(results)
+
 
 class TrainAndTest:
     """ Train a model and then test it.
@@ -150,8 +158,7 @@ class TrainAndTest:
         data_tr,
         data_te,
         optimizer,
-        metrics=[pinot.rmse, pinot.r2, pinot.avg_nll,
-            pinot.metrics.log_sigma],
+        metrics=[pinot.rmse, pinot.r2, pinot.avg_nll, pinot.metrics.log_sigma],
         n_epochs=100,
         record_interval=1,
     ):
@@ -164,26 +171,25 @@ class TrainAndTest:
         self.record_interval = record_interval
 
     def __str__(self):
-        _str = ''
-        _str += '# model'
-        _str += '\n'
+        _str = ""
+        _str += "# model"
+        _str += "\n"
         _str += str(self.net)
-        _str += '\n'
-        if hasattr(self.net, 'noise_model'):
-            _str += '# noise model'
-            _str += '\n'
+        _str += "\n"
+        if hasattr(self.net, "noise_model"):
+            _str += "# noise model"
+            _str += "\n"
             _str += str(self.net.noise_model)
-            _str += '\n'
-        _str += '# optimizer'
-        _str += '\n'
+            _str += "\n"
+        _str += "# optimizer"
+        _str += "\n"
         _str += str(self.optimizer)
-        _str += '\n'
-        _str += '# n_epochs'
-        _str += '\n'
+        _str += "\n"
+        _str += "# n_epochs"
+        _str += "\n"
         _str += str(self.n_epochs)
-        _str += '\n'
+        _str += "\n"
         return _str
-
 
     def run(self):
         train = Train(
@@ -198,7 +204,10 @@ class TrainAndTest:
         self.states = train.states
 
         test = Test(
-            net=self.net, data=self.data_te, metrics=self.metrics, states=self.states,
+            net=self.net,
+            data=self.data_te,
+            metrics=self.metrics,
+            states=self.states,
             sampler=self.optimizer,
         )
 
@@ -207,7 +216,10 @@ class TrainAndTest:
         self.results_te = test.results
 
         test = Test(
-            net=self.net, data=self.data_tr, metrics=self.metrics, states=self.states,
+            net=self.net,
+            data=self.data_tr,
+            metrics=self.metrics,
+            states=self.states,
             sampler=self.optimizer,
         )
 
@@ -217,7 +229,8 @@ class TrainAndTest:
 
         del train
 
-        return {'test': self.results_te, 'training': self.results_tr}
+        return {"test": self.results_te, "training": self.results_tr}
+
 
 class MultipleTrainAndTest:
     """ A sequence of controlled experiment.

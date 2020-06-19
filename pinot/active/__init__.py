@@ -1,3 +1,1 @@
-import pinot.active
-import pinot.active.acquisition
-import pinot.active.experiment
+from pinot.active import acquisition, experiment

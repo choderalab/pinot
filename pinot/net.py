@@ -23,6 +23,7 @@ class BaseNet(torch.nn.Module, abc.ABC):
 
 
     """
+
     def __init__(self, output_regressor, *args, **kwargs):
         super(BaseNet, self).__init__()
 
@@ -39,7 +40,7 @@ class BaseNet(torch.nn.Module, abc.ABC):
         # if there is a special loss function implemented in the head,
         # use that instead
 
-        if hasattr(self.output_regressor, 'loss'):
+        if hasattr(self.output_regressor, "loss"):
             # get latent representation
             h = self.representation(g)
 
@@ -71,34 +72,31 @@ class Net(BaseNet):
     def __init__(
         self,
         representation,
-        output_regressor=pinot.inference\
-            .output_regressors.neural_network_output_regressor\
-            .NeuralNetworkOutputRegressor,
+        output_regressor=pinot.inference.NeuralNetworkOutputRegressor,
         **kwargs
     ):
 
         super(Net, self).__init__(output_regressor=output_regressor)
         self.representation = representation
 
-
         # read the representation hidden units here
         # grab the last dimension of `representation`
         # grab the last dimension of `representation`
         self.representation_out_features = [
-                layer for layer in list(self.representation.modules())\
-                        if hasattr(layer, 'out_features')][-1].out_features
+            layer
+            for layer in list(self.representation.modules())
+            if hasattr(layer, "out_features")
+        ][-1].out_features
 
         self.output_regressor_cls = output_regressor
 
         # if nothing is specified for head,
         # use the MLE with heteroschedastic model
         output_regressor = output_regressor(
-            in_features=self.representation_out_features,
-            **kwargs
+            in_features=self.representation_out_features, **kwargs
         )
 
         self.output_regressor = output_regressor
-
 
     def _condition(self, g):
         """ Compute the output distribution.
@@ -118,7 +116,7 @@ class Net(BaseNet):
         if sampler is None:
             return self._condition(g)
 
-        if not hasattr(sampler, 'sample_params'):
+        if not hasattr(sampler, "sample_params"):
             return self._condition(g)
 
         # initialize a list of distributions
@@ -132,25 +130,25 @@ class Net(BaseNet):
         # NOTE: this is not necessarily the most efficienct solution
         # since we don't know the memory footprint of
         # torch.distributions
-        mus, sigmas = zip(*[
+        mus, sigmas = zip(
+            *[
                 (distribution.loc, distribution.scale)
-                for distribution in distributions])
+                for distribution in distributions
+            ]
+        )
 
         # concat parameters together
         # (n_samples, batch_size, measurement_dimension)
-        mu = torch.stack(mus).cpu() # distribution no cuda
+        mu = torch.stack(mus).cpu()  # distribution no cuda
         sigma = torch.stack(sigmas).cpu()
 
         # construct the distribution
-        distribution = torch.distributions.normal.Normal(
-                loc=mu,
-                scale=sigma)
+        distribution = torch.distributions.normal.Normal(loc=mu, scale=sigma)
 
         # make it mixture
-        distribution = torch.distributions.mixture_same_family\
-                .MixtureSameFamily(
-                        torch.distributions.Categorical(
-                            torch.ones(mu.shape[0],)),
-                        torch.distributions.Independent(distribution, 2))
+        distribution = torch.distributions.mixture_same_family.MixtureSameFamily(
+            torch.distributions.Categorical(torch.ones(mu.shape[0],)),
+            torch.distributions.Independent(distribution, 2),
+        )
 
         return distribution

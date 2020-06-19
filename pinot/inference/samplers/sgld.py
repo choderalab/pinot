@@ -55,7 +55,9 @@ class SGLD(Optimizer):
         if lr < 0.0:
             raise ValueError("Invalid learning rate: {}".format(lr))
         if num_burn_in_steps < 0:
-            raise ValueError("Invalid num_burn_in_steps: {}".format(num_burn_in_steps))
+            raise ValueError(
+                "Invalid num_burn_in_steps: {}".format(num_burn_in_steps)
+            )
 
         defaults = dict(
             lr=lr,
@@ -98,7 +100,8 @@ class SGLD(Optimizer):
 
                 #  Momentum update {{{ #
                 momentum.add_(
-                    (1.0 - precondition_decay_rate) * ((gradient ** 2) - momentum)
+                    (1.0 - precondition_decay_rate)
+                    * ((gradient ** 2) - momentum)
                 )
                 #  }}} Momentum update #
 
@@ -107,10 +110,13 @@ class SGLD(Optimizer):
                 else:
                     sigma = torch.zeros_like(parameter)
 
-                preconditioner = 1.0 / torch.sqrt(momentum + group["diagonal_bias"])
+                preconditioner = 1.0 / torch.sqrt(
+                    momentum + group["diagonal_bias"]
+                )
 
                 scaled_grad = 0.5 * preconditioner * gradient * num_pseudo_batches + torch.normal(
-                    mean=torch.zeros_like(gradient), std=torch.ones_like(gradient)
+                    mean=torch.zeros_like(gradient),
+                    std=torch.ones_like(gradient),
                 ) * sigma * torch.sqrt(
                     preconditioner
                 )

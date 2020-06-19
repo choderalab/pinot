@@ -6,30 +6,37 @@ import torch
 import abc
 import dgl
 import pinot
-from pinot.generative.utils import (batch_semi_supervised,
-                                    prepare_semi_supervised_data)
+from pinot.generative.utils import (
+    batch_semi_supervised,
+    prepare_semi_supervised_data,
+)
 
 # =============================================================================
 # HELPER FUNCTIONS
 # =============================================================================
 def _independent(distribution):
     return torch.distributions.normal.Normal(
-        distribution.mean.flatten(),
-        distribution.variance.flatten().pow(0.5))
+        distribution.mean.flatten(), distribution.variance.flatten().pow(0.5)
+    )
+
 
 def _slice_fn_tensor(x, idxs):
     return x[idxs]
 
+
 def _collate_fn_tensor(x):
     return torch.stack(x)
 
+
 def _collate_fn_graph(x):
     return dgl.batch(x)
+
 
 def _slice_fn_graph(x, idxs):
     if x.batch_size > 1:
         x = dgl.unbatch(x)
     return dgl.batch([x[idx] for idx in idxs])
+
 
 def _slice_fn_tuple(x, idxs):
     gs, ys = x
@@ -37,12 +44,14 @@ def _slice_fn_tuple(x, idxs):
     tensor_slices = _slice_fn_tensor(ys, idxs)
     return graph_slices, tensor_slices
 
+
 # =============================================================================
 # MODULE CLASSES
 # =============================================================================
 class ActiveLearningExperiment(torch.nn.Module, abc.ABC):
     """ Implements active learning experiment base class.
     """
+
     def __init__(self):
         super(ActiveLearningExperiment, self).__init__()
 
@@ -54,25 +63,27 @@ class ActiveLearningExperiment(torch.nn.Module, abc.ABC):
     def acquire(self, *args, **kwargs):
         raise NotImplementedError
 
+
 class BayesOptExperiment(ActiveLearningExperiment):
     """ Implements active learning experiment with single task target.
     """
+
     def __init__(
-            self,
-            net,
-            data,
-            acquisition,
-            optimizer,
-            n_epochs=100,
-            strategy='sequential',
-            q=1,
-            num_samples=1000,
-            early_stopping=True,
-            workup=_independent,
-            slice_fn=_slice_fn_tensor,
-            collate_fn=_collate_fn_tensor,
-            net_state_dict=None,
-        ):
+        self,
+        net,
+        data,
+        acquisition,
+        optimizer,
+        n_epochs=100,
+        strategy="sequential",
+        q=1,
+        num_samples=1000,
+        early_stopping=True,
+        workup=_independent,
+        slice_fn=_slice_fn_tensor,
+        collate_fn=_collate_fn_tensor,
+        net_state_dict=None,
+    ):
 
         super(BayesOptExperiment, self).__init__()
 
@@ -119,6 +130,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
 
     def blind_pick(self, seed=2666):
         import random
+
         random.seed(seed)
         best = random.choice(self.new)
         self.old.append(self.new.pop(best))
@@ -139,7 +151,8 @@ class BayesOptExperiment(ActiveLearningExperiment):
             optimizer=self.optimizer,
             n_epochs=self.n_epochs,
             net=self.net,
-            record_interval=999999).train()
+            record_interval=999999,
+        ).train()
 
     def acquire(self):
         """ Acquire new training data.
@@ -155,15 +168,17 @@ class BayesOptExperiment(ActiveLearningExperiment):
         # write API for sampler
         distribution = self.net.condition(gs)
 
-        if self.strategy == 'batch':
+        if self.strategy == "batch":
 
             # batch acquisition
-            indices, q_samples = self.acquisition(posterior=distribution,
-                                                  batch_size=gs.batch_size,
-                                                  y_best=self.y_best)
+            indices, q_samples = self.acquisition(
+                posterior=distribution,
+                batch_size=gs.batch_size,
+                y_best=self.y_best,
+            )
 
             # argmax sample batch
-            best = indices[:,torch.argmax(q_samples)].squeeze()
+            best = indices[:, torch.argmax(q_samples)].squeeze()
 
         else:
             # workup
@@ -180,7 +195,6 @@ class BayesOptExperiment(ActiveLearningExperiment):
         # print(len(self.new), best)
         self.old.extend([self.new.pop(b) for b in best])
 
-
     def update_data(self):
         """ Update the internal data using old and new.
         """
@@ -193,7 +207,6 @@ class BayesOptExperiment(ActiveLearningExperiment):
         # set y_max
         gs, ys = self.old_data
         self.y_best = torch.max(ys)
-
 
     def run(self, num_rounds=999999, seed=None):
         """ Run the model.
@@ -221,6 +234,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
 class SemiSupervisedBayesOptExperiment(BayesOptExperiment):
     """ Implements active learning experiment with single task target.
     """
+
     def __init__(self, *args, **kwargs):
 
         super(SemiSupervisedBayesOptExperiment, self).__init__(*args, **kwargs)
@@ -231,15 +245,14 @@ class SemiSupervisedBayesOptExperiment(BayesOptExperiment):
         # combine new (unlabeled!) and old (labeled!)
         # Flatten the labeled_data and remove labels to be ready
         semi_supervised_data = prepare_semi_supervised_data(
-            self.flatten_data(self.new_data),
-            self.flatten_data(self.old_data)
-            )
+            self.flatten_data(self.new_data), self.flatten_data(self.old_data)
+        )
 
         # NOTE that we have to use a special version of batch here
         # because torch.tensor doesn't take in `None`
         batched_semi_supervised_data = batch_semi_supervised(
-            semi_supervised_data,
-            batch_size=len(semi_supervised_data))
+            semi_supervised_data, batch_size=len(semi_supervised_data)
+        )
 
         # reset
         self.reset_net()
@@ -253,7 +266,8 @@ class SemiSupervisedBayesOptExperiment(BayesOptExperiment):
             optimizer=self.optimizer,
             n_epochs=self.n_epochs,
             net=self.net,
-            record_interval=999999).train()
+            record_interval=999999,
+        ).train()
 
     def flatten_data(self, data):
         gs, ys = data

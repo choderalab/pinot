@@ -122,7 +122,9 @@ class AdLaLa(BaseSampler):
         for w in self.param_groups[group]["params"]:
             if w.grad is not None:
                 state = self.state[w]
-                state["p"].add_(torch.sqrt(fraction * h) * sigma * torch.randn(w.shape))
+                state["p"].add_(
+                    torch.sqrt(fraction * h) * sigma * torch.randn(w.shape)
+                )
 
     def E_step(self, group, fraction=0.5):
         """E_fraction: xi := xi + (fraction h) * epsilon [p^T p - N * tau]
@@ -161,7 +163,9 @@ class AdLaLa(BaseSampler):
                 # TODO: these are just scalars, may not have to be torched?
                 dt = fraction * h
                 c = torch.exp(-dt * gamma)
-                d = torch.sqrt(1 - torch.exp(-2.0 * dt * gamma)) * torch.sqrt(tau)
+                d = torch.sqrt(1 - torch.exp(-2.0 * dt * gamma)) * torch.sqrt(
+                    tau
+                )
 
                 state = self.state[w]
                 state["p"] = (c * state["p"]) + (d * torch.randn(w.shape))
@@ -188,7 +192,9 @@ class AdLaLa(BaseSampler):
             for w in group["params"]:
                 # NOTE: `w.grad == None` is different from `w.grad == 0.`
                 # as the later could be used to sample parameters without taking grads.
-                if w.grad is None:  # skip network params not contributing to loss.
+                if (
+                    w.grad is None
+                ):  # skip network params not contributing to loss.
                     continue
 
                 state = self.state[w]
@@ -252,7 +258,6 @@ class AdLaLa(BaseSampler):
             for group in self.param_groups:
                 for w in group["params"]:
                     w.backward(torch.zeros_like(w))
-
 
         # self.step(closure)
 

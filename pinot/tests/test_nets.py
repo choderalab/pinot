@@ -14,8 +14,10 @@ def test_initialize():
     )
     net = pinot.Net(net_representation)
 
+
 def test_forward():
     import pinot
+
     g, y = pinot.data.esol()[0]
     layer = pinot.representation.dgl_legacy.GN
     net_representation = pinot.representation.Sequential(

@@ -21,18 +21,14 @@ class Matern52(BaseKernel):
     $$
 
     """
+
     def __init__(self, scale=0.0, variance=0.0):
         super(Matern52, self).__init__()
-        self.scale = torch.nn.Parameter(
-                torch.tensor(scale))
-        self.variance = torch.nn.Parameter(
-                torch.tensor(variance))
+        self.scale = torch.nn.Parameter(torch.tensor(scale))
+        self.variance = torch.nn.Parameter(torch.tensor(variance))
 
     def distance(self, x, x_):
-        return torch.norm(
-                x[:, None, :] - x_[None, :, :],
-                p=2,
-                dim=2)
+        return torch.norm(x[:, None, :] - x_[None, :, :], p=2, dim=2)
 
     def forward(self, x, x_=None):
         # replicate x if there's no x_
@@ -52,10 +48,10 @@ class Matern52(BaseKernel):
 
         # convariant matrix
         # (batch_size, batch_size)
-        k = torch.exp(self.variance) * (
-                1.0\
-              + torch.sqrt(5.0 * distance_sq)\
-              + (5.0 / 3.0) * distance_sq)\
-              * torch.exp(-torch.sqrt(5.0 * distance_sq))
+        k = (
+            torch.exp(self.variance)
+            * (1.0 + torch.sqrt(5.0 * distance_sq) + (5.0 / 3.0) * distance_sq)
+            * torch.exp(-torch.sqrt(5.0 * distance_sq))
+        )
 
         return k

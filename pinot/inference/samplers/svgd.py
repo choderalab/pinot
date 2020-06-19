@@ -10,11 +10,14 @@ def rbf_kernel(x):
     """ Compute the pairwise RBF kernel for a stack of vectors.
     """
     # compute pairwise distance
-    pairwise_distance_square = torch.pow(x[:, None, :] - x[None, :, :], 2).sum(dim=-1)
+    pairwise_distance_square = torch.pow(x[:, None, :] - x[None, :, :], 2).sum(
+        dim=-1
+    )
 
     # compute bandwidth
     h = torch.div(
-        torch.median(torch.reshape(pairwise_distance_square, [-1])), np.log(x.shape[0])
+        torch.median(torch.reshape(pairwise_distance_square, [-1])),
+        np.log(x.shape[0]),
     )
 
     k_xx = torch.exp(torch.div(pairwise_distance_square, -h))
