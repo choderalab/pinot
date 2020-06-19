@@ -71,7 +71,9 @@ class Net(BaseNet):
     def __init__(
         self,
         representation,
-        output_regressor=pinot.inference.heads.mle_head.MaximumLikelihoodEstimationHead,
+        output_regressor=pinot.inference\
+            .output_regressors.neural_network_output_regressor\
+            .NeuralNetworkOutputRegressor,
         **kwargs
     ):
 
@@ -81,7 +83,12 @@ class Net(BaseNet):
 
         # read the representation hidden units here
         # grab the last dimension of `representation`
-        self.representation_out_features = list(self.representation.modules())[-1]._out_feats
+        # grab the last dimension of `representation`
+        self.representation_out_features = [
+                layer for layer in list(self.representation.modules())\
+                        if hasattr(layer, 'out_features')][-1].out_features
+
+        self.output_regressor_cls = output_regressor
 
         # if nothing is specified for head,
         # use the MLE with heteroschedastic model
@@ -100,7 +107,7 @@ class Net(BaseNet):
         h = self.representation(g)
 
         # h -> distribution
-        distribution = self.head.condition(h)
+        distribution = self.output_regressor.condition(h)
 
         return distribution
 

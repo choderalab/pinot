@@ -81,7 +81,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
         self.optimizer = optimizer
         self.n_epochs = n_epochs
 
-        # data            
+        # data
         self.data = data
         self.old = []
         if isinstance(data, tuple):
@@ -92,7 +92,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
         # acquisition
         self.acquisition = acquisition
         self.strategy = strategy
-        
+
         # batch acquisition stuff
         self.q = q
         self.num_samples = num_samples
@@ -161,7 +161,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
             indices, q_samples = self.acquisition(posterior=distribution,
                                                   batch_size=gs.batch_size,
                                                   y_best=self.y_best)
-            
+
             # argmax sample batch
             best = indices[:,torch.argmax(q_samples)].squeeze()
 
@@ -235,9 +235,11 @@ class SemiSupervisedBayesOptExperiment(BayesOptExperiment):
             self.flatten_data(self.old_data)
             )
 
-        # NOTE that we have to use a special version of batch here because torch.tensor doesn't take in None
-        batched_semi_supervised_data = batch_semi_supervised(semi_supervised_data,
-                                                             batch_size=len(semi_supervised_data))
+        # NOTE that we have to use a special version of batch here
+        # because torch.tensor doesn't take in `None`
+        batched_semi_supervised_data = batch_semi_supervised(
+            semi_supervised_data,
+            batch_size=len(semi_supervised_data))
 
         # reset
         self.reset_net()
@@ -257,6 +259,6 @@ class SemiSupervisedBayesOptExperiment(BayesOptExperiment):
         gs, ys = data
         # if gs.batch_size > 1:
         gs = dgl.unbatch(gs)
-            
+
         flattened_data = list(zip(gs, list(ys)))
         return flattened_data

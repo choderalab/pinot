@@ -4,12 +4,13 @@
 import dgl
 import torch
 import pinot
-from pinot.inference.heads.base_output_regressor import BaseOutputRegressor
+from pinot.inference.output_regressors.base_output_regressor\
+    import BaseOutputRegressor
 
 # =============================================================================
 # MODULE CLASSES
 # =============================================================================
-class MaximumLikelihoodEstimationHead(BaseHead):
+class NeuralNetworkOutputRegressor(BaseOutputRegressor):
     """ Head for MaximumLikelihoodEstimation (MLE).
 
     Methods
@@ -35,12 +36,12 @@ class MaximumLikelihoodEstimationHead(BaseHead):
     """
     def __init__(
             self,
-            representation_hidden_units,
+            in_features,
             output_regression=None,
             noise_model='normal-heteroschedastic',
             measurement_dimension=1):
 
-        super(MaximumLikelihoodEstimationHead, self).__init__()
+        super(NeuralNetworkOutputRegressor, self).__init__()
 
         # get output regression if it is not specified
         if output_regression is None:
@@ -49,7 +50,7 @@ class MaximumLikelihoodEstimationHead(BaseHead):
             self._output_regression = torch.nn.ModuleList(
                     [
                         torch.nn.Linear(
-                            representation_hidden_units,
+                            in_features,
                             measurement_dimension)\
                                 for _ in range(2) # NOTE: hard-coded
                     ])

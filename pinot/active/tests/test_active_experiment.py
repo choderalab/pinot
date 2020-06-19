@@ -23,12 +23,12 @@ def bo():
             torch.nn.Linear(1, 50),
             torch.nn.Tanh()))
 
-    return pinot.active.experiment.SingleTaskBayesianOptimizationExperiment(
+    return pinot.active.experiment.BayesOptExperiment(
         net=net,
         data=torch.cat([x, y], dim=1),
         optimizer=torch.optim.Adam(net.parameters(), 1e-3),
         acquisition=pinot.active.acquisition.probability_of_improvement,
-        n_epochs_training=10)
+        n_epochs=10)
 
 def test_init(bo):
     bo
@@ -44,4 +44,4 @@ def test_train(bo):
     bo.train()
 
 def test_run(bo):
-    old = bo.run(limit=2)
+    old = bo.run(num_rounds=2)

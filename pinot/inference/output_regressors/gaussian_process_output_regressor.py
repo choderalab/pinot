@@ -51,13 +51,18 @@ class ExactGaussianProcessOuputRegressor(GaussianProcessOutputRegressor):
             in_features,
             kernel=None,
             ):
-        super(ExactGaussianProcessHead, self).__init__()
+        super(ExactGaussianProcessOuputRegressor, self).__init__()
 
         if kernel is None:
             kernel = pinot.inference.kernels.rbf.RBF
 
+        # point unintialized class to self
+        self.kernel_cls = kernel
+
         # put representation hidden units
         self.kernel = kernel(in_features)
+
+        self.in_features = in_features
 
     def _get_kernel_and_auxiliary_variables(
             self, x_tr, y_tr, x_te=None, sigma=1.0, epsilon=1e-5,
@@ -78,7 +83,7 @@ class ExactGaussianProcessOuputRegressor(GaussianProcessOutputRegressor):
         # (batch_size_tr, batch_size_tr)
         k_plus_sigma = k_tr_tr + (sigma ** 2) * torch.eye(
             k_tr_tr.shape[0],
-            device=k.device)
+            device=k_tr_tr.device)
 
         # (batch_size_tr, batch_size_tr)
         l_low = torch.cholesky(k_plus_sigma)
@@ -185,7 +190,7 @@ class ExactGaussianProcessOuputRegressor(GaussianProcessOutputRegressor):
         return nll
 
 
-class VariationalGaussianProcessOuputRegressor(GaussianProcessHead):
+class VariationalGaussianProcessOuputRegressor(GaussianProcessOutputRegressor):
     """ Variational Gaussian Process.
 
     """
