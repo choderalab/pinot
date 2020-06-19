@@ -38,10 +38,3 @@ def test_reset(bo):
 
 def test_blinkd_pick(bo):
     assert isinstance(bo.blind_pick(), int)
-
-def test_train(bo):
-    bo.blind_pick()
-    bo.train()
-
-def test_run(bo):
-    old = bo.run(num_rounds=2)

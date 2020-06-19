@@ -1,5 +1,2 @@
 # import pinot.inference
-import pinot.inference
-import pinot.inference.samplers
-import pinot.inference.kernels
-import pinot.inference.output_regressors
+from pinot.inference import samplers, kernels, output_regressors

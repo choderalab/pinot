@@ -1,2 +1,2 @@
-import pinot.inference.output_regressors.gaussian_process_output_regressor
-import pinot.inference.output_regressors.neural_network_output_regressor
+from pinot.inference.output_regressors import gaussian_process_output_regressor
+from pinot.inference.output_regressors import neural_network_output_regressor
