@@ -66,14 +66,13 @@ class Net(BaseNet):
         the model that translates graphs to latent representations
 
 
-
     """
 
     def __init__(
         self,
         representation,
         head=pinot.inference.heads.mle_head.MaximumLikelihoodEstimationHead,
-        **head_kwargs
+        **kwargs
     ):
 
         super(Net, self).__init__(head=head)
@@ -90,7 +89,7 @@ class Net(BaseNet):
         # use the MLE with heteroschedastic model
         head = head(
             representation_hidden_units=representation_hidden_units,
-            **head_kwargs
+            **kwargs
         )
 
         self.head = head

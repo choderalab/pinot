@@ -71,7 +71,9 @@ class ExactGaussianProcessHead(GaussianProcessHead):
             k_te_te = k_te_tr = k_tr_te = k_tr_tr
 
         # (batch_size_tr, batch_size_tr)
-        k_plus_sigma = k_tr_tr + (sigma ** 2) * torch.eye(k_tr_tr.shape[0])
+        k_plus_sigma = k_tr_tr + (sigma ** 2) * torch.eye(
+            k_tr_tr.shape[0],
+            device=k.device)
 
         # (batch_size_tr, batch_size_tr)
         l_low = torch.cholesky(k_plus_sigma)
