@@ -1,5 +1,6 @@
 import pytest
 
+
 def test_import():
     import pinot.net
 
@@ -15,18 +16,20 @@ def net():
 
     net = pinot.Net(
         net_representation,
-        output_regressor=pinot.inference.output_regressors\
-            .gaussian_process_output_regressor\
-            .ExactGaussianProcessOutputRegressor)
+        output_regressor=pinot.inference.output_regressors.gaussian_process_output_regressor.ExactGaussianProcessOutputRegressor,
+    )
 
     return net
+
 
 def test_init(net):
     net
 
+
 def test_condition(net):
     import torch
     import pinot
+
     ds = pinot.data.esol()[:8]
     ds = pinot.data.utils.batch(ds, 8)
     g, y = ds[0]

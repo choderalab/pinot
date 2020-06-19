@@ -13,11 +13,8 @@ class SemiSupervisedNet(pinot.Net):
     r""" Net object with semisupervised learning.
 
     """
-    def __init__(
-            self,
-            output_regression_generative,
-            decoder,
-            *args, **kwargs):
+
+    def __init__(self, output_regression_generative, decoder, *args, **kwargs):
         super(SemiSupervisedNet, self).__init__(*args, **kwargs)
 
         # bookkeeping
@@ -28,17 +25,13 @@ class SemiSupervisedNet(pinot.Net):
         """ Forward pass for semisupervised training.
         """
         # (n_nodes, hidden_dim)
-        return self.representation.forward(
-            g,
-            pool=None)
+        return self.representation.forward(g, pool=None)
 
     @staticmethod
     def _condition_no_pool(h):
         theta = self.output_regression_generative(h)
         mu, log_var = theta
-        distribution = torch.distributions.normal.Normal(
-            loc=mu,
-            scale=log_var)
+        distribution = torch.distributions.normal.Normal(loc=mu, scale=log_var)
 
         return distribution, mu, log_var
 
@@ -77,10 +70,10 @@ class SemiSupervisedNet(pinot.Net):
             # Unbatch into individual subgraphs
             gs_unbatched = dgl.unbatch(g)
             # Decode each subgraph
-            decoded_subgraphs = [self.dc(g_sample.ndata["h"]) \
-                for g_sample in gs_unbatched]
+            decoded_subgraphs = [
+                self.dc(g_sample.ndata["h"]) for g_sample in gs_unbatched
+            ]
             return decoded_subgraphs, mu, logvar
-
 
     def loss_semisupervised(self, g):
         """ ELBO loss.

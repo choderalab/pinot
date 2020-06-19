@@ -253,7 +253,6 @@ class AdLaLa(BaseSampler):
                 for w in group["params"]:
                     w.backward(torch.zeros_like(w))
 
-
         # self.step(closure)
 
         self.D_step(0, 0.5)

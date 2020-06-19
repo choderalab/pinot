@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+
 class InnerProductDecoder(nn.Module):
     """Decoder for using inner product for edge prediction."""
 
@@ -22,6 +23,7 @@ class EdgeAndNodeDecoder(nn.Module):
     """ Decoder that returns both a predicted adjacency matrix
         and node identities
     """
+
     def __init__(self, feature_dim, num_atom_types, hidden_dim=64, dropout=0):
         super(EdgeAndNodeDecoder, self).__init__()
         self.dropout = dropout
@@ -29,7 +31,7 @@ class EdgeAndNodeDecoder(nn.Module):
         self.decode_nodes = nn.Sequential(
             nn.Linear(feature_dim, self.hidden_dim),
             nn.ReLU(),
-            nn.Linear(self.hidden_dim, num_atom_types)
+            nn.Linear(self.hidden_dim, num_atom_types),
         )
 
     def forward(self, z):
@@ -66,8 +68,16 @@ class SequentialDecoder(nn.Module):
         predictions $\hat{x}$
     """
 
-    def __init__(self, embedding_dim, num_atom_types, Dx1=64, Dx2=64,
-            Da1=64, Da2=64, hidden_dim=64):
+    def __init__(
+        self,
+        embedding_dim,
+        num_atom_types,
+        Dx1=64,
+        Dx2=64,
+        Da1=64,
+        Da2=64,
+        hidden_dim=64,
+    ):
         super(SequentialDecoder, self).__init__()
         self.embedding_dim = embedding_dim
         self.num_atom_types = num_atom_types
@@ -75,24 +85,20 @@ class SequentialDecoder(nn.Module):
         self.Dx1 = Dx1
         self.Dx2 = Dx2
         self.z_to_zx = nn.Sequential(
-            nn.Linear(embedding_dim, self.Dx1),
-            nn.ReLU(),
-            nn.Linear(self.Dx1, self.Dx2)
+            nn.Linear(embedding_dim, self.Dx1), nn.ReLU(), nn.Linear(self.Dx1, self.Dx2)
         )
 
         self.Da1 = Da1
         self.Da2 = Da2
         self.z_to_za = nn.Sequential(
-            nn.Linear(embedding_dim, self.Da1),
-            nn.ReLU(),
-            nn.Linear(self.Da1, self.Da2)
+            nn.Linear(embedding_dim, self.Da1), nn.ReLU(), nn.Linear(self.Da1, self.Da2)
         )
 
         self.hidden_dim = hidden_dim
         self.zx_to_x = nn.Sequential(
             nn.Linear(self.Dx2, self.hidden_dim),
             nn.ReLU(),
-            nn.Linear(self.hidden_dim, self.num_atom_types)
+            nn.Linear(self.hidden_dim, self.num_atom_types),
         )
 
     def forward(self, z):

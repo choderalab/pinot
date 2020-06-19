@@ -19,21 +19,21 @@ def graph_from_adjacency_matrix(a):
     # make graph symmetrical
     a = torch.transpose(a, 0, 1) + a
 
-    # query indices 
+    # query indices
     idxs = torch.gt(a, 1.0).nonzero().detach().numpy().tolist()
 
-    # add indices one by one 
+    # add indices one by one
     g = dgl.DGLGraph()
     g.add_nodes(a.shape[0])
     g.add_edges(*list(zip(*idxs)))
 
     return g
 
-    
+
 def prepare_semi_supervised_data(unlabeled_data, labeled_data):
     # Mix labelled and unlabelled data together
     semi_supervised_data = []
-    
+
     for (g, y) in unlabeled_data:
         semi_supervised_data.append((g, None))
     for (g, y) in labeled_data:
@@ -59,25 +59,24 @@ def batch_semi_supervised(ds, batch_size, seed=2666):
     ]
 
     ys_batched = [
-        list(ys[idx * batch_size : (idx + 1) * batch_size])
-        for idx in range(n_batches)
+        list(ys[idx * batch_size : (idx + 1) * batch_size]) for idx in range(n_batches)
     ]
 
     return list(zip(gs_batched, ys_batched))
 
- 
+
 def prepare_semi_supervised_data_from_labeled_data(labeled_data, r=0.2, seed=2666):
     """
     r is the ratio of labelled data turning into unlabelled
     """
     semi_data = []
     small_labeled_data = []
-    
+
     np.random.seed(seed)
-    for (g,y) in labeled_data:
+    for (g, y) in labeled_data:
         if np.random.rand() < r:
             semi_data.append((g, y))
-            small_labeled_data.append((g,y))
+            small_labeled_data.append((g, y))
         else:
             semi_data.append((g, None))
     return semi_data, small_labeled_data

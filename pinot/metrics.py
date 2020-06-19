@@ -12,6 +12,7 @@ import pinot
 # MODULE FUNCTIONS
 # =============================================================================
 
+
 def _mse(y, y_hat):
     return torch.nn.functional.mse_loss(y, y_hat)
 
@@ -29,7 +30,7 @@ def mse(net, g, y, sampler=None):
 
 
 def _rmse(y, y_hat):
-    assert(y.numel() == y_hat.numel())
+    assert y.numel() == y_hat.numel()
     return torch.sqrt(torch.nn.functional.mse_loss(y.flatten(), y_hat.flatten()))
 
 
@@ -59,18 +60,20 @@ def r2(net, g, y, sampler=None):
 
     return _r2(y, y_hat)
 
+
 def log_sigma(net, g, y, sampler=None):
     return net.log_sigma
 
+
 def avg_nll(net, g, y, sampler=None):
-    
+
     # TODO:
     # generalize
     if isinstance(net, pinot.inference.gp.gpr.base_gpr.GPR):
         distribution = net.condition(g)
         distribution = torch.distributions.normal.Normal(
-                distribution.mean,
-                distribution.variance.pow(0.5))
+            distribution.mean, distribution.variance.pow(0.5)
+        )
 
         return -distribution.log_prob(y.flatten()).mean()
 

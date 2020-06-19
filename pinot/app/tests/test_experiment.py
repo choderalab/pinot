@@ -13,9 +13,9 @@ def test_train():
     net_representation = pinot.representation.Sequential(
         layer, [32, "tanh", 32, "tanh", 32, "tanh"]
     )
-    
+
     net = pinot.Net(net_representation)
-    
+
     train = pinot.Train(
         net=net,
         data=pinot.data.esol()[:10],
@@ -69,6 +69,7 @@ def test_train_and_test():
         optimizer=torch.optim.Adam(net.parameters(), 1e-3),
         n_epochs=1,
         data_tr=pinot.data.utils.batch(pinot.data.esol()[:10], 5),
-        data_te=pinot.data.utils.batch(pinot.data.esol()[:10], 5),)
+        data_te=pinot.data.utils.batch(pinot.data.esol()[:10], 5),
+    )
 
     print(train_and_test)

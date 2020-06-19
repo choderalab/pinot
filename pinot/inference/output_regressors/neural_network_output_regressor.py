@@ -4,8 +4,7 @@
 import dgl
 import torch
 import pinot
-from pinot.inference.output_regressors.base_output_regressor\
-    import BaseOutputRegressor
+from pinot.inference.output_regressors.base_output_regressor import BaseOutputRegressor
 
 # =============================================================================
 # MODULE CLASSES
@@ -34,12 +33,14 @@ class NeuralNetworkOutputRegressor(BaseOutputRegressor):
         or a function that transforms a set of parameters.
 
     """
+
     def __init__(
-            self,
-            in_features,
-            output_regression=None,
-            noise_model='normal-heteroschedastic',
-            measurement_dimension=1):
+        self,
+        in_features,
+        output_regression=None,
+        noise_model="normal-heteroschedastic",
+        measurement_dimension=1,
+    ):
 
         super(NeuralNetworkOutputRegressor, self).__init__()
 
@@ -48,12 +49,11 @@ class NeuralNetworkOutputRegressor(BaseOutputRegressor):
             # make the output regression as simple as a linear one
             # if nothing is specified
             self._output_regression = torch.nn.ModuleList(
-                    [
-                        torch.nn.Linear(
-                            in_features,
-                            measurement_dimension)\
-                                for _ in range(2) # NOTE: hard-coded
-                    ])
+                [
+                    torch.nn.Linear(in_features, measurement_dimension)
+                    for _ in range(2)  # NOTE: hard-coded
+                ]
+            )
 
             def output_regression(theta):
                 return [f(theta) for f in self._output_regression]
@@ -61,7 +61,6 @@ class NeuralNetworkOutputRegressor(BaseOutputRegressor):
         # bookkeeping
         self.noise_model = noise_model
         self.output_regression = output_regression
-
 
     def condition(self, h):
         """ Compute the output distribution.
@@ -74,37 +73,33 @@ class NeuralNetworkOutputRegressor(BaseOutputRegressor):
 
         theta = self.output_regression(h)
 
-        if self.noise_model == 'normal-heteroschedastic':
+        if self.noise_model == "normal-heteroschedastic":
             mu, log_sigma = theta
             distribution = torch.distributions.normal.Normal(
-                    loc=mu,
-                    scale=torch.exp(log_sigma))
+                loc=mu, scale=torch.exp(log_sigma)
+            )
 
-        elif self.noise_model == 'normal-homoschedastic':
+        elif self.noise_model == "normal-homoschedastic":
             mu, _ = theta
 
             # initialize a `LOG_SIMGA` if there isn't one
-            if not hasattr(self, 'LOG_SIGMA'):
+            if not hasattr(self, "LOG_SIGMA"):
                 self.LOG_SIGMA = torch.zeros((1, self.measurement_dimension))
                 self.LOG_SIGMA.requires_grad = True
 
             distribution = torch.distributions.normal.Normal(
-                    loc=mu,
-                    scale=torch.exp(self.LOG_SIGMA))
+                loc=mu, scale=torch.exp(self.LOG_SIGMA)
+            )
 
-        elif self.noise_model == 'normal-homoschedastic-fixed':
+        elif self.noise_model == "normal-homoschedastic-fixed":
             mu, _ = theta
             distribution = torch.distributions.normal.Normal(
-                    loc=mu,
-                    scale=torch.ones((1, self.measurement_dimension)))
+                loc=mu, scale=torch.ones((1, self.measurement_dimension))
+            )
 
         else:
-            assert isinstance(
-                    self.noise_model,
-                    dict)
+            assert isinstance(self.noise_model, dict)
 
-            distribution = self.noise_model[distribution](
-                    self.noise_model[kwargs])
-
+            distribution = self.noise_model[distribution](self.noise_model[kwargs])
 
         return distribution

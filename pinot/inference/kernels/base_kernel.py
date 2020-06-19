@@ -1,4 +1,4 @@
-#=============================================================================
+# =============================================================================
 # IMPORTS
 # =============================================================================
 import torch
@@ -18,6 +18,7 @@ class BaseKernel(torch.nn.Module, abc.ABC):
         noise added to kernel.
 
     """
+
     def __init__(self, epsilon=1e-6):
         super(BaseKernel, self).__init__()
         self.epsilon = epsilon

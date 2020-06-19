@@ -1,4 +1,4 @@
-#=============================================================================
+# =============================================================================
 # IMPORTS
 # =============================================================================
 import torch
@@ -16,26 +16,18 @@ class RBF(BaseKernel):
     ----
     l could be either of shape 1 or hidden dim
     """
-    def __init__(
-            self,
-            in_features,
-            scale=0.0, variance=0.0, ard=True):
+
+    def __init__(self, in_features, scale=0.0, variance=0.0, ard=True):
 
         super(RBF, self).__init__()
 
         if ard is True:
-            self.scale = torch.nn.Parameter(
-                scale * torch.ones(in_features)
-            )
+            self.scale = torch.nn.Parameter(scale * torch.ones(in_features))
 
-        self.variance = torch.nn.Parameter(
-                torch.tensor(variance))
+        self.variance = torch.nn.Parameter(torch.tensor(variance))
 
     def distance(self, x, x_):
-        return torch.norm(
-                x[:, None, :] - x_[None, :, :],
-                p=2,
-                dim=2)
+        return torch.norm(x[:, None, :] - x_[None, :, :], p=2, dim=2)
 
     def forward(self, x, x_=None):
         # replicate x if there's no x_
