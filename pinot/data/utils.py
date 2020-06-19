@@ -80,7 +80,7 @@ def load_unlabeled_data(path, size=0.1, toolkit="rdkit", seed=2666):
         # Use only a subset of the data
         df_smiles = df_smiles[:num_mols]
         # Create "fake" labels
-        df_y = torch.FloatTensor([1 for _ in range(num_mols)])
+        df_y = list([torch.tensor([np.nan]) for _ in range(num_mols)])
 
         if toolkit == "rdkit":
             from rdkit import Chem
@@ -147,45 +147,17 @@ def batch(ds, batch_size, seed=2666):
     gs, ys = tuple(zip(*ds))
 
     gs_batched = [
-        dgl.batch(gs[idx * batch_size : (idx + 1) * batch_size])
-        for idx in range(n_batches)
+        dgl.batch(gs[idx * batch_size : (idx + 1) * batch_size]) for idx in range(n_batches)
     ]
 
     ys_batched = [
-        torch.stack(ys[idx * batch_size : (idx + 1) * batch_size], dim=0)
-        for idx in range(n_batches)
+        torch.stack(ys[idx * batch_size : (idx + 1) * batch_size], dim=0) for idx in range(n_batches)
     ]
 
     return list(zip(gs_batched, ys_batched))
 
 
-def batch_semi_supervised(ds, batch_size, seed=2666):
-    """ Very similar to batch, but should be used when the 
-    data contains None (data for semi-supervised training)
-    because torch.tensor(arr) throws an error when arr
-    contains any None
-    """
-    n_data_points = len(ds)
-    n_batches = n_data_points // batch_size  # drop the rest
-
-    np.random.seed(seed)
-    np.random.shuffle(ds)
-    gs, ys = tuple(zip(*ds))
-
-    gs_batched = [
-        dgl.batch(gs[idx * batch_size : (idx + 1) * batch_size])
-        for idx in range(n_batches)
-    ]
-
-    ys_batched = [
-        list(ys[idx * batch_size : (idx + 1) * batch_size])
-        for idx in range(n_batches)
-    ]
-
-    return list(zip(gs_batched, ys_batched))
-
-
-def prepare_semi_supervised_data(unlabelled_data, labelled_data, batch_size=32):
+def prepare_semi_supervised_data(unlabelled_data, labelled_data, seed=2666):
     """ Create a semi-supervised data by mixing unlabelled and labelled
     data. An example of labelled data can be readily accessed via
     `pinot.data.zinc_tiny()`
@@ -193,11 +165,14 @@ def prepare_semi_supervised_data(unlabelled_data, labelled_data, batch_size=32):
     semi_supervised_data = []
     
     for (g, y) in unlabelled_data:
-        semi_supervised_data.append((g, None))
+        semi_supervised_data.append((g, torch.tensor([np.nan])))
     for (g, y) in labelled_data:
         semi_supervised_data.append((g, y))
+
+    # Shuffle the combined data
+    np.random.seed(seed)
+    np.random.shuffle(semi_supervised_data)
         
-    semi_supervised_data = batch_semi_supervised(semi_supervised_data, batch_size)
     return semi_supervised_data
 
 
@@ -221,5 +196,5 @@ def prepare_semi_supeprvised_data_from_labeled_data(labelled_data, r=0.2, seed=2
             semi_data.append((g, y))
             small_labelled_data.append((g,y))
         else:
-            semi_data.append((g, None))
+            semi_data.append((g, torch.tensor([np.nan])))
     return semi_data, small_labelled_data

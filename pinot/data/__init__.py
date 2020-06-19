@@ -61,3 +61,8 @@ moonshot_semi_small = load_moonshot_semi_supervised(0.1)
 # This data set contains around 60k molecules, 530 are labeled
 moonshot_semi_all   = load_moonshot_semi_supervised(1.0)
 
+def get_esol_semi():
+    esol_semi, _ = utils.prepare_semi_supeprvised_data_from_labeled_data(esol(), r=0.5)
+    return esol_semi
+
+esol_semi = get_esol_semi
