@@ -21,9 +21,12 @@ class MultiTaskNet(pinot.Net):
         super(MultiTaskNet, self).__init__(representation, output_regressor, **kwargs)
         self.output_regressors = torch.nn.ModuleDict()
 
-    def condition(self, g, l, sampler=None):
+    def condition(self, g, l=None, sampler=None):
         """ Compute the output distribution with sampled weights.
         """
+        if l is None:
+            l = np.ones(len(self.output_regressors), dtype=torch.bool)
+
         # find which assays are being used
         assays = torch.arange(l.shape[1])[l.any(axis=0)]
         assay_distributions = []
@@ -56,9 +59,10 @@ class MultiTaskNet(pinot.Net):
             assay_distributions.append(assay_distribution)
         return assay_distributions
             
-    def loss(self, g, l, y):
+    def loss(self, g, y):
         """ Compute the loss with a input graph and a set of parameters.
         """
+        l = self._generate_mask(y)
         loss = 0.0
         distributions = self.condition(g, l)
         for idx, assay_mask in enumerate(l.T):
@@ -66,3 +70,6 @@ class MultiTaskNet(pinot.Net):
                 assay_y = y[assay_mask, idx].view(-1, 1)
                 loss += -distributions[idx].log_prob(assay_y).mean()
         return loss
+
+    def _generate_mask(self, y):
+        return ~torch.isnan(y)
