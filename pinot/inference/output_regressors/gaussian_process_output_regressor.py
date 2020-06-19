@@ -43,7 +43,7 @@ class GaussianProcessOutputRegressor(BaseOutputRegressor):
 # =============================================================================
 # MODULE CLASSES
 # =============================================================================
-class ExactGaussianProcessOuputRegressor(GaussianProcessOutputRegressor):
+class ExactGaussianProcessOutputRegressor(GaussianProcessOutputRegressor):
     """ Exact Gaussian Process.
 
     """
@@ -52,7 +52,7 @@ class ExactGaussianProcessOuputRegressor(GaussianProcessOutputRegressor):
             in_features,
             kernel=None,
             ):
-        super(ExactGaussianProcessOuputRegressor, self).__init__()
+        super(ExactGaussianProcessOutputRegressor, self).__init__()
 
         if kernel is None:
             kernel = pinot.inference.kernels.rbf.RBF
