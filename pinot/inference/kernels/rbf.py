@@ -18,18 +18,14 @@ class RBF(BaseKernel):
     """
     def __init__(
             self,
-            representation_hidden_units,
+            in_features,
             scale=0.0, variance=0.0, ard=True):
 
         super(RBF, self).__init__()
 
         if ard is True:
             self.scale = torch.nn.Parameter(
-                    torch.tensor(scale))
-
-        else:
-            self.scale = torch.nn.Parameter(
-                scale * torch.ones(representation_hidden_units)
+                scale * torch.ones(in_features)
             )
 
         self.variance = torch.nn.Parameter(

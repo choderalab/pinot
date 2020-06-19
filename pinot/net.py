@@ -81,14 +81,14 @@ class Net(BaseNet):
 
         # read the representation hidden units here
         # grab the last dimension of `representation`
-        representation_hidden_units = [
+        representation_out_features = [
                 layer for layer in list(self.representation.modules())\
                         if hasattr(layer, 'out_features')][-1].out_features
 
         # if nothing is specified for head,
         # use the MLE with heteroschedastic model
         head = head(
-            representation_hidden_units=representation_hidden_units,
+            in_features=representation_out_features,
             **kwargs
         )
 

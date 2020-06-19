@@ -14,7 +14,6 @@ def test_initialize():
     )
     net = pinot.Net(net_representation)
 
-
 def test_forward():
     import pinot
     g, y = pinot.data.esol()[0]
@@ -25,6 +24,3 @@ def test_forward():
     net = pinot.Net(net_representation)
 
     net.condition(g)
-
-
-   

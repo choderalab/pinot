@@ -5,17 +5,18 @@ import torch
 import pinot
 import abc
 import math
-from pinot.inference.heads.base_head import BaseHead
+from pinot.inference.output_regressors.base_output_regressor\
+    import BaseOutputRegressor
 
 # =============================================================================
 # BASE CLASSES
 # =============================================================================
-class GaussianProcessHead(BaseHead):
+class GaussianProcessOutputRegressor(BaseOutputRegressor):
     """ Gaussian Process Regression.
 
     """
     def __init__(self, epsilon=1e-5):
-        super(GaussianProcessHead, self).__init__()
+        super(GaussianProcessOutputRegressor, self).__init__()
         self.epsilon = epsilon
 
     @abc.abstractmethod
@@ -41,18 +42,22 @@ class GaussianProcessHead(BaseHead):
 # =============================================================================
 # MODULE CLASSES
 # =============================================================================
-class ExactGaussianProcessHead(GaussianProcessHead):
+class ExactGaussianProcessOuputRegressor(GaussianProcessOutputRegressor):
     """ Exact Gaussian Process.
 
     """
-    def __init__(self, representation_hidden_units, kernel=None):
+    def __init__(
+            self,
+            in_features,
+            kernel=None,
+            ):
         super(ExactGaussianProcessHead, self).__init__()
 
         if kernel is None:
             kernel = pinot.inference.kernels.rbf.RBF
 
         # put representation hidden units
-        self.kernel = kernel(representation_hidden_units)
+        self.kernel = kernel(in_features)
 
     def _get_kernel_and_auxiliary_variables(
             self, x_tr, y_tr, x_te=None, sigma=1.0, epsilon=1e-5,
@@ -178,3 +183,42 @@ class ExactGaussianProcessHead(GaussianProcessHead):
             + 0.5 * y_tr.shape[0] * math.log(2.0 * math.pi)
 
         return nll
+
+
+class VariationalGaussianProcessOuputRegressor(
+        GaussianProcessHead,
+        gpytorch.models.ApproximateGP):
+    """ Variational Gaussian Process.
+
+    """
+    def __init__(self, inducing_points, kernel=None):
+        if kernel is None:
+            kernel = gpytorch.kernels.RBFKernel()
+
+        variational_distribution = gpytorch.variational\
+            .CholeskyVariationalDistribution(
+                inducing_points.size(-1))
+
+        variational_strategy = gpytorch.variational\
+            .VariationalStrategy(
+                self,
+                inducing_points,
+                variational_distribution,
+                learn_inducing_points=True
+            )
+
+        super().__init__(variaitonal_strategy)
+        self.mean_module = gpytorch.means.ConstantMean()
+        self.covar_module = gpytorch.kernels.ScaleKernel(
+            kernel)
+        self.likelihood = likelihood
+
+    def condition(self, x):
+        mean_x = self.mean_module(x)
+        covar_x = self.covar_module(x)
+        return gpytorch.distributions.MultivariateNormal(
+            mean_x,
+            covar_x)
+
+    def loss(self, x, y):
+        raise NotImplementedError
