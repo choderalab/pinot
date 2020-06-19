@@ -23,11 +23,11 @@ class BaseNet(torch.nn.Module, abc.ABC):
 
 
     """
-    def __init__(self, head, *args, **kwargs):
+    def __init__(self, output_regressor, *args, **kwargs):
         super(BaseNet, self).__init__()
 
         # bookkeeping
-        self.head = head
+        self.output_regressor = output_regressor
 
     @abc.abstractmethod
     def condition(self, g, sampler=None, *args, **kwargs):
@@ -39,11 +39,11 @@ class BaseNet(torch.nn.Module, abc.ABC):
         # if there is a special loss function implemented in the head,
         # use that instead
 
-        if hasattr(self.head, 'loss'):
+        if hasattr(self.output_regressor, 'loss'):
             # get latent representation
             h = self.representation(g)
 
-            return self.head.loss(h, y)
+            return self.output_regressor.loss(h, y)
 
         # no sampling in training phase
         distribution = self.condition(g, sampler=None, *args, **kwargs)
@@ -71,28 +71,26 @@ class Net(BaseNet):
     def __init__(
         self,
         representation,
-        head=pinot.inference.heads.mle_head.MaximumLikelihoodEstimationHead,
+        output_regressor=pinot.inference.heads.mle_head.MaximumLikelihoodEstimationHead,
         **kwargs
     ):
 
-        super(Net, self).__init__(head=head)
+        super(Net, self).__init__(output_regressor=output_regressor)
         self.representation = representation
 
 
         # read the representation hidden units here
         # grab the last dimension of `representation`
-        representation_out_features = [
-                layer for layer in list(self.representation.modules())\
-                        if hasattr(layer, 'out_features')][-1].out_features
+        self.representation_out_features = list(self.representation.modules())[-1]._out_feats
 
         # if nothing is specified for head,
         # use the MLE with heteroschedastic model
-        head = head(
-            in_features=representation_out_features,
+        output_regressor = output_regressor(
+            in_features=self.representation_out_features,
             **kwargs
         )
 
-        self.head = head
+        self.output_regressor = output_regressor
 
 
     def _condition(self, g):
