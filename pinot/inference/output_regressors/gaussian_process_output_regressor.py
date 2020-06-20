@@ -50,15 +50,10 @@ class ExactGaussianProcessOutputRegressor(GaussianProcessOutputRegressor):
     """
 
     def __init__(
-<<<<<<< HEAD
             self,
             in_features,
             kernel=None,
             ):
-=======
-        self, in_features, kernel=None,
-    ):
->>>>>>> f469527d16f5385a75c59ea65b54d8db06942da1
         super(ExactGaussianProcessOutputRegressor, self).__init__()
 
         if kernel is None:
