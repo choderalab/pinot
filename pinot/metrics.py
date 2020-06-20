@@ -71,6 +71,5 @@ def avg_nll(net, g, y, sampler=None):
 
     # TODO:
     # generalize
-
-    # y = y.cpu()
+    y = y.cpu()
     return -net.condition(g, sampler=sampler).log_prob(y).mean()

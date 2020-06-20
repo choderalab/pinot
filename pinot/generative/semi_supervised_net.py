@@ -3,85 +3,122 @@
 # =============================================================================
 import dgl
 import torch
+import torch.nn as nn
 import pinot
 from pinot.generative.losses import negative_elbo
 
 # =============================================================================
 # MODULE CLASSES
 # =============================================================================
+
 class SemiSupervisedNet(pinot.Net):
-    r""" Net object with semisupervised learning.
+    def __init__(self, representation, decoder, \
+            output_regressor, unsup_scale=1., cuda=True,
+            generative_hidden_dim=64):
 
-    """
+        super(SemiSupervisedNet, self).__init__(
+            representation=representation,
+            output_regressor=output_regressor
+        )
 
-    def __init__(self, output_regression_generative, decoder, *args, **kwargs):
-        super(SemiSupervisedNet, self).__init__(*args, **kwargs)
+        # Recommended class: pinot.representation.sequential.Sequential
+        # Representation needs to have these functions
+        # representation.forward(g, pool) -> h_graph or h_node depending on pool
+        # representation.pool(h_node) -> h_graph
+        assert(hasattr(representation, "forward"))
+        assert(hasattr(representation, "pool"))
+        
+        # grab the last dimension of `representation`
+        self.representation_dim = [
+                layer for layer in list(self.representation.modules())\
+                        if hasattr(layer, 'out_features')][-1].out_features
 
-        # bookkeeping
-        self.output_regression_generative = output_regression_generative
+        # Output_regressor_generative:
+        assert(hasattr(decoder, "embedding_dim"))
+        self.generative_hidden_dim = generative_hidden_dim
+        self.output_regressor_generative = nn.ModuleList(
+        [
+            nn.Sequential(
+                nn.Linear(self.representation_dim, self.generative_hidden_dim),
+                nn.Tanh(),
+                nn.Linear(self.generative_hidden_dim, decoder.embedding_dim),
+            ) for _ in range(2) # mean and logvar
+        ])
+
+        # Recommended class: pinot.generative.decoder.DecoderNetwork
+        # Decoder needs to satisfy:
+        # decoder.loss(g, z_sample) -> compute reconstruction loss
+        assert(hasattr(decoder, "forward"))
         self.decoder = decoder
 
-    def forward_no_pool(self, g):
-        """ Forward pass for semisupervised training.
+        # Output regressor needs to satisfy
+        # output_regressor.loss(h_graph, y) -> supervised loss
+        # output_regressor.condition(h_graph) -> pred distribution
+        assert(hasattr(output_regressor, "loss"))
+        assert(hasattr(output_regressor, "condition"))
+        # self.output_regressor = output_regressor
+
+        # Move to CUDA if available
+        self.cuda = cuda
+        self.device = torch.device("cuda:0" if cuda else "cpu:0")
+        self.representation.to(self.device)
+        self.output_regressor_generative.to(self.device)
+        self.decoder.to(self.device)
+        self.output_regressor.to(self.device)
+
+        # Zookeeping
+        self.unsup_scale = unsup_scale
+
+
+    def loss(self, g, y):
+        """ Compute the loss function
         """
-        # (n_nodes, hidden_dim)
-        return self.representation.forward(g, pool=None)
+        # Move to CUDA if available
+        g.to(self.device)
+        # Compute the node representation
+        # print(g.ndata["h"].shape)
+        # Call this function to compute the nodes representations
+        h = self.representation.forward(g, pool=None) # We always call this
+        # print(g.ndata["h"].shape)
+        # Compute unsupervised loss
+        unsup_loss = self.loss_unsupervised(g, h)
+        # Compute the graph representation from node representation
+        # print(g.ndata["h"].shape)
+        # Then compute graph representation, by pooling
+        h = self.representation.pool(g, h)
+        # print(g.ndata["h"].shape)
+        
+        supervised_loss = torch.tensor(0.)
 
-    @staticmethod
-    def _condition_no_pool(h):
-        theta = self.output_regression_generative(h)
-        mu, log_var = theta
-        distribution = torch.distributions.normal.Normal(loc=mu, scale=log_var)
+        # Then compute supervised loss
+        if len(y[~torch.isnan(y)]) != 0:
+            # Only compute supervised loss for the labeled data
+            h_not_none = h[~torch.isnan(y).flatten(), :]
+            y_not_none = y[~torch.isnan(y)].unsqueeze(1)
+            # Convert to cuda if available
+            y_not_none = y_not_none.to(self.device)
+            # The output-regressor needs to implement a loss function
+            supervised_loss = self.loss_supervised(h_not_none, y_not_none)
 
-        return distribution, mu, log_var
+        total_loss = supervised_loss.sum() + unsup_loss*self.unsup_scale
+        return total_loss
 
-    def condition_no_pool(self, g):
-        h = self.forward_no_pool(g)
-        distribution, mu, log_var = self._condition_no_pool(h)
-        return distribution
+    def loss_supervised(self, h, y):
+        return self.output_regressor.loss(h, y)
 
-    def encode_and_decode(self, g):
-        """ Forward pass through the GVAE
-
-        Args:
-            x (FloatTensor): node features
-                Shape (N, D) where N is the number of nodes in the graph
-            adj (FloatTensor): adjacency matrix
-                Shape (N, N)
-
-        Returns:
-            adj*, mu, logvar
-                adj* is the reconstructed adjacency matrix
-                mu, logvar are the parameters of the approximate Gaussian
-                    posterior
+    def loss_unsupervised(self, g, h):
         """
-        # Encode
-        approx_posterior, mu, logvar = self.condition(g)
 
-        # Then decode
-        # First sample latent node representations
-        z_sample = approx_posterior.rsample()
-        # z_sample = mu
-
-        # Create a local scope so as not to modify the original input graph
-        with g.local_scope():
-            # Create a new graph with sampled representations
-            g.ndata["h"] = z_sample
-            # Unbatch into individual subgraphs
-            gs_unbatched = dgl.unbatch(g)
-            # Decode each subgraph
-            decoded_subgraphs = [
-                self.dc(g_sample.ndata["h"]) for g_sample in gs_unbatched
-            ]
-            return decoded_subgraphs, mu, logvar
-
-    def loss_semisupervised(self, g):
-        """ ELBO loss.
         """
-        # encode and decode
-        decoded_subgraphs, mu, logvar = encode_and_decode(g)
-
-        # loss
+        # h = (number of nodes, embedding_dim)
+        theta = [parameter.forward(h) for parameter in self.output_regressor_generative]
+        mu, logvar = theta[0], theta[1]
+        # (number of nodes, z_dimension)
+        distribution = torch.distributions.normal.Normal(
+                    loc=mu,
+                    scale=torch.exp(logvar)
+        )
+        z_sample = distribution.rsample()
+        decoded_subgraphs = self.decoder(g, z_sample)
         loss = negative_elbo(decoded_subgraphs, mu, logvar, g)
-
         return loss
