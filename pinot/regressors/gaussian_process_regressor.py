@@ -5,21 +5,19 @@ import torch
 import pinot
 import abc
 import math
-from pinot.inference.output_regressors.base_output_regressor import (
-    BaseOutputRegressor,
-)
+from pinot.regressors.base_regressor import BaseRegressor
 import gpytorch
 
 # =============================================================================
 # BASE CLASSES
 # =============================================================================
-class GaussianProcessOutputRegressor(BaseOutputRegressor):
+class GaussianProcessRegressor(BaseRegressor):
     """ Gaussian Process Regression.
 
     """
 
     def __init__(self, epsilon=1e-5):
-        super(GaussianProcessOutputRegressor, self).__init__()
+        super(GaussianProcessRegressor, self).__init__()
         self.epsilon = epsilon
 
     @abc.abstractmethod
@@ -44,7 +42,7 @@ class GaussianProcessOutputRegressor(BaseOutputRegressor):
 # =============================================================================
 # MODULE CLASSES
 # =============================================================================
-class ExactGaussianProcessOutputRegressor(GaussianProcessOutputRegressor):
+class ExactGaussianProcessRegressor(GaussianProcessRegressor):
     """ Exact Gaussian Process.
 
     """
@@ -54,10 +52,10 @@ class ExactGaussianProcessOutputRegressor(GaussianProcessOutputRegressor):
             in_features,
             kernel=None,
             ):
-        super(ExactGaussianProcessOutputRegressor, self).__init__()
+        super(ExactGaussianProcessRegressor, self).__init__()
 
         if kernel is None:
-            kernel = pinot.inference.kernels.rbf.RBF
+            kernel = pinot.regressors.kernels.rbf.RBF
 
         # point unintialized class to self
         self.kernel_cls = kernel
@@ -202,7 +200,7 @@ class ExactGaussianProcessOutputRegressor(GaussianProcessOutputRegressor):
         return nll
 
 
-class VariationalGaussianProcessOutputRegressor(GaussianProcessOutputRegressor):
+class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
     """ Variational Gaussian Process.
 
     """
@@ -214,7 +212,7 @@ class VariationalGaussianProcessOutputRegressor(GaussianProcessOutputRegressor):
             inducing_points_boundary=1.0,
             num_data=1,
             kernel=None):
-        super(VariationalGaussianProcessOutputRegressor, self).__init__()
+        super(VariationalGaussianProcessRegressor, self).__init__()
 
         # construct inducing points
         inducing_points = torch.distributions.uniform.Uniform(

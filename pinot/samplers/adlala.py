@@ -3,7 +3,7 @@
 # =============================================================================
 import torch
 import pinot
-from pinot.inference.samplers.base_sampler import BaseSampler
+from pinot.samplers.base_sampler import BaseSampler
 
 # =============================================================================
 # MODULE CLASSES

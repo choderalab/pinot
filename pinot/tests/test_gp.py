@@ -16,7 +16,7 @@ def net():
 
     net = pinot.Net(
         net_representation,
-        output_regressor=pinot.inference.ExactGaussianProcessOutputRegressor,
+        output_regressor=pinot.regressors.ExactGaussianProcessRegressor,
     )
 
     return net

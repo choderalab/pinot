@@ -59,7 +59,7 @@ def upper_confidence_bound(distribution, y_best=0.0, kappa=0.5):
         the best value so far.
     """
 
-    from pinot.inference.utils import confidence_interval
+    from pinot.samplers.utils import confidence_interval
 
     _, high = confidence_interval(distribution, kappa)
     return high
@@ -89,7 +89,7 @@ class MCAcquire:
     ):
         """
         Runs Monte Carlo acquisition over provided `sequential_fn`
-        
+
         Parameters
         ----------
         sequential_acq : Python function

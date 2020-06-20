@@ -4,7 +4,7 @@
 import torch
 import pinot
 import abc
-from pinot.inference.kernels.base_kernel import BaseKernel
+from pinot.regressors.kernels.base_kernel import BaseKernel
 
 # =============================================================================
 # MODULE CLASSES

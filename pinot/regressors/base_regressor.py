@@ -8,7 +8,7 @@ import abc
 # =============================================================================
 # BASE CLASSES
 # =============================================================================
-class BaseOutputRegressor(torch.nn.Module):
+class BaseRegressor(torch.nn.Module):
     """ Base class for `Head` object that translates latent representation
     `h` to a distribution.
 
@@ -18,7 +18,7 @@ class BaseOutputRegressor(torch.nn.Module):
     """
 
     def __init__(self):
-        super(BaseOutputRegressor, self).__init__()
+        super(BaseRegressor, self).__init__()
 
     @abc.abstractmethod
     def condition(self, h, *args, **kwargs):

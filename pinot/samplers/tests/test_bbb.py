@@ -6,7 +6,7 @@ import numpy.testing as npt
 
 
 def test_import():
-    import pinot.inference.samplers.bbb
+    import pinot.samplers.bbb
 
 
 def test_linear_regression():
@@ -21,7 +21,7 @@ def test_linear_regression():
     b.requires_grad = True
 
     opt = torch.optim.Adam([k, b], 1e-1)
-    bbb = pinot.inference.samplers.bbb.BBB(opt, 1e-5)
+    bbb = pinot.samplers.bbb.BBB(opt, 1e-5)
 
     for _ in range(3000):
 
