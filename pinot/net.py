@@ -1,6 +1,5 @@
 """ Combine representation, parameterization, and distribution class
 to construct a model.
-
 """
 # =============================================================================
 # IMPORTS
@@ -16,12 +15,9 @@ import pinot
 class BaseNet(torch.nn.Module, abc.ABC):
     """ Base class for `Net` object that inputs graphs and outputs
     distributions and is trainable.
-
     Methods
     -------
     condition :
-
-
     """
 
     def __init__(self, representation, output_regressor, *args, **kwargs):
@@ -76,14 +72,10 @@ class Net(BaseNet):
     """ An object that combines the representation and parameter
     learning, puts into a predicted distribution and calculates the
     corresponding divergence.
-
-
     Attributes
     ----------
     representation: a `pinot.representation` module
         the model that translates graphs to latent representations
-
-
     """
 
     def __init__(
@@ -128,7 +120,6 @@ class Net(BaseNet):
 
     def condition(self, g, sampler=None, n_samples=64):
         """ Compute the output distribution with sampled weights.
-
         """
         if sampler is None:
             return self._condition(g)
