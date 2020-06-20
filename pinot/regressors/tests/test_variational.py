@@ -38,8 +38,8 @@ def test_train_and_test():
     lr = 1e-4
     optimizer = torch.optim.Adam([
         {'params': net.representation.parameters(), 'weight_decay': lr},
-        {'params': net.output_regressor.output_regressor.hyperparameters(), 'lr': lr * 0.01},
-        {'params': net.output_regressor.output_regressor.variational_parameters()},
+        {'params': net.output_regressor.hyperparameters(), 'lr': lr * 0.01},
+        {'params': net.output_regressor.variational_parameters()},
         {'params': net.output_regressor.likelihood.parameters()}
     ])
 
@@ -72,8 +72,8 @@ def test_train_and_test_cuda():
     lr = 1e-4
     optimizer = torch.optim.Adam([
         {'params': net.representation.parameters(), 'weight_decay': lr},
-        {'params': net.output_regressor.output_regressor.hyperparameters(), 'lr': lr * 0.01},
-        {'params': net.output_regressor.output_regressor.variational_parameters()},
+        {'params': net.output_regressor.hyperparameters(), 'lr': lr * 0.01},
+        {'params': net.output_regressor.variational_parameters()},
         {'params': net.output_regressor.likelihood.parameters()}
     ])
 

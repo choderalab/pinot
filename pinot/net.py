@@ -31,23 +31,6 @@ class BaseNet(torch.nn.Module, abc.ABC):
     def condition(self, g, sampler=None, *args, **kwargs):
         raise NotImplementedError
 
-    def eval(self):
-        self.representation.eval()
-        self.output_regressor.eval()
-
-    def train(self):
-        self.representation.train()
-        self.output_regressor.train()
-
-    def to(self, device):
-        self.representation = self.representation.to(device)
-        self.output_regressor = self.output_regressor.to(device)
-        return self
-
-    def parameter(self):
-        return list(self.representation.parameters())\
-            +  list(self.output_regressor.parameters)
-
     def loss(self, g, y, *args, **kwargs):
         """ Negative log likelihood loss.
         """
