@@ -4,14 +4,12 @@
 import dgl
 import torch
 import pinot
-from pinot.inference.output_regressors.base_output_regressor import (
-    BaseOutputRegressor,
-)
+from pinot.regressors.base_regressor import BaseRegressor
 
 # =============================================================================
 # MODULE CLASSES
 # =============================================================================
-class NeuralNetworkOutputRegressor(BaseOutputRegressor):
+class NeuralNetworkRegressor(BaseRegressor):
     """ Head for MaximumLikelihoodEstimation (MLE).
 
     Methods
@@ -44,7 +42,7 @@ class NeuralNetworkOutputRegressor(BaseOutputRegressor):
         measurement_dimension=1,
     ):
 
-        super(NeuralNetworkOutputRegressor, self).__init__()
+        super(NeuralNetworkRegressor, self).__init__()
 
         # get output regression if it is not specified
         if output_regression is None:

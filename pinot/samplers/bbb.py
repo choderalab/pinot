@@ -6,7 +6,7 @@
 import torch
 import dgl
 import pinot
-from pinot.inference.samplers.base_sampler import BaseSampler
+from pinot.samplers.base_sampler import BaseSampler
 
 
 # =============================================================================

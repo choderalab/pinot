@@ -72,7 +72,7 @@ class Net(BaseNet):
     def __init__(
         self,
         representation,
-        output_regressor=pinot.inference.NeuralNetworkOutputRegressor,
+        output_regressor=pinot.regressors.NeuralNetworkRegressor,
         **kwargs
     ):
 
