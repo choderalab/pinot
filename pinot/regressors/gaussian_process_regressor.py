@@ -49,7 +49,7 @@ class ExactGaussianProcessRegressor(GaussianProcessRegressor):
             in_features,
             kernel=None,
             ):
-        super(ExactGaussianProcessOutputRegressor, self).__init__()
+        super(ExactGaussianProcessRegressor, self).__init__()
 
         if kernel is None:
             kernel = pinot.regressors.kernels.rbf.RBF
