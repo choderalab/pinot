@@ -124,12 +124,18 @@ class SequentialDecoder(nn.Module):
 class DecoderNetwork(nn.Module):
     """
     """
-    def __init__(self, embedding_dim, num_atom_types):
+    def __init__(self, embedding_dim, num_atom_types, cuda=True):
         super(DecoderNetwork, self).__init__()
         self.embedding_dim = embedding_dim
         self.decoder = SequentialDecoder(embedding_dim, num_atom_types)
+        self.cuda = cuda
+        self.device = torch.device("cuda:0" if cuda else "cpu:0")
+        self.decoder.to(self.device)
 
     def forward(self, g, z_sample):
+        # Move to CUDA if available
+        g.to(self.device)
+        z_sample.to(self.device)
         with g.local_scope():
             # Create a new graph with sampled representations
             g.ndata["h"] = z_sample

@@ -54,8 +54,7 @@ class SemiSupervisedNet(pinot.Net):
         # Output regressor needs to satisfy
         # output_regressor.loss(h_graph, y) -> supervised loss
         # output_regressor.condition(h_graph) -> pred distribution
-        assert(hasattr(output_regressor, "loss"))
-        assert(hasattr(output_regressor, "condition"))
+        assert(hasattr(output_regressor, "loss") or hasattr(output_regressor, "condition"))
         # self.output_regressor = output_regressor
 
         # Move to CUDA if available
@@ -104,7 +103,14 @@ class SemiSupervisedNet(pinot.Net):
         return total_loss
 
     def loss_supervised(self, h, y):
-        return self.output_regressor.loss(h, y)
+        # If output regressor has loss function implemented
+        if hasattr(self.output_regressor, "loss"):
+            return self.output_regressor.loss(h, y)
+
+        # If the output_regressor does not have loss
+        distribution = self.output_regressor.condition(h)
+        nll = -distribution.log_prob(y).mean()
+        return nll
 
     def loss_unsupervised(self, g, h):
         """

@@ -1,2 +1,3 @@
 from pinot.generative import utils
-import pinot.generative.decoder
+from pinot.generative.decoder import DecoderNetwork
+from pinot.generative.semi_supervised_net import SemiSupervisedNet
