@@ -233,7 +233,7 @@ class VariationalGaussianProcessOutputRegressor(GaussianProcessOutputRegressor):
                     kernel = gpytorch.kernels.RBFKernel()
 
                 variational_distribution = gpytorch.variational.CholeskyVariationalDistribution(
-                    inducing_points.size(-1)
+                    inducing_points.size(0)
                 )
 
                 variational_strategy = gpytorch.variational.VariationalStrategy(
@@ -247,7 +247,7 @@ class VariationalGaussianProcessOutputRegressor(GaussianProcessOutputRegressor):
                 self.mean_module = gpytorch.means.ConstantMean()
                 self.covar_module = gpytorch.kernels.ScaleKernel(kernel)
 
-            def condition(self, x):
+            def forward(self, x):
                 mean_x = self.mean_module(x)
                 covar_x = self.covar_module(x)
                 return gpytorch.distributions.MultivariateNormal(mean_x, covar_x)
@@ -262,9 +262,9 @@ class VariationalGaussianProcessOutputRegressor(GaussianProcessOutputRegressor):
         #     likelihood=self.likelihood, model=self.gp, num_data=self.num_data
         # )
 
-    def condition(self, x):
-        return self.gp.condition(x)
+    def forward(self, x):
+        return self.gp(x)
 
     def loss(self, x, y):
-        distribution = self.condition(x)
+        distribution = self(x)
         return -self.objective_function(distribution, y)

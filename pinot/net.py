@@ -31,7 +31,7 @@ class BaseNet(torch.nn.Module, abc.ABC):
         self.output_regressor = output_regressor
 
     @abc.abstractmethod
-    def condition(self, g, sampler=None, *args, **kwargs):
+    def forward(self, g, sampler=None, *args, **kwargs):
         raise NotImplementedError
 
     def loss(self, g, y, *args, **kwargs):
@@ -98,26 +98,26 @@ class Net(BaseNet):
 
         self.output_regressor = output_regressor
 
-    def _condition(self, g):
+    def _forward(self, g):
         """ Compute the output distribution.
         """
         # g -> h
         h = self.representation(g)
 
         # h -> distribution
-        distribution = self.output_regressor.condition(h)
+        distribution = self.output_regressor.forward(h)
 
         return distribution
 
-    def condition(self, g, sampler=None, n_samples=64):
+    def forward(self, g, sampler=None, n_samples=64):
         """ Compute the output distribution with sampled weights.
 
         """
         if sampler is None:
-            return self._condition(g)
+            return self._forward(g)
 
         if not hasattr(sampler, "sample_params"):
-            return self._condition(g)
+            return self._forward(g)
 
         # initialize a list of distributions
         distributions = []

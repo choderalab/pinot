@@ -60,7 +60,7 @@ class Train:
             self.marginal_likelihood = marginal_likelihood(
                 likelihood=self.likelihood,
                 model=self.net.output_regressor.gp,
-                num_data=self.net.output_regressor.num_data
+                num_data=data[0].batch_size
             )
 
     def train_once(self):
@@ -71,8 +71,7 @@ class Train:
             def l():
                 self.optimizer.zero_grad()
                 if self.marginal_likelihood:
-                    h = self.net.representation(g)
-                    distribution = self.net.output_regressor.gp.condition(h)
+                    distribution = self.net(g)
                     loss = torch.sum(-self.marginal_likelihood(distribution, y))
                 else:
                     loss = torch.sum(self.net.loss(g, y))
