@@ -24,15 +24,33 @@ class BaseNet(torch.nn.Module, abc.ABC):
 
     """
 
-    def __init__(self, output_regressor, *args, **kwargs):
+    def __init__(self, representation, output_regressor, *args, **kwargs):
         super(BaseNet, self).__init__()
 
         # bookkeeping
+        self.representation = representation
         self.output_regressor = output_regressor
 
     @abc.abstractmethod
     def condition(self, g, sampler=None, *args, **kwargs):
         raise NotImplementedError
+
+    def eval(self):
+        self.representation.eval()
+        self.output_regressor.eval()
+
+    def train(self):
+        self.representation.eval()
+        self.output_regressor.train()
+
+    def to(self, device):
+        self.representation = self.representation.to(device)
+        self.output_regressor = self.output_regressor.to(device)
+        return self
+
+    def parameter(self):
+        return list(self.representation.parameters())\
+            +  list(self.output_regressor.parameters)
 
     def loss(self, g, y, *args, **kwargs):
         """ Negative log likelihood loss.
@@ -53,7 +71,6 @@ class BaseNet(torch.nn.Module, abc.ABC):
         nll = -distribution.log_prob(y).mean()
 
         return nll
-
 
 class Net(BaseNet):
     """ An object that combines the representation and parameter
@@ -76,8 +93,9 @@ class Net(BaseNet):
         **kwargs
     ):
 
-        super(Net, self).__init__(output_regressor=output_regressor)
-        self.representation = representation
+        super(Net, self).__init__(
+            representation=representation,
+            output_regressor=output_regressor)
 
         # read the representation hidden units here
         # grab the last dimension of `representation`
