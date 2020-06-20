@@ -1,12 +1,12 @@
 import pytest
 import torch
-
+import pinot
 
 def test_import():
-    from regressors import VariationalGaussianProcessRegressor
+    from pinot.regressors import VariationalGaussianProcessRegressor
 
 def test_init():
-    from regressors import VariationalGaussianProcessRegressor
+    from pinot.regressors import VariationalGaussianProcessRegressor
     ds_tr, ds_te, num_data = get_data()
 
     layer = pinot.representation.dgl_legacy.GN
@@ -16,12 +16,12 @@ def test_init():
 
     net = pinot.Net(
         net_representation,
-        VariationalGaussianProcessRegressor
+        VariationalGaussianProcessRegressor,
         num_data=num_data
     )        
 
 def test_train_and_test():
-    from regressors import VariationalGaussianProcessRegressor
+    from pinot.regressors import VariationalGaussianProcessRegressor
     ds_tr, ds_te, num_data = get_data()
 
     layer = pinot.representation.dgl_legacy.GN
@@ -55,7 +55,7 @@ def test_train_and_test():
 
 
 def test_train_and_test_cuda():
-    from regressors import VariationalGaussianProcessRegressor
+    from pinot.regressors import VariationalGaussianProcessRegressor
     ds_tr, ds_te, num_data = get_data(cuda=True)
 
     layer = pinot.representation.dgl_legacy.GN
@@ -90,7 +90,6 @@ def test_train_and_test_cuda():
 
 
 def get_data(cuda=False):
-    import data
     # get data
     ds = pinot.data.esol()
     num_data = len(ds)
