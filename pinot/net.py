@@ -33,6 +33,7 @@ class BaseNet(torch.nn.Module, abc.ABC):
         raise NotImplementedError
 
     def loss(self, g, y):
+
         """ Negative log likelihood loss.
         """
         # g -> h

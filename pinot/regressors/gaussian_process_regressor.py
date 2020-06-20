@@ -193,7 +193,7 @@ class ExactGaussianProcessRegressor(GaussianProcessRegressor):
 
 
 
-class VariationalGaussianProcessRegressor(object):
+class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
     """
     """
 
@@ -243,33 +243,18 @@ class VariationalGaussianProcessRegressor(object):
                 return gpytorch.distributions.MultivariateNormal(mean, covar)
 
 
-        self.output_regressor = _GaussianProcessLayer(inducing_points,
-                                                      kernel=kernel)
+        self.gp = _GaussianProcessLayer(inducing_points, kernel=kernel)
 
         self.likelihood = gpytorch.likelihoods.GaussianLikelihood()
 
-        self.mll = gpytorch.mlls.VariationalELBO(self.likelihood,
-                                                 self.output_regressor,
-                                                 num_data=num_data)
+        self.mll = gpytorch.mlls.VariationalELBO(
+            self.likelihood,
+            self.output_regressor,
+            num_data=num_data)
 
     def forward(self, x):
         distribution = self.output_regressor(x)
         return distribution
-
-    def parameters(self):
-        return list(self.output_regressor.hyperparameters()) \
-              +list(self.output_regressor.variational_parameters()) \
-              +list(self.likelihood.parameters())
-
-    def eval(self):
-        self.output_regressor.eval()
-        self.likelihood.eval()
-        return self
-
-    def train(self):
-        self.output_regressor.train()
-        self.likelihood.train()
-        return self
 
     def condition(self, *args, **kwargs):
         return self.output_regressor(*args, **kwargs)
@@ -277,8 +262,3 @@ class VariationalGaussianProcessRegressor(object):
     def loss(self, x, y):
         distribution = self.output_regressor(x)
         return -self.mll(distribution, y.flatten())
-
-    def to(self, device):
-        self.output_regressor = self.output_regressor.to(device)
-        self.likelihood = self.likelihood.to(device)
-        return self
