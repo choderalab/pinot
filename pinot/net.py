@@ -91,7 +91,6 @@ class Net(BaseNet):
 
         # read the representation hidden units here
         # grab the last dimension of `representation`
-        # grab the last dimension of `representation`
         self.representation_out_features = [
             layer
             for layer in list(self.representation.modules())

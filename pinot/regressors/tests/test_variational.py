@@ -2,6 +2,7 @@ import pytest
 import torch
 import pinot
 
+
 def test_variational():
     import pinot
     ds = pinot.data.esol()
@@ -20,5 +21,4 @@ def test_variational():
     net = Train(net=net,
             data=ds_batched,
             n_epochs=10,
-            optimizer=torch.optim.Adam(net.parameters(), lr=1e-4),
-            marginal_likelihood=gpytorch.mlls.VariationalELBO).train()
+            optimizer=torch.optim.Adam(net.parameters(), lr=1e-4)).train()
