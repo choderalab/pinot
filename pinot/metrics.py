@@ -63,6 +63,16 @@ def r2(net, g, y, sampler=None):
     return _r2(y, y_hat)
 
 
+def pearsonr(net, g, y, sampler=None):
+    from scipy.stats import pearsonr as pr
+    y_hat = net.condition(g, sampler=sampler).mean.detach().cpu()
+    y = y.detach().cpu()
+    
+    result = pr(y.flatten().numpy(), y_hat.flatten().numpy())
+    correlation, _ = result
+    return torch.Tensor([correlation])[0]
+
+
 def log_sigma(net, g, y, sampler=None):
     return net.log_sigma
 

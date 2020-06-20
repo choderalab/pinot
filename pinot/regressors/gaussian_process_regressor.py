@@ -193,7 +193,7 @@ class ExactGaussianProcessRegressor(GaussianProcessRegressor):
 
 
 
-class VariationalGaussianProcessRegressor(object):
+class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
     """
     """
 
