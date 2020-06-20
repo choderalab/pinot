@@ -1,5 +1,6 @@
 import pinot
 import pinot.data
+import pinot.data.datasets
 from . import utils
 import os
 import numpy as np
