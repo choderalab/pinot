@@ -90,7 +90,6 @@ def test_train_and_test_cuda():
 
 
 def get_data(cuda=False):
-    from regressors import VariationalGaussianProcessRegressor
     import data
     # get data
     ds = pinot.data.esol()
