@@ -6,14 +6,19 @@ import torch
 import torch.nn as nn
 import pinot
 from pinot.generative.losses import negative_elbo
+from pinot.generative.decoder import DecoderNetwork
+from pinot.regressors.neural_network_regressor import NeuralNetworkRegressor
 
 # =============================================================================
 # MODULE CLASSES
 # =============================================================================
 
 class SemiSupervisedNet(pinot.Net):
-    def __init__(self, representation, decoder, \
-            output_regressor, unsup_scale=1., cuda=True,
+    def __init__(self, representation,
+            output_regressor=NeuralNetworkRegressor,
+            decoder=DecoderNetwork,
+            unsup_scale=1.,
+            cuda=True,
             generative_hidden_dim=64):
 
         super(SemiSupervisedNet, self).__init__(
@@ -25,36 +30,36 @@ class SemiSupervisedNet(pinot.Net):
         # Representation needs to have these functions
         # representation.forward(g, pool) -> h_graph or h_node depending on pool
         # representation.pool(h_node) -> h_graph
-        assert(hasattr(representation, "forward"))
-        assert(hasattr(representation, "pool"))
+        assert(hasattr(self.representation, "forward"))
+        assert(hasattr(self.representation, "pool"))
         
         # grab the last dimension of `representation`
         self.representation_dim = [
                 layer for layer in list(self.representation.modules())\
                         if hasattr(layer, 'out_features')][-1].out_features
 
+        # Recommended class: pinot.generative.decoder.DecoderNetwork
+        # Decoder needs to satisfy:
+        # decoder.loss(g, z_sample) -> compute reconstruction loss        
+        self.decoder = decoder(embedding_dim=generative_hidden_dim, num_atom_types=100, cuda=cuda)
+
         # Output_regressor_generative:
-        assert(hasattr(decoder, "embedding_dim"))
+        assert(hasattr(self.decoder, "forward"))
+        assert(hasattr(self.decoder, "embedding_dim"))
         self.generative_hidden_dim = generative_hidden_dim
         self.output_regressor_generative = nn.ModuleList(
         [
             nn.Sequential(
                 nn.Linear(self.representation_dim, self.generative_hidden_dim),
                 nn.Tanh(),
-                nn.Linear(self.generative_hidden_dim, decoder.embedding_dim),
+                nn.Linear(self.generative_hidden_dim, self.decoder.embedding_dim),
             ) for _ in range(2) # mean and logvar
         ])
-
-        # Recommended class: pinot.generative.decoder.DecoderNetwork
-        # Decoder needs to satisfy:
-        # decoder.loss(g, z_sample) -> compute reconstruction loss
-        assert(hasattr(decoder, "forward"))
-        self.decoder = decoder
 
         # Output regressor needs to satisfy
         # output_regressor.loss(h_graph, y) -> supervised loss
         # output_regressor.condition(h_graph) -> pred distribution
-        assert(hasattr(output_regressor, "loss") or hasattr(output_regressor, "condition"))
+        assert(hasattr(self.output_regressor, "loss") or hasattr(self.output_regressor, "condition"))
         # self.output_regressor = output_regressor
 
         # Move to CUDA if available
