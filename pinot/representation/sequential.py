@@ -79,3 +79,8 @@ class Sequential(torch.nn.Module):
                 x = pool(g)
 
         return x
+
+    def pool(self, g, h, pool=lambda g: dgl.sum_nodes(g, "h")):
+        with g.local_scope():
+            g.ndata["h"] = h
+            return pool(g)
