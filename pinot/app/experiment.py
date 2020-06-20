@@ -13,6 +13,7 @@ import os
 from abc import ABC
 import copy
 import pinot
+import gpytorch
 
 # =============================================================================
 # MODULE CLASSES
@@ -38,7 +39,15 @@ class Train:
 
     """
 
-    def __init__(self, net, data, optimizer, n_epochs=100, record_interval=1):
+    def __init__(
+        self,
+        net,
+        data,
+        optimizer,
+        n_epochs=100,
+        record_interval=1,
+        marginal_likelihood=None,
+        likelihood=gpytorch.likelihoods.GaussianLikelihood()):
 
         self.data = data
         self.optimizer = optimizer
@@ -46,6 +55,13 @@ class Train:
         self.net = net
         self.record_interval = record_interval
         self.states = {}
+        self.likelihood = likelihood
+        if marginal_likelihood:
+            self.marginal_likelihood = marginal_likelihood(
+                likelihood=self.likelihood,
+                model=self.net.output_regressor.gp,
+                num_data=self.net.output_regressor.num_data
+            )
 
     def train_once(self):
         """ Train the model for one batch.
@@ -53,8 +69,13 @@ class Train:
         for g, y in self.data:
 
             def l():
-                loss = torch.sum(self.net.loss(g, y))
                 self.optimizer.zero_grad()
+                if self.marginal_likelihood:
+                    h = self.net.representation(g)
+                    distribution = self.net.output_regressor.gp.condition(h)
+                    loss = torch.sum(-self.marginal_likelihood(distribution, y))
+                else:
+                    loss = torch.sum(self.net.loss(g, y))
                 loss.backward()
                 return loss
 

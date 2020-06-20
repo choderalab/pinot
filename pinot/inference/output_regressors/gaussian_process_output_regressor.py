@@ -50,15 +50,10 @@ class ExactGaussianProcessOutputRegressor(GaussianProcessOutputRegressor):
     """
 
     def __init__(
-<<<<<<< HEAD
             self,
             in_features,
             kernel=None,
             ):
-=======
-        self, in_features, kernel=None,
-    ):
->>>>>>> f469527d16f5385a75c59ea65b54d8db06942da1
         super(ExactGaussianProcessOutputRegressor, self).__init__()
 
         if kernel is None:
@@ -252,19 +247,23 @@ class VariationalGaussianProcessOutputRegressor(GaussianProcessOutputRegressor):
                 self.mean_module = gpytorch.means.ConstantMean()
                 self.covar_module = gpytorch.kernels.ScaleKernel(kernel)
 
+            def condition(self, x):
+                mean_x = self.mean_module(x)
+                covar_x = self.covar_module(x)
+                return gpytorch.distributions.MultivariateNormal(mean_x, covar_x)
+
         self.gp = _VariationalGP(
             inducing_points=inducing_points, kernel=kernel
         )
 
-        self.likelihood = gpytorch.likelihoods.GaussianLikelihood()
-        self.objective_function = gpytorch.mlls.VariationalELBO(
-            likelihood=self.likelihood, model=self.gp, num_data=num_data
-        )
+        # self.likelihood = gpytorch.likelihoods.GaussianLikelihood()
+        self.num_data = num_data
+        # self.objective_function = gpytorch.mlls.VariationalELBO(
+        #     likelihood=self.likelihood, model=self.gp, num_data=self.num_data
+        # )
 
     def condition(self, x):
-        mean_x = self.gp.mean_module(x)
-        covar_x = self.gp.covar_module(x)
-        return gpytorch.distributions.MultivariateNormal(mean_x, covar_x)
+        return self.gp.condition(x)
 
     def loss(self, x, y):
         distribution = self.condition(x)
