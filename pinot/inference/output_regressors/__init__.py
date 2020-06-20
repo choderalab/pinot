@@ -1,6 +1,0 @@
-from pinot.inference.output_regressors.gaussian_process_output_regressor import (
-	ExactGaussianProcessOutputRegressor,
-	VariationalGaussianProcessOutputRegressor
-)
-
-from pinot.inference.output_regressors.neural_network_output_regressor import NeuralNetworkOutputRegressor
