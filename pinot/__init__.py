@@ -11,7 +11,7 @@ from pinot.app.experiment import *
 
 import pinot.metrics
 import pinot.representation
-import pinot.generative
+
 
 
 import pinot.samplers
@@ -19,6 +19,7 @@ import pinot.regressors
 
 from pinot.net import Net
 
+import pinot.generative
 
 
 from pinot.samplers.adlala import AdLaLa
