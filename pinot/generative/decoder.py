@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from pinot.generative.losses import negative_elbo
+import dgl
 
 class InnerProductDecoder(nn.Module):
     """Decoder for using inner product for edge prediction."""
@@ -50,6 +51,7 @@ class EdgeAndNodeDecoder(nn.Module):
         adj = torch.mm(z_prime, z_prime.t())
         node_preds = self.decode_nodes(z_prime)
         return (adj, node_preds)
+
 
 class SequentialDecoder(nn.Module):
     """ Simple decoder where the node identity prediction is dependent
@@ -120,15 +122,12 @@ class SequentialDecoder(nn.Module):
 
 
 class DecoderNetwork(nn.Module):
+    """
+    """
     def __init__(self, embedding_dim, num_atom_types):
-        super(DecoderNewtwork, self).__init__()
+        super(DecoderNetwork, self).__init__()
         self.embedding_dim = embedding_dim
         self.decoder = SequentialDecoder(embedding_dim, num_atom_types)
-
-    def loss(self, g, z_sample):
-        decoded_subgraphs, mu, logvar = self.forward(g, z_sample)
-        loss = negative_elbo(decoded_subgraphs, mu, logvar, g)
-        return loss
 
     def forward(self, g, z_sample):
         with g.local_scope():
@@ -139,4 +138,4 @@ class DecoderNetwork(nn.Module):
             # Decode each subgraph
             decoded_subgraphs = [self.decoder(g_sample.ndata["h"]) \
                 for g_sample in gs_unbatched]
-            return decoded_subgraphs, mu, logvar
+            return decoded_subgraphs
