@@ -8,6 +8,7 @@ import dgl
 import torch
 import abc
 import pinot
+from pinot.regressors import NeuralNetworkRegressor
 
 # =============================================================================
 # BASE CLASSES
@@ -31,42 +32,26 @@ class BaseNet(torch.nn.Module, abc.ABC):
     def condition(self, g, sampler=None, *args, **kwargs):
         raise NotImplementedError
 
-    def eval(self):
-        self.representation.eval()
-        self.output_regressor.eval()
+    def loss(self, g, y):
 
-    def train(self):
-        self.representation.train()
-        self.output_regressor.train()
-
-    def to(self, device):
-        self.representation = self.representation.to(device)
-        self.output_regressor = self.output_regressor.to(device)
-        return self
-
-    def parameter(self):
-        return list(self.representation.parameters())\
-            +  list(self.output_regressor.parameters)
-
-    def loss(self, g, y, *args, **kwargs):
         """ Negative log likelihood loss.
         """
+        # g -> h
+        h = self.representation(g)
+
+        return self._loss(h, y)
+
+    def _loss(self, h, y):
         # if there is a special loss function implemented in the head,
         # use that instead
 
-        if hasattr(self.output_regressor, "loss"):
-            # get latent representation
-            h = self.representation(g)
-
+        if hasattr(self.output_regressor, 'loss'):
             return self.output_regressor.loss(h, y)
 
-        # no sampling in training phase
-        distribution = self.condition(g, sampler=None, *args, **kwargs)
-
-        # the loss here is always negative log likelihood
+        distribution = self._condition(h)
         nll = -distribution.log_prob(y).mean()
-
         return nll
+
 
 class Net(BaseNet):
     """ An object that combines the representation and parameter
@@ -81,7 +66,7 @@ class Net(BaseNet):
     def __init__(
         self,
         representation,
-        output_regressor=pinot.regressors.NeuralNetworkRegressor,
+        output_regressor=NeuralNetworkRegressor,
         **kwargs
     ):
 
@@ -107,11 +92,9 @@ class Net(BaseNet):
 
         self.output_regressor = output_regressor
 
-    def _condition(self, g):
+    def _condition(self, h):
         """ Compute the output distribution.
         """
-        # g -> h
-        h = self.representation(g)
 
         # h -> distribution
         distribution = self.output_regressor.condition(h)
@@ -121,11 +104,14 @@ class Net(BaseNet):
     def condition(self, g, sampler=None, n_samples=64):
         """ Compute the output distribution with sampled weights.
         """
+        # g -> h
+        h = self.representation(g)
+
         if sampler is None:
-            return self._condition(g)
+            return self._condition(h)
 
         if not hasattr(sampler, "sample_params"):
-            return self._condition(g)
+            return self._condition(h)
 
         # initialize a list of distributions
         distributions = []
