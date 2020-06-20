@@ -36,7 +36,7 @@ class BaseNet(torch.nn.Module, abc.ABC):
         self.output_regressor.eval()
 
     def train(self):
-        self.representation.eval()
+        self.representation.train()
         self.output_regressor.train()
 
     def to(self, device):
