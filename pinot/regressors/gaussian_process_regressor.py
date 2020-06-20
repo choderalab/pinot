@@ -244,13 +244,13 @@ class VariationalGaussianProcessRegressor(object):
 
 
         self.output_regressor = _GaussianProcessLayer(inducing_points,
-                                                     kernel=kernel)
+                                                      kernel=kernel)
 
         self.likelihood = gpytorch.likelihoods.GaussianLikelihood()
 
         self.mll = gpytorch.mlls.VariationalELBO(self.likelihood,
-                                            self.output_regressor,
-                                            num_data=num_data)
+                                                 self.output_regressor,
+                                                 num_data=num_data)
 
     def forward(self, x):
         distribution = self.output_regressor(x)
@@ -264,17 +264,19 @@ class VariationalGaussianProcessRegressor(object):
     def eval(self):
         self.output_regressor.eval()
         self.likelihood.eval()
+        return self
 
     def train(self):
         self.output_regressor.train()
         self.likelihood.train()
+        return self
 
     def condition(self, *args, **kwargs):
-        return self.forward(*args, **kwargs)
+        return self.output_regressor(*args, **kwargs)
 
     def loss(self, x, y):
-        distribution = self.forward(x)
-        return -self.mll(distribution, y)
+        distribution = self.output_regressor(x)
+        return -self.mll(distribution, y.flatten())
 
     def to(self, device):
         self.output_regressor = self.output_regressor.to(device)

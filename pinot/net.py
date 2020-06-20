@@ -103,7 +103,7 @@ class Net(BaseNet):
         # if nothing is specified for head,
         # use the MLE with heteroschedastic model
         output_regressor = output_regressor(
-            representation=self.representation, **kwargs
+            in_features=self.representation_out_features, **kwargs
         )
 
         self.output_regressor = output_regressor
