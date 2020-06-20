@@ -9,6 +9,7 @@ import dgl
 import torch
 import abc
 import pinot
+import gpytorch
 
 # =============================================================================
 # BASE CLASSES

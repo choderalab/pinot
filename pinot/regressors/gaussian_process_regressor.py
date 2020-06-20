@@ -254,15 +254,15 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
             inducing_points=inducing_points, kernel=kernel
         )
 
-        # self.likelihood = gpytorch.likelihoods.GaussianLikelihood()
+        self.likelihood = gpytorch.likelihoods.GaussianLikelihood()
         self.num_data = num_data
-        # self.objective_function = gpytorch.mlls.VariationalELBO(
-        #     likelihood=self.likelihood, model=self.gp, num_data=self.num_data
-        # )
+        self.objective_function = gpytorch.mlls.VariationalELBO(
+            likelihood=self.likelihood, model=self.gp, num_data=self.num_data
+        )
 
     def forward(self, x):
         return self.gp(x)
 
     def loss(self, x, y):
         distribution = self(x)
-        return -self.objective_function(distribution, y)
+        return -self.objective_function(distribution, y.flatten())

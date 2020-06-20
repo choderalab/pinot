@@ -47,7 +47,9 @@ class Train:
         n_epochs=100,
         record_interval=1,
         marginal_likelihood=None,
-        likelihood=gpytorch.likelihoods.GaussianLikelihood()):
+        variational=False,
+        # likelihood=gpytorch.likelihoods.GaussianLikelihood()
+        ):
 
         self.data = data
         self.optimizer = optimizer
@@ -55,13 +57,15 @@ class Train:
         self.net = net
         self.record_interval = record_interval
         self.states = {}
-        self.likelihood = likelihood
-        if marginal_likelihood:
-            self.marginal_likelihood = marginal_likelihood(
-                likelihood=self.likelihood,
-                model=self.net.output_regressor.gp,
-                num_data=data[0].batch_size
-            )
+        self.variational = variational
+        # self.likelihood = likelihood
+        # if marginal_likelihood:
+        #     self.marginal_likelihood = marginal_likelihood(
+        #         likelihood=self.likelihood.train(),
+        #         model=self.net.output_regressor.gp,
+        #         num_data=len(data)
+        #     )
+        # self.optimizer.add_param_group({'params': self.likelihood.parameters()})
 
     def train_once(self):
         """ Train the model for one batch.
@@ -70,9 +74,8 @@ class Train:
 
             def l():
                 self.optimizer.zero_grad()
-                if self.marginal_likelihood:
-                    distribution = self.net(g)
-                    loss = torch.sum(-self.marginal_likelihood(distribution, y))
+                if self.variational:
+                    loss = torch.sum(self.net.loss(g, y))
                 else:
                     loss = torch.sum(self.net.loss(g, y))
                 loss.backward()
