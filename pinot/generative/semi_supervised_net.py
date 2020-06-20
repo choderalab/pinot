@@ -6,14 +6,17 @@ import torch
 import torch.nn as nn
 import pinot
 from pinot.generative.losses import negative_elbo
+from pinot.net import Net
 
 # =============================================================================
 # MODULE CLASSES
 # =============================================================================
 
-class SemiSupervisedNet(pinot.Net):
-    def __init__(self, representation, decoder, \
-            output_regressor, unsup_scale=1., cuda=True,
+class SemiSupervisedNet(Net):
+    def __init__(self, representation, output_regressor,
+            decoder,
+            unsup_scale=1.,
+            cuda=True,
             generative_hidden_dim=64):
 
         super(SemiSupervisedNet, self).__init__(
@@ -27,7 +30,7 @@ class SemiSupervisedNet(pinot.Net):
         # representation.pool(h_node) -> h_graph
         assert(hasattr(representation, "forward"))
         assert(hasattr(representation, "pool"))
-        
+
         # grab the last dimension of `representation`
         self.representation_dim = [
                 layer for layer in list(self.representation.modules())\
@@ -87,7 +90,7 @@ class SemiSupervisedNet(pinot.Net):
         # Then compute graph representation, by pooling
         h = self.representation.pool(g, h)
         # print(g.ndata["h"].shape)
-        
+
         supervised_loss = torch.tensor(0.)
 
         # Then compute supervised loss

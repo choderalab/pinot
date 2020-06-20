@@ -8,6 +8,7 @@ import dgl
 import torch
 import abc
 import pinot
+from pinot.regressors import NeuralNetworkRegressor
 
 # =============================================================================
 # BASE CLASSES
@@ -81,7 +82,7 @@ class Net(BaseNet):
     def __init__(
         self,
         representation,
-        output_regressor=pinot.regressors.NeuralNetworkRegressor,
+        output_regressor=NeuralNetworkRegressor,
         **kwargs
     ):
 
