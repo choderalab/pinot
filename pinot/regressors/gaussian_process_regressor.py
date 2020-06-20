@@ -263,6 +263,9 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
     def forward(self, x):
         return self.gp(x)
 
+    def condition(self, *args, **kwargs):
+        return self.forward(*args, **kwargs)
+
     def loss(self, x, y):
         distribution = self(x)
         return -self.objective_function(distribution, y)

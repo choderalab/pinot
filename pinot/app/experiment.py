@@ -166,7 +166,7 @@ class TrainAndTest:
         data_tr,
         data_te,
         optimizer,
-        metrics=[pinot.rmse, pinot.r2, pinot.avg_nll, pinot.metrics.log_sigma],
+        metrics=[pinot.rmse, pinot.r2, pinot.avg_nll],
         n_epochs=100,
         record_interval=1,
     ):
