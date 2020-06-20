@@ -56,6 +56,7 @@ def test_import(
     'net',
     [
         pinot.Net,
+        pinot.generative.semi_supervised_net.SemiSupervisedNet
 ])
 @pytest.mark.parametrize(
     'regressor',
@@ -97,4 +98,4 @@ def test_forward(net, regressor, representation, ds):
     from pinot.metrics import _independent
     distribution = _independent(distribution)
     assert distribution.batch_shape == torch.Size([4])
-    assert distribution.even_dim == torch.Size([])
+    assert distribution.event_shape == torch.Size([])
