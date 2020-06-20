@@ -15,7 +15,7 @@ def test_variational():
         representation,
         VariationalGaussianProcessRegressor
     ) # .to(torch.device('cuda:0'))
-    
+
     from pinot.app.experiment import Train
     net = Train(net=net,
             data=ds_batched,
