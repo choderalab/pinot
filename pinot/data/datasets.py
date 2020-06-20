@@ -78,27 +78,27 @@ class TemporalDataset(Dataset):
     """ Dataset with time.
 
     """
-    def __init__(self, ds):
+    def __init__(self, ds=None):
         super(TemporalDataset, self).__init__(ds)
-
 
     def from_csv(
         self,
         path,
-        toolkit="rdkit",
-        smiles_col=-1,
-        time_col=-3,
-        y_cols=[-2],
+        smiles_col,
+        y_cols,
+        time_col,
         seed=2666,
         scale=1.0,
         dropna=False,
-        **kwargs
+        toolkit="rdkit",
     ):
         """ Read csv from file.
         """
 
         def _from_csv():
-            df = pd.read_csv(path, error_bad_lines=False, **kwargs)
+            df = pd.read_csv(path, error_bad_lines=False)
+
+            df = df.sort_values(by=df.columns[time_col], ascending=True)
 
             if dropna is True:
                 df = df.dropna(axis=0, subset=[df.columns[y_cols[0]]])
@@ -106,6 +106,7 @@ class TemporalDataset(Dataset):
             df_smiles = df.iloc[:, smiles_col]
             df_y = df.iloc[:, y_cols]
             df_time = df.iloc[:, time_col]
+
 
             if toolkit == "rdkit":
                 from rdkit import Chem
@@ -135,12 +136,29 @@ class TemporalDataset(Dataset):
                             scale * df_y.values[idxs], dtype=torch.float32
                         )
                     ),
-                   list(df_time.values[idxs]), 
+                   list(df_time.values[idxs]),
                 )
             )
 
             return ds
 
-        return _from_csv
+        ds = _from_csv()
+        self.ds = ds
+        return self
+
+    def split_by_time(self, time):
+        before = []
+        after = []
+
+        for g, y, t in self.ds:
+            if t < time:
+                before.append((g, y))
+
+            if t >= time:
+                after.append((g, y))
 
 
+        before = Dataset(before)
+        after = Dataset(after)
+
+        return before, after

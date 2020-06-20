@@ -8,8 +8,9 @@ def test_import():
 def esol():
     import pinot
     ds = pinot.data.datasets.Dataset(
-            ).from_csv('esol.csv')
+            ).from_csv('../esol.csv')
 
+    return ds
 
 def test_esol(esol):
     esol

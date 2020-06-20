@@ -1,11 +1,13 @@
 import pinot
-import pinot.data
-import pinot.data.datasets
+from . import datasets
 from . import utils
 import os
 import numpy as np
 
-esol = utils.from_csv(os.path.dirname(utils.__file__) + "/esol.csv")
+esol = utils.from_csv(
+    os.path.dirname(utils.__file__) + "/esol.csv"
+)
+
 freesolv = utils.from_csv(
     os.path.dirname(utils.__file__) + "/SAMPL.csv", smiles_col=1, y_cols=[2]
 )
@@ -58,3 +60,10 @@ moonshot_meta = utils.from_csv(
     y_cols=[3, 4, 5, 6, 7, 8, 9, 10, 11],
     scale=0.01,
 )
+
+moonshot_with_date = datasets.TemporalDataset(
+        ).from_csv(
+            os.path.dirname(utils.__file__) + '/moonshot_with_date.csv',
+            smiles_col=1,
+            y_cols=[5, 6, 7, 8, 9, 10],
+            time_col=-3)
