@@ -71,13 +71,6 @@ def avg_nll(net, g, y, sampler=None):
 
     # TODO:
     # generalize
-    if isinstance(net, pinot.inference.gp.gpr.base_gpr.GPR):
-        distribution = net.condition(g)
-        distribution = torch.distributions.normal.Normal(
-            distribution.mean, distribution.variance.pow(0.5)
-        )
 
-        return -distribution.log_prob(y.flatten()).mean()
-
-    y = y.cpu()
+    # y = y.cpu()
     return -net.condition(g, sampler=sampler).log_prob(y).mean()
