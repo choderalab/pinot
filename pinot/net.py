@@ -32,7 +32,7 @@ class BaseNet(torch.nn.Module, abc.ABC):
         self.output_regressor = output_regressor
 
     @abc.abstractmethod
-    def forward(self, g, sampler=None, *args, **kwargs):
+    def condition(self, g, sampler=None, *args, **kwargs):
         raise NotImplementedError
 
     def loss(self, g, y, *args, **kwargs):
@@ -94,31 +94,31 @@ class Net(BaseNet):
         # if nothing is specified for head,
         # use the MLE with heteroschedastic model
         output_regressor = output_regressor(
-            in_features=self.representation_out_features, **kwargs
+            representation=representation, **kwargs
         )
 
         self.output_regressor = output_regressor
 
-    def _forward(self, g):
+    def _condition(self, g):
         """ Compute the output distribution.
         """
         # g -> h
         h = self.representation(g)
 
         # h -> distribution
-        distribution = self.output_regressor.forward(h)
+        distribution = self.output_regressor.condition(h)
 
         return distribution
 
-    def forward(self, g, sampler=None, n_samples=64):
+    def condition(self, g, sampler=None, n_samples=64):
         """ Compute the output distribution with sampled weights.
 
         """
         if sampler is None:
-            return self._forward(g)
+            return self._condition(g)
 
         if not hasattr(sampler, "sample_params"):
-            return self._forward(g)
+            return self._condition(g)
 
         # initialize a list of distributions
         distributions = []

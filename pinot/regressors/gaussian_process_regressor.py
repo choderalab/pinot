@@ -200,39 +200,46 @@ class ExactGaussianProcessRegressor(GaussianProcessRegressor):
         return nll
 
 
-class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
-    """ Variational Gaussian Process.
 
+class VariationalGaussianProcessRegressor(object):
+    """
     """
 
-    def __init__(
-            self,
-            in_features,
-            n_inducing_points=100,
-            inducing_points_boundary=1.0,
-            num_data=1,
-            kernel=None):
+    def __init__(self,
+                 representation,
+                 n_inducing_points=100,
+                 inducing_points_boundary=1.0,
+                 num_data=1,
+                 kernel=None):
         super(VariationalGaussianProcessRegressor, self).__init__()
+        self.representation = representation
+        self.representation_out_features = [
+            layer
+            for layer in list(self.representation.modules())
+            if hasattr(layer, "out_features")
+        ][-1].out_features
 
         # construct inducing points
         inducing_points = torch.distributions.uniform.Uniform(
             -1
             * inducing_points_boundary
-            * torch.ones(n_inducing_points, in_features),
+            * torch.ones(n_inducing_points, self.representation_out_features),
             1
             * inducing_points_boundary
-            * torch.ones(n_inducing_points, in_features),
+            * torch.ones(n_inducing_points, self.representation_out_features),
         ).sample()
 
-        class _VariationalGP(gpytorch.models.ApproximateGP):
-            def __init__(self, inducing_points, kernel):
 
+        class _GaussianProcessLayer(gpytorch.models.ApproximateGP):
+            def __init__(self,
+                         inducing_points,
+                         kernel
+                        ):
                 if kernel is None:
                     kernel = gpytorch.kernels.RBFKernel()
 
                 variational_distribution = gpytorch.variational.CholeskyVariationalDistribution(
-                    inducing_points.size(0)
-                )
+                    num_inducing_points=inducing_points.size(0))
 
                 variational_strategy = gpytorch.variational.VariationalStrategy(
                     self,
@@ -240,29 +247,59 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
                     variational_distribution,
                     learn_inducing_locations=True,
                 )
-
                 super().__init__(variational_strategy)
+
                 self.mean_module = gpytorch.means.ConstantMean()
                 self.covar_module = gpytorch.kernels.ScaleKernel(kernel)
 
             def forward(self, x):
-                mean_x = self.mean_module(x)
-                covar_x = self.covar_module(x)
-                return gpytorch.distributions.MultivariateNormal(mean_x, covar_x)
+                mean = self.mean_module(x)
+                covar = self.covar_module(x)
+                return gpytorch.distributions.MultivariateNormal(mean, covar)
 
-        self.gp = _VariationalGP(
-            inducing_points=inducing_points, kernel=kernel
-        )
+
+        self.output_regressor = _GaussianProcessLayer(inducing_points,
+                                                     kernel=kernel)
 
         self.likelihood = gpytorch.likelihoods.GaussianLikelihood()
-        self.num_data = num_data
-        self.objective_function = gpytorch.mlls.VariationalELBO(
-            likelihood=self.likelihood, model=self.gp, num_data=self.num_data
-        )
+
+        self.mll = gpytorch.mlls.VariationalELBO(self.likelihood,
+                                            self.output_regressor,
+                                            num_data=num_data)
 
     def forward(self, x):
-        return self.gp(x)
+        features = self.representation(x)
+        res = self.output_regressor(features)
+        return res
+
+    def parameters(self):
+        return list(self.representation.parameters())\
+              +list(self.output_regressor.hyperparameters())\
+              +list(self.output_regressor.variational_parameters())\
+              +list(self.likelihood.parameters())
+
+    def eval(self):
+        self.representation.eval()
+        self.output_regressor.eval()
+        self.likelihood.eval()
+
+    def train(self):
+        self.representation.train()
+        self.output_regressor.train()
+        self.likelihood.train()
+
+    def condition(self, *args, **kwargs):
+        return self.forward(*args, **kwargs)
 
     def loss(self, x, y):
-        distribution = self(x)
-        return -self.objective_function(distribution, y.flatten())
+        distribution = self.output_regressor(
+            self.representation(
+                x))
+
+        return -self.mll(distribution, y)
+
+    def to(self, device):
+        self.representation = self.representation.to(device)
+        self.output_regressor = self.output_regressor.to(device)
+        self.likelihood = self.likelihood.to(device)
+        return self
