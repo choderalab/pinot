@@ -223,7 +223,7 @@ class VariationalGaussianProcessRegressor(object):
             * torch.ones(n_inducing_points, in_features),
         ).sample()
 
-        class _GaussianProcessLayer(ApproximateGP):
+        class _GaussianProcessLayer(gpytorch.models.ApproximateGP):
             def __init__(self,
                          inducing_points,
                          kernel=None
