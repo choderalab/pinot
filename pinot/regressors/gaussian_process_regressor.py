@@ -13,7 +13,6 @@ import gpytorch
 # =============================================================================
 class GaussianProcessRegressor(BaseRegressor):
     """ Gaussian Process Regression.
-
     """
 
     def __init__(self, epsilon=1e-5):
@@ -26,7 +25,6 @@ class GaussianProcessRegressor(BaseRegressor):
 
     def _perturb(self, k):
         """ Add small noise `epsilon` to the diagnol of kernels.
-
         Parameters
         ----------
         k : torch.tensor
@@ -44,7 +42,6 @@ class GaussianProcessRegressor(BaseRegressor):
 # =============================================================================
 class ExactGaussianProcessRegressor(GaussianProcessRegressor):
     """ Exact Gaussian Process.
-
     """
 
     def __init__(
@@ -104,12 +101,10 @@ class ExactGaussianProcessRegressor(GaussianProcessRegressor):
 
     def condition(self, x_te, x_tr=None, y_tr=None, sampler=None):
         r""" Calculate the predictive distribution given `x_te`.
-
         Note
         ----
         Here we allow the speicifaction of sampler but won't actually
         use it here.
-
         Parameters
         ----------
         x_tr : torch.tensor, shape=(batch_size, ...)
@@ -163,18 +158,15 @@ class ExactGaussianProcessRegressor(GaussianProcessRegressor):
 
     def loss(self, x_tr, y_tr):
         r""" Compute the loss.
-
         Note
         ----
         Defined to be negative Gaussian likelihood.
-
         Parameters
         ----------
         x_tr : torch.tensor, shape=(batch_size, ...)
             training data.
         y_tr : torch.tensor, shape=(batch_size, 1)
             training data measurement.
-
         """
         # point data to object
         self._x_tr = x_tr
@@ -206,34 +198,27 @@ class VariationalGaussianProcessRegressor(object):
     """
 
     def __init__(self,
-                 representation,
+                 in_features,
                  n_inducing_points=100,
                  inducing_points_boundary=1.0,
                  num_data=1,
                  kernel=None):
         super(VariationalGaussianProcessRegressor, self).__init__()
-        self.representation = representation
-        self.representation_out_features = [
-            layer
-            for layer in list(self.representation.modules())
-            if hasattr(layer, "out_features")
-        ][-1].out_features
 
         # construct inducing points
         inducing_points = torch.distributions.uniform.Uniform(
             -1
             * inducing_points_boundary
-            * torch.ones(n_inducing_points, self.representation_out_features),
+            * torch.ones(n_inducing_points, in_features),
             1
             * inducing_points_boundary
-            * torch.ones(n_inducing_points, self.representation_out_features),
+            * torch.ones(n_inducing_points, in_features),
         ).sample()
-
 
         class _GaussianProcessLayer(gpytorch.models.ApproximateGP):
             def __init__(self,
                          inducing_points,
-                         kernel
+                         kernel=None
                         ):
                 if kernel is None:
                     kernel = gpytorch.kernels.RBFKernel()
@@ -268,23 +253,19 @@ class VariationalGaussianProcessRegressor(object):
                                             num_data=num_data)
 
     def forward(self, x):
-        features = self.representation(x)
-        res = self.output_regressor(features)
-        return res
+        distribution = self.output_regressor(x)
+        return distribution
 
     def parameters(self):
-        return list(self.representation.parameters())\
-              +list(self.output_regressor.hyperparameters())\
+        return list(self.output_regressor.hyperparameters())\
               +list(self.output_regressor.variational_parameters())\
               +list(self.likelihood.parameters())
 
     def eval(self):
-        self.representation.eval()
         self.output_regressor.eval()
         self.likelihood.eval()
 
     def train(self):
-        self.representation.train()
         self.output_regressor.train()
         self.likelihood.train()
 
@@ -292,14 +273,10 @@ class VariationalGaussianProcessRegressor(object):
         return self.forward(*args, **kwargs)
 
     def loss(self, x, y):
-        distribution = self.output_regressor(
-            self.representation(
-                x))
-
+        distribution = self.forward(x)
         return -self.mll(distribution, y)
 
     def to(self, device):
-        self.representation = self.representation.to(device)
         self.output_regressor = self.output_regressor.to(device)
         self.likelihood = self.likelihood.to(device)
         return self

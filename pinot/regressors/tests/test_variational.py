@@ -3,9 +3,9 @@ import torch
 import pinot
 
 def test_variational():
-    import data
-    ds = data.esol()
-    ds_batched = data.utils.batch(ds, 32)
+    import pinot
+    ds = pinot.data.esol()
+    ds_batched = pinot.data.utils.batch(ds, 32)
 
     representation = pinot.representation.Sequential(pinot.representation.dgl_legacy.gn(),
                                                  [32, 'tanh', 32, 'tanh', 32, 'tanh'])
