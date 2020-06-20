@@ -48,7 +48,7 @@ class BaseNet(torch.nn.Module, abc.ABC):
             return self.output_regressor.loss(h, y)
 
         distribution = self._condition(h)
-        nll = -distribution.log_prob(y)
+        nll = -distribution.log_prob(y).mean()
         return nll
 
 
@@ -110,7 +110,7 @@ class Net(BaseNet):
             return self._condition(h)
 
         if not hasattr(sampler, "sample_params"):
-            return self._condition(g)
+            return self._condition(h)
 
         # initialize a list of distributions
         distributions = []

@@ -93,6 +93,7 @@ def test_forward(net, regressor, representation, ds):
 
     g, y = ds[0]
     loss = net.loss(g, y)
+
     distribution = net.condition(g)
 
     from pinot.metrics import _independent
