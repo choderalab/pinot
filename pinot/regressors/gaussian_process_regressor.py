@@ -257,8 +257,8 @@ class VariationalGaussianProcessRegressor(object):
         return distribution
 
     def parameters(self):
-        return list(self.output_regressor.hyperparameters())\
-              +list(self.output_regressor.variational_parameters())\
+        return list(self.output_regressor.hyperparameters()) \
+              +list(self.output_regressor.variational_parameters()) \
               +list(self.likelihood.parameters())
 
     def eval(self):
