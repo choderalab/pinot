@@ -48,6 +48,7 @@ class ExactGaussianProcessRegressor(GaussianProcessRegressor):
             self,
             in_features,
             kernel=None,
+            log_sigma=-3.0
             ):
         super(ExactGaussianProcessRegressor, self).__init__()
 
@@ -61,8 +62,10 @@ class ExactGaussianProcessRegressor(GaussianProcessRegressor):
         self.kernel = kernel(in_features)
 
         self.in_features = in_features
-        log_sigma))
 
+        self.log_sigma = torch.nn.Parameter(
+            torch.tensor(
+                log_sigma))
 
     def _get_kernel_and_auxiliary_variables(
             self, x_tr, y_tr, x_te=None,
