@@ -35,8 +35,15 @@ def run(args):
     assert len(partition) == 2, "only training and test here."
 
     # batch
-    ds = pinot.data.utils.batch(ds, batch_size)
-    ds_tr, ds_te = pinot.data.utils.split(ds, partition)
+
+    if args.output_regressor == 'ExactGaussianProcessRegressor':
+        ds_tr, ds_te = pinot.data.utils.split(ds, partition)
+        ds_tr = pinot.data.batch(ds_tr, len(ds_tr))
+        ds_te = pinot.data.batch(ds_te, len(ds_te))
+
+    else:
+        ds = pinot.data.utils.batch(ds, batch_size)
+        ds_tr, ds_te = pinot.data.utils.split(ds, partition)
 
     if torch.cuda.is_available():
         ds_tr = [

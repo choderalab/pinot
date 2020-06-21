@@ -24,6 +24,10 @@ class RBF(BaseKernel):
         if ard is True:
             self.scale = torch.nn.Parameter(scale * torch.ones(in_features))
 
+        else:
+            self.scale = torch.nn.Parameter(
+                torch.tensor(scale))
+
         self.variance = torch.nn.Parameter(torch.tensor(variance))
 
     def distance(self, x, x_):
