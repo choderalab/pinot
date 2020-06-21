@@ -100,13 +100,7 @@ class SemiSupervisedNet(pinot.Net):
 
     def loss_supervised(self, h, y):
         # If output regressor has loss function implemented
-        if hasattr(self.output_regressor, "loss"):
-            return self.output_regressor.loss(h, y)
-
-        # If the output_regressor does not have loss
-        distribution = self.output_regressor.condition(h)
-        nll = -distribution.log_prob(y).mean()
-        return nll
+        return self._loss(h, y)
 
     def loss_unsupervised(self, g, h):
         """
