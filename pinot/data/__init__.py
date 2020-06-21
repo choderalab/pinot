@@ -61,7 +61,7 @@ moonshot_meta = utils.from_csv(
     scale=0.01,
 )
 
-moonshot_with_date = datasets.TemporalDataset(
+moonshot_with_date = lambda: datasets.TemporalDataset(
         ).from_csv(
             os.path.dirname(utils.__file__) + '/moonshot_with_date.csv',
             smiles_col=1,
