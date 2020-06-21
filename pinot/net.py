@@ -26,7 +26,7 @@ class BaseNet(torch.nn.Module, abc.ABC):
 
         # bookkeeping
         self.representation = representation
-        self.output_regressor = output_regressor
+        self.output_regressor_cls = output_regressor
 
     @abc.abstractmethod
     def condition(self, g, sampler=None, *args, **kwargs):
