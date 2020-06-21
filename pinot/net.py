@@ -46,7 +46,7 @@ class BaseNet(torch.nn.Module, abc.ABC):
             return self.output_regressor.loss(h, y)
 
         distribution = self._condition(h)
-        nll = -distribution.log_prob(y).mean()
+        nll = -distribution.log_prob(y).sum()
         return nll
 
 
@@ -87,6 +87,8 @@ class Net(BaseNet):
             in_features=self.representation_out_features, **kwargs
         )
 
+
+        self.representation = representation
         self.output_regressor = output_regressor
 
     def _condition(self, h):
