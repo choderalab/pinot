@@ -78,6 +78,25 @@ def test_init(net, regressor, representation, decoder):
         decoder=decoder
     )
 
+@pytest.mark.parametrize(
+    'net',
+    [
+        pinot.generative.semi_supervised_net.SemiSupervisedNet
+])
+@pytest.mark.parametrize(
+    'regressor',
+    [
+        pinot.regressors.ExactGaussianProcessRegressor,
+        pinot.regressors.VariationalGaussianProcessRegressor,
+        pinot.regressors.NeuralNetworkRegressor
+    ]
+)
+@pytest.mark.parametrize(
+    'decoder',
+    [
+        pinot.generative.DecoderNetwork,
+    ]
+)
 def test_loss(net, regressor, representation, decoder, ds):
     net = net(
         output_regressor=regressor,
