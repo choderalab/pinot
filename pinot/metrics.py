@@ -103,5 +103,5 @@ def avg_nll(net, g, y, sampler=None):
     # calculate the log_prob
     log_prob = distribution.log_prob(y.flatten()).mean()
 
-    return log_prob
+    return -log_prob
 
