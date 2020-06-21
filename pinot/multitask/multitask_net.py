@@ -3,11 +3,10 @@ import gpytorch
 import torch
 
 
-class MultiTaskNet(pinot.Net):
+class MultitaskNet(pinot.Net):
     """ An object that combines the representation and parameter
     learning, puts into a predicted distribution and calculates the
     corresponding divergence.
-
 
     Attributes
     ----------
@@ -17,19 +16,18 @@ class MultiTaskNet(pinot.Net):
     def __init__(
         self,
         representation,
-        output_regressor=pinot.inference.output_regressors.NeuralNetworkOutputRegressor,
+        output_regressor=pinot.regressors.NeuralNetworkRegressor,
         **kwargs
     ):
-
         super(MultiTaskNet, self).__init__(representation, output_regressor, **kwargs)
         self.output_regressors = torch.nn.ModuleDict()
-
 
     def condition(self, g, assay):
         """ Compute the output distribution with sampled weights.
         """
         self.eval()
         h = self.representation(g)
+        
         # nn.ModuleDict needs string keys
         assay = str(assay)
 
@@ -49,7 +47,6 @@ class MultiTaskNet(pinot.Net):
         # get distribution for each input
         distribution = self.output_regressor.condition(h)
         return distribution
-
         
     def condition_train(self, g, l, sampler=None):
         """ Compute the output distribution with sampled weights.
@@ -87,15 +84,21 @@ class MultiTaskNet(pinot.Net):
         loss = 0.0
         l = self._generate_mask(y)
         distributions = self.condition_train(g, l)
-        print(distributions[0].loc)
 
         for idx, assay_mask in enumerate(l.T):
             if assay_mask.any():
                 # create dummy ys if unlabeled
-                y_dummy = torch.zeros(y.shape[0], device=y.get_device()).view(-1, 1)
-                y_dummy[assay_mask] = y[assay_mask, idx].view(-1, 1)
+                y_dummy = torch.zeros(y.shape[0]).view(-1, 1)
+                
+                # move to cuda if available
+                if torch.cuda.is_available():
+                    y_dummy = y_dummy.to(torch.device('cuda:0'))
+                
+                y_dummy[assay_mask] = y[assay_mask, idx].view(-1, 1)                
+                
                 # compute log probs
                 log_probs = distributions[idx].log_prob(y_dummy)
+                
                 # mask log probs
                 loss += -log_probs[assay_mask].mean()
         return loss

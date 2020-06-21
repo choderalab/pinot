@@ -73,8 +73,8 @@ class Train:
         `record_interval`.
 
         """
-
-        for epoch_idx in range(int(self.n_epochs)):
+        from tqdm import tqdm
+        for epoch_idx in tqdm(range(int(self.n_epochs))):
             self.train_once()
 
             if epoch_idx % self.record_interval == 0:
