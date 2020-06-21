@@ -59,15 +59,6 @@ class SemiSupervisedNet(pinot.Net):
         # output_regressor.loss(h_graph, y) -> supervised loss
         # output_regressor.condition(h_graph) -> pred distribution
         assert(hasattr(self.output_regressor, "loss") or hasattr(self.output_regressor, "condition"))
-        # self.output_regressor = output_regressor
-
-        # Move to CUDA if available
-        # self.cuda = cuda
-        # self.device = torch.device("cuda:0" if cuda else "cpu:0")
-        # self.representation.to(self.device)
-        # self.output_regressor_generative.to(self.device)
-        # self.decoder.to(self.device)
-        # self.output_regressor.to(self.device)
 
         # Zookeeping
         self.unsup_scale = unsup_scale
@@ -76,20 +67,14 @@ class SemiSupervisedNet(pinot.Net):
     def loss(self, g, y):
         """ Compute the loss function
         """
-        # Move to CUDA if available
-        # g.to(self.device)
         # Compute the node representation
-        # print(g.ndata["h"].shape)
         # Call this function to compute the nodes representations
         h = self.representation.forward(g, pool=None) # We always call this
-        # print(g.ndata["h"].shape)
         # Compute unsupervised loss
         unsup_loss = self.loss_unsupervised(g, h)
         # Compute the graph representation from node representation
-        # print(g.ndata["h"].shape)
         # Then compute graph representation, by pooling
         h = self.representation.pool(g, h)
-        # print(g.ndata["h"].shape)
 
         supervised_loss = torch.tensor(0.)
 
@@ -98,8 +83,7 @@ class SemiSupervisedNet(pinot.Net):
             # Only compute supervised loss for the labeled data
             h_not_none = h[~torch.isnan(y).flatten(), :]
             y_not_none = y[~torch.isnan(y)].unsqueeze(1)
-            # Convert to cuda if available
-            y_not_none = y_not_none.to(self.device)
+            y_not_none = y_not_none
             # The output-regressor needs to implement a loss function
             supervised_loss = self.loss_supervised(h_not_none, y_not_none)
 
