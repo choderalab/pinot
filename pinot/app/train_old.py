@@ -17,7 +17,11 @@ def run(args):
         layer=layer, config=args.config
     )
 
-    net = pinot.Net(net_representation, noise_model=args.noise_model)
+    net = pinot.Net(
+            net_representation,
+            output_regressor=getattr(
+                pinot.regressors,
+                args.output_regressor))
 
     # get the entire dataset
     ds = getattr(pinot.data, args.data)()
@@ -85,7 +89,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--noise_model", default="normal-heteroschedastic", type=str
     )
-    parser.add_argument("--optimizer", default="adam", type=str)
+    parser.add_argument("--optimizer", default="Adam", type=str)
     parser.add_argument(
         "--config", nargs="*", default=[32, "tanh", 32, "tanh", 32, "tanh"]
     )
@@ -96,6 +100,7 @@ if __name__ == "__main__":
     parser.add_argument("--lr", default=1e-5, type=float)
     parser.add_argument("--partition", default="4:1", type=str)
     parser.add_argument("--n_epochs", default=5)
-
+    parser.add_argument("--output_regressor", default="VariationalGaussianProcessOutputRegressor", type=str)
+    parser.add_argument("--n_inducing_points", default=100, type=int)
     args = parser.parse_args()
     run(args)

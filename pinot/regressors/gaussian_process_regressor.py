@@ -13,7 +13,6 @@ import gpytorch
 # =============================================================================
 class GaussianProcessRegressor(BaseRegressor):
     """ Gaussian Process Regression.
-
     """
 
     def __init__(self, epsilon=1e-5):
@@ -26,7 +25,6 @@ class GaussianProcessRegressor(BaseRegressor):
 
     def _perturb(self, k):
         """ Add small noise `epsilon` to the diagnol of kernels.
-
         Parameters
         ----------
         k : torch.tensor
@@ -44,7 +42,6 @@ class GaussianProcessRegressor(BaseRegressor):
 # =============================================================================
 class ExactGaussianProcessRegressor(GaussianProcessRegressor):
     """ Exact Gaussian Process.
-
     """
 
     def __init__(
@@ -52,7 +49,7 @@ class ExactGaussianProcessRegressor(GaussianProcessRegressor):
             in_features,
             kernel=None,
             ):
-        super(ExactGaussianProcessOutputRegressor, self).__init__()
+        super(ExactGaussianProcessRegressor, self).__init__()
 
         if kernel is None:
             kernel = pinot.regressors.kernels.rbf.RBF
@@ -104,12 +101,10 @@ class ExactGaussianProcessRegressor(GaussianProcessRegressor):
 
     def condition(self, x_te, x_tr=None, y_tr=None, sampler=None):
         r""" Calculate the predictive distribution given `x_te`.
-
         Note
         ----
         Here we allow the speicifaction of sampler but won't actually
         use it here.
-
         Parameters
         ----------
         x_tr : torch.tensor, shape=(batch_size, ...)
@@ -163,18 +158,15 @@ class ExactGaussianProcessRegressor(GaussianProcessRegressor):
 
     def loss(self, x_tr, y_tr):
         r""" Compute the loss.
-
         Note
         ----
         Defined to be negative Gaussian likelihood.
-
         Parameters
         ----------
         x_tr : torch.tensor, shape=(batch_size, ...)
             training data.
         y_tr : torch.tensor, shape=(batch_size, 1)
             training data measurement.
-
         """
         # point data to object
         self._x_tr = x_tr
@@ -200,18 +192,17 @@ class ExactGaussianProcessRegressor(GaussianProcessRegressor):
         return nll
 
 
-class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
-    """ Variational Gaussian Process.
 
+class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
+    """
     """
 
-    def __init__(
-            self,
-            in_features,
-            n_inducing_points=100,
-            inducing_points_boundary=1.0,
-            num_data=1,
-            kernel=None):
+    def __init__(self,
+                 in_features,
+                 n_inducing_points=100,
+                 inducing_points_boundary=1.0,
+                 num_data=1,
+                 kernel=None):
         super(VariationalGaussianProcessRegressor, self).__init__()
 
         # construct inducing points
@@ -224,15 +215,16 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
             * torch.ones(n_inducing_points, in_features),
         ).sample()
 
-        class _VariationalGP(gpytorch.models.ApproximateGP):
-            def __init__(self, inducing_points, kernel):
-
+        class _GaussianProcessLayer(gpytorch.models.ApproximateGP):
+            def __init__(self,
+                         inducing_points,
+                         kernel=None
+                        ):
                 if kernel is None:
                     kernel = gpytorch.kernels.RBFKernel()
 
                 variational_distribution = gpytorch.variational.CholeskyVariationalDistribution(
-                    inducing_points.size(0)
-                )
+                    num_inducing_points=inducing_points.size(0))
 
                 variational_strategy = gpytorch.variational.VariationalStrategy(
                     self,
@@ -240,29 +232,35 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
                     variational_distribution,
                     learn_inducing_locations=True,
                 )
-
                 super().__init__(variational_strategy)
+
                 self.mean_module = gpytorch.means.ConstantMean()
                 self.covar_module = gpytorch.kernels.ScaleKernel(kernel)
 
             def forward(self, x):
-                mean_x = self.mean_module(x)
-                covar_x = self.covar_module(x)
-                return gpytorch.distributions.MultivariateNormal(mean_x, covar_x)
+                mean = self.mean_module(x)
+                covar = self.covar_module(x)
+                return gpytorch.distributions.MultivariateNormal(mean, covar)
 
-        self.gp = _VariationalGP(
-            inducing_points=inducing_points, kernel=kernel
-        )
 
-        # self.likelihood = gpytorch.likelihoods.GaussianLikelihood()
-        self.num_data = num_data
-        # self.objective_function = gpytorch.mlls.VariationalELBO(
-        #     likelihood=self.likelihood, model=self.gp, num_data=self.num_data
-        # )
+        self.gp = _GaussianProcessLayer(inducing_points, kernel=kernel)
+        self.variational_parameters = self.gp.variational_parameters
+        self.hyperparameters = self.gp.hyperparameters
+
+        self.likelihood = gpytorch.likelihoods.GaussianLikelihood()
+
+        self.mll = gpytorch.mlls.VariationalELBO(
+            self.likelihood,
+            self.gp,
+            num_data=num_data)
 
     def forward(self, x):
-        return self.gp(x)
+        distribution = self.gp(x)
+        return distribution
+
+    def condition(self, *args, **kwargs):
+        return self.gp(*args, **kwargs)
 
     def loss(self, x, y):
-        distribution = self(x)
-        return -self.objective_function(distribution, y)
+        distribution = self.gp(x)
+        return -self.mll(distribution, y.flatten())
