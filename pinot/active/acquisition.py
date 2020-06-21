@@ -12,6 +12,11 @@ from gpytorch.distributions import MultivariateNormal
 # =============================================================================
 # MODULE FUNCTIONS
 # =============================================================================
+def dummy(distribution, y_best=0.0):
+    return torch.range(
+            start=0,
+            end=distribution.mean.flatten().shape[0]).flip(0)
+
 def probability_of_improvement(distribution, y_best=0.0):
     r""" Probability of Improvement (PI).
     Parameters

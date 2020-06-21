@@ -21,6 +21,7 @@ def from_csv(
     seed=2666,
     scale=1.0,
     dropna=False,
+    shuffle=True,
     **kwargs
 ):
     """ Read csv from file.
@@ -64,8 +65,10 @@ def from_csv(
                 ),
             )
         )
-        random.seed(seed)
-        random.shuffle(ds)
+
+        if shuffle is True:
+            random.seed(seed)
+            random.shuffle(ds)
 
         return ds
 
@@ -145,15 +148,18 @@ def split(ds, partition):
     return ds_batched
 
 
-def batch(ds, batch_size, seed=2666):
+def batch(ds, batch_size, seed=2666, shuffle=False):
     """ Batch graphs and values after shuffling.
     """
     # get the numebr of data
     n_data_points = len(ds)
     n_batches = n_data_points // batch_size  # drop the rest
 
-    random.seed(seed)
-    random.shuffle(ds)
+    if shuffle is True:
+        random.seed(seed)
+        random.shuffle(ds)
+
+
     gs, ys = tuple(zip(*ds))
 
     gs_batched = [

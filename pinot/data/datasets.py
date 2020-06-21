@@ -34,7 +34,7 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
             return 0
 
         else:
-            return len(self.graphs)
+            return len(self.ds)
 
     def __getitem__(self, idx):
         if self.ds is None:
