@@ -52,13 +52,7 @@ def from_csv(
             gs = [pinot.graph.from_rdkit_mol(mol) for mol in mols]
 
         elif toolkit == "openeye":
-            from openeye import oechem
-
-            mols = [
-                oechem.OESmilesToMol(oechem.OEGraphMol(), smiles)
-                for smiles in df_smiles
-            ]
-            gs = [pinot.graph.from_oemol(mol) for mol in mols]
+            raise NotImplementedError
 
         ds = list(
             zip(
