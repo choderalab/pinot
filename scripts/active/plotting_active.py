@@ -10,8 +10,8 @@ from tqdm import tqdm
 import torch
 
 import pinot
-from pinot.active.acquisition import BTModel, SeqAcquire, MCAcquire
-from pinot.generative.torch_gvae.model import GCNModelVAE
+# from pinot.active.acquisition import BTModel, SeqAcquire, MCAcquire
+# from pinot.generative.torch_gvae.model import GCNModelVAE
 
 import sys
 sys.path.append('../../pinot/active/')
@@ -19,8 +19,8 @@ sys.path.append('../../pinot/active/')
 import experiment
 
 sys.path.append('../../pinot/')
-import semisupervised
-import semisupervised_gp
+# import semisupervised
+# import semisupervised_gp
 
 
 ######################
@@ -168,16 +168,21 @@ class ActivePlot():
     def get_acquisition(self, gs):
         """ Retrieve acquisition function and prepare for BO Experiment
         """
+        
+        '''        
         batch_acquisitions = {'Expected Improvement': SeqAcquire(acq_fn='ei'),
                               'Probability of Improvement': SeqAcquire(acq_fn='pi'),
                               'Upper Confidence Bound': SeqAcquire(acq_fn='ucb', beta=0.95),
                               'Uncertainty': SeqAcquire(acq_fn='uncertainty'),
                               'Random': SeqAcquire(acq_fn='random')}
+        '''
 
-        sequential_acquisitions = {'Expected Improvement': pinot.active.acquisition.expected_improvement,
-                                   'Probability of Improvement': pinot.active.acquisition.probability_of_improvement,
-                                   'Upper Confidence Bound': pinot.active.acquisition.expected_improvement,
+
+        sequential_acquisitions = {'ExpectedImprovement': pinot.active.acquisition.expected_improvement,
+                                   'ProbabilityOfImprovement': pinot.active.acquisition.probability_of_improvement,
+                                   'UpperConfidenceBound': pinot.active.acquisition.expected_improvement,
                                    'Uncertainty': pinot.active.acquisition.expected_improvement,
+                                   'Human': pinot.active.acquisition.dummy,
                                    'Random': pinot.active.acquisition.expected_improvement}
         
         if self.strategy == 'batch':
@@ -202,32 +207,10 @@ class ActivePlot():
             layer=layer,
             config=self.config)
 
-        if self.net == 'gp':
-            kernel = pinot.inference.gp.kernels.deep_kernel.DeepKernel(
-                    representation=net_representation,
-                    base_kernel=pinot.inference.gp.kernels.rbf.RBF())
-            net = pinot.inference.gp.gpr.exact_gpr.ExactGPR(kernel)
 
-        elif self.net == 'mle':
-            net = pinot.Net(net_representation)
-
-        elif self.net == 'semi':
-            gvae = GCNModelVAE(input_feat_dim=self.feat_dim,
-                               gcn_type=self.layer,
-                               # gcn_init_args={"num_heads":5},
-                               gcn_hidden_dims=[64, 64],
-                               embedding_dim=32,
-                               num_atom_types=100)
-            net = semisupervised.SemiSupervisedNet(gvae) # TODO pinot.
-
-        elif self.net == 'semi_gp':
-            gvae = GCNModelVAE(input_feat_dim=self.feat_dim,
-                               gcn_type=self.layer,
-                               # gcn_init_args={"num_heads":5},
-                               gcn_hidden_dims=[64, 64],
-                               embedding_dim=32,
-                               num_atom_types=100)
-            net = semisupervised_gp.SemiSupervisedGaussianProcess(gvae)
+        net = pinot.Net(
+                net_representation,
+                getattr(pinot.regressors, self.net))
 
         if self.strategy == 'batch':
             net = BTModel(net)
@@ -241,7 +224,7 @@ if __name__ == '__main__':
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--net', type=str, default='gp')
+    parser.add_argument('--net', type=str, default='ExactGaussianProcessRegressor')
     parser.add_argument('--representation', type=str, default='GraphConv')
 
     parser.add_argument('--lr', type=float, default=1e-3)
@@ -249,7 +232,7 @@ if __name__ == '__main__':
     
     parser.add_argument('--data', type=str, default='esol')
     parser.add_argument('--strategy', type=str, default='sequential')
-    parser.add_argument('--acquisition', type=str, default='Expected Improvement')
+    parser.add_argument('--acquisition', type=str, default='ExpectedImprovement')
     parser.add_argument('--marginalize_batch', type=bool, default=True)
     parser.add_argument('--num_samples', type=int, default=1000)
     parser.add_argument('--q', type=int, default=1)
@@ -293,5 +276,5 @@ if __name__ == '__main__':
 
     # save to disk
     if args.index_provided:
-        filename = f'{args.net}_{args.representation}_{args.optimizer}_{args.data}_{args.strategy}_q{args.q}_{args.index}.csv'
+        filename = f'{args.net}_{args.representation}_{args.optimizer}_{args.data}_{args.strategy}_{args.acquisition}_q{args.q}_{args.index}.csv'
     best_df.to_csv(filename)
