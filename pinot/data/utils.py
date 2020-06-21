@@ -85,6 +85,9 @@ def load_unlabeled_data(path, size=0.1, toolkit="rdkit", seed=2666):
     def _from_txt():
         f = open(path, "r")
         df_smiles = [line.rstrip() for line in f]
+        # Shuffle the data
+        random.seed(seed)
+        random.shuffle(df_smiles)
         # Since loading the whole data set takes a lot of time
         # Load only a subset of the data instead
         num_mols = int(len(df_smiles) * size)
@@ -108,8 +111,6 @@ def load_unlabeled_data(path, size=0.1, toolkit="rdkit", seed=2666):
             gs = [pinot.graph.from_oemol(mol) for mol in mols]
 
         gs = list(zip(gs, df_y))
-        random.seed(seed)
-        random.shuffle(gs)
 
         return gs
 
