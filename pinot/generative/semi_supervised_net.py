@@ -18,7 +18,9 @@ class SemiSupervisedNet(pinot.Net):
             output_regressor=NeuralNetworkRegressor,
             decoder=DecoderNetwork,
             unsup_scale=1.,
-            generative_hidden_dim=64):
+            embedding_dim=64,
+            generative_hidden_dim=64,
+        ):
 
         super(SemiSupervisedNet, self).__init__(
             representation=representation,
@@ -40,12 +42,18 @@ class SemiSupervisedNet(pinot.Net):
         # Recommended class: pinot.generative.decoder.DecoderNetwork
         # Decoder needs to satisfy:
         # decoder.loss(g, z_sample) -> compute reconstruction loss        
-        self.decoder = decoder(embedding_dim=generative_hidden_dim, num_atom_types=100)
+        # Embedding_dim is the dimension of the z_sample vector, or the
+        # input of the decoder
+        self.embedding_dim = embedding_dim
+        self.decoder = decoder(embedding_dim=embedding_dim, num_atom_types=100)
 
         # Output_regressor_generative:
         assert(hasattr(self.decoder, "forward"))
         assert(hasattr(self.decoder, "embedding_dim"))
+        # Generative hidden dim is the size of the hidden layer of the
+        # generative output regressor network
         self.generative_hidden_dim = generative_hidden_dim
+
         self.output_regressor_generative = nn.ModuleList(
         [
             nn.Sequential(

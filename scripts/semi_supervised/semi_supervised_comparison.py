@@ -87,6 +87,9 @@ import os
 import logging
 import time
 
+# Specify accelerator (if any)
+device = torch.device("cuda:0" if args.cuda else "cpu:0")
+
 # If output folder doesn't exist, create a new one
 if not os.path.exists(args.output):
     os.mkdir(args.output)
@@ -102,6 +105,11 @@ logging.basicConfig(filename=os.path.join(args.output, args.log), filemode='w', 
 start = time.time()
 data_labeled_all = getattr(pinot.data, args.labeled_data)()
 data_unlabeled_all = getattr(pinot.data, args.unlabeled_data)()
+
+data_labeled_all = [(g.to(device), y.to(device)) for (g,y) in data_labeled_all]
+
+data_unlabeled_all = [(g.to(device), y.to(device)) for (g,y) in data_unlabeled_all]
+
 data_labeled = [(g, y) for (g,y) in data_labeled_all if ~torch.isnan(y)]
 
 
@@ -136,23 +144,22 @@ def get_net_and_optimizer(args, unsup_scale):
     else:
         output_regressor = pinot.regressors.VariationalGaussianProcessRegressor
 
-    decoder = pinot.generative.DecoderNetwork(args.embedding_dim, 100, args.cuda)
+    decoder = pinot.generative.DecoderNetwork
 
     # First train a fully supervised Net to use as Baseline
     net = pinot.generative.SemiSupervisedNet(
         representation=representation,
-        decoder=decoder,
         output_regressor=output_regressor,
+        decoder=decoder,
         unsup_scale=unsup_scale,
-        cuda=args.cuda
+        embedding_dim=args.embedding_dim
     )
     optimizer = pinot.app.utils.optimizer_translation(
         opt_string=args.optimizer,
         lr=args.lr,
         weight_decay=0.01,
     )
-    return net, optimizer(net)
-
+    return net.to(device), optimizer(net)
 
 def train_and_test_semi_supervised(net, optimizer, semi_data, labeled_train, labeled_test, n_epochs):
     train = pinot.app.experiment.Train(net=net, data=semi_data, optimizer=optimizer, n_epochs=n_epochs)
