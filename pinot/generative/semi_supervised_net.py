@@ -38,13 +38,10 @@ class SemiSupervisedNet(pinot.Net):
 
         # pass in decoder as class
         self.decoder_cls = decoder
-
-        self.decoder = decoder(embedding_dim=embedding_dim)
-
         # Recommended class: pinot.generative.decoder.DecoderNetwork
         # Decoder needs to satisfy:
         # decoder.loss(g, z_sample) -> compute reconstruction loss        
-        self.decoder = decoder(embedding_dim=generative_hidden_dim, num_atom_types=100, cuda=cuda)
+        self.decoder = decoder(embedding_dim=generative_hidden_dim, num_atom_types=100)
 
         # Output_regressor_generative:
         assert(hasattr(self.decoder, "forward"))
