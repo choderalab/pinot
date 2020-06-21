@@ -18,7 +18,6 @@ class SemiSupervisedNet(pinot.Net):
             output_regressor=NeuralNetworkRegressor,
             decoder=DecoderNetwork,
             unsup_scale=1.,
-            cuda=True,
             generative_hidden_dim=64):
 
         super(SemiSupervisedNet, self).__init__(
