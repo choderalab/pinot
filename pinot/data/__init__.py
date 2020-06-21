@@ -60,7 +60,7 @@ moonshot_with_date = lambda: datasets.TemporalDataset(
 moonshot_sorted = utils.from_csv(
         os.path.dirname(utils.__file__) + '/moonshot_with_date.csv',
         smiles_col=1,
-        y_cols=[5],
+        y_cols=[6],
         scale=0.01,
         shuffle=False,
         dropna=True)
