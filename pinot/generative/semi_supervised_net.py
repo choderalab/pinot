@@ -79,23 +79,19 @@ class SemiSupervisedNet(pinot.Net):
         # Call this function to compute the nodes representations
         h = self.representation.forward(g, pool=None) # We always call this
         # Compute unsupervised loss
-        unsup_loss = self.loss_unsupervised(g, h)
+        total_loss = self.loss_unsupervised(g, h) * self.unsup_scale
         # Compute the graph representation from node representation
         # Then compute graph representation, by pooling
         h = self.representation.pool(g, h)
 
-        supervised_loss = torch.tensor(0.)
-
         # Then compute supervised loss
         if len(y[~torch.isnan(y)]) != 0:
             # Only compute supervised loss for the labeled data
-            h_not_none = h[~torch.isnan(y).flatten(), :]
-            y_not_none = y[~torch.isnan(y)].unsqueeze(1)
-            y_not_none = y_not_none
+            h_labeled = h[~torch.isnan(y).flatten(), :]
+            y_labeled = y[~torch.isnan(y)].unsqueeze(1)
             # The output-regressor needs to implement a loss function
-            supervised_loss = self.loss_supervised(h_not_none, y_not_none)
-
-        total_loss = supervised_loss.sum() + unsup_loss*self.unsup_scale
+            supervised_loss = self.loss_supervised(h_labeled, y_labeled)
+            total_loss += supervised_loss.sum()
         return total_loss
 
     def loss_supervised(self, h, y):
