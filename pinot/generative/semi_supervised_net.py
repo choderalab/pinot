@@ -34,9 +34,12 @@ class SemiSupervisedNet(pinot.Net):
         assert(hasattr(self.representation, "pool"))
         
         # grab the last dimension of `representation`
-        self.representation_dim = [
-                layer for layer in list(self.representation.modules())\
-                        if hasattr(layer, 'out_features')][-1].out_features
+        self.representation_dim = self.representation_out_features
+
+        # pass in decoder as class
+        self.decoder_cls = decoder
+
+        self.decoder = decoder(embedding_dim=embedding_dim)
 
         # Recommended class: pinot.generative.decoder.DecoderNetwork
         # Decoder needs to satisfy:
@@ -63,12 +66,12 @@ class SemiSupervisedNet(pinot.Net):
         # self.output_regressor = output_regressor
 
         # Move to CUDA if available
-        self.cuda = cuda
-        self.device = torch.device("cuda:0" if cuda else "cpu:0")
-        self.representation.to(self.device)
-        self.output_regressor_generative.to(self.device)
-        self.decoder.to(self.device)
-        self.output_regressor.to(self.device)
+        # self.cuda = cuda
+        # self.device = torch.device("cuda:0" if cuda else "cpu:0")
+        # self.representation.to(self.device)
+        # self.output_regressor_generative.to(self.device)
+        # self.decoder.to(self.device)
+        # self.output_regressor.to(self.device)
 
         # Zookeeping
         self.unsup_scale = unsup_scale
@@ -78,7 +81,7 @@ class SemiSupervisedNet(pinot.Net):
         """ Compute the loss function
         """
         # Move to CUDA if available
-        g.to(self.device)
+        # g.to(self.device)
         # Compute the node representation
         # print(g.ndata["h"].shape)
         # Call this function to compute the nodes representations
@@ -91,7 +94,7 @@ class SemiSupervisedNet(pinot.Net):
         # Then compute graph representation, by pooling
         h = self.representation.pool(g, h)
         # print(g.ndata["h"].shape)
-        
+
         supervised_loss = torch.tensor(0.)
 
         # Then compute supervised loss

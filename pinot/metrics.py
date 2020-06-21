@@ -9,9 +9,17 @@ import torch
 import pinot
 
 # =============================================================================
+# HELPER FUNCTIONS
+# =============================================================================
+def _independent(distribution):
+    return torch.distributions.normal.Normal(
+        loc=distribution.mean.flatten(),
+        scale=distribution.variance.pow(0.5).flatten()
+    )
+
+# =============================================================================
 # MODULE FUNCTIONS
 # =============================================================================
-
 
 def _mse(y, y_hat):
     return torch.nn.functional.mse_loss(y, y_hat)
@@ -63,13 +71,36 @@ def r2(net, g, y, sampler=None):
     return _r2(y, y_hat)
 
 
+def pearsonr(net, g, y, sampler=None):
+    from scipy.stats import pearsonr as pr
+    y_hat = net.condition(g, sampler=sampler).mean.detach().cpu()
+    y = y.detach().cpu()
+    
+    result = pr(y.flatten().numpy(), y_hat.flatten().numpy())
+    correlation, _ = result
+    return torch.Tensor([correlation])[0]
+
+
 def log_sigma(net, g, y, sampler=None):
     return net.log_sigma
-
 
 def avg_nll(net, g, y, sampler=None):
 
     # TODO:
     # generalize
-    y = y.cpu()
-    return -net.condition(g, sampler=sampler).log_prob(y).mean()
+
+    # ensure `y` is one-dimensional
+    assert y.dim() == 2
+    assert y.shape[-1] == 1
+
+    # make the predictive distribution
+    distribution = net.condition(g, sampler=sampler)
+
+    # make independent
+    distribution = _independent(distribution)
+
+    # calculate the log_prob
+    log_prob = distribution.log_prob(y.flatten()).mean()
+
+    return log_prob
+

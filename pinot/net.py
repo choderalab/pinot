@@ -1,6 +1,5 @@
 """ Combine representation, parameterization, and distribution class
 to construct a model.
-
 """
 # =============================================================================
 # IMPORTS
@@ -9,6 +8,7 @@ import dgl
 import torch
 import abc
 import pinot
+from pinot.regressors import NeuralNetworkRegressor
 
 # =============================================================================
 # BASE CLASSES
@@ -16,42 +16,37 @@ import pinot
 class BaseNet(torch.nn.Module, abc.ABC):
     """ Base class for `Net` object that inputs graphs and outputs
     distributions and is trainable.
-
     Methods
     -------
     condition :
-
-
     """
 
-    def __init__(self, output_regressor, *args, **kwargs):
+    def __init__(self, representation, output_regressor, *args, **kwargs):
         super(BaseNet, self).__init__()
 
         # bookkeeping
+        self.representation = representation
         self.output_regressor = output_regressor
 
     @abc.abstractmethod
     def condition(self, g, sampler=None, *args, **kwargs):
         raise NotImplementedError
 
-    def loss(self, g, y, *args, **kwargs):
+    def loss(self, g, y):
         """ Negative log likelihood loss.
         """
-        # if there is a special loss function implemented in the head,
-        # use that instead
+        # g -> h
+        h = self.representation(g)
 
-        if hasattr(self.output_regressor, "loss"):
-            # get latent representation
-            h = self.representation(g)
+        return self._loss(h, y)
 
+    def _loss(self, h, y):
+        # use loss function from output_regressor, if already implemented
+        if hasattr(self.output_regressor, 'loss'):
             return self.output_regressor.loss(h, y)
 
-        # no sampling in training phase
-        distribution = self.condition(g, sampler=None, *args, **kwargs)
-
-        # the loss here is always negative log likelihood
+        distribution = self._condition(h)
         nll = -distribution.log_prob(y).mean()
-
         return nll
 
 
@@ -59,28 +54,24 @@ class Net(BaseNet):
     """ An object that combines the representation and parameter
     learning, puts into a predicted distribution and calculates the
     corresponding divergence.
-
-
     Attributes
     ----------
     representation: a `pinot.representation` module
         the model that translates graphs to latent representations
-
-
     """
 
     def __init__(
         self,
         representation,
-        output_regressor=pinot.regressors.NeuralNetworkRegressor,
+        output_regressor=NeuralNetworkRegressor,
         **kwargs
     ):
 
-        super(Net, self).__init__(output_regressor=output_regressor)
-        self.representation = representation
+        super(Net, self).__init__(
+            representation=representation,
+            output_regressor=output_regressor)
 
         # read the representation hidden units here
-        # grab the last dimension of `representation`
         # grab the last dimension of `representation`
         self.representation_out_features = [
             layer
@@ -98,11 +89,9 @@ class Net(BaseNet):
 
         self.output_regressor = output_regressor
 
-    def _condition(self, g):
+    def _condition(self, h):
         """ Compute the output distribution.
         """
-        # g -> h
-        h = self.representation(g)
 
         # h -> distribution
         distribution = self.output_regressor.condition(h)
@@ -111,13 +100,15 @@ class Net(BaseNet):
 
     def condition(self, g, sampler=None, n_samples=64):
         """ Compute the output distribution with sampled weights.
-
         """
+        # g -> h
+        h = self.representation(g)
+
         if sampler is None:
-            return self._condition(g)
+            return self._condition(h)
 
         if not hasattr(sampler, "sample_params"):
-            return self._condition(g)
+            return self._condition(h)
 
         # initialize a list of distributions
         distributions = []

@@ -72,7 +72,7 @@ class SequentialDecoder(nn.Module):
     def __init__(
         self,
         embedding_dim,
-        num_atom_types,
+        num_atom_types=100,
         Dx1=64,
         Dx2=64,
         Da1=64,
