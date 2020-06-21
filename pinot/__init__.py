@@ -1,6 +1,8 @@
 import pinot
 import pinot.graph
 import pinot.data
+import pinot.regressors
+from pinot.net import Net
 import pinot.active
 
 from pinot.metrics import *
@@ -16,8 +18,6 @@ import pinot.representation
 
 import pinot.samplers
 import pinot.regressors
-
-from pinot.net import Net
 
 import pinot.generative
 
