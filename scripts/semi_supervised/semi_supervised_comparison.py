@@ -107,9 +107,7 @@ data_labeled_all = getattr(pinot.data, args.labeled_data)()
 data_unlabeled_all = getattr(pinot.data, args.unlabeled_data)()
 
 data_labeled_all = [(g.to(device), y.to(device)) for (g,y) in data_labeled_all]
-
 data_unlabeled_all = [(g.to(device), y.to(device)) for (g,y) in data_unlabeled_all]
-
 data_labeled = [(g, y) for (g,y) in data_labeled_all if ~torch.isnan(y)]
 
 
@@ -159,7 +157,8 @@ def get_net_and_optimizer(args, unsup_scale):
         lr=args.lr,
         weight_decay=0.01,
     )
-    return net.to(device), optimizer(net)
+    net.to(device)
+    return net, optimizer(net)
 
 def train_and_test_semi_supervised(net, optimizer, semi_data, labeled_train, labeled_test, n_epochs):
     train = pinot.app.experiment.Train(net=net, data=semi_data, optimizer=optimizer, n_epochs=n_epochs)
@@ -215,15 +214,18 @@ for volume in vols:
 
     # Mix the train moonshot labeled with moonshot unlabeled to get semisupervised data
     train_semi = pinot.data.utils.prepare_semi_supervised_data(train_unlabeled, train_labeled)
+    train_semi = [(g.to(device), y.to(device)) for (g, y) in train_semi]
 
     # Initialize the model
     # The unsupervised weighting constant is amount of labeled / amount of unlabeled data used for training
     unsup_scale = float(len(train_labeled))/(len(train_unlabeled) + len(train_labeled))
-
     semiNet, optimizer = get_net_and_optimizer(args, unsup_scale)
 
     # Train data is either mini-batched (NN / variational GP) or 1 batch (exact GP)
-    train = pinot.data.utils.batch(train_semi, len(train_semi)) if args.regressor_type == "gp" else  pinot.data.utils.batch(train_semi, batch_size)
+    if args.regressor_type == "gp":
+        train = pinot.data.utils.batch(train_semi, len(train_semi))
+    else:  
+        train = pinot.data.utils.batch(train_semi, batch_size)
 
     semitrain, semitest = train_and_test_semi_supervised(semiNet, optimizer, train, train_labeled, test_labeled, args.n_epochs)
 
