@@ -21,7 +21,7 @@ def run(args):
             net_representation,
             output_regressor=getattr(
                 pinot.regressors,
-                args.output_regressor))
+                args.output_regressor)(32))
 
     # get the entire dataset
     ds = getattr(pinot.data, args.data)()
@@ -36,10 +36,11 @@ def run(args):
 
     # batch
 
-    if args.output_regressor == 'ExactGaussianProcessRegressor':
+    if 'Exact' in args.output_regressor:
         ds_tr, ds_te = pinot.data.utils.split(ds, partition)
-        ds_tr = pinot.data.batch(ds_tr, len(ds_tr))
-        ds_te = pinot.data.batch(ds_te, len(ds_te))
+
+        ds_tr = pinot.data.utils.batch(ds_tr, len(ds_tr))
+        ds_te = pinot.data.utils.batch(ds_te, len(ds_te))
 
     else:
         ds = pinot.data.utils.batch(ds, batch_size)
@@ -58,7 +59,7 @@ def run(args):
         net = net.to(torch.device("cuda:0"))
 
     optimizer = pinot.app.utils.optimizer_translation(
-        args.optimizer, lr=args.lr, kl_loss_scaling=1.0 / float(len(ds_tr))
+        args.optimizer, weight_decay=0.01, lr=args.lr,
     )(net)
 
     train_and_test = pinot.app.experiment.TrainAndTest(
