@@ -21,6 +21,7 @@ def from_csv(
     seed=2666,
     scale=1.0,
     dropna=False,
+    shuffle=True,
     **kwargs
 ):
     """ Read csv from file.
@@ -52,13 +53,7 @@ def from_csv(
             gs = [pinot.graph.from_rdkit_mol(mol) for mol in mols]
 
         elif toolkit == "openeye":
-            from openeye import oechem
-
-            mols = [
-                oechem.OESmilesToMol(oechem.OEGraphMol(), smiles)
-                for smiles in df_smiles
-            ]
-            gs = [pinot.graph.from_oemol(mol) for mol in mols]
+            raise NotImplementedError
 
         ds = list(
             zip(
@@ -70,8 +65,10 @@ def from_csv(
                 ),
             )
         )
-        random.seed(seed)
-        random.shuffle(ds)
+
+        if shuffle is True:
+            random.seed(seed)
+            random.shuffle(ds)
 
         return ds
 
@@ -85,6 +82,9 @@ def load_unlabeled_data(path, size=0.1, toolkit="rdkit", seed=2666):
     def _from_txt():
         f = open(path, "r")
         df_smiles = [line.rstrip() for line in f]
+        # Shuffle the data
+        random.seed(seed)
+        random.shuffle(df_smiles)
         # Since loading the whole data set takes a lot of time
         # Load only a subset of the data instead
         num_mols = int(len(df_smiles) * size)
@@ -108,8 +108,6 @@ def load_unlabeled_data(path, size=0.1, toolkit="rdkit", seed=2666):
             gs = [pinot.graph.from_oemol(mol) for mol in mols]
 
         gs = list(zip(gs, df_y))
-        random.seed(seed)
-        random.shuffle(gs)
 
         return gs
 
@@ -150,15 +148,18 @@ def split(ds, partition):
     return ds_batched
 
 
-def batch(ds, batch_size, seed=2666):
+def batch(ds, batch_size, seed=2666, shuffle=False):
     """ Batch graphs and values after shuffling.
     """
     # get the numebr of data
     n_data_points = len(ds)
     n_batches = n_data_points // batch_size  # drop the rest
 
-    random.seed(seed)
-    random.shuffle(ds)
+    if shuffle is True:
+        random.seed(seed)
+        random.shuffle(ds)
+
+
     gs, ys = tuple(zip(*ds))
 
     gs_batched = [

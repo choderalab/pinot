@@ -17,7 +17,7 @@ from copy import deepcopy
 # =============================================================================
 DEFAULT_MODEL_KWARGS = {
     "SAGEConv": {"aggregator_type": "mean"},
-    "GATConv": {"num_heads": 4},
+    "GATConv": {"num_heads": 3},
     "TAGConv": {"k": 2},
 }
 

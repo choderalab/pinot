@@ -35,10 +35,17 @@ def run(args):
     assert len(partition) == 2, "only training and test here."
 
     # batch
-    ds = pinot.data.utils.batch(ds, batch_size)
-    ds_tr, ds_te = pinot.data.utils.split(ds, partition)
 
-    if torch.cuda.is_available() and 1==2:
+    if args.output_regressor == 'ExactGaussianProcessRegressor':
+        ds_tr, ds_te = pinot.data.utils.split(ds, partition)
+        ds_tr = pinot.data.batch(ds_tr, len(ds_tr))
+        ds_te = pinot.data.batch(ds_te, len(ds_te))
+
+    else:
+        ds = pinot.data.utils.batch(ds, batch_size)
+        ds_tr, ds_te = pinot.data.utils.split(ds, partition)
+
+    if torch.cuda.is_available():
         ds_tr = [
             (g.to(torch.device("cuda:0")), y.to(torch.device("cuda:0")))
             for g, y in ds_tr
@@ -89,7 +96,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--noise_model", default="normal-heteroschedastic", type=str
     )
-    parser.add_argument("--optimizer", default="adam", type=str)
+    parser.add_argument("--optimizer", default="Adam", type=str)
     parser.add_argument(
         "--config", nargs="*", default=[32, "tanh", 32, "tanh", 32, "tanh"]
     )

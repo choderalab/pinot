@@ -6,23 +6,21 @@ import torch
 import torch.nn as nn
 import pinot
 from pinot.generative.losses import negative_elbo
-from pinot.net import Net
-from pinot.generative.decoder import SequentialDecoder
+from pinot.generative.decoder import DecoderNetwork
 from pinot.regressors.neural_network_regressor import NeuralNetworkRegressor
 
 # =============================================================================
 # MODULE CLASSES
 # =============================================================================
 
-class SemiSupervisedNet(Net):
-    def __init__(
-            self,
-            representation,
+class SemiSupervisedNet(pinot.Net):
+    def __init__(self, representation,
             output_regressor=NeuralNetworkRegressor,
-            decoder=SequentialDecoder,
-            embedding_dim=64,
+            decoder=DecoderNetwork,
             unsup_scale=1.,
-            cuda=True):
+            embedding_dim=64,
+            generative_hidden_dim=64,
+        ):
 
         super(SemiSupervisedNet, self).__init__(
             representation=representation,
@@ -33,20 +31,29 @@ class SemiSupervisedNet(Net):
         # Representation needs to have these functions
         # representation.forward(g, pool) -> h_graph or h_node depending on pool
         # representation.pool(h_node) -> h_graph
-        assert(hasattr(representation, "forward"))
-        assert(hasattr(representation, "pool"))
-
+        assert(hasattr(self.representation, "forward"))
+        assert(hasattr(self.representation, "pool"))
+        
         # grab the last dimension of `representation`
         self.representation_dim = self.representation_out_features
 
         # pass in decoder as class
         self.decoder_cls = decoder
-
-        self.decoder = decoder(embedding_dim=embedding_dim)
+        # Recommended class: pinot.generative.decoder.DecoderNetwork
+        # Decoder needs to satisfy:
+        # decoder.loss(g, z_sample) -> compute reconstruction loss        
+        # Embedding_dim is the dimension of the z_sample vector, or the
+        # input of the decoder
+        self.embedding_dim = embedding_dim
+        self.decoder = decoder(embedding_dim=embedding_dim, num_atom_types=100)
 
         # Output_regressor_generative:
+        assert(hasattr(self.decoder, "forward"))
         assert(hasattr(self.decoder, "embedding_dim"))
-        self.generative_hidden_dim = self.representation_dim
+        # Generative hidden dim is the size of the hidden layer of the
+        # generative output regressor network
+        self.generative_hidden_dim = generative_hidden_dim
+
         self.output_regressor_generative = nn.ModuleList(
         [
             nn.Sequential(
@@ -56,26 +63,10 @@ class SemiSupervisedNet(Net):
             ) for _ in range(2) # mean and logvar
         ])
 
-        # Recommended class: pinot.generative.decoder.DecoderNetwork
-        # Decoder needs to satisfy:
-        # decoder.loss(g, z_sample) -> compute reconstruction loss
-        assert(hasattr(self.decoder, "forward"))
-
         # Output regressor needs to satisfy
         # output_regressor.loss(h_graph, y) -> supervised loss
         # output_regressor.condition(h_graph) -> pred distribution
-
-        # assert(hasattr(output_regressor, "loss"))
-        assert(hasattr(output_regressor, "condition"))
-        # self.output_regressor = output_regressor
-
-        # Move to CUDA if available
-        # self.cuda = cuda
-        # self.device = torch.device("cuda:0" if cuda else "cpu:0")
-        # self.representation.to(self.device)
-        # self.output_regressor_generative.to(self.device)
-        # self.decoder.to(self.device)
-        # self.output_regressor.to(self.device)
+        assert(hasattr(self.output_regressor, "loss") or hasattr(self.output_regressor, "condition"))
 
         # Zookeeping
         self.unsup_scale = unsup_scale
@@ -84,20 +75,14 @@ class SemiSupervisedNet(Net):
     def loss(self, g, y):
         """ Compute the loss function
         """
-        # Move to CUDA if available
-        # g.to(self.device)
         # Compute the node representation
-        # print(g.ndata["h"].shape)
         # Call this function to compute the nodes representations
         h = self.representation.forward(g, pool=None) # We always call this
-        # print(g.ndata["h"].shape)
         # Compute unsupervised loss
         unsup_loss = self.loss_unsupervised(g, h)
         # Compute the graph representation from node representation
-        # print(g.ndata["h"].shape)
         # Then compute graph representation, by pooling
         h = self.representation.pool(g, h)
-        # print(g.ndata["h"].shape)
 
         supervised_loss = torch.tensor(0.)
 
@@ -106,8 +91,7 @@ class SemiSupervisedNet(Net):
             # Only compute supervised loss for the labeled data
             h_not_none = h[~torch.isnan(y).flatten(), :]
             y_not_none = y[~torch.isnan(y)].unsqueeze(1)
-            # Convert to cuda if available
-            y_not_none = y_not_none.to(self.device)
+            y_not_none = y_not_none
             # The output-regressor needs to implement a loss function
             supervised_loss = self.loss_supervised(h_not_none, y_not_none)
 
@@ -115,7 +99,7 @@ class SemiSupervisedNet(Net):
         return total_loss
 
     def loss_supervised(self, h, y):
-        # return self.output_regressor.loss(h, y)
+        # If output regressor has loss function implemented
         return self._loss(h, y)
 
     def loss_unsupervised(self, g, h):

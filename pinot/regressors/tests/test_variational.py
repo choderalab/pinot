@@ -18,7 +18,7 @@ def test_init():
         net_representation,
         VariationalGaussianProcessRegressor,
         num_data=num_data
-    )        
+    )
 
 def test_train_and_test():
     from pinot.regressors import VariationalGaussianProcessRegressor
@@ -55,6 +55,9 @@ def test_train_and_test():
 
 
 def test_train_and_test_cuda():
+    if torch.cuda.is_available() is False: # pass if no cuda
+        return None
+
     from pinot.regressors import VariationalGaussianProcessRegressor
     ds_tr, ds_te, num_data = get_data(cuda=True)
 

@@ -1,13 +1,16 @@
 import pinot
-import pinot.data
+from . import datasets
 from . import utils
 import os
 import numpy as np
 import sys
 
+
+
 esol = utils.from_csv(os.path.dirname(utils.__file__) + "/esol.csv")
 freesolv = utils.from_csv(os.path.dirname(utils.__file__) + "/SAMPL.csv", smiles_col=1, y_cols=[2])
 lipophilicity = utils.from_csv(os.path.dirname(utils.__file__) + "/Lipophilicity.csv")
+
 
 
 zinc_tiny = utils.load_unlabeled_data(os.path.dirname(utils.__file__) + "/zinc/all.txt", size=0.01)
@@ -42,7 +45,25 @@ moonshot_meta = utils.from_csv(
     os.path.dirname(utils.__file__) + "/moonshot.csv",
     smiles_col=0,
     y_cols=[3, 4, 5, 6, 7, 8, 9, 10, 11],
-    scale=0.01)
+
+    scale=0.01,
+)
+
+moonshot_with_date = lambda: datasets.TemporalDataset(
+        ).from_csv(
+            os.path.dirname(utils.__file__) + '/moonshot_with_date.csv',
+            smiles_col=1,
+            y_cols=[5, 6, 7, 8, 9, 10],
+            time_col=-3,
+            scale=0.01)
+
+moonshot_sorted = utils.from_csv(
+        os.path.dirname(utils.__file__) + '/moonshot_with_date.csv',
+        smiles_col=1,
+        y_cols=[5],
+        scale=0.01,
+        shuffle=False,
+        dropna=True)
 
 
 def load_moonshot_semi_supervised(unlabeled_size=0.1, seed=2666):
@@ -67,3 +88,4 @@ def get_esol_semi():
     return esol_semi
 
 esol_semi = get_esol_semi
+

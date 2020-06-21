@@ -90,8 +90,9 @@ def avg_nll(net, g, y, sampler=None):
     # generalize
 
     # ensure `y` is one-dimensional
-    assert y.dim() == 2
-    assert y.shape[-1] == 1
+    assert ((y.dim() == 2 and y.shape[-1] == 1) or 
+        (y.dim() == 1)
+    ) 
 
     # make the predictive distribution
     distribution = net.condition(g, sampler=sampler)
