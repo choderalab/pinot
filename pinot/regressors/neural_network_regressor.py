@@ -62,7 +62,7 @@ class NeuralNetworkRegressor(BaseRegressor):
         self.noise_model = noise_model
         self.output_regression = output_regression
 
-    def condition(self, h):
+    def condition(self, h, **kwargs):
         """ Compute the output distribution.
 
         Parameters

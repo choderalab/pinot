@@ -157,10 +157,6 @@ class ExactGaussianProcessRegressor(GaussianProcessRegressor):
         sigma : float or torch.tensor, shape=(), default=1.0
             noise parameter.
         """
-        if x_tr is None:
-            x_tr = self._x_tr
-        if y_tr is None:
-            y_tr = self._y_tr
 
         # get parameters
         k_tr_tr, k_te_te, k_te_tr, k_tr_te, l_low, alpha\

@@ -9,6 +9,7 @@ import torch
 import abc
 import pinot
 from pinot.regressors import NeuralNetworkRegressor
+from pinot.regressors import ExactGaussianProcessRegressor
 
 # =============================================================================
 # BASE CLASSES
@@ -27,6 +28,7 @@ class BaseNet(torch.nn.Module, abc.ABC):
         # bookkeeping
         self.representation = representation
         self.output_regressor_cls = output_regressor
+
 
     @abc.abstractmethod
     def condition(self, g, sampler=None, *args, **kwargs):
@@ -91,12 +93,33 @@ class Net(BaseNet):
         self.representation = representation
         self.output_regressor = output_regressor
 
-    def _condition(self, h):
+        # determine if the output regressor is an `ExactGaussianProcess`
+        self.has_exact_gp = False
+        if isinstance(
+                self.output_regressor,
+                ExactGaussianProcessRegressor
+            ):
+
+            self.has_exact_gp = True
+
+    def loss(self, g, y):
+        """ Negative log likelihood loss.
+        """
+        # g -> h
+        h = self.representation(g)
+
+        if self.has_exact_gp is True:
+            self.g_last = g
+            self.y_last = y
+
+        return self._loss(h, y)
+
+    def _condition(self, h, **kwargs):
         """ Compute the output distribution.
         """
 
         # h -> distribution
-        distribution = self.output_regressor.condition(h)
+        distribution = self.output_regressor.condition(h, **kwargs)
 
         return distribution
 
@@ -105,12 +128,20 @@ class Net(BaseNet):
         """
         # g -> h
         h = self.representation(g)
+        kwargs = {}
+
+        if self.has_exact_gp is True:
+            h_last = self.representation(self.g_last)
+            kwargs = {
+                'x_tr': h_last,
+                'y_tr': self.y_last
+            }
 
         if sampler is None:
-            return self._condition(h)
+            return self._condition(h, **kwargs)
 
         if not hasattr(sampler, "sample_params"):
-            return self._condition(h)
+            return self._condition(h, **kwargs)
 
         # initialize a list of distributions
         distributions = []
