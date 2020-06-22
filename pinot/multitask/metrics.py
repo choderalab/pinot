@@ -8,6 +8,7 @@ import dgl
 import torch
 import pinot
 from scipy.stats import pearsonr as pr
+from sklearn.metrics import r2_score, mean_squared_error
 
 # =============================================================================
 # HELPER FUNCTIONS
@@ -18,92 +19,65 @@ def _independent(distribution):
         scale=distribution.variance.pow(0.5).flatten()
     )
 
+_convert = lambda x: x.detach().cpu().numpy()
+
+
 # =============================================================================
 # MODULE FUNCTIONS
 # =============================================================================
 
-def _mse(y, y_hat):
-    return torch.nn.functional.mse_loss(y, y_hat)
-
-
-def mse(net, g, y, l, sampler=None):
+def mse(net, g, y):
     task_metrics = {}
-    for task, mask in enumerate(l.T):
-        y_hat_task = net.condition(g, sampler=sampler).mean.cpu()[mask]
-        y_task = y.cpu()[mask]
 
-        # gp
-        if y_hat_task.dim() == 1:
-            y_hat_task = y_hat_task.unsqueeze(1)
-        task_metrics[task] = _mse(y_task, y_hat_task)
+    l = net._generate_mask(y)    
+    for task, mask in enumerate(l.T):
+        y_hat_task = net.condition(g, task).mean[mask]
+        y_task = y[:, task][mask]
+        y_hat_task, y_task = _convert(y_hat_task), _convert(y_task)
+        task_metrics[task] = mean_squared_error(y_task, y_hat_task)
+    return task_metrics
+
+def rmse(net, g, y):
+    task_metrics = {}
+
+    l = net._generate_mask(y)    
+    for task, mask in enumerate(l.T):
+        y_hat_task = net.condition(g, task).mean[mask]
+        y_task = y[:, task][mask]
+        y_hat_task, y_task = _convert(y_hat_task), _convert(y_task)
+        task_metrics[task] = mean_squared_error(y_task, y_hat_task).sqrt()
     return task_metrics
 
 
-def _rmse(y, y_hat):
-    assert y.numel() == y_hat.numel()
-    return torch.sqrt(
-        torch.nn.functional.mse_loss(y.flatten(), y_hat.flatten())
-    )
-
-
-def rmse(net, g, y, l, sampler=None):
+def r2(net, g, y):
     task_metrics = {}
-    for task, mask in enumerate(l.T):
-        y_hat_task = net.condition(g, sampler=sampler).mean.cpu()[mask]
-        y_task = y.cpu()[mask]
 
-        # gp
-        if y_hat_task.dim() == 1:
-            y_hat_task = y_hat_task.unsqueeze(1)
-            
-        task_metrics[task] = _rmse(y_task, y_hat_task)
+    l = net._generate_mask(y)    
+    for task, mask in enumerate(l.T):
+        y_hat_task = net.condition(g, task).mean[mask]
+        y_task = y[:, task][mask]
+        y_hat_task, y_task = _convert(y_hat_task), _convert(y_task)
+        task_metrics[task] = r2_score(y_task, y_hat_task)
     return task_metrics
 
-
-def _r2(y, y_hat):
-    ss_tot = (y - y.mean()).pow(2).sum()
-    ss_res = (y_hat - y).pow(2).sum()
-    return 1 - torch.div(ss_res, ss_tot)
-
-def r2(net, g, y, l, sampler=None):
+def pearson(net, g, y):
     task_metrics = {}
     
+    l = net._generate_mask(y)
     for task, mask in enumerate(l.T):
-        y_hat_task = net.condition(g, task, sampler=sampler).mean.cpu()[mask]
-        y_task = y.cpu()[mask]
-
-        if y_hat_task.dim() == 1:
-            y_hat_task = y_hat_task.unsqueeze(1)
-
-        task_metrics[task] = _r2(y_task, y_hat_task)
+        y_hat_task = net.condition(g, task).mean[mask]
+        y_task = y[:, task][mask]
+        y_hat_task, y_task = _convert(y_hat_task), _convert(y_task)
+        task_metrics[task] = pr(y_task, y_hat_task)[0]
     return task_metrics
 
-
-def log_sigma(net, g, y, sampler=None):
+def log_sigma(net, g, y):
     return net.log_sigma
 
-
-def pearsonr(net, g, y, l, sampler=None):
-    task_metrics = {}
-
-    for task, mask in enumerate(l.T):
-        y_hat_task = net.condition(g, task, sampler=sampler).mean.detach().cpu()[mask]
-        y_task = y.detach().cpu()[mask]
-        
-        result = pr(y_task.flatten().numpy(),
-                    y_hat_task.flatten().numpy())
-
-        correlation, _ = result
-        task_metrics[task] = torch.Tensor([correlation])[0]
-    return task_metrics
-
-
-def log_sigma(net, g, y, l, sampler=None):
-    return net.log_sigma
 
 def avg_nll(net, g, y, l, sampler=None):
     # make the predictive distribution
-    distributions = net.condition_train(g, sampler=sampler)
+    distributions = net.condition_train(g)
 
     # make independent
     distributions = [_independent(d) for d in distributions]
