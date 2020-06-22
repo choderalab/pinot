@@ -1,4 +1,5 @@
 import torch
+from pinot import Net
 from pinot.regressors import ExactGaussianProcessRegressor, NeuralNetworkRegressor
 
 class MultitaskNet(pinot.Net):
