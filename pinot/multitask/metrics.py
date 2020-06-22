@@ -7,6 +7,10 @@
 import dgl
 import torch
 import pinot
+<<<<<<< Updated upstream
+=======
+from scipy.stats import pearsonr as pr
+>>>>>>> Stashed changes
 
 # =============================================================================
 # HELPER FUNCTIONS
@@ -25,16 +29,17 @@ def _mse(y, y_hat):
     return torch.nn.functional.mse_loss(y, y_hat)
 
 
-def mse(net, g, y, sampler=None):
+def mse(net, g, y, l, sampler=None):
+	task_metrics = {}
+	for task, mask in enumerate(l.T):
+	    y_hat_task = net.condition(g, sampler=sampler).mean.cpu()[mask]
+	    y_task = y.cpu()[mask]
 
-    y_hat = net.condition(g, sampler=sampler).mean.cpu()
-    y = y.cpu()
-
-    # gp
-    if y_hat.dim() == 1:
-        y_hat = y_hat.unsqueeze(1)
-
-    return _mse(y, y_hat)
+	    # gp
+	    if y_hat_task.dim() == 1:
+	        y_hat_task = y_hat_task.unsqueeze(1)
+        task_metrics[task] = _mse(y_task, y_hat_task)
+    return task_metrics
 
 
 def _rmse(y, y_hat):
@@ -44,15 +49,17 @@ def _rmse(y, y_hat):
     )
 
 
-def rmse(net, g, y, sampler=None):
-    y_hat = net.condition(g, sampler=sampler).mean.cpu()
-    y = y.cpu()
+def rmse(net, g, y, l, sampler=None):
+	task_metrics = {}
+	for task, mask in enumerate(l.T):
+	    y_hat_task = net.condition(g, sampler=sampler).mean.cpu()[mask]
+	    y_task = y.cpu()[mask]
 
-    # gp
-    if y_hat.dim() == 1:
-        y_hat = y_hat.unsqueeze(1)
-
-    return _rmse(y, y_hat)
+	    # gp
+	    if y_hat_task.dim() == 1:
+	        y_hat_task = y_hat_task.unsqueeze(1)
+        task_metrics[task] = _rmse(y_task, y_hat_task)
+    return task_metrics
 
 
 def _r2(y, y_hat):
@@ -60,47 +67,66 @@ def _r2(y, y_hat):
     ss_res = (y_hat - y).pow(2).sum()
     return 1 - torch.div(ss_res, ss_tot)
 
-
-def r2(net, g, y, sampler=None):
-    y_hat = net.condition(g, sampler=sampler).mean.cpu()
-    y = y.cpu()
-
-    if y_hat.dim() == 1:
-        y_hat = y_hat.unsqueeze(1)
-
-    return _r2(y, y_hat)
-
-
-def pearsonr(net, g, y, sampler=None):
-    from scipy.stats import pearsonr as pr
-    y_hat = net.condition(g, sampler=sampler).mean.detach().cpu()
-    y = y.detach().cpu()
+def r2(net, g, y, l, sampler=None):
+    task_metrics = {}
     
-    result = pr(y.flatten().numpy(), y_hat.flatten().numpy())
-    correlation, _ = result
-    return torch.Tensor([correlation])[0]
+    for task, mask in enumerate(l.T):
+        y_hat_task = net.condition(g, task, sampler=sampler).mean.cpu()[mask]
+        y_task = y.cpu()[mask]
+
+        if y_hat_task.dim() == 1:
+            y_hat_task = y_hat_task.unsqueeze(1)
+
+        task_metrics[task] = _r2(y_task, y_hat_task)
+    return task_metrics
 
 
 def log_sigma(net, g, y, sampler=None):
     return net.log_sigma
 
-def avg_nll(net, g, y, sampler=None):
 
-    # TODO:
-    # generalize
+def pearsonr(net, g, y, l, sampler=None):
+    task_metrics = {}
 
-    # ensure `y` is one-dimensional
-    assert y.dim() == 2
-    assert y.shape[-1] == 1
+    for task, mask in enumerate(l.T):
+	    y_hat_task = net.condition(g, task, sampler=sampler).mean.detach().cpu()[mask]
+	    y_task = y.detach().cpu()[mask]
+	    
+	    result = pr(y_task.flatten().numpy(),
+	    			y_hat_task.flatten().numpy())
 
+	    correlation, _ = result
+	    task_metrics[task] = torch.Tensor([correlation])[0]
+    return task_metrics
+
+
+def log_sigma(net, g, y, l, sampler=None):
+    return net.log_sigma
+
+def avg_nll(net, g, y, l, sampler=None):
     # make the predictive distribution
-    distribution = net.condition(g, sampler=sampler)
+    distributions = net.condition_train(g, sampler=sampler)
 
     # make independent
-    distribution = _independent(distribution)
+    distributions = [_independent(d) for d in distributions]
+    
+    task_metrics = {}
 
-    # calculate the log_prob
-    log_prob = distribution.log_prob(y.flatten()).mean()
+    for task, mask in enumerate(l.T):
+	    # # ensure `y` is one-dimensional
+	    # assert ((y.dim() == 2 and y.shape[-1] == 1) or 
+	    #     (y.dim() == 1)
+	    # )
 
-    return log_prob
+	    # create dummy ys if unlabeled
+		y_dummy = torch.zeros(y.shape[0])
 
+		if torch.cuda.is_available():
+			y_dummy = y_dummy.to(torch.device('cuda:0'))
+
+		y_dummy[mask] = y[mask, task]
+
+	    # calculate the log_prob
+	    log_prob = distributions[task].log_prob(y_dummy.flatten()).mean()
+	    task_metrics[task] = -log_prob
+    return task_metrics

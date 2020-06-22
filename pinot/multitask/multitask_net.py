@@ -1,7 +1,5 @@
-import pinot
-import gpytorch
 import torch
-
+from pinot.regressors import ExactGaussianProcessRegressor, NeuralNetworkRegressor
 
 class MultitaskNet(pinot.Net):
     """ An object that combines the representation and parameter
@@ -16,92 +14,92 @@ class MultitaskNet(pinot.Net):
     def __init__(
         self,
         representation,
-        output_regressor=pinot.regressors.NeuralNetworkRegressor,
+        output_regressor=NeuralNetworkRegressor,
         **kwargs
     ):
-        super(MultiTaskNet, self).__init__(representation, output_regressor, **kwargs)
+        super(MultitaskNet, self).__init__(
+            representation,
+            output_regressor,
+            **kwargs)
+        
         self.output_regressors = torch.nn.ModuleDict()
+        self.kwargs = kwargs
 
-    def condition(self, g, assay):
+    def condition(self, g, task):
         """ Compute the output distribution with sampled weights.
         """
-        self.eval()
+        task = str(task)
+
+        # get representation
         h = self.representation(g)
         
-        # nn.ModuleDict needs string keys
-        assay = str(assay)
+        # get output regressor for a particular task
+        self.output_regressor = self.check_regressor(task)
 
-        # if we already instantiated the output_regressor
-        if assay not in self.output_regressors:
-
-            # get the type of self.output_regressor, and instantiate it
-            self.output_regressors[assay] = type(self.output_regressor)(self.representation_out_features)
-
-            # move to cuda if the parent net is
-            if next(self.parameters()).is_cuda:
-                self.output_regressors[assay].cuda()
-
-        # switch to head for that assay
-        self.output_regressor = self.output_regressors[assay]
-
-        # get distribution for each input
+        # get distribution for input
         distribution = self.output_regressor.condition(h)
+
         return distribution
-        
-    def condition_train(self, g, l, sampler=None):
-        """ Compute the output distribution with sampled weights.
-        """
-        h = self.representation(g)
-
-        # find which assays are being used
-        assays = [str(assay) for assay in range(l.shape[1])]
-        distributions = []
-        
-        for assay in assays:
-            
-            # if we already instantiated the output_regressor
-            if assay not in self.output_regressors:
-                
-                # get the type of self.output_regressor, and instantiate it
-                self.output_regressors[assay] = type(self.output_regressor)(self.representation_out_features)
-                
-                # move to cuda if the parent net is
-                if next(self.parameters()).is_cuda:
-                    self.output_regressors[assay].cuda()
-                
-            # switch to head for that assay
-            self.output_regressor = self.output_regressors[assay]
-
-            # get distribution for each input
-            distribution = self.output_regressor.condition(h)
-            distributions.append(distribution)
-
-        return distributions
 
     def loss(self, g, y):
         """ Compute the loss with a input graph and a set of parameters.
         """
         loss = 0.0
+        
+        # for each task in the data, split up data
+        h = self.representation(g)
         l = self._generate_mask(y)
-        distributions = self.condition_train(g, l)
 
-        for idx, assay_mask in enumerate(l.T):
-            if assay_mask.any():
-                # create dummy ys if unlabeled
-                y_dummy = torch.zeros(y.shape[0]).view(-1, 1)
-                
-                # move to cuda if available
-                if torch.cuda.is_available():
-                    y_dummy = y_dummy.to(torch.device('cuda:0'))
-                
-                y_dummy[assay_mask] = y[assay_mask, idx].view(-1, 1)                
-                
-                # compute log probs
-                log_probs = distributions[idx].log_prob(y_dummy)
-                
-                # mask log probs
-                loss += -log_probs[assay_mask].mean()
+        for task, mask in enumerate(l.T):
+            
+            # switch to regressor for that task
+            self.output_regressor = self.get_regressor(task)
+
+            if isinstance(self.output_regressor, ExactGaussianProcessRegressor):
+                # mask input if ExactGP
+                h_task = self._mask_tensor(h, mask)
+                y_task = self._mask_tensor(y, mask, task)
+                loss += self.output_regressor.loss(h_task, y_task).mean()
+            else:
+                # mask output if VariationalGP
+                distribution = self.output_regressor.condition(h)
+                y_dummy = self._generate_y_dummy(y, task)
+                loss += -distribution.log_prob(y_dummy)[mask].mean()
+
         return loss
+    
+    def get_regressor(self, task):
+        """ Adds a regressor for a particular task if it's not already available.
+        """
+        # ModuleDict needs str
+        task = str(task)
+        
+        # if we already instantiated the output_regressor
+        if task not in self.output_regressors:
+
+            # get the type of self.output_regressor, and instantiate it
+            self.output_regressors[task] = self.output_regressor_cls(
+                self.representation_out_features,
+                **self.kwargs
+                )
+
+            # move to cuda if the parent net is
+            if next(self.parameters()).is_cuda:
+                self.output_regressors[task].cuda()
+        
+        return self.output_regressors[task]
+    
+    def _generate_y_dummy(self, y, task):
+        """ Generates y dummy - fill nans with zeros.
+        """
+        y_dummy = y[:, task]
+        y_dummy[torch.isnan(y_dummy)] = 0
+        return y_dummy.view(-1, 1)
+
+    def _mask_tensor(self, x, mask, task=None):
+        
+        ret = x[mask, task].unsqueeze(-1) if task != None else x[mask]
+        return ret
 
     def _generate_mask(self, y):
         return ~torch.isnan(y)
