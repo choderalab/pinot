@@ -79,6 +79,35 @@ parser.add_argument(
     help="Log file"
 )
 
+parser.add_argument(
+    '--const_unsup_scale',
+    action="store_true",
+    default=False,
+    help="Unsupervised scaling constant, either 1 or number of labeled data/unlabeled",
+)
+
+parser.add_argument(
+    '--weight_decay',
+    default=0.01,
+    help="Weight decay for optimizer",
+)
+
+parser.add_argument(
+    '--batch_size',
+    default=32,
+    type=int,
+    help="Batch size"
+)
+
+parser.add_argument(
+    '--label_split',
+    nargs="+",
+    type=float,
+    default=[0.8,0.2],
+    help="Training-testing split for labeled data"
+)
+
+
 args = parser.parse_args()
 
 import pinot
@@ -112,10 +141,10 @@ data_labeled = [(g, y) for (g,y) in data_labeled_all if ~torch.isnan(y)]
 
 
 # Split the labeled moonshot data into training set and test set
-train_labeled, test_labeled = pinot.data.utils.split(data_labeled, [0.8, 0.2])
+train_labeled, test_labeled = pinot.data.utils.split(data_labeled, args.label_split)
 
 # Do minibatching on LABELED data
-batch_size = 32
+batch_size = args.batch_size
 one_batch_train_labeled = pinot.data.utils.batch(train_labeled, len(train_labeled))
 end = time.time()
 logging.debug("Finished loading all data after {} seconds".format(end-start))
@@ -155,7 +184,7 @@ def get_net_and_optimizer(args, unsup_scale):
     optimizer = pinot.app.utils.optimizer_translation(
         opt_string=args.optimizer,
         lr=args.lr,
-        weight_decay=0.01,
+        weight_decay=args.weight_decay,
     )
     net.to(device)
     return net, optimizer(net)
@@ -172,7 +201,7 @@ def train_and_test_semi_supervised(net, optimizer, semi_data, labeled_train, lab
 
     return train_results, test_results
 
-supNet, optimizer = get_net_and_optimizer(args, 0.)
+supNet, optimizer = get_net_and_optimizer(args, 0.) # Note that with unsup_scale = 0., this becomes a supervised only model
 
 start = time.time()
 # Use batch training if exact GP or mini-batch if NN/variational GP
@@ -218,7 +247,10 @@ for volume in vols:
 
     # Initialize the model
     # The unsupervised weighting constant is amount of labeled / amount of unlabeled data used for training
-    unsup_scale = float(len(train_labeled))/(len(train_unlabeled) + len(train_labeled))
+    unsup_scale = 1.0
+    if not args.const_unsup_scale:
+        unsup_scale = float(len(train_labeled))/(len(train_unlabeled) + len(train_labeled))
+
     semiNet, optimizer = get_net_and_optimizer(args, unsup_scale)
 
     # Train data is either mini-batched (NN / variational GP) or 1 batch (exact GP)
@@ -278,6 +310,10 @@ def plot_learning_curve(learning_curve, vols, sup_metric, savefile=None):
 
 logging.debug("Finished training all the semi-supervised model, now saving plots")
 
-plot_learning_curve(learning_curve_train, vols, sup_train_metrics, os.path.join(args.output, "{}_{}_{}_{}_train_learning_curve.png".format(args.regressor_type, args.layer, args.architecture, args.n_epochs)))
 
-plot_learning_curve(learning_curve_test, vols, sup_test_metrics, os.path.join(args.output, "{}_{}_{}_{}_test_learning_curve.png".format(args.regressor_type, args.layer, args.architecture, args.n_epochs)))
+savefile = "reg={}_l={}_a={}_n={}_sc={}_b={}_wd={}_sp={}".format(args.regressor_type, args.layer, args.architecture, args.n_epochs, args.const_unsup_scale, args.batch_size, args.weight_decay, args.label_split)
+
+
+plot_learning_curve(learning_curve_train, vols, sup_train_metrics, os.path.join(args.output,savefile + "train_learning_curve.png"))
+
+plot_learning_curve(learning_curve_test, vols, sup_test_metrics, os.path.join(args.output, savefile + "test_learning_curve.png"))
