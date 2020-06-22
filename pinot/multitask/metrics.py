@@ -7,10 +7,7 @@
 import dgl
 import torch
 import pinot
-<<<<<<< Updated upstream
-=======
 from scipy.stats import pearsonr as pr
->>>>>>> Stashed changes
 
 # =============================================================================
 # HELPER FUNCTIONS
