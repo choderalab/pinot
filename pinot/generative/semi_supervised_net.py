@@ -87,8 +87,6 @@ class SemiSupervisedNet(pinot.Net):
         # Then compute supervised loss
         if len(y[~torch.isnan(y)]) != 0:
             # Only compute supervised loss for the labeled data
-            labeled_idx = ~torch.isnan(y)
-
             h_labeled = h[~torch.isnan(y).flatten(), :]
             y_labeled = y[~torch.isnan(y)].unsqueeze(1)
 
