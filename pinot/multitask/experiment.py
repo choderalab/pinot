@@ -51,7 +51,7 @@ class MultitaskTrain(Train):
 
         self.states["final"] = copy.deepcopy(self.net.state_dict())
 
-        if hasattr(self.optimizer, "expecation_params"):
+        if hasattr(self.optimizer, "expectation_params"):
             self.optimizer.expectation_params()
 
         return self.net
@@ -62,9 +62,12 @@ class MultitaskTrain(Train):
         Adds parameters from a specific regressor to the optimizer.
         """
         lr = self.optimizer.param_groups[0]['lr']
-        params = [{'params': output_regressor.hyperparameters(), 'lr': lr * 1e-3},
-                  {'params': output_regressor.variational_parameters()},
-                  {'params': output_regressor.likelihood.parameters()}]
+        if hasattr(output_regressor, 'likelihood'):
+            params = [{'params': output_regressor.hyperparameters(), 'lr': lr * 1e-3},
+                      {'params': output_regressor.variational_parameters()},
+                      {'params': output_regressor.likelihood.parameters()}]
+        else:
+            params = [{'params': output_regressor.parameters()}]
         
         for p in params:
             self.optimizer.add_param_group(p)

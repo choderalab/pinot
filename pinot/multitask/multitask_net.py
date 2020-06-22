@@ -2,7 +2,7 @@ import torch
 from pinot import Net
 from pinot.regressors import ExactGaussianProcessRegressor, NeuralNetworkRegressor
 
-class MultitaskNet(pinot.Net):
+class MultitaskNet(Net):
     """ An object that combines the representation and parameter
     learning, puts into a predicted distribution and calculates the
     corresponding divergence.
@@ -35,7 +35,7 @@ class MultitaskNet(pinot.Net):
         h = self.representation(g)
         
         # get output regressor for a particular task
-        self.output_regressor = self.check_regressor(task)
+        self.output_regressor = self._get_regressor(task)
 
         # get distribution for input
         distribution = self.output_regressor.condition(h)
@@ -43,7 +43,7 @@ class MultitaskNet(pinot.Net):
         return distribution
 
     def loss(self, g, y):
-        """ Compute the loss with a input graph and a set of parameters.
+        """ Compute the loss from input graph and corresponding y.
         """
         loss = 0.0
         
@@ -54,7 +54,7 @@ class MultitaskNet(pinot.Net):
         for task, mask in enumerate(l.T):
             
             # switch to regressor for that task
-            self.output_regressor = self.get_regressor(task)
+            self.output_regressor = self._get_regressor(task)
 
             if isinstance(self.output_regressor, ExactGaussianProcessRegressor):
                 # mask input if ExactGP
@@ -69,8 +69,8 @@ class MultitaskNet(pinot.Net):
 
         return loss
     
-    def get_regressor(self, task):
-        """ Adds a regressor for a particular task if it's not already available.
+    def _get_regressor(self, task):
+        """ Returns regressor for a task.
         """
         # ModuleDict needs str
         task = str(task)
@@ -98,9 +98,15 @@ class MultitaskNet(pinot.Net):
         return y_dummy.view(-1, 1)
 
     def _mask_tensor(self, x, mask, task=None):
-        
-        ret = x[mask, task].unsqueeze(-1) if task != None else x[mask]
+        """ Subsets data given mask for particular task.
+        """
+        if task != None:
+            ret = x[mask, task].unsqueeze(-1)
+        else:
+            ret = x[mask]
         return ret
 
     def _generate_mask(self, y):
+        """ Creates a boolean mask where y is nan.
+        """
         return ~torch.isnan(y)
