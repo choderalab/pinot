@@ -293,7 +293,6 @@ class SemiSupervisedBayesOptExperiment(BayesOptExperiment):
 class MultitaskBayesOptExperiment(BayesOptExperiment):
     """ Implements active learning experiment with multiple task target.
     """
-
     def __init__(self, *args, **kwargs):
 
         super(MultitaskBayesOptExperiment, self).__init__(*args, **kwargs)
@@ -307,16 +306,30 @@ class MultitaskBayesOptExperiment(BayesOptExperiment):
         # split input target
         gs, ys = self.new_data
 
-        # get the predictive distribution
-        # TODO:
-        # write API for sampler
-        distribution = self.net.condition(gs)
+        scores = []
+        # for each task
+        for task in range(ys.size(1)):
+            
+            # get the predictive distribution
+            distribution = self.net.condition(gs, task)
+            
+            # workup
+            distribution = self.workup(distribution)
 
-        # workup
-        distribution = self.workup(distribution)
+            # get score
+            score = self.acquisition(distribution, y_best=self.y_best)
+            scores.append(score)
 
-        # get score
-        score = self.acquisition(distribution, y_best=self.y_best)
+        # harmonize the scores
+        # TODO: AVERAGE SCORES
+        # first, scale the scores
+        scaled_scores = [(s - s.mean())/s.std for s in scores]
+        # next: stack the scores
+        scaled_scores = torch.stack(scaled_scores)
+        # next: average the scores
+        score = scaled_scores.mean(axis=0)
+        print(score)
+        print(score.shape)
 
         if not self.weighted_acquire:
             # argmax
