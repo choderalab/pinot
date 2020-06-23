@@ -203,18 +203,18 @@ class ActivePlot():
         """
         layer = pinot.representation.dgl_legacy.gn(model_name=self.layer)
 
-        net_representation = pinot.representation.Sequential(
+        representation = pinot.representation.Sequential(
             layer=layer,
             config=self.config)
 
         if self.net == 'gp':
             kernel = pinot.inference.gp.kernels.deep_kernel.DeepKernel(
-                    representation=net_representation,
+                    representation=representation,
                     base_kernel=pinot.inference.gp.kernels.rbf.RBF())
             net = pinot.inference.gp.gpr.exact_gpr.ExactGPR(kernel)
 
         elif self.net == 'mle':
-            net = pinot.Net(net_representation)
+            net = pinot.Net(representation)
 
         elif self.net == 'semi':
             gvae = GCNModelVAE(input_feat_dim=self.feat_dim,
@@ -270,7 +270,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    Plot = ActivePlot(
+    plot = ActivePlot(
         # net config
         net=args.net,
         layer=args.representation,
@@ -296,7 +296,7 @@ if __name__ == '__main__':
         num_epochs=args.num_epochs,
         )
 
-    best_df = Plot.generate()
+    best_df = plot.generate()
 
     # save to disk
     if args.index_provided:
