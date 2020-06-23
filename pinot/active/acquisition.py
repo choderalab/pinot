@@ -54,7 +54,7 @@ def expected_improvement(distribution, y_best=0.0):
     return distribution.mean - y_best
 
 
-def upper_confidence_bound(distribution, y_best=0.0, kappa=0.5):
+def upper_confidence_bound(distribution, y_best=0.0, kappa=0.95):
     r""" Upper Confidence Bound (UCB).
     Parameters
     ----------
