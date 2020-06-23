@@ -89,6 +89,11 @@ class SemiSupervisedNet(pinot.Net):
             # Only compute supervised loss for the labeled data
             h_labeled = h[~torch.isnan(y).flatten(), :]
             y_labeled = y[~torch.isnan(y)].unsqueeze(1)
+
+            if self.has_exact_gp is True: # Save the last graph batch + ys if exact GP
+                self.y_last = y_labeled
+                self.g_last = dgl.batch([g for i,g in enumerate(dgl.unbatch(g)) if ~torch.isnan(y[i])])
+
             # The output-regressor needs to implement a loss function
             supervised_loss = self.loss_supervised(h_labeled, y_labeled)
             total_loss += supervised_loss.sum()
