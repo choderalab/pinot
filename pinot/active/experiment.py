@@ -7,10 +7,7 @@ from torch.utils.data import WeightedRandomSampler
 import abc
 import dgl
 import pinot
-from pinot.generative.utils import (
-    batch_semi_supervised,
-    prepare_semi_supervised_data,
-)
+from pinot.data.utils import batch, prepare_semi_supervised_data
 
 # =============================================================================
 # HELPER FUNCTIONS
@@ -19,7 +16,6 @@ def _independent(distribution):
     return torch.distributions.normal.Normal(
         distribution.mean.flatten(), distribution.variance.flatten().pow(0.5)
     )
-
 
 def _slice_fn_tensor(x, idxs):
     return x[idxs]
@@ -201,9 +197,12 @@ class BayesOptExperiment(ActiveLearningExperiment):
                     weights=weights,
                     num_samples=self.q,
                     replacement=False)
+                best = torch.IntTensor(list(best))
 
         # pop from the back so you don't disrupt the order
         best = best.sort(descending=True).values
+
+        print(best)
         # print(len(self.new), best)
         self.old.extend([self.new.pop(b) for b in best])
 
@@ -262,7 +261,7 @@ class SemiSupervisedBayesOptExperiment(BayesOptExperiment):
 
         # NOTE that we have to use a special version of batch here
         # because torch.tensor doesn't take in `None`
-        batched_semi_supervised_data = batch_semi_supervised(
+        batched_semi_supervised_data = pinot.data.utils.batch(
             semi_supervised_data, batch_size=len(semi_supervised_data)
         )
 
@@ -285,6 +284,54 @@ class SemiSupervisedBayesOptExperiment(BayesOptExperiment):
         gs, ys = data
         # if gs.batch_size > 1:
         gs = dgl.unbatch(gs)
+        ys = list(torch.unbind(ys))
 
-        flattened_data = list(zip(gs, list(ys)))
+        flattened_data = list(zip(gs, ys))
         return flattened_data
+
+
+class MultitaskBayesOptExperiment(BayesOptExperiment):
+    """ Implements active learning experiment with multiple task target.
+    """
+
+    def __init__(self, *args, **kwargs):
+
+        super(MultitaskBayesOptExperiment, self).__init__(*args, **kwargs)
+
+    def acquire(self):
+        """ Acquire new training data.
+        """
+        # set net to eval
+        self.net.eval()
+
+        # split input target
+        gs, ys = self.new_data
+
+        # get the predictive distribution
+        # TODO:
+        # write API for sampler
+        distribution = self.net.condition(gs)
+
+        # workup
+        distribution = self.workup(distribution)
+
+        # get score
+        score = self.acquisition(distribution, y_best=self.y_best)
+
+        if not self.weighted_acquire:
+            # argmax
+            best = torch.topk(score, self.q).indices
+        else:
+            # generate probability distribution
+            weights = torch.exp(-score)
+            weights = weights/weights.sum()
+            best = WeightedRandomSampler(
+                weights=weights,
+                num_samples=self.q,
+                replacement=False)
+            best = torch.IntTensor(list(best))
+
+        # pop from the back so you don't disrupt the order
+        best = best.sort(descending=True).values
+        # print(len(self.new), best)
+        self.old.extend([self.new.pop(b) for b in best])
