@@ -19,8 +19,9 @@ sys.path.append('../../pinot/active/')
 import experiment
 
 sys.path.append('../../pinot/')
-# import semisupervised
-# import semisupervised_gp
+from multitask import MultitaskNet
+from multitask.experiment import MultitaskTrain
+from pinot.generative import SemiSupervisedNet
 
 
 ######################
@@ -50,12 +51,16 @@ class ActivePlot():
         self.weighted_acquire = weighted_acquire
         self.num_samples = num_samples
         self.q = q
+        self.train = pinot.app.experiment.Train
 
         # handle semi
-        if self.net != 'semi':
-            self.bo = experiment.BayesOptExperiment
-        else:
+        if self.net == 'semi':
             self.bo = experiment.SemiSupervisedBayesOptExperiment
+        elif self.net == 'multitask':
+            self.bo = experiment.MultitaskBayesOptExperiment
+            self.train = MultitaskTrain
+        else:
+            self.bo = experiment.BayesOptExperiment
 
         # housekeeping
         self.device = torch.device(device)
@@ -107,7 +112,6 @@ class ActivePlot():
         -------
         results
         """
-        
         # get the real solution
         ds = self.generate_data()
         gs, ys = ds[0]
@@ -139,7 +143,8 @@ class ActivePlot():
                          q=self.q,
                          weighted_acquire=self.weighted_acquire,
                          slice_fn=experiment._slice_fn_tuple, # pinot.active.
-                         collate_fn=experiment._collate_fn_graph # pinot.active.
+                         collate_fn=experiment._collate_fn_graph, # pinot.active.
+                         train_class=self.train
                          )
 
             # run experiment
@@ -147,11 +152,17 @@ class ActivePlot():
 
             # pad if experiment stopped early
             # candidates_acquired = limit + 1 because we begin with a blind pick
-            results_shape = self.num_rounds * self.q + 1
-            results_data = actual_sol*np.ones(results_shape)
-            results_data[:len(x)] = np.maximum.accumulate(ys[x].cpu().squeeze())
-            
-            # print(len(x), results_data[-1])
+            results_size = self.num_rounds * self.q + 1
+            if self.net == 'multitask':
+                results_data = actual_sol*np.ones((results_size, ys.size(1)))
+                output = ys[x]
+                output[torch.isnan(output)] = -np.inf
+            else:
+                results_data = actual_sol*np.ones(results_size)
+                output = ys[x]
+
+            results_data[:len(x)] = np.maximum.accumulate(output.cpu().squeeze())
+
             # record results
             self.results[self.acquisition][i] = results_data
 
@@ -217,22 +228,25 @@ class ActivePlot():
             net = pinot.Net(representation)
 
         elif self.net == 'semi':
-            gvae = GCNModelVAE(input_feat_dim=self.feat_dim,
-                               gcn_type=self.layer,
-                               # gcn_init_args={"num_heads":5},
-                               gcn_hidden_dims=[64, 64],
-                               embedding_dim=32,
-                               num_atom_types=100)
-            net = semisupervised.SemiSupervisedNet(gvae) # TODO pinot.
+            net = SemiSupervisedNet(
+                representation=representation,
+                unsup_scale=0.1 # <------ if unsup_scale = 0., reduces to supervised model
+            )
 
         elif self.net == 'semi_gp':
-            gvae = GCNModelVAE(input_feat_dim=self.feat_dim,
-                               gcn_type=self.layer,
-                               # gcn_init_args={"num_heads":5},
-                               gcn_hidden_dims=[64, 64],
-                               embedding_dim=32,
-                               num_atom_types=100)
-            net = semisupervised_gp.SemiSupervisedGaussianProcess(gvae)
+            output_regressor = pinot.regressors.ExactGaussianProcessRegressor
+
+            net = SemiSupervisedNet(
+                representation=representation,
+                output_regressor=output_regressor,
+            )
+
+        elif self.net == 'multitask':
+            output_regressor = pinot.regressors.ExactGaussianProcessRegressor
+            net = MultitaskNet(
+                representation=representation,
+                output_regressor=output_regressor,
+            )
 
         if self.strategy == 'batch':
             net = BTModel(net)

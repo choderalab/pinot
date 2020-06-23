@@ -2,20 +2,19 @@
 # IMPORTS
 # =============================================================================
 import math
-
 import torch
-from torch import nn
-
-from botorch.posteriors.gpytorch import GPyTorchPosterior
-from gpytorch.distributions import MultivariateNormal
 
 # =============================================================================
 # MODULE FUNCTIONS
 # =============================================================================
 def dummy(distribution, y_best=0.0):
-    return torch.range(
-            start=0,
-            end=distribution.mean.flatten().shape[0]).flip(0)
+    score = torch.range(
+        start=0,
+        end=len(distribution.mean.flatten()) - 1
+        ).flip(0)
+    if torch.cuda.is_available():
+        score = score.cuda()
+    return score
 
 def probability_of_improvement(distribution, y_best=0.0):
     r""" Probability of Improvement (PI).
@@ -26,7 +25,6 @@ def probability_of_improvement(distribution, y_best=0.0):
     y_best : float or float tensor, default=0.0
         the best value so far.
     """
-
     return 1.0 - distribution.cdf(y_best)
 
 

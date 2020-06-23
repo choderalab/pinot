@@ -52,20 +52,22 @@ class MultitaskNet(Net):
         l = self._generate_mask(y)
 
         for task, mask in enumerate(l.T):
-            
-            # switch to regressor for that task
-            self.output_regressor = self._get_regressor(task)
 
-            if isinstance(self.output_regressor, ExactGaussianProcessRegressor):
-                # mask input if ExactGP
-                h_task = self._mask_tensor(h, mask)
-                y_task = self._mask_tensor(y, mask, task)
-                loss += self.output_regressor.loss(h_task, y_task).mean()
-            else:
-                # mask output if VariationalGP
-                distribution = self.output_regressor.condition(h)
-                y_dummy = self._generate_y_dummy(y, task)
-                loss += -distribution.log_prob(y_dummy)[mask].mean()
+            if mask.any():
+            
+                # switch to regressor for that task
+                self.output_regressor = self._get_regressor(task)
+
+                if isinstance(self.output_regressor, ExactGaussianProcessRegressor):
+                    # mask input if ExactGP
+                    h_task = self._mask_tensor(h, mask)
+                    y_task = self._mask_tensor(y, mask, task)
+                    loss += self.output_regressor.loss(h_task, y_task).mean()
+                else:
+                    # mask output if VariationalGP
+                    distribution = self.output_regressor.condition(h)
+                    y_dummy = self._generate_y_dummy(y, task)
+                    loss += -distribution.log_prob(y_dummy)[mask].mean()
 
         return loss
     

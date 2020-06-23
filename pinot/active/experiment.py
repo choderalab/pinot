@@ -81,6 +81,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
         slice_fn=_slice_fn_tensor,
         collate_fn=_collate_fn_tensor,
         net_state_dict=None,
+        train_class=pinot.app.experiment.Train,
     ):
 
         super(BayesOptExperiment, self).__init__()
@@ -117,6 +118,9 @@ class BayesOptExperiment(ActiveLearningExperiment):
         self.collate_fn = collate_fn
         self.net_state_dict = net_state_dict
 
+        # training
+        self.train_class = train_class
+
     def reset_net(self):
         """ Reset everything.
         """
@@ -145,7 +149,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
         self.net.train()
 
         # train the model
-        self.net = pinot.app.experiment.Train(
+        self.net = self.train_class(
             data=[self.old_data],
             optimizer=self.optimizer,
             n_epochs=self.n_epochs,
@@ -201,8 +205,6 @@ class BayesOptExperiment(ActiveLearningExperiment):
 
         # pop from the back so you don't disrupt the order
         best = best.sort(descending=True).values
-
-        print(best)
         # print(len(self.new), best)
         self.old.extend([self.new.pop(b) for b in best])
 
@@ -234,7 +236,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
             self.acquire()
             self.update_data()
 
-            if self.early_stopping and self.y_best == self.best_possible:
+            if self.early_stopping and torch.eq(self.y_best, self.best_possible).all():
                 break
 
             idx += 1
@@ -309,27 +311,33 @@ class MultitaskBayesOptExperiment(BayesOptExperiment):
         scores = []
         # for each task
         for task in range(ys.size(1)):
-            
-            # get the predictive distribution
-            distribution = self.net.condition(gs, task)
-            
-            # workup
-            distribution = self.workup(distribution)
 
-            # get score
-            score = self.acquisition(distribution, y_best=self.y_best)
-            scores.append(score)
+            # if we trained for this task
+            if str(task) in self.net.output_regressors:
 
+                # get the predictive distribution
+                distribution = self.net.condition(gs, task)
+                
+                # workup
+                distribution = self.workup(distribution)
+
+                # get score
+                score = self.acquisition(distribution, y_best=self.y_best[task])
+                epsilon = 1e-4*torch.rand(score.shape)
+                
+                if torch.cuda.is_available:
+                    epsilon = epsilon.cuda()
+
+                scores.append(score + epsilon)
+        
         # harmonize the scores
         # TODO: AVERAGE SCORES
         # first, scale the scores
-        scaled_scores = [(s - s.mean())/s.std for s in scores]
+        scaled_scores = [(s - s.mean())/s.std() for s in scores]
         # next: stack the scores
         scaled_scores = torch.stack(scaled_scores)
         # next: average the scores
         score = scaled_scores.mean(axis=0)
-        print(score)
-        print(score.shape)
 
         if not self.weighted_acquire:
             # argmax
@@ -346,5 +354,27 @@ class MultitaskBayesOptExperiment(BayesOptExperiment):
 
         # pop from the back so you don't disrupt the order
         best = best.sort(descending=True).values
-        # print(len(self.new), best)
         self.old.extend([self.new.pop(b) for b in best])
+
+    def update_data(self):
+        """ Update the internal data using old and new.
+        """
+        # grab new data
+        self.new_data = self.slice_fn(self.data, self.new)
+
+        # grab old data
+        self.old_data = self.slice_fn(self.data, self.old)
+
+        # set y_max
+        gs, ys = self.old_data
+
+        # get the max value observed for each task
+        # TODO: Do this intelligently.
+        y_best = -10 * torch.ones(ys.size(1))
+
+        for idx, col in enumerate(ys.T):
+            col_labeled = col[~torch.isnan(col)]
+            if col_labeled.size(0):
+                y_best[idx] = torch.max(col_labeled)
+
+        self.y_best = y_best

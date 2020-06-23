@@ -3,13 +3,14 @@ import pinot.graph
 import pinot.data
 import pinot.regressors
 from pinot.net import Net
-import pinot.active
 
 from pinot.metrics import *
 
 import pinot.app
 
 from pinot.app.experiment import *
+
+import pinot.active
 
 import pinot.metrics
 import pinot.representation
