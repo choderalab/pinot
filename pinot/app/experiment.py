@@ -168,6 +168,7 @@ class TrainAndTest:
         metrics=[pinot.rmse, pinot.r2, pinot.pearsonr, pinot.avg_nll],
         n_epochs=100,
         record_interval=1,
+        train=Train,
     ):
         self.net = net  # deepcopy the model object
         self.data_tr = data_tr
@@ -176,6 +177,7 @@ class TrainAndTest:
         self.optimizer = optimizer
         self.n_epochs = n_epochs
         self.record_interval = record_interval
+        self.train = train
 
     def __str__(self):
         _str = ""
@@ -199,7 +201,8 @@ class TrainAndTest:
         return _str
 
     def run(self):
-        train = Train(
+
+        train = self.train(
             net=self.net,
             data=self.data_tr,
             optimizer=self.optimizer,

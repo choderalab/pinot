@@ -3,6 +3,7 @@
 # =============================================================================
 import gc
 import torch
+from torch.utils.data import WeightedRandomSampler
 import abc
 import dgl
 import pinot
@@ -79,6 +80,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
         q=1,
         num_samples=1000,
         early_stopping=True,
+        weighted_acquire=False,
         workup=_independent,
         slice_fn=_slice_fn_tensor,
         collate_fn=_collate_fn_tensor,
@@ -107,6 +109,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
         # batch acquisition stuff
         self.q = q
         self.num_samples = num_samples
+        self.weighted_acquire = weighted_acquire
 
         # early stopping
         self.early_stopping = early_stopping
@@ -187,8 +190,17 @@ class BayesOptExperiment(ActiveLearningExperiment):
             # get score
             score = self.acquisition(distribution, y_best=self.y_best)
 
-            # argmax
-            best = torch.topk(score, self.q).indices
+            if not self.weighted_acquire:
+                # argmax
+                best = torch.topk(score, self.q).indices
+            else:
+                # generate probability distribution
+                weights = torch.exp(-score)
+                weights = weights/weights.sum()
+                best = WeightedRandomSampler(
+                    weights=weights,
+                    num_samples=self.q,
+                    replacement=False)
 
         # pop from the back so you don't disrupt the order
         best = best.sort(descending=True).values

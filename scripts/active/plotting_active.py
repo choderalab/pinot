@@ -29,7 +29,7 @@ sys.path.append('../../pinot/')
 class ActivePlot():
 
     def __init__(self, net, layer, config,
-                 lr, optimizer_type,
+                 lr, optimizer_type, weighted_acquire,
                  data, strategy, acquisition, marginalize_batch, num_samples, q,
                  device, num_trials, num_rounds, num_epochs):        
         
@@ -47,6 +47,7 @@ class ActivePlot():
         self.strategy = strategy
         self.acquisition = acquisition
         self.marginalize_batch = marginalize_batch
+        self.weighted_acquire = weighted_acquire
         self.num_samples = num_samples
         self.q = q
 
@@ -136,6 +137,7 @@ class ActivePlot():
                          n_epochs=self.num_epochs,
                          strategy=self.strategy,
                          q=self.q,
+                         weighted_acquire=self.weighted_acquire,
                          slice_fn=experiment._slice_fn_tuple, # pinot.active.
                          collate_fn=experiment._collate_fn_graph # pinot.active.
                          )
@@ -176,8 +178,6 @@ class ActivePlot():
                               'Uncertainty': SeqAcquire(acq_fn='uncertainty'),
                               'Random': SeqAcquire(acq_fn='random')}
         '''
-
-
         sequential_acquisitions = {'ExpectedImprovement': pinot.active.acquisition.expected_improvement,
                                    'ProbabilityOfImprovement': pinot.active.acquisition.probability_of_improvement,
                                    'UpperConfidenceBound': pinot.active.acquisition.expected_improvement,
@@ -207,10 +207,32 @@ class ActivePlot():
             layer=layer,
             config=self.config)
 
+        if self.net == 'gp':
+            kernel = pinot.inference.gp.kernels.deep_kernel.DeepKernel(
+                    representation=net_representation,
+                    base_kernel=pinot.inference.gp.kernels.rbf.RBF())
+            net = pinot.inference.gp.gpr.exact_gpr.ExactGPR(kernel)
 
-        net = pinot.Net(
-                net_representation,
-                getattr(pinot.regressors, self.net))
+        elif self.net == 'mle':
+            net = pinot.Net(net_representation)
+
+        elif self.net == 'semi':
+            gvae = GCNModelVAE(input_feat_dim=self.feat_dim,
+                               gcn_type=self.layer,
+                               # gcn_init_args={"num_heads":5},
+                               gcn_hidden_dims=[64, 64],
+                               embedding_dim=32,
+                               num_atom_types=100)
+            net = semisupervised.SemiSupervisedNet(gvae) # TODO pinot.
+
+        elif self.net == 'semi_gp':
+            gvae = GCNModelVAE(input_feat_dim=self.feat_dim,
+                               gcn_type=self.layer,
+                               # gcn_init_args={"num_heads":5},
+                               gcn_hidden_dims=[64, 64],
+                               embedding_dim=32,
+                               num_atom_types=100)
+            net = semisupervised_gp.SemiSupervisedGaussianProcess(gvae)
 
         if self.strategy == 'batch':
             net = BTModel(net)
@@ -235,6 +257,7 @@ if __name__ == '__main__':
     parser.add_argument('--acquisition', type=str, default='ExpectedImprovement')
     parser.add_argument('--marginalize_batch', type=bool, default=True)
     parser.add_argument('--num_samples', type=int, default=1000)
+    parser.add_argument('--weighted_acquire', type=bool, default=True)
     parser.add_argument('--q', type=int, default=1)
 
     parser.add_argument('--device', type=str, default='cuda:0')
@@ -263,6 +286,7 @@ if __name__ == '__main__':
         acquisition=args.acquisition,
         marginalize_batch=args.marginalize_batch,
         num_samples=args.num_samples,
+        weighted_acquire=args.weighted_acquire,
         q=args.q,
 
         # housekeeping
@@ -276,5 +300,5 @@ if __name__ == '__main__':
 
     # save to disk
     if args.index_provided:
-        filename = f'{args.net}_{args.representation}_{args.optimizer}_{args.data}_{args.strategy}_{args.acquisition}_q{args.q}_{args.index}.csv'
+        filename = f'{args.net}_{args.representation}_{args.optimizer}_{args.data}_{args.strategy}_{args.acquisition}_q{args.q}_weighted_{args.weighted_acquire}_{args.index}.csv'
     best_df.to_csv(filename)
