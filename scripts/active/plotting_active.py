@@ -122,6 +122,7 @@ class ActivePlot():
         
         # acquistion functions to be tested
         for i in range(self.num_trials):
+            print(i)
             
             # make fresh net and optimizer
             net = self.get_net().to(self.device)
@@ -263,7 +264,7 @@ if __name__ == '__main__':
     parser.add_argument('--net', type=str, default='ExactGaussianProcessRegressor')
     parser.add_argument('--representation', type=str, default='GraphConv')
 
-    parser.add_argument('--lr', type=float, default=1e-3)
+    parser.add_argument('--lr', type=float, default=1e-4)
     parser.add_argument('--optimizer', type=str, default='Adam')
     
     parser.add_argument('--data', type=str, default='esol')
@@ -313,6 +314,8 @@ if __name__ == '__main__':
     best_df = plot.generate()
 
     # save to disk
-    if args.index_provided:
-        filename = f'{args.net}_{args.representation}_{args.optimizer}_{args.data}_{args.strategy}_{args.acquisition}_q{args.q}_weighted_{args.weighted_acquire}_{args.index}.csv'
+    if args.index_provided and args.weighted_acquire:
+        filename = f'{args.net}_{args.representation}_{args.optimizer}_{args.data}_{args.strategy}_{args.acquisition}_q{args.q}_weighted_{args.index}.csv'
+    elif args.index_provided and not args.weighted_acquire:
+        filename = f'{args.net}_{args.representation}_{args.optimizer}_{args.data}_{args.strategy}_{args.acquisition}_q{args.q}_unweighted_{args.index}.csv'    
     best_df.to_csv(filename)
