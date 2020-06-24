@@ -10,8 +10,6 @@ from tqdm import tqdm
 import torch
 
 import pinot
-# from pinot.active.acquisition import BTModel, SeqAcquire, MCAcquire
-# from pinot.generative.torch_gvae.model import GCNModelVAE
 
 import sys
 sys.path.append('../../pinot/active/')
