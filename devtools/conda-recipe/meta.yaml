@@ -1,0 +1,31 @@
+package:
+  name: pinot-dev
+  version: !!str 0.0.0
+
+source:
+  path: ../../
+
+build:
+  preserve_egg_dir: True
+  number: 0
+
+requirements:
+  build:
+    - python
+    - setuptools
+
+  run:
+    - python
+    - numpy
+    - six
+    - cython
+    - rdkit
+    - torch
+    - dgl
+    - matplotlib
+    - pandas
+
+
+about:
+  home: https://github.com/choderalab/pinot
+  license: MIT
