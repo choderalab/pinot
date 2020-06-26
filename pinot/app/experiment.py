@@ -58,7 +58,6 @@ class Train:
         """ Train the model for one batch.
         """
         for g, y in self.data:
-
             def l():
                 self.optimizer.zero_grad()
                 loss = torch.sum(self.net.loss(g, y))
@@ -133,7 +132,10 @@ class Test:
             g = []
             for g_, y_ in self.data:
                 y.append(y_)
-                g += dgl.unbatch(g_)
+                if isinstance(g_, dgl.DGLGraph):
+                    g.append(g_)
+                else:
+                    g += dgl.unbatch(g_)
 
             if y[0].dim() == 0:
                 y = torch.stack(y)

@@ -162,3 +162,11 @@ class TemporalDataset(Dataset):
         after = Dataset(after)
 
         return before, after
+
+    def filter_by_time(self, after='1989-06-04', before='2666-12-31'):
+        between = []
+        for g, y, t in self.ds:
+            if after <= t <= before:
+                between.append((g, y))
+
+        return between

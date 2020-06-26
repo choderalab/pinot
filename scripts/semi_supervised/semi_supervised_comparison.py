@@ -79,6 +79,36 @@ parser.add_argument(
     help="Log file"
 )
 
+parser.add_argument(
+    '--const_unsup_scale',
+    action="store_true",
+    default=False,
+    help="Unsupervised scaling constant, either 1 or number of labeled data/unlabeled",
+)
+
+parser.add_argument(
+    '--weight_decay',
+    default=0.01,
+    type=float,
+    help="Weight decay for optimizer",
+)
+
+parser.add_argument(
+    '--batch_size',
+    default=32,
+    type=int,
+    help="Batch size"
+)
+
+parser.add_argument(
+    '--label_split',
+    nargs="+",
+    type=float,
+    default=[0.8,0.2],
+    help="Training-testing split for labeled data"
+)
+
+
 args = parser.parse_args()
 
 import pinot
@@ -95,6 +125,10 @@ if not os.path.exists(args.output):
     os.mkdir(args.output)
 
 logging.basicConfig(filename=os.path.join(args.output, args.log), filemode='w', format='%(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
+logging.debug(args)
+
+savefile = "reg={}_l={}_a={}_n={}_sc={}_b={}_wd={}_sp={}".format(args.regressor_type, args.layer, args.architecture, args.n_epochs, args.const_unsup_scale, args.batch_size, args.weight_decay, args.label_split)
+logging.debug("savefile = {}".format(savefile))
 
 #############################################################################
 #
@@ -107,20 +141,20 @@ data_labeled_all = getattr(pinot.data, args.labeled_data)()
 data_unlabeled_all = getattr(pinot.data, args.unlabeled_data)()
 
 data_labeled_all = [(g.to(device), y.to(device)) for (g,y) in data_labeled_all]
-
 data_unlabeled_all = [(g.to(device), y.to(device)) for (g,y) in data_unlabeled_all]
-
 data_labeled = [(g, y) for (g,y) in data_labeled_all if ~torch.isnan(y)]
 
 
 # Split the labeled moonshot data into training set and test set
-train_labeled, test_labeled = pinot.data.utils.split(data_labeled, [0.8, 0.2])
+train_labeled, test_labeled = pinot.data.utils.split(data_labeled, args.label_split)
 
 # Do minibatching on LABELED data
-batch_size = 32
+batch_size = args.batch_size
 one_batch_train_labeled = pinot.data.utils.batch(train_labeled, len(train_labeled))
 end = time.time()
 logging.debug("Finished loading all data after {} seconds".format(end-start))
+logging.debug("We have {} labeled and {} unlabeled molecules".format(len(data_labeled_all), len(data_unlabeled_all)))
+
 
 #############################################################################
 #
@@ -157,9 +191,10 @@ def get_net_and_optimizer(args, unsup_scale):
     optimizer = pinot.app.utils.optimizer_translation(
         opt_string=args.optimizer,
         lr=args.lr,
-        weight_decay=0.01,
+        weight_decay=args.weight_decay,
     )
-    return net.to(device), optimizer(net)
+    net.to(device)
+    return net, optimizer(net)
 
 def train_and_test_semi_supervised(net, optimizer, semi_data, labeled_train, labeled_test, n_epochs):
     train = pinot.app.experiment.Train(net=net, data=semi_data, optimizer=optimizer, n_epochs=n_epochs)
@@ -171,24 +206,28 @@ def train_and_test_semi_supervised(net, optimizer, semi_data, labeled_train, lab
     test_metrics = pinot.app.experiment.Test(net=net, data=labeled_test, states=train.states, metrics=[pinot.metrics.r2, pinot.metrics.avg_nll, pinot.metrics.rmse])
     test_results = test_metrics.test()
 
-    return train_results, test_results
+    return train_results, test_results, train.states
 
-supNet, optimizer = get_net_and_optimizer(args, 0.)
+supNet, optimizer = get_net_and_optimizer(args, 0.) # Note that with unsup_scale = 0., this becomes a supervised only model
 
 start = time.time()
 # Use batch training if exact GP or mini-batch if NN/variational GP
 train = one_batch_train_labeled if args.regressor_type == "gp" else pinot.data.utils.batch(train_labeled, batch_size)
-suptrain, suptest = train_and_test_semi_supervised(supNet, optimizer, train, train_labeled, test_labeled, args.n_epochs)
+suptrain, suptest, supstates = train_and_test_semi_supervised(supNet, optimizer, train, train_labeled, test_labeled, args.n_epochs)
 
 end = time.time()
-logging.debug("Finished training supervised net after {} seconds".format(end-start))
-
+logging.debug("Finished training supervised net after {} seconds and save state dict".format(end-start))
+torch.save(supNet.state_dict(), os.path.join(args.output, savefile + "_sup.th"))
+torch.save(supstates, os.path.join(args.output, savefile + "_sup_all_states.th"))
 
 sup_train_metrics = {}
 sup_test_metrics  = {}
 for metric in suptrain.keys():
     sup_train_metrics[metric] = suptrain[metric]["final"]
     sup_test_metrics[metric]  = suptest[metric]["final"]
+
+logging.debug(sup_train_metrics)
+logging.debug(sup_test_metrics)
 
 #############################################################################
 #
@@ -197,7 +236,7 @@ for metric in suptrain.keys():
 #############################################################################
 
 
-vols = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+vols = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
 
 metrics = list(suptrain.keys())
 
@@ -215,25 +254,35 @@ for volume in vols:
 
     # Mix the train moonshot labeled with moonshot unlabeled to get semisupervised data
     train_semi = pinot.data.utils.prepare_semi_supervised_data(train_unlabeled, train_labeled)
+    train_semi = [(g.to(device), y.to(device)) for (g, y) in train_semi]
 
     # Initialize the model
     # The unsupervised weighting constant is amount of labeled / amount of unlabeled data used for training
-    unsup_scale = float(len(train_labeled))/(len(train_unlabeled) + len(train_labeled))
+    unsup_scale = 1.0
+    if not args.const_unsup_scale:
+        unsup_scale = float(len(train_labeled))/(len(train_unlabeled) + len(train_labeled))
 
     semiNet, optimizer = get_net_and_optimizer(args, unsup_scale)
 
     # Train data is either mini-batched (NN / variational GP) or 1 batch (exact GP)
-    train = pinot.data.utils.batch(train_semi, len(train_semi)) if args.regressor_type == "gp" else  pinot.data.utils.batch(train_semi, batch_size)
+    if args.regressor_type == "gp":
+        train = pinot.data.utils.batch(train_semi, len(train_semi))
+    else:  
+        train = pinot.data.utils.batch(train_semi, batch_size)
 
-    semitrain, semitest = train_and_test_semi_supervised(semiNet, optimizer, train, train_labeled, test_labeled, args.n_epochs)
+    semitrain, semitest, semistates = train_and_test_semi_supervised(semiNet, optimizer, train, train_labeled, test_labeled, args.n_epochs)
 
     for key in metrics:
         learning_curve_train[key].append(semitrain[key]["final"])
         learning_curve_test[key].append(semitest[key]["final"])
+
+    logging.debug(learning_curve_train)
+    logging.debug(learning_curve_test)
     
     end = time.time()
-    logging.debug("Finished training with {} of augmented unlabeled data after {} seconds".format(volume, end-start))
-
+    logging.debug("Finished training with {} of augmented unlabeled data after {} seconds, now saving the state dictionary and training states".format(volume, end-start))
+    torch.save(semiNet.state_dict(), os.path.join(args.output, savefile + "_semi_vol={}.th".format(volume)))
+    torch.save(semistates, os.path.join(args.output, savefile + "_semi_all_states_vol={}.th".format(volume)))
 
 #############################################################################
 #
@@ -276,6 +325,17 @@ def plot_learning_curve(learning_curve, vols, sup_metric, savefile=None):
 
 logging.debug("Finished training all the semi-supervised model, now saving plots")
 
-plot_learning_curve(learning_curve_train, vols, sup_train_metrics, os.path.join(args.output, "{}_{}_{}_{}_train_learning_curve.png".format(args.regressor_type, args.layer, args.architecture, args.n_epochs)))
+# Log more information
+logging.debug("Learning curve train:")
+logging.debug(learning_curve_train)
+logging.debug("Learning curve test:")
+logging.debug(learning_curve_test)
+logging.debug("supervised train:")
+logging.debug(sup_train_metrics)
+logging.debug(sup_test_metrics)
 
-plot_learning_curve(learning_curve_test, vols, sup_test_metrics, os.path.join(args.output, "{}_{}_{}_{}_test_learning_curve.png".format(args.regressor_type, args.layer, args.architecture, args.n_epochs)))
+
+
+plot_learning_curve(learning_curve_train, vols, sup_train_metrics, os.path.join(args.output,savefile + "train_learning_curve.png"))
+
+plot_learning_curve(learning_curve_test, vols, sup_test_metrics, os.path.join(args.output, savefile + "test_learning_curve.png"))

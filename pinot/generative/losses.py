@@ -115,12 +115,16 @@ def negative_elbo(decoded_subgraphs, mu, logvar, g):
         # Compute decoding loss for each individual sub-graphs
         decoded_edges, decoded_nodes = decoded_subgraphs[i]
         adj_mat = subgraph.adjacency_matrix(True).to_dense()
+
         
         if torch.cuda.is_available:
             adj_mat = adj_mat.cuda()
 
-        node_types = subgraph.ndata["type"].flatten().long()
 
+        if torch.cuda.is_available and decoded_edges.is_cuda:
+            adj_mat = adj_mat.cuda()
+
+        node_types = subgraph.ndata["type"].flatten().long()
         edge_nll = torch.sum(
             F.binary_cross_entropy_with_logits(decoded_edges, adj_mat)
         )

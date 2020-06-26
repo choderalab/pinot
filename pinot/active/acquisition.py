@@ -16,6 +16,8 @@ def dummy(distribution, y_best=0.0):
         score = score.cuda()
     return score
 
+
+
 def probability_of_improvement(distribution, y_best=0.0):
     r""" Probability of Improvement (PI).
     Parameters
