@@ -7,8 +7,7 @@ def test_import():
 @pytest.fixture
 def esol():
     import pinot
-    ds = pinot.data.datasets.Dataset(
-            ).from_csv('../esol.csv')
+    ds = pinot.data.esol()
 
     return ds
 
