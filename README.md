@@ -9,9 +9,24 @@ pinot
 
 Probabilistic Inference for NOvel Therapeutics
 
+# install
+```
+pip install .
+pip install -r requirements
+```
 
+Note that we support both RDKit and OpenEye for chemoinformatics modeling.
+To install RDKit: `conda install rdkit`.
 
+# license
+This package is licensed under MIT license.
 
-### Copyright
-
-Copyright (c) 2020, Yuanqing Wang @ choderalab // MSKCC
+# copyright
+Copyright (c) 2020, Chodera Lab @ Memorial Sloan Kettering Cancer Center and Authors.
+Authors:
+- Yuanqing Wang
+- Michael Retchin
+- Duc Nguyen
+- Theofanis Karaletsos
+- Josh Fass
+- John D. Chodera
