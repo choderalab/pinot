@@ -6,7 +6,9 @@ import pinot
 import abc
 import math
 from pinot.regressors.base_regressor import BaseRegressor
-import gpytorch
+# import gpytorch
+import numpy as np
+
 
 # =============================================================================
 # BASE CLASSES
@@ -192,76 +194,300 @@ class ExactGaussianProcessRegressor(GaussianProcessRegressor):
         return distribution
 
 
-
-
 class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
-    """
-    """
+    """ Sparse variational GPR.
 
-    def __init__(self,
-                 in_features,
-                 n_inducing_points=100,
-                 inducing_points_boundary=1.0,
-                 num_data=1,
-                 kernel=None):
+    """
+    def __init__(
+            self,
+            in_features,
+            kernel=None,
+            log_sigma=-3.0,
+            n_inducing_points=100,
+            initializer_std=0.1,
+            kl_loss_scaling=1.0,
+            grid_boundary=10.0):
         super(VariationalGaussianProcessRegressor, self).__init__()
+        if kernel is None:
+            kernel = pinot.regressors.kernels.rbf.RBF
 
-        # construct inducing points
-        inducing_points = torch.distributions.uniform.Uniform(
-            -1
-            * inducing_points_boundary
-            * torch.ones(n_inducing_points, in_features),
-            1
-            * inducing_points_boundary
-            * torch.ones(n_inducing_points, in_features),
-        ).sample()
+        # point unintialized class to self
+        self.kernel_cls = kernel
 
-        class _GaussianProcessLayer(gpytorch.models.ApproximateGP):
-            def __init__(self,
-                         inducing_points,
-                         kernel=None
-                        ):
-                if kernel is None:
-                    kernel = gpytorch.kernels.RBFKernel()
+        # put representation hidden units
+        self.kernel = kernel(in_features)
 
-                variational_distribution = gpytorch.variational.CholeskyVariationalDistribution(
-                    num_inducing_points=inducing_points.size(0))
+        self.in_features = in_features
 
-                variational_strategy = gpytorch.variational.VariationalStrategy(
-                    self,
-                    inducing_points,
-                    variational_distribution,
-                    learn_inducing_locations=True,
-                )
-                super().__init__(variational_strategy)
+        self.log_sigma = torch.nn.Parameter(
+            torch.tensor(
+                log_sigma))
 
-                self.mean_module = gpytorch.means.ConstantMean()
-                self.covar_module = gpytorch.kernels.ScaleKernel(kernel)
+        # uniform distribution within boundary
+        # (n_inducing_points, hidden_dimension)
+        self.x_tr = torch.nn.Parameter(
+            torch.distributions.uniform.Uniform(
+                -1 * grid_boundary * torch.ones(
+                    n_inducing_points,
+                    in_features),
+                1 * grid_boundary * torch.ones(
+                    n_inducing_points,
+                    in_features)
+            ).sample())
 
-            def forward(self, x):
-                mean = self.mean_module(x)
-                covar = self.covar_module(x)
-                return gpytorch.distributions.MultivariateNormal(mean, covar)
+        # variational mean for inducing points value
+        # (n_inducing_points, 1)
+        self.y_tr_mu = torch.nn.Parameter(
+            torch.distributions.normal.Normal(
+                loc=torch.randn(n_inducing_points, 1),
+                scale=initializer_std*torch.ones(n_inducing_points, 1)
+            ).sample())
+
+        # to ensure lower cholesky
+        # (n_inducing_points, )
+        self.y_tr_sigma_diag = torch.nn.Parameter(
+            torch.distributions.normal.Normal(
+                loc=torch.zeros(n_inducing_points),
+                scale=initializer_std*torch.ones(
+                    n_inducing_points)
+            ).sample())
+
+        # (0.5 * n_inducing_points * (n_inducing_points - 1), )
+        self.y_tr_sigma_tril = torch.nn.Parameter(
+            torch.zeros(int(n_inducing_points*(n_inducing_points-1)*0.5)))
+
+        self.n_inducing_points = n_inducing_points
+
+        self.kl_loss_scaling = kl_loss_scaling
 
 
-        self.gp = _GaussianProcessLayer(inducing_points, kernel=kernel)
-        self.variational_parameters = self.gp.variational_parameters
-        self.hyperparameters = self.gp.hyperparameters
+    def _y_tr_sigma(self):
+        # embed diagnoal of sigma
+        y_tr_diag = torch.diag_embed(torch.exp(self.y_tr_sigma_diag))
 
-        self.likelihood = gpytorch.likelihoods.GaussianLikelihood()
+        # (n_inducing_points, n_inducing_points)
+        mask = torch.gt(
+            torch.range(0, self.y_tr_sigma_diag.shape[0]-1)[:, None],
+            torch.range(0, self.y_tr_sigma_diag.shape[0]-1)[None, :])
 
-        self.mll = gpytorch.mlls.VariationalELBO(
-            self.likelihood,
-            self.gp,
-            num_data=num_data)
+        # (n_inducing_points, n_inducing_points)
+        y_tr_sigma = y_tr_diag.masked_scatter(
+            mask,
+            self.y_tr_sigma_tril)
 
-    def forward(self, x):
-        distribution = self.gp(x)
+        return y_tr_sigma
+
+    def _k_tr_tr(self):
+        return self._perturb(
+            self.kernel(
+                self.x_tr))
+
+    def _k_tr_te(self, x_te):
+        return self._perturb(
+            self.kernel(
+                self.x_tr,
+                x_te))
+
+    def _k_te_tr(self, x_te):
+        return self._k_tr_te(x_te).t()
+
+    def _k_te_te(self, x_te):
+        return self._perturb(self.kernel(x_te))
+
+    def forward(self, x_te):
+        """ Forward pass.
+
+        """
+
+        # get the kernels
+        (
+            k_tr_tr,
+            k_tr_te,
+            k_te_tr,
+            k_te_te
+        ) = (
+            self._k_tr_tr(),
+            self._k_tr_te(x_te),
+            self._k_te_tr(x_te),
+            self._k_te_te(x_te)
+        )
+
+        # (n_tr, n_tr)
+        l_k_tr_tr = torch.cholesky(k_tr_tr, upper=False)
+
+        # (n_tr, 1)
+        l_k_tr_tr_inv_mu, _ = torch.triangular_solve(
+            input=self.y_tr_mu,
+            A=l_k_tr_tr,
+            upper=False
+        )
+
+        # (n_tr, n_tr)
+        l_k_tr_tr_inv_sigma, _ = torch.triangular_solve(
+            input=self._y_tr_sigma(),
+            A=l_k_tr_tr,
+            upper=False
+        )
+
+        # (n_tr, te)
+        l_k_tr_tr_inv_k_tr_te, _ = torch.triangular_solve(
+            input=k_tr_te,
+            A=l_k_tr_tr,
+            upper=False)
+
+        # (n_te, 1)
+        predictive_mean = l_k_tr_tr_inv_k_tr_te.t() @ l_k_tr_tr_inv_mu
+
+        # (n_tr, n_te)
+        k_tr_tr_inv_k_tr_te = l_k_tr_tr_inv_k_tr_te.t()\
+            @ l_k_tr_tr_inv_k_tr_te
+
+        # (n_te, n_te)
+        l_k_tr_tr_inv_sigma_t_at_l_k_tr_tr_inv_k_tr_te =\
+            l_k_tr_tr_inv_sigma.t() @ l_k_tr_tr_inv_k_tr_te
+
+        # (n_te, n_te)
+        compose_l_k_tr_tr_inv_sigma_t_at_l_k_tr_tr_inv_k_tr_te =\
+            l_k_tr_tr_inv_sigma_t_at_l_k_tr_tr_inv_k_tr_te.t()\
+            @ l_k_tr_tr_inv_sigma_t_at_l_k_tr_tr_inv_k_tr_te
+
+        # (n_te, n_te)
+        predictive_cov\
+            = k_te_te\
+            - k_tr_tr_inv_k_tr_te\
+            + compose_l_k_tr_tr_inv_sigma_t_at_l_k_tr_tr_inv_k_tr_te
+
+        predictive_cov += torch.exp(self.log_sigma) * torch.eye(
+            k_te_te.shape[0],
+            device=k_te_te.device
+        )
+
+        return predictive_mean, predictive_cov
+
+    def condition(self, x_te, sampler=None):
+        predictive_mean, predictive_cov = self.forward(x_te)
+
+        distribution = torch.distributions.multivariate_normal.MultivariateNormal(
+            loc=predictive_mean.flatten(),
+            covariance_matrix=predictive_cov)
+
         return distribution
 
-    def condition(self, *args, **kwargs):
-        return self.gp(*args, **kwargs)
+    def loss(self, x_te, y_te):
+        # define prior
+        prior_mean = torch.zeros(self.n_inducing_points, 1)
+        prior_tril = self._k_tr_tr().cholesky()
 
-    def loss(self, x, y):
-        distribution = self.gp(x)
-        return -self.mll(distribution, y.flatten())
+        distribution = self.condition(x_te)
+
+        nll = -distribution.log_prob(y_te.flatten()).mean()
+
+        prior_mean = torch.zeros(self.n_inducing_points, 1)
+        prior_tril = torch.cholesky(self._k_tr_tr())
+
+        log_p_u = self.exp_log_full_gaussian(
+            self.y_tr_mu,
+            self._y_tr_sigma(),
+            prior_mean,
+            prior_tril)
+
+        log_q_u = -self.entropy_full_gaussian(
+            self.y_tr_mu,
+            self._y_tr_sigma())
+
+        loss = nll + self.kl_loss_scaling * (log_q_u - log_p_u)
+
+        return nll
+
+    @staticmethod
+    def exp_log_full_gaussian(mean1, tril1, mean2, tril2):
+        const_term = -0.5 * mean1.shape[0] * np.log(2 * np.pi * np.exp(1))
+        log_det_prior = -torch.sum(torch.log(torch.diag(tril2)))
+        LpiLq = torch.triangular_solve(tril1.double(), tril2.double(), upper=False)[0]
+        trace_term = -0.5 * torch.sum(LpiLq ** 2)
+        mu_diff = mean1 - mean2
+        quad_solve = torch.triangular_solve(mu_diff.double(), tril2.double(), upper=False)[0]
+        quad_term = -0.5 * torch.sum(quad_solve ** 2)
+        res = const_term + log_det_prior + trace_term + quad_term
+        return res
+
+
+    @staticmethod
+    def entropy_full_gaussian(mean1, tril1):
+        const_term = 0.5 * mean1.shape[0] * np.log(2 * np.pi * np.exp(1))
+        log_det_prior = torch.sum(torch.log(torch.diag(tril1)))
+        return log_det_prior + const_term
+
+
+#
+# class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
+#     """
+#     """
+#
+#     def __init__(self,
+#                  in_features,
+#                  n_inducing_points=100,
+#                  inducing_points_boundary=1.0,
+#                  num_data=1,
+#                  kernel=None):
+#         super(VariationalGaussianProcessRegressor, self).__init__()
+#
+#         # construct inducing points
+#         inducing_points = torch.distributions.uniform.Uniform(
+#             -1
+#             * inducing_points_boundary
+#             * torch.ones(n_inducing_points, in_features),
+#             1
+#             * inducing_points_boundary
+#             * torch.ones(n_inducing_points, in_features),
+#         ).sample()
+#
+#         class _GaussianProcessLayer(gpytorch.models.ApproximateGP):
+#             def __init__(self,
+#                          inducing_points,
+#                          kernel=None
+#                         ):
+#                 if kernel is None:
+#                     kernel = gpytorch.kernels.RBFKernel()
+#
+#                 variational_distribution = gpytorch.variational.CholeskyVariationalDistribution(
+#                     num_inducing_points=inducing_points.size(0))
+#
+#                 variational_strategy = gpytorch.variational.VariationalStrategy(
+#                     self,
+#                     inducing_points,
+#                     variational_distribution,
+#                     learn_inducing_locations=True,
+#                 )
+#                 super().__init__(variational_strategy)
+#
+#                 self.mean_module = gpytorch.means.ConstantMean()
+#                 self.covar_module = gpytorch.kernels.ScaleKernel(kernel)
+#
+#             def forward(self, x):
+#                 mean = self.mean_module(x)
+#                 covar = self.covar_module(x)
+#                 return gpytorch.distributions.MultivariateNormal(mean, covar)
+#
+#
+#         self.gp = _GaussianProcessLayer(inducing_points, kernel=kernel)
+#         self.variational_parameters = self.gp.variational_parameters
+#         self.hyperparameters = self.gp.hyperparameters
+#
+#         self.likelihood = gpytorch.likelihoods.GaussianLikelihood()
+#
+#         self.mll = gpytorch.mlls.VariationalELBO(
+#             self.likelihood,
+#             self.gp,
+#             num_data=num_data)
+#
+#     def forward(self, x):
+#         distribution = self.gp(x)
+#         return distribution
+#
+#     def condition(self, *args, **kwargs):
+#         return self.gp(*args, **kwargs)
+#
+#     def loss(self, x, y):
+#         distribution = self.gp(x)
+#         return -self.mll(distribution, y.flatten())

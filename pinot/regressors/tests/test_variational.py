@@ -17,7 +17,7 @@ def test_init():
     net = pinot.Net(
         net_representation,
         VariationalGaussianProcessRegressor,
-        num_data=num_data
+        # num_data=num_data
     )
 
 def test_train_and_test():
@@ -32,16 +32,18 @@ def test_train_and_test():
     net = pinot.Net(
         representation,
         VariationalGaussianProcessRegressor,
-        num_data=num_data
+        # num_data=num_data
     )
 
     lr = 1e-4
-    optimizer = torch.optim.Adam([
-        {'params': net.representation.parameters(), 'weight_decay': lr},
-        {'params': net.output_regressor.hyperparameters(), 'lr': lr * 0.01},
-        {'params': net.output_regressor.variational_parameters()},
-        {'params': net.output_regressor.likelihood.parameters()}
-    ])
+    # optimizer = torch.optim.Adam([
+    #     {'params': net.representation.parameters(), 'weight_decay': lr},
+    #     {'params': net.output_regressor.hyperparameters(), 'lr': lr * 0.01},
+    #     {'params': net.output_regressor.variational_parameters()},
+    #     {'params': net.output_regressor.likelihood.parameters()}
+    # ])
+
+    optimizer = torch.optim.Adam(net.parameters(), 1e-3)
 
     train_and_test = pinot.TrainAndTest(
         net=net,
@@ -69,7 +71,7 @@ def test_train_and_test_cuda():
     net = pinot.Net(
         representation,
         VariationalGaussianProcessRegressor,
-        num_data=num_data
+        # num_data=num_data
     ).to(torch.device('cuda:0'))
 
     lr = 1e-4
