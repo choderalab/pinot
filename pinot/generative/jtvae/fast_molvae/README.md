@@ -20,7 +20,6 @@ Step 1: Preprocess the data:
 mkdir parsed_junction_trees
 python pinot/generative/jtvae/preprocess.py --smiles ../data/moses/train.txt --trees_out parsed_junction_trees/all_jt_trees.pkl --vocab_out all_vocab.txt
 ```
-This script will preprocess the training data (subgraph enumeration & tree decomposition), and save results into a list of files. We suggest you to use small value for `--split` if you are working with smaller datasets.
 
 Step 2: Train VAE model with KL annealing. 
 ```

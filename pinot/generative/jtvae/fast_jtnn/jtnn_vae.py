@@ -16,40 +16,61 @@ import copy, math
 
 class JTNNVAE(nn.Module):
 
-    def __init__(self, vocab, hidden_size, latent_size, depthT, depthG):
+    def __init__(self, vocab, hidden_size=450, latent_size=56, depthT=20, depthG=3):
         super(JTNNVAE, self).__init__()
         self.vocab = vocab
         self.hidden_size = hidden_size
-        self.latent_size = latent_size = int(latent_size / 2) #Tree and Mol has two vectors
+        latent_size = int(latent_size/2) # Note that the latent size refers to the
+        # combined latent space of both the Tree embedding and the Molecular
+        # embedding
+        self.latent_size = latent_size
 
-        self.jtnn = JTNNEncoder(hidden_size, depthT, nn.Embedding(vocab.size(), hidden_size))
-        self.decoder = JTNNDecoder(vocab, hidden_size, latent_size, nn.Embedding(vocab.size(), hidden_size))
+        # Junction tree encoder
+        # the encoder maps from 
+        self.tree_encoder = JTNNEncoder(hidden_size, depthT, nn.Embedding(vocab.size(), hidden_size))
+        self.molecular_encoder = MPN(hidden_size, depthG)
 
+        # Decoder
+        self.tree_decoder = JTNNDecoder(vocab, hidden_size, latent_size, nn.Embedding(vocab.size(), hidden_size))
         self.jtmpn = JTMPN(hidden_size, depthG)
-        self.mpn = MPN(hidden_size, depthG)
 
+        # Part of the decoder, mapping from the same space as the approximate posterior
+        # to the dimension of the representations
         self.A_assm = nn.Linear(latent_size, hidden_size, bias=False)
         self.assm_loss = nn.CrossEntropyLoss(size_average=False)
-
+        
+        # Parameterization, mapping from latent representation to parameters
+        # of approximate posterior
         self.T_mean = nn.Linear(hidden_size, latent_size)
         self.T_var = nn.Linear(hidden_size, latent_size)
         self.G_mean = nn.Linear(hidden_size, latent_size)
         self.G_var = nn.Linear(hidden_size, latent_size)
 
     def encode(self, jtenc_holder, mpn_holder):
-        tree_vecs, tree_mess = self.jtnn(*jtenc_holder)
-        mol_vecs = self.mpn(*mpn_holder)
+        """ Encoder the junction tree and the molecule into their
+        respective hidden representation
+        """
+        tree_vecs, tree_mess = self.tree_encoder(*jtenc_holder)
+        mol_vecs = self.molecular_encoder(*mpn_holder)
         return tree_vecs, tree_mess, mol_vecs
     
     def encode_from_smiles(self, smiles_list):
+        """ Directly encode molecules from their SMILES formula
+        Note that `tree_mess` is not required here
+        """
         tree_batch = [MolTree(s) for s in smiles_list]
-        _, jtenc_holder, mpn_holder = tensorize(tree_batch, self.vocab, assm=False)
-        tree_vecs, _, mol_vecs = self.encode(jtenc_holder, mpn_holder)
-        return torch.cat([tree_vecs, mol_vecs], dim=-1)
+        tree_batch, jtenc_holder, mpn_holder = tensorize(tree_batch, self.vocab, assm=False)
+        tree_vecs, tree_mess, mol_vecs = self.encode(jtenc_holder, mpn_holder)
+        return tree_vecs, tree_mess, mol_vecs, tree_batch, jtenc_holder, mpn_holder
 
     def encode_latent(self, jtenc_holder, mpn_holder):
-        tree_vecs, _ = self.jtnn(*jtenc_holder)
-        mol_vecs = self.mpn(*mpn_holder)
+        """ Mapping from the latent representation to the *parameters*
+        of the approximate posterior distribution
+        In this case, it is the mean and **variance** of the normal
+        posterior
+        """
+        tree_vecs, _ = self.tree_encoder(*jtenc_holder)
+        mol_vecs = self.molecular_encoder(*mpn_holder)
         tree_mean = self.T_mean(tree_vecs)
         mol_mean = self.G_mean(mol_vecs)
         tree_var = -torch.abs(self.T_var(tree_vecs))
@@ -70,20 +91,58 @@ class JTNNVAE(nn.Module):
         z_mol = torch.randn(1, self.latent_size)
         return self.decode(z_tree, z_mol, prob_decode)
 
-    def forward(self, x_batch, beta=0.0):
-        x_batch, x_jtenc_holder, x_mpn_holder, x_jtmpn_holder = x_batch
-        x_tree_vecs, x_tree_mess, x_mol_vecs = self.encode(x_jtenc_holder, x_mpn_holder)
+    def forward_from_smile(self, smile_list, beta=0.0):
+        """ Similar to forward but the input is a batch of SMILES formula
+        This shows the possibility of processing molecular input into junction
+        trees on the fly.
+        """
+        x_tree_vecs, x_tree_mess, x_mol_vecs, x_batch, jtenc_holder, x_jtmpn_holder\
+            = self.encoder_from_smiles(smile_list)
+
         z_tree_vecs,tree_kl = self.rsample(x_tree_vecs, self.T_mean, self.T_var)
         z_mol_vecs,mol_kl = self.rsample(x_mol_vecs, self.G_mean, self.G_var)
 
+        # Do decoding and reconstruction loss
         kl_div = tree_kl + mol_kl
-        word_loss, topo_loss, word_acc, topo_acc = self.decoder(x_batch, z_tree_vecs)
+        word_loss, topo_loss, word_acc, topo_acc = self.tree_decoder(x_batch, z_tree_vecs)
+        assm_loss, assm_acc = self.assm(x_batch, x_jtmpn_holder, z_mol_vecs, x_tree_mess)
+
+        return word_loss + topo_loss + assm_loss + beta * kl_div, kl_div.item(), word_acc, topo_acc, assm_acc
+
+    def forward(self, x_batch, beta=0.0):
+        """
+        It's interesting to note that 
+
+        x_jtenc_encoder = JTNNEncoder.tensorize(tree_batch)
+        x_mpn_holder = MPN.tensorize(smiles_batch)
+
+        And tree_batch also comes from SMILE. In other words,
+        the data can come from just SMILE/molecular data
+
+        """
+        # Extract the data from x_batch
+        x_batch, x_jtenc_holder, x_mpn_holder, x_jtmpn_holder = x_batch
+        # Encode the input to obtain the representation
+        # of the junction tree and the molecule
+        x_tree_vecs, x_tree_mess, x_mol_vecs = self.encode(x_jtenc_holder, x_mpn_holder)
+
+        # Sample the latent variables
+        z_tree_vecs,tree_kl = self.rsample(x_tree_vecs, self.T_mean, self.T_var)
+        z_mol_vecs,mol_kl = self.rsample(x_mol_vecs, self.G_mean, self.G_var)
+
+        # Do decoding and reconstruction loss
+        kl_div = tree_kl + mol_kl
+        word_loss, topo_loss, word_acc, topo_acc = self.tree_decoder(x_batch, z_tree_vecs)
         assm_loss, assm_acc = self.assm(x_batch, x_jtmpn_holder, z_mol_vecs, x_tree_mess)
 
         return word_loss + topo_loss + assm_loss + beta * kl_div, kl_div.item(), word_acc, topo_acc, assm_acc
 
     def assm(self, mol_batch, jtmpn_holder, x_mol_vecs, x_tree_mess):
-        jtmpn_holder,batch_idx = jtmpn_holder
+        """ 'Reconstruct' the original molecule and compute the reconstruction
+        error. It's interesting that this function does not actually reconstruct
+        or sample any synthetic molecule.
+        """
+        jtmpn_holder,batch_idx = jtmpn_holder # This is part of input data
         fatoms,fbonds,agraph,bgraph,scope = jtmpn_holder
         batch_idx = create_var(batch_idx)
 
@@ -117,10 +176,13 @@ class JTNNVAE(nn.Module):
         return all_loss, acc * 1.0 / cnt
 
     def decode(self, x_tree_vecs, x_mol_vecs, prob_decode):
+        """ Decode from 
+        To synthesize a new molecule
+        """
         #currently do not support batch decoding
         assert x_tree_vecs.size(0) == 1 and x_mol_vecs.size(0) == 1
 
-        pred_root,pred_nodes = self.decoder.decode(x_tree_vecs, prob_decode)
+        pred_root,pred_nodes = self.tree_decoder.decode(x_tree_vecs, prob_decode)
         if len(pred_nodes) == 0: return None
         elif len(pred_nodes) == 1: return pred_root.smiles
 
@@ -133,7 +195,7 @@ class JTNNVAE(nn.Module):
 
         scope = [(0, len(pred_nodes))]
         jtenc_holder,mess_dict = JTNNEncoder.tensorize_nodes(pred_nodes, scope)
-        _,tree_mess = self.jtnn(*jtenc_holder)
+        _,tree_mess = self.tree_encoder(*jtenc_holder)
         tree_mess = (tree_mess, mess_dict) #Important: tree_mess is a matrix, mess_dict is a python dict
 
         x_mol_vecs = self.A_assm(x_mol_vecs).squeeze() #bilinear
