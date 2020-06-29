@@ -427,6 +427,7 @@ class SemiSupervisedBayesOptExperiment(BayesOptExperiment):
             record_interval=999999,
         ).train()
 
+
     def flatten_data(self, data):
         """
 
@@ -442,6 +443,7 @@ class SemiSupervisedBayesOptExperiment(BayesOptExperiment):
         gs, ys = data
         # if gs.batch_size > 1:
         gs = dgl.unbatch(gs)
+        ys = list(torch.unbind(ys))
 
-        flattened_data = list(zip(gs, list(ys)))
+        flattened_data = list(zip(gs, ys))
         return flattened_data

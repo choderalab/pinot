@@ -211,10 +211,14 @@ class ActivePlot():
             layer=layer,
             config=self.config)
 
-        if self.net == 'mle':
-            net = pinot.Net(representation)
+        output_regressor = getattr(pinot.regressors, self.net)
 
-        elif self.net == 'semi':
+        net = SemiSupervisedNet(
+            representation=representation,
+            output_regressor=output_regressor,
+        )
+
+        if self.net == 'semi':
             net = SemiSupervisedNet(
                 representation=representation,
                 unsup_scale=0.1 # <------ if unsup_scale = 0., reduces to supervised model
@@ -235,8 +239,8 @@ class ActivePlot():
                 output_regressor=output_regressor,
             )
 
-        if self.strategy == 'batch':
-            net = BTModel(net)
+        # if self.strategy == 'batch':
+        #     net = BTModel(net)
 
         return net
 
