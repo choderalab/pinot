@@ -32,9 +32,13 @@ def dummy(distribution, y_best=0.0):
 
 
     """
-    return torch.range(start=0, end=distribution.mean.flatten().shape[0]).flip(
-        0
-    )
+    score = torch.range(
+        start=0,
+        end=len(distribution.mean.flatten()) - 1
+        ).flip(0)
+    if torch.cuda.is_available():
+        score = score.cuda()
+    return score
 
 
 def probability_of_improvement(distribution, y_best=0.0):

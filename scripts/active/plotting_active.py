@@ -11,8 +11,7 @@ import torch
 
 import pinot
 import pinot.active.experiment as experiment
-from pinot.multitask import MultitaskNet
-from pinot.multitask.experiment import MultitaskTrain
+from pinot import multitask
 from pinot.generative import SemiSupervisedNet
 
 
@@ -47,12 +46,12 @@ class ActivePlot():
 
         # handle semi
         if self.net == 'semi':
-            self.bo = experiment.SemiSupervisedBayesOptExperiment
+            self.bo_class = experiment.SemiSupervisedBayesOptExperiment
         elif self.net == 'multitask':
-            self.bo = experiment.MultitaskBayesOptExperiment
-            self.train = MultitaskTrain
+            self.bo_class = multitask.MultitaskBayesOptExperiment
+            self.train = multitask.MultitaskTrain
         else:
-            self.bo = experiment.BayesOptExperiment
+            self.bo_class = experiment.BayesOptExperiment
 
         # housekeeping
         self.device = torch.device(device)
@@ -127,21 +126,22 @@ class ActivePlot():
                 )
             
             # instantiate experiment
-            bo = self.bo(net=net,
-                         data=ds[0],
-                         optimizer=optimizer(net),
-                         acquisition=acq_fn,
-                         n_epochs=self.num_epochs,
-                         strategy=self.strategy,
-                         q=self.q,
-                         weighted_acquire=self.weighted_acquire,
-                         slice_fn=experiment._slice_fn_tuple, # pinot.active.
-                         collate_fn=experiment._collate_fn_graph, # pinot.active.
-                         train_class=self.train
-                         )
+            self.bo = self.bo_class(
+                net=net,
+                data=ds[0],
+                optimizer=optimizer(net),
+                acquisition=acq_fn,
+                n_epochs=self.num_epochs,
+                strategy=self.strategy,
+                q=self.q,
+                weighted_acquire=self.weighted_acquire,
+                slice_fn=experiment._slice_fn_tuple, # pinot.active.
+                collate_fn=experiment._collate_fn_graph, # pinot.active.
+                train_class=self.train
+            )
 
             # run experiment
-            x = bo.run(num_rounds=self.num_rounds)
+            x = self.bo.run(num_rounds=self.num_rounds)
 
             # pad if experiment stopped early
             # candidates_acquired = limit + 1 because we begin with a blind pick
@@ -234,7 +234,7 @@ class ActivePlot():
 
         elif self.net == 'multitask':
             output_regressor = pinot.regressors.ExactGaussianProcessRegressor
-            net = MultitaskNet(
+            net = multitask.MultitaskNet(
                 representation=representation,
                 output_regressor=output_regressor,
             )

@@ -1,4 +1,4 @@
-from pinot.active import BayesOptExperiment
+from pinot.active.experiment import BayesOptExperiment
 from torch.utils.data import WeightedRandomSampler
 
 

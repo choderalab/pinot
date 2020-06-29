@@ -11,6 +11,7 @@ from pinot.generative.utils import (
     prepare_semi_supervised_data,
 )
 from pinot.metrics import _independent
+from torch.utils.data import WeightedRandomSampler
 
 # =============================================================================
 # HELPER FUNCTIONS
@@ -209,12 +210,13 @@ class BayesOptExperiment(ActiveLearningExperiment):
         strategy="sequential",
         q=1,
         num_samples=1000,
-        early_stopping=True,
         weighted_acquire=False,
+        early_stopping=True,
         workup=_independent,
         slice_fn=_slice_fn_tensor,
         collate_fn=_collate_fn_tensor,
         net_state_dict=None,
+        train_class=pinot.app.experiment.Train,
     ):
 
         super(BayesOptExperiment, self).__init__()
@@ -239,6 +241,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
         # batch acquisition stuff
         self.q = q
         self.num_samples = num_samples
+        self.weighted_acquire = weighted_acquire
 
         # early stopping
         self.early_stopping = early_stopping
@@ -249,6 +252,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
         self.slice_fn = slice_fn
         self.collate_fn = collate_fn
         self.net_state_dict = net_state_dict
+        self.train_class = train_class
 
     def reset_net(self):
         """Reset everything."""
@@ -297,7 +301,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
         self.net.train()
 
         # train the model
-        self.net = pinot.app.experiment.Train(
+        self.net = self.train_class(
             data=[self.old_data],
             optimizer=self.optimizer,
             n_epochs=self.n_epochs,
