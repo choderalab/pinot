@@ -10,8 +10,6 @@ from tqdm import tqdm
 import torch
 
 import pinot
-# from pinot.active.acquisition import BTModel, SeqAcquire, MCAcquire
-# from pinot.generative.torch_gvae.model import GCNModelVAE
 
 import sys
 sys.path.append('../../pinot/active/')
@@ -19,8 +17,9 @@ sys.path.append('../../pinot/active/')
 import experiment
 
 sys.path.append('../../pinot/')
-# import semisupervised
-# import semisupervised_gp
+from multitask import MultitaskNet
+from multitask.experiment import MultitaskTrain
+from pinot.generative import SemiSupervisedNet
 
 
 ######################
@@ -29,7 +28,7 @@ sys.path.append('../../pinot/')
 class ActivePlot():
 
     def __init__(self, net, layer, config,
-                 lr, optimizer_type,
+                 lr, optimizer_type, weighted_acquire,
                  data, strategy, acquisition, marginalize_batch, num_samples, q,
                  device, num_trials, num_rounds, num_epochs):        
         
@@ -47,14 +46,19 @@ class ActivePlot():
         self.strategy = strategy
         self.acquisition = acquisition
         self.marginalize_batch = marginalize_batch
+        self.weighted_acquire = weighted_acquire
         self.num_samples = num_samples
         self.q = q
+        self.train = pinot.app.experiment.Train
 
         # handle semi
-        if self.net != 'semi':
-            self.bo = experiment.BayesOptExperiment
-        else:
+        if self.net == 'semi':
             self.bo = experiment.SemiSupervisedBayesOptExperiment
+        elif self.net == 'multitask':
+            self.bo = experiment.MultitaskBayesOptExperiment
+            self.train = MultitaskTrain
+        else:
+            self.bo = experiment.BayesOptExperiment
 
         # housekeeping
         self.device = torch.device(device)
@@ -106,7 +110,6 @@ class ActivePlot():
         -------
         results
         """
-        
         # get the real solution
         ds = self.generate_data()
         gs, ys = ds[0]
@@ -117,6 +120,7 @@ class ActivePlot():
         
         # acquistion functions to be tested
         for i in range(self.num_trials):
+            print(i)
             
             # make fresh net and optimizer
             net = self.get_net().to(self.device)
@@ -136,8 +140,10 @@ class ActivePlot():
                          n_epochs=self.num_epochs,
                          strategy=self.strategy,
                          q=self.q,
+                         weighted_acquire=self.weighted_acquire,
                          slice_fn=experiment._slice_fn_tuple, # pinot.active.
-                         collate_fn=experiment._collate_fn_graph # pinot.active.
+                         collate_fn=experiment._collate_fn_graph, # pinot.active.
+                         train_class=self.train
                          )
 
             # run experiment
@@ -145,11 +151,17 @@ class ActivePlot():
 
             # pad if experiment stopped early
             # candidates_acquired = limit + 1 because we begin with a blind pick
-            results_shape = self.num_rounds * self.q + 1
-            results_data = actual_sol*np.ones(results_shape)
-            results_data[:len(x)] = np.maximum.accumulate(ys[x].cpu().squeeze())
-            
-            # print(len(x), results_data[-1])
+            results_size = self.num_rounds * self.q + 1
+            if self.net == 'multitask':
+                results_data = actual_sol*np.ones((results_size, ys.size(1)))
+                output = ys[x]
+                output[torch.isnan(output)] = -np.inf
+            else:
+                results_data = actual_sol*np.ones(results_size)
+                output = ys[x]
+
+            results_data[:len(x)] = np.maximum.accumulate(output.cpu().squeeze())
+
             # record results
             self.results[self.acquisition][i] = results_data
 
@@ -176,8 +188,6 @@ class ActivePlot():
                               'Uncertainty': SeqAcquire(acq_fn='uncertainty'),
                               'Random': SeqAcquire(acq_fn='random')}
         '''
-
-
         sequential_acquisitions = {'ExpectedImprovement': pinot.active.acquisition.expected_improvement,
                                    'ProbabilityOfImprovement': pinot.active.acquisition.probability_of_improvement,
                                    'UpperConfidenceBound': pinot.active.acquisition.expected_improvement,
@@ -203,14 +213,39 @@ class ActivePlot():
         """
         layer = pinot.representation.dgl_legacy.gn(model_name=self.layer)
 
-        net_representation = pinot.representation.Sequential(
+        representation = pinot.representation.Sequential(
             layer=layer,
             config=self.config)
 
+        if self.net == 'gp':
+            kernel = pinot.inference.gp.kernels.deep_kernel.DeepKernel(
+                    representation=representation,
+                    base_kernel=pinot.inference.gp.kernels.rbf.RBF())
+            net = pinot.inference.gp.gpr.exact_gpr.ExactGPR(kernel)
 
-        net = pinot.Net(
-                net_representation,
-                getattr(pinot.regressors, self.net))
+        elif self.net == 'mle':
+            net = pinot.Net(representation)
+
+        elif self.net == 'semi':
+            net = SemiSupervisedNet(
+                representation=representation,
+                unsup_scale=0.1 # <------ if unsup_scale = 0., reduces to supervised model
+            )
+
+        elif self.net == 'semi_gp':
+            output_regressor = pinot.regressors.ExactGaussianProcessRegressor
+
+            net = SemiSupervisedNet(
+                representation=representation,
+                output_regressor=output_regressor,
+            )
+
+        elif self.net == 'multitask':
+            output_regressor = pinot.regressors.ExactGaussianProcessRegressor
+            net = MultitaskNet(
+                representation=representation,
+                output_regressor=output_regressor,
+            )
 
         if self.strategy == 'batch':
             net = BTModel(net)
@@ -227,7 +262,7 @@ if __name__ == '__main__':
     parser.add_argument('--net', type=str, default='ExactGaussianProcessRegressor')
     parser.add_argument('--representation', type=str, default='GraphConv')
 
-    parser.add_argument('--lr', type=float, default=1e-3)
+    parser.add_argument('--lr', type=float, default=1e-4)
     parser.add_argument('--optimizer', type=str, default='Adam')
     
     parser.add_argument('--data', type=str, default='esol')
@@ -235,6 +270,7 @@ if __name__ == '__main__':
     parser.add_argument('--acquisition', type=str, default='ExpectedImprovement')
     parser.add_argument('--marginalize_batch', type=bool, default=True)
     parser.add_argument('--num_samples', type=int, default=1000)
+    parser.add_argument('--weighted_acquire', type=bool, default=True)
     parser.add_argument('--q', type=int, default=1)
 
     parser.add_argument('--device', type=str, default='cuda:0')
@@ -247,7 +283,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    Plot = ActivePlot(
+    plot = ActivePlot(
         # net config
         net=args.net,
         layer=args.representation,
@@ -263,6 +299,7 @@ if __name__ == '__main__':
         acquisition=args.acquisition,
         marginalize_batch=args.marginalize_batch,
         num_samples=args.num_samples,
+        weighted_acquire=args.weighted_acquire,
         q=args.q,
 
         # housekeeping
@@ -272,9 +309,11 @@ if __name__ == '__main__':
         num_epochs=args.num_epochs,
         )
 
-    best_df = Plot.generate()
+    best_df = plot.generate()
 
     # save to disk
-    if args.index_provided:
-        filename = f'{args.net}_{args.representation}_{args.optimizer}_{args.data}_{args.strategy}_{args.acquisition}_q{args.q}_{args.index}.csv'
+    if args.index_provided and args.weighted_acquire:
+        filename = f'{args.net}_{args.representation}_{args.optimizer}_{args.data}_{args.strategy}_{args.acquisition}_q{args.q}_weighted_{args.index}.csv'
+    elif args.index_provided and not args.weighted_acquire:
+        filename = f'{args.net}_{args.representation}_{args.optimizer}_{args.data}_{args.strategy}_{args.acquisition}_q{args.q}_unweighted_{args.index}.csv'    
     best_df.to_csv(filename)
