@@ -193,7 +193,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
 
     train : Train the model for some epochs in one round.
 
-    acquire : Acquie candidates from pool.
+    acquire : Acquire candidates from pool.
 
     run : Conduct rounds of acquisition and train.
 
@@ -210,6 +210,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
         q=1,
         num_samples=1000,
         early_stopping=True,
+        weighted_acquire=False,
         workup=_independent,
         slice_fn=_slice_fn_tensor,
         collate_fn=_collate_fn_tensor,
@@ -336,8 +337,18 @@ class BayesOptExperiment(ActiveLearningExperiment):
             # get score
             score = self.acquisition(distribution, y_best=self.y_best)
 
-            # argmax
-            best = torch.topk(score, self.q).indices
+            if not self.weighted_acquire:
+                # argmax
+                best = torch.topk(score, self.q).indices
+            else:
+                # generate probability distribution
+                weights = torch.exp(-score)
+                weights = weights/weights.sum()
+                best = WeightedRandomSampler(
+                    weights=weights,
+                    num_samples=self.q,
+                    replacement=False)
+                best = torch.IntTensor(list(best))
 
         # pop from the back so you don't disrupt the order
         best = best.sort(descending=True).values
