@@ -6,10 +6,12 @@ import numpy.testing as npt
 
 
 def test_import():
+    """ """
     import pinot.samplers.bbb
 
 
 def test_linear_regression():
+    """ """
     x = torch.distributions.normal.Normal(loc=0.0, scale=10.0).sample([100])
 
     y = 2 * x + 1.0
@@ -26,6 +28,7 @@ def test_linear_regression():
     for _ in range(3000):
 
         def l():
+            """ """
             bbb.zero_grad()
             y_hat = k * x + b
             loss = (y - y_hat).pow(2).sum()

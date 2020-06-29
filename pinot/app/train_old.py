@@ -11,6 +11,17 @@ import torch
 # MODULE FUNCTIONS
 # =============================================================================
 def run(args):
+    """
+
+    Parameters
+    ----------
+    args :
+        
+
+    Returns
+    -------
+
+    """
     layer = pinot.representation.dgl_legacy.gn(model_name=args.layer)
 
     net_representation = pinot.representation.Sequential(

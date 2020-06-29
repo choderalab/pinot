@@ -14,6 +14,7 @@ from pinot.regressors.neural_network_regressor import NeuralNetworkRegressor
 # =============================================================================
 
 class SemiSupervisedNet(pinot.Net):
+    """ """
     def __init__(self, representation,
             output_regressor=NeuralNetworkRegressor,
             decoder=DecoderNetwork,
@@ -73,7 +74,18 @@ class SemiSupervisedNet(pinot.Net):
 
 
     def loss(self, g, y):
-        """ Compute the loss function
+        """Compute the loss function
+
+        Parameters
+        ----------
+        g :
+            
+        y :
+            
+
+        Returns
+        -------
+
         """
         # Compute the node representation
         # Call this function to compute the nodes representations
@@ -100,11 +112,34 @@ class SemiSupervisedNet(pinot.Net):
         return total_loss
 
     def loss_supervised(self, h, y):
+        """
+
+        Parameters
+        ----------
+        h :
+            
+        y :
+            
+
+        Returns
+        -------
+
+        """
         # If output regressor has loss function implemented
         return self._loss(h, y)
 
     def loss_unsupervised(self, g, h):
         """
+
+        Parameters
+        ----------
+        g :
+            
+        h :
+            
+
+        Returns
+        -------
 
         """
         # h = (number of nodes, embedding_dim)

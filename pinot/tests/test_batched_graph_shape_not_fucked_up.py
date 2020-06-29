@@ -3,6 +3,7 @@ import pinot
 
 
 def test_batched_graph_shape():
+    """ """
     ds = pinot.data.esol()
     ds = pinot.data.utils.batch(ds, 8)
     g, y = ds[0]

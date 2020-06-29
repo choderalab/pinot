@@ -9,11 +9,12 @@ import abc
 # BASE CLASSES
 # =============================================================================
 class BaseRegressor(torch.nn.Module):
-    """ Base class for `Head` object that translates latent representation
+    """Base class for `Head` object that translates latent representation
     `h` to a distribution.
 
     Methods
     -------
+    condition : Forward pass to come up with predictive distribution.
 
     """
 
@@ -22,4 +23,5 @@ class BaseRegressor(torch.nn.Module):
 
     @abc.abstractmethod
     def condition(self, h, *args, **kwargs):
+        """ Forward pass to come up with predictive distribution. """
         raise NotImplementedError

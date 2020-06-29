@@ -10,35 +10,112 @@ from pinot.generative.utils import (
     batch_semi_supervised,
     prepare_semi_supervised_data,
 )
+from pinot.metrics import _independent
 
 # =============================================================================
 # HELPER FUNCTIONS
 # =============================================================================
-def _independent(distribution):
-    return torch.distributions.normal.Normal(
-        distribution.mean.flatten(), distribution.variance.flatten().pow(0.5)
-    )
-
-
 def _slice_fn_tensor(x, idxs):
+    """ Slice function for tensors.
+
+    Parameters
+    ----------
+    x : `torch.Tensor`, `shape=(n_data, )`
+        Input tensor.
+
+    idxs : `List` of `int`
+        Indices to be taken.
+
+    Returns
+    -------
+    x : `torch.Tensor`, `shape=(n_data_chosen, )`
+        Output tensor.
+
+    """
     return x[idxs]
 
 
 def _collate_fn_tensor(x):
+    """ Collate function for tensors.
+
+    Parameters
+    ----------
+    x : `List` of `torch.Tensor`
+        Tensors to be stacked.
+
+
+    Returns
+    -------
+    x : `torch.Tensor`
+        Output tensor.
+
+    """
     return torch.stack(x)
 
 
 def _collate_fn_graph(x):
+    """ Collate function for graphs.
+
+    Parameters
+    ----------
+    x : `List` of `dgl.DGLGraph`
+        Input list of graphs to be batched.
+
+
+    Returns
+    -------
+    x : `dgl.DGLGraph`
+
+    """
     return dgl.batch(x)
 
 
 def _slice_fn_graph(x, idxs):
+    """ Slice function for graphs.
+
+    Parameters
+    ----------
+    x : `dgl.DGLGraph`
+        Batched graph.
+
+    idxs : `List` of `int`
+        Indices of the chosen graphs.
+
+
+    Returns
+    -------
+    x : `dgl.DGLGraph`
+        Sliced graph.
+
+    """
     if x.batch_size > 1:
         x = dgl.unbatch(x)
+    else:
+        raise RuntimeError('Can only slice if there is more than one.')
+
     return dgl.batch([x[idx] for idx in idxs])
 
 
 def _slice_fn_tuple(x, idxs):
+    """ Slice function for tuples.
+
+    Parameters
+    ----------
+    x : `List` of `tuple`
+        Input data pairs.
+
+    idxs : `List` of `int`
+        Indices of chosen data points.
+
+    Returns
+    -------
+    `graph_slices` : `dgl.DGLGraph`
+        Sliced and batched graph.
+
+    `tensor_clies` : `torch.Tensor`
+        Sliced and stacked tensor.
+
+    """
     gs, ys = x
     graph_slices = _slice_fn_graph(gs, idxs)
     tensor_slices = _slice_fn_tensor(ys, idxs)
@@ -49,23 +126,77 @@ def _slice_fn_tuple(x, idxs):
 # MODULE CLASSES
 # =============================================================================
 class ActiveLearningExperiment(torch.nn.Module, abc.ABC):
-    """ Implements active learning experiment base class.
-    """
+    """Implements active learning experiment base class."""
 
     def __init__(self):
         super(ActiveLearningExperiment, self).__init__()
 
     @abc.abstractmethod
     def train(self, *args, **kwargs):
+        """ Train the model. """
         raise NotImplementedError
 
     @abc.abstractmethod
     def acquire(self, *args, **kwargs):
+        """ Acquire new data points from pool or space. """
         raise NotImplementedError
 
 
 class BayesOptExperiment(ActiveLearningExperiment):
-    """ Implements active learning experiment with single task target.
+    """Implements active learning experiment with single task target.
+
+    Parameters
+    ----------
+    net : `pinot.Net`
+        Forward pass model that combines representation and output regression
+        and generates predictive distribution.
+
+    data : `List` of `tuple` of `(dgl.DGLGraph, torch.Tensor)`
+        or `pinot.data.dataset.Dataset`
+        Pairs of graph, measurement.
+
+    acquisition : `callable`
+        Acquisition function that takes the graphs of candidates and
+        provides scores.
+
+    optimizer : `torch.optim.Optimizer` or `pinot.Sampler`
+        Optimizer for training.
+
+    n_epochs : `int`
+        Number of epochs.
+
+    strategy : `str`, either `sequential` or `batch`
+        Acquisition strategy.
+
+    q : `int`
+        Number of acquired candidates in each round.
+
+    early_stopping : `bool`
+        Whether the search ends when the best within the candidate pool
+        is already acquired.
+
+    workup : `callable` (default `_independent`)
+        Post-processing predictive distribution.
+
+    slice_fn : `callable` (default `_slice_fn_tensor`)
+        Function used to slice data.
+
+    collate_fn : `callable` (default `_collate_fn_tensor`)
+        Function used to stack or batch input.
+
+
+    Methods
+    -------
+    reset_net : Reset the states of `net`.
+
+    blind_pick : Pick random candidates to start acquiring.
+
+    train : Train the model for some epochs in one round.
+
+    acquire : Acquie candidates from pool.
+
+    run : Conduct rounds of acquisition and train.
+
     """
 
     def __init__(
@@ -119,8 +250,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
         self.net_state_dict = net_state_dict
 
     def reset_net(self):
-        """ Reset everything.
-        """
+        """Reset everything."""
         # TODO:
         # reset optimizer too
         (p.reset_parameters() for _, p in self.net.named_children())
@@ -129,6 +259,27 @@ class BayesOptExperiment(ActiveLearningExperiment):
             self.net.load_state_dict(self.net_state_dict)
 
     def blind_pick(self, seed=2666):
+        """ Randomly pick index from the candidate pool.
+
+        Parameters
+        ----------
+        seed : `int`
+             (Default value = 2666)
+             Random seed.
+
+        Returns
+        -------
+        best : `int`
+            The chosen candidate to start.
+
+        Note
+        ----
+        Random seed set to `2666`, the title of the single greatest novel in
+        human literary history by Roberto Bolano.
+        This needs to be set to `None`
+        if parallel experiments were to be performed.
+
+        """
         import random
 
         random.seed(seed)
@@ -137,8 +288,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
         return best
 
     def train(self):
-        """ Train the model with new data.
-        """
+        """Train the model with new data."""
         # reset
         self.reset_net()
 
@@ -155,8 +305,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
         ).train()
 
     def acquire(self):
-        """ Acquire new training data.
-        """
+        """Acquire new training data."""
         # set net to eval
         self.net.eval()
 
@@ -196,8 +345,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
         self.old.extend([self.new.pop(b) for b in best])
 
     def update_data(self):
-        """ Update the internal data using old and new.
-        """
+        """Update the internal data using old and new."""
         # grab new data
         self.new_data = self.slice_fn(self.data, self.new)
 
@@ -209,10 +357,22 @@ class BayesOptExperiment(ActiveLearningExperiment):
         self.y_best = torch.max(ys)
 
     def run(self, num_rounds=999999, seed=None):
-        """ Run the model.
+        """Run the model and conduct rounds of acquisition and training.
+
         Parameters
         ----------
-        rounds : int, default=99999
+        num_rounds : `int`
+             (Default value = 999999)
+             Number of rounds.
+
+        seed : `int` or `None`
+             (Default value = None)
+             Random seed.
+
+        Returns
+        -------
+        self.old : Resulting indices of acquired candidates.
+
         """
         idx = 0
         self.blind_pick(seed=seed)
@@ -232,16 +392,14 @@ class BayesOptExperiment(ActiveLearningExperiment):
 
 
 class SemiSupervisedBayesOptExperiment(BayesOptExperiment):
-    """ Implements active learning experiment with single task target.
-    """
+    """Implements active learning experiment with single task target."""
 
     def __init__(self, *args, **kwargs):
 
         super(SemiSupervisedBayesOptExperiment, self).__init__(*args, **kwargs)
 
     def train(self):
-        """ Train the model with new data.
-        """
+        """Train the model with new data."""
         # combine new (unlabeled!) and old (labeled!)
         # Flatten the labeled_data and remove labels to be ready
         semi_supervised_data = prepare_semi_supervised_data(
@@ -270,6 +428,17 @@ class SemiSupervisedBayesOptExperiment(BayesOptExperiment):
         ).train()
 
     def flatten_data(self, data):
+        """
+
+        Parameters
+        ----------
+        data :
+
+
+        Returns
+        -------
+
+        """
         gs, ys = data
         # if gs.batch_size > 1:
         gs = dgl.unbatch(gs)

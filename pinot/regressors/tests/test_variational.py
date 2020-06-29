@@ -3,9 +3,11 @@ import torch
 import pinot
 
 def test_import():
+    """ """
     from pinot.regressors import VariationalGaussianProcessRegressor
 
 def test_init():
+    """ """
     from pinot.regressors import VariationalGaussianProcessRegressor
     ds_tr, ds_te, num_data = get_data()
 
@@ -21,6 +23,7 @@ def test_init():
     )
 
 def test_train_and_test():
+    """ """
     from pinot.regressors import VariationalGaussianProcessRegressor
     ds_tr, ds_te, num_data = get_data()
 
@@ -57,6 +60,7 @@ def test_train_and_test():
 
 
 def test_train_and_test_cuda():
+    """ """
     if torch.cuda.is_available() is False: # pass if no cuda
         return None
 
@@ -95,6 +99,17 @@ def test_train_and_test_cuda():
 
 
 def get_data(cuda=False):
+    """
+
+    Parameters
+    ----------
+    cuda :
+         (Default value = False)
+
+    Returns
+    -------
+
+    """
     # get data
     ds = pinot.data.esol()
     num_data = len(ds)

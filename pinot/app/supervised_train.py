@@ -13,6 +13,17 @@ import logging
 # MODULE FUNCTIONS
 # =============================================================================
 def run(args):
+    """
+
+    Parameters
+    ----------
+    args :
+        
+
+    Returns
+    -------
+
+    """
     if args.info:
         logging.basicConfig(level=logging.INFO)
 

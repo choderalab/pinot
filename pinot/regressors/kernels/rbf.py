@@ -15,6 +15,7 @@ class RBF(BaseKernel):
     Note
     ----
     l could be either of shape 1 or hidden dim
+
     """
 
     def __init__(self, in_features, scale=0.0, variance=0.0, ard=True):
@@ -31,9 +32,11 @@ class RBF(BaseKernel):
         self.variance = torch.nn.Parameter(torch.tensor(variance))
 
     def distance(self, x, x_):
+        """ Distance between data points. """
         return torch.norm(x[:, None, :] - x_[None, :, :], p=2, dim=2)
 
     def forward(self, x, x_=None):
+        """ Forward pass. """
         # replicate x if there's no x_
         if x_ is None:
             x_ = x

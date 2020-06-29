@@ -3,17 +3,28 @@ import torch
 
 
 def test_import():
+    """ """
     import pinot
     import pinot.active.experiment
 
 
 @pytest.fixture
 def bo():
+    """ """
     import pinot
 
     def f(x):
-        """ Example from
+        """Example from
         https://pyro.ai/examples/bo.html
+
+        Parameters
+        ----------
+        x :
+            
+
+        Returns
+        -------
+
         """
         return (6 * x - 2) ** 2 * torch.sin(12 * x - 4)
 
@@ -36,12 +47,45 @@ def bo():
 
 
 def test_init(bo):
+    """
+
+    Parameters
+    ----------
+    bo :
+        
+
+    Returns
+    -------
+
+    """
     bo
 
 
 def test_reset(bo):
+    """
+
+    Parameters
+    ----------
+    bo :
+        
+
+    Returns
+    -------
+
+    """
     bo.reset_net()
 
 
 def test_blinkd_pick(bo):
+    """
+
+    Parameters
+    ----------
+    bo :
+        
+
+    Returns
+    -------
+
+    """
     assert isinstance(bo.blind_pick(), int)

@@ -12,13 +12,15 @@ from pinot.regressors.kernels.base_kernel import BaseKernel
 class Matern52(BaseKernel):
     r"""Matern52 kernel.
 
-    $$
+
+
+    Notes
+    -----
+    .. math::
 
     k_\text{m52}(x, x') =
     (1 + \sqrt{5r ^ 2} + 5/3 r^2)
     \operatorname{exp}(-\sqrt{-5r ^ 2})
-
-    $$
 
     """
 
@@ -28,9 +30,11 @@ class Matern52(BaseKernel):
         self.variance = torch.nn.Parameter(torch.tensor(variance))
 
     def distance(self, x, x_):
+        """ Distance between data points. """
         return torch.norm(x[:, None, :] - x_[None, :, :], p=2, dim=2)
 
     def forward(self, x, x_=None):
+        """ Forward pass. """
         # replicate x if there's no x_
         if x_ is None:
             x_ = x

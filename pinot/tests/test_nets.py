@@ -2,10 +2,12 @@ import pytest
 
 
 def test_import():
+    """ """
     import pinot.net
 
 
 def test_initialize():
+    """ """
     import pinot
 
     layer = pinot.representation.dgl_legacy.GN
@@ -16,6 +18,7 @@ def test_initialize():
 
 
 def test_forward():
+    """ """
     import pinot
 
     g, y = pinot.data.esol()[0]

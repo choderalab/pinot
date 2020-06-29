@@ -14,8 +14,7 @@ import numpy as np
 # BASE CLASSES
 # =============================================================================
 class GaussianProcessRegressor(BaseRegressor):
-    """ Gaussian Process Regression.
-    """
+    """Gaussian Process Regression."""
 
     def __init__(self, epsilon=1e-5):
         super(GaussianProcessRegressor, self).__init__()
@@ -23,14 +22,22 @@ class GaussianProcessRegressor(BaseRegressor):
 
     @abc.abstractmethod
     def condition(self, *args, **kwargs):
+        """ Forward pass to come up with predictive distribution. """
         raise NotImplementedError
 
     def _perturb(self, k):
-        """ Add small noise `epsilon` to the diagnol of kernels.
+        """Add small noise `epsilon` to the diagnol of covariant matrix.
+
         Parameters
         ----------
-        k : torch.tensor
-            kernel to be perturbed.
+        k : `torch.Tensor`, `shape=(n_data_points, n_data_points)`
+            Covariant matrix.
+
+        Returns
+        -------
+        k : `torch.Tensor`, `shape=(n_data_points, n_data_points)`
+            Preturbed covariant matrix.
+
         """
 
         # introduce noise along the diagnol
@@ -43,7 +50,20 @@ class GaussianProcessRegressor(BaseRegressor):
 # MODULE CLASSES
 # =============================================================================
 class ExactGaussianProcessRegressor(GaussianProcessRegressor):
-    """ Exact Gaussian Process.
+    r""" Exact Gaussian Process.
+
+    Parameters
+    ----------
+    in_features : `int`
+        Input features on the latent space.
+
+    kernel : `pinot.regressors.kernels.Kernel`
+        Kernel used for Gaussian process.
+
+    log_sigma : `float`
+        ..math:: \log\sigma
+
+
     """
 
     def __init__(
@@ -72,6 +92,7 @@ class ExactGaussianProcessRegressor(GaussianProcessRegressor):
     def _get_kernel_and_auxiliary_variables(
             self, x_tr, y_tr, x_te=None,
         ):
+        """ Get kernel and auxiliary variables for forward pass. """
 
         # grab sigma
         sigma = torch.exp(self.log_sigma)
@@ -120,12 +141,20 @@ class ExactGaussianProcessRegressor(GaussianProcessRegressor):
 
         Parameters
         ----------
-        x_tr : torch.tensor, shape=(batch_size, ...)
-            training data.
-        y_tr : torch.tensor, shape=(batch_size, 1)
-            training data measurement.
+        x_tr : `torch.Tensor`, `shape=(n_training_data, hidden_dimension)`
+            Input of training data.
+
+        y_tr : `torch.Tensor`, `shape=(n_training_data, 1)`
+            Target of training data.
+
+
+        Returns
+        -------
+        nll : `torch.Tensor`, `shape=(,)`
+            Negative log likelihood.
 
         """
+
         # point data to object
         self._x_tr = x_tr
         self._y_tr = y_tr
@@ -146,18 +175,30 @@ class ExactGaussianProcessRegressor(GaussianProcessRegressor):
         Note
         ----
         Here we allow the speicifaction of sampler but won't actually
-        use it here.
+        use it here in this version.
 
         Parameters
         ----------
-        x_tr : torch.tensor, shape=(batch_size, ...)
-            training data.
-        y_tr : torch.tensor, shape=(batch_size, 1)
-            training data measurement.
-        x_te : torch.tensor, shape=(batch_size, ...)
-            test data.
-        sigma : float or torch.tensor, shape=(), default=1.0
-            noise parameter.
+        x_te : `torch.Tensor`, `shape=(n_te, hidden_dimension)`
+            Test input.
+
+        x_tr : `torch.Tensor`, `shape=(n_tr, hidden_dimension)`
+             (Default value = None)
+             Training input.
+
+        y_tr : `torch.Tensor`, `shape=(n_tr, 1)`
+             (Default value = None)
+             Test input.
+
+        sampler : `torch.optim.Optimizer` or `pinot.Sampler`
+             (Default value = None)
+             Sampler.
+
+        Returns
+        -------
+        distribution : `torch.distributions.Distribution`
+            Predictive distribution.
+
         """
 
         # get parameters
@@ -195,9 +236,22 @@ class ExactGaussianProcessRegressor(GaussianProcessRegressor):
 
 
 class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
-    """ Sparse variational GPR.
+    """Sparse variational Gaussian proces.
+
+    Parameters
+    ----------
+    in_features : `int`
+        Input features on the latent space.
+
+    kernel : `pinot.regressors.kernels.Kernel`
+        Kernel used for Gaussian process.
+
+    log_sigma : `float`
+        ..math:: \log\sigma
+
 
     """
+
     def __init__(
             self,
             in_features,
@@ -262,6 +316,7 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
 
 
     def _y_tr_sigma(self):
+        """ Getting the covariance matrix for variational training input."""
         # embed diagnoal of sigma
         y_tr_diag = torch.diag_embed(torch.exp(self.y_tr_sigma_diag))
 
@@ -295,7 +350,20 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
         return self._perturb(self.kernel(x_te))
 
     def forward(self, x_te):
-        """ Forward pass.
+        """Forward pass.
+
+        Parameters
+        ----------
+        x_te : `torch.Tensor`, `(x_te, hidden_dimension)`
+            Test input.
+
+        Returns
+        -------
+        predictive_mean : `torch.Tensor`, `(x_te, )`
+            Predictive mean.
+
+        predictive_cov : `torch.Tensor`, `(x_te, x_te)`
+            Preditive covariance.
 
         """
 
@@ -365,6 +433,19 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
         return predictive_mean, predictive_cov
 
     def condition(self, x_te, sampler=None):
+        """
+
+        Parameters
+        ----------
+        x_te :
+
+        sampler :
+             (Default value = None)
+
+        Returns
+        -------
+
+        """
         predictive_mean, predictive_cov = self.forward(x_te)
 
         distribution = torch.distributions.multivariate_normal.MultivariateNormal(
@@ -374,6 +455,23 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
         return distribution
 
     def loss(self, x_te, y_te):
+        """ Loss function.
+
+        Parameters
+        ----------
+        x_te : `torch.Tensor`, `shape=(n_te, hidden_dimension)`
+            Training input.
+
+        y_te : `torch.Tensor`, `shape=(n_te, )`
+            Training target.
+
+
+        Returns
+        -------
+        loss : `torch.Tensor`, `shape=(,)`
+            Loss function.
+
+        """
         # define prior
         prior_mean = torch.zeros(self.n_inducing_points, 1)
         prior_tril = self._k_tr_tr().cholesky()
@@ -397,7 +495,7 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
 
         loss = nll + self.kl_loss_scaling * (log_q_u - log_p_u)
 
-        return nll
+        return loss
 
     @staticmethod
     def exp_log_full_gaussian(mean1, tril1, mean2, tril2):
