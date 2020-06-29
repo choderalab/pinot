@@ -9,11 +9,6 @@ parser.add_argument(
     choices=["gp", "nn", "vgp"],
     help="Type of output regressor, Gaussian Process, Variational GP or Neural Networks"
 )
-parser.add_argument('--layer',
-    type=str,
-    default='GraphConv',
-    help="Type of graph convolution layer"
-)
 parser.add_argument(
     '--lr',
     type=float,
@@ -127,7 +122,7 @@ if not os.path.exists(args.output):
 logging.basicConfig(filename=os.path.join(args.output, args.log), filemode='w', format='%(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
 logging.debug(args)
 
-savefile = "reg={}_l={}_a={}_n={}_sc={}_b={}_wd={}_sp={}".format(args.regressor_type, args.layer, args.architecture, args.n_epochs, args.const_unsup_scale, args.batch_size, args.weight_decay, args.label_split)
+savefile = "reg={}_a={}_n={}_sc={}_b={}_wd={}_sp={}".format(args.regressor_type, args.architecture, args.n_epochs, args.const_unsup_scale, args.batch_size, args.weight_decay, args.label_split)
 logging.debug("savefile = {}".format(savefile))
 
 #############################################################################
@@ -164,10 +159,7 @@ logging.debug("We have {} labeled and {} unlabeled molecules".format(len(data_la
 
 
 def get_net_and_optimizer(args, unsup_scale):
-    layer = pinot.representation.dgl_legacy.gn(model_name=args.layer)
-
-    representation = pinot.representation.sequential.Sequential(
-        layer,
+    representation = pinot.representation.sequential.SequentialMix(
         args.architecture,
     )
 
