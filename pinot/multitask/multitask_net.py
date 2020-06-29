@@ -1,162 +1,113 @@
-import pinot
-import gpytorch
 import torch
+from pinot import Net
+from pinot.regressors import ExactGaussianProcessRegressor, NeuralNetworkRegressor
 
-
-class MultiTaskNet(pinot.Net):
-    """An object that combines the representation and parameter
+class MultitaskNet(Net):
+    """ An object that combines the representation and parameter
     learning, puts into a predicted distribution and calculates the
     corresponding divergence.
-
-    Parameters
-    ----------
-
-    Returns
-    -------
-
     Attributes
     ----------
     representation: a `pinot.representation` module
         the model that translates graphs to latent representations
     """
-
     def __init__(
         self,
         representation,
-        output_regressor=pinot.inference.output_regressors.NeuralNetworkOutputRegressor,
+        regressor=NeuralNetworkRegressor,
         **kwargs
     ):
+        super(MultitaskNet, self).__init__(
+            representation,
+            regressor,
+            **kwargs)
+        
+        self.regressors = torch.nn.ModuleDict()
+        self.kwargs = kwargs
 
-        super(MultiTaskNet, self).__init__(
-            representation, output_regressor, **kwargs
-        )
-        self.output_regressors = torch.nn.ModuleDict()
-
-    def condition(self, g, assay):
-        """Compute the output distribution with sampled weights.
-
-        Parameters
-        ----------
-        g :
-            
-        assay :
-            
-
-        Returns
-        -------
-
+    def condition(self, g, task):
+        """ Compute the output distribution with sampled weights.
         """
-        self.eval()
+        task = str(task)
+
+        # get representation
         h = self.representation(g)
-        # nn.ModuleDict needs string keys
-        assay = str(assay)
+        
+        # get output regressor for a particular task
+        self.regressor = self._get_regressor(task)
 
-        # if we already instantiated the output_regressor
-        if assay not in self.output_regressors:
+        # get distribution for input
+        distribution = self.regressor.condition(h)
 
-            # get the type of self.output_regressor, and instantiate it
-            self.output_regressors[assay] = type(self.output_regressor)(
-                self.representation_out_features
-            )
+        return distribution
+
+    def loss(self, g, y):
+        """ Compute the loss from input graph and corresponding y.
+        """
+        loss = 0.0
+        
+        # for each task in the data, split up data
+        h = self.representation(g)
+        l = self._generate_mask(y)
+
+        for task, mask in enumerate(l.T):
+
+            if mask.any():
+            
+                # switch to regressor for that task
+                self.regressor = self._get_regressor(task)
+
+                if isinstance(self.regressor, ExactGaussianProcessRegressor):
+                    # mask input if ExactGP
+                    h_task = self._mask_tensor(h, mask)
+                    y_task = self._mask_tensor(y, mask, task)
+                    loss += self.regressor.loss(h_task, y_task).mean()
+                else:
+                    # mask output if VariationalGP
+                    distribution = self.regressor.condition(h)
+                    y_dummy = self._generate_y_dummy(y, task)
+                    loss += -distribution.log_prob(y_dummy)[mask].mean()
+
+        return loss
+    
+    def _get_regressor(self, task):
+        """ Returns regressor for a task.
+        """
+        # ModuleDict needs str
+        task = str(task)
+        
+        # if we already instantiated the regressor
+        if task not in self.regressors:
+
+            # get the type of self.regressor, and instantiate it
+            self.regressors[task] = self.regressor_cls(
+                self.representation_out_features,
+                **self.kwargs
+                )
 
             # move to cuda if the parent net is
             if next(self.parameters()).is_cuda:
-                self.output_regressors[assay].cuda()
-
-        # switch to head for that assay
-        self.output_regressor = self.output_regressors[assay]
-
-        # get distribution for each input
-        distribution = self.output_regressor.condition(h)
-        return distribution
-
-    def condition_train(self, g, l, sampler=None):
-        """Compute the output distribution with sampled weights.
-
-        Parameters
-        ----------
-        g :
-            
-        l :
-            
-        sampler :
-             (Default value = None)
-
-        Returns
-        -------
-
+                self.regressors[task].cuda()
+        
+        return self.regressors[task]
+    
+    def _generate_y_dummy(self, y, task):
+        """ Generates y dummy - fill nans with zeros.
         """
-        h = self.representation(g)
+        y_dummy = y[:, task]
+        y_dummy[torch.isnan(y_dummy)] = 0
+        return y_dummy.view(-1, 1)
 
-        # find which assays are being used
-        assays = [str(assay) for assay in range(l.shape[1])]
-        distributions = []
-
-        for assay in assays:
-
-            # if we already instantiated the output_regressor
-            if assay not in self.output_regressors:
-
-                # get the type of self.output_regressor, and instantiate it
-                self.output_regressors[assay] = type(self.output_regressor)(
-                    self.representation_out_features
-                )
-
-                # move to cuda if the parent net is
-                if next(self.parameters()).is_cuda:
-                    self.output_regressors[assay].cuda()
-
-            # switch to head for that assay
-            self.output_regressor = self.output_regressors[assay]
-
-            # get distribution for each input
-            distribution = self.output_regressor.condition(h)
-            distributions.append(distribution)
-
-        return distributions
-
-    def loss(self, g, y):
-        """Compute the loss with a input graph and a set of parameters.
-
-        Parameters
-        ----------
-        g :
-            
-        y :
-            
-
-        Returns
-        -------
-
+    def _mask_tensor(self, x, mask, task=None):
+        """ Subsets data given mask for particular task.
         """
-        loss = 0.0
-        l = self._generate_mask(y)
-        distributions = self.condition_train(g, l)
-        print(distributions[0].loc)
-
-        for idx, assay_mask in enumerate(l.T):
-            if assay_mask.any():
-                # create dummy ys if unlabeled
-                y_dummy = torch.zeros(y.shape[0], device=y.get_device()).view(
-                    -1, 1
-                )
-                y_dummy[assay_mask] = y[assay_mask, idx].view(-1, 1)
-                # compute log probs
-                log_probs = distributions[idx].log_prob(y_dummy)
-                # mask log probs
-                loss += -log_probs[assay_mask].mean()
-        return loss
+        if task != None:
+            ret = x[mask, task].unsqueeze(-1)
+        else:
+            ret = x[mask]
+        return ret
 
     def _generate_mask(self, y):
-        """
-
-        Parameters
-        ----------
-        y :
-            
-
-        Returns
-        -------
-
+        """ Creates a boolean mask where y is nan.
         """
         return ~torch.isnan(y)

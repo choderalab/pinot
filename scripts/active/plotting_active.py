@@ -10,15 +10,9 @@ from tqdm import tqdm
 import torch
 
 import pinot
-
-import sys
-sys.path.append('../../pinot/active/')
-
-import experiment
-
-sys.path.append('../../pinot/')
-from multitask import MultitaskNet
-from multitask.experiment import MultitaskTrain
+import pinot.active.experiment as experiment
+from pinot.multitask import MultitaskNet
+from pinot.multitask.experiment import MultitaskTrain
 from pinot.generative import SemiSupervisedNet
 
 
@@ -217,13 +211,7 @@ class ActivePlot():
             layer=layer,
             config=self.config)
 
-        if self.net == 'gp':
-            kernel = pinot.inference.gp.kernels.deep_kernel.DeepKernel(
-                    representation=representation,
-                    base_kernel=pinot.inference.gp.kernels.rbf.RBF())
-            net = pinot.inference.gp.gpr.exact_gpr.ExactGPR(kernel)
-
-        elif self.net == 'mle':
+        if self.net == 'mle':
             net = pinot.Net(representation)
 
         elif self.net == 'semi':
