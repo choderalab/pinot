@@ -32,9 +32,9 @@ def dummy(distribution, y_best=0.0):
 
 
     """
-    return torch.range(
-            start=0,
-            end=distribution.mean.flatten().shape[0]).flip(0)
+    return torch.range(start=0, end=distribution.mean.flatten().shape[0]).flip(
+        0
+    )
 
 
 def probability_of_improvement(distribution, y_best=0.0):
@@ -371,5 +371,5 @@ class SeqAcquire:
         if axis == 0:
             high = samples_sorted[high_idx, :]
         else:
-            high = samples_sorted[:,high_idx,:]
+            high = samples_sorted[:, high_idx, :]
         return high

@@ -91,7 +91,7 @@ def _slice_fn_graph(x, idxs):
     if x.batch_size > 1:
         x = dgl.unbatch(x)
     else:
-        raise RuntimeError('Can only slice if there is more than one.')
+        raise RuntimeError("Can only slice if there is more than one.")
 
     return dgl.batch([x[idx] for idx in idxs])
 

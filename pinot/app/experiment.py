@@ -54,13 +54,7 @@ class Train:
 
     """
 
-    def __init__(
-        self,
-        net,
-        data,
-        optimizer,
-        n_epochs=100,
-        record_interval=1):
+    def __init__(self, net, data, optimizer, n_epochs=100, record_interval=1):
 
         self.data = data
         self.optimizer = optimizer
@@ -72,6 +66,7 @@ class Train:
     def train_once(self):
         """Train the model for one batch."""
         for g, y in self.data:
+
             def l():
                 """ """
                 self.optimizer.zero_grad()

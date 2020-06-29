@@ -3,15 +3,17 @@ import pinot
 import torch
 import numpy as np
 
+
 @pytest.fixture
 def representation():
     """ """
     layer = pinot.representation.dgl_legacy.gn()
     representation = pinot.representation.Sequential(
-        layer,
-        [32, 'tanh', 32, 'tanh', 32, 'tanh'])
+        layer, [32, "tanh", 32, "tanh", 32, "tanh"]
+    )
 
     return representation
+
 
 @pytest.fixture
 def ds():
@@ -21,18 +23,14 @@ def ds():
     return ds
 
 
+@pytest.mark.parametrize("net", [pinot.Net,])
 @pytest.mark.parametrize(
-    'net',
-    [
-        pinot.Net,
-])
-@pytest.mark.parametrize(
-    'regressor',
+    "regressor",
     [
         pinot.regressors.ExactGaussianProcessRegressor,
         pinot.regressors.VariationalGaussianProcessRegressor,
-        pinot.regressors.NeuralNetworkRegressor
-    ]
+        pinot.regressors.NeuralNetworkRegressor,
+    ],
 )
 def test_train(net, regressor, representation, ds):
     """
@@ -52,19 +50,12 @@ def test_train(net, regressor, representation, ds):
     -------
 
     """
-    net = net(
-        output_regressor=regressor,
-        representation=representation
-    )
+    net = net(output_regressor=regressor, representation=representation)
 
     optimizer = torch.optim.Adam(net.parameters(), 1e-3)
 
     exp = pinot.app.experiment.TrainAndTest(
-        optimizer=optimizer,
-        net=net,
-        data_tr=ds,
-        data_te=ds,
-        n_epochs=1
+        optimizer=optimizer, net=net, data_tr=ds, data_te=ds, n_epochs=1
     )
 
     results = exp.run()

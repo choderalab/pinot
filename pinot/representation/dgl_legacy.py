@@ -27,6 +27,7 @@ DEFAULT_MODEL_KWARGS = {
 # =============================================================================
 class GN(torch.nn.Module):
     """ Graph net. """
+
     def __init__(
         self, in_features, out_features, model_name="GraphConv", kwargs={},
     ):

@@ -1,5 +1,6 @@
 import pytest
 
+
 def test_import():
     """ """
     import pinot.data.datasets
@@ -9,6 +10,7 @@ def test_import():
 def moonshot():
     """ """
     import pinot
+
     ds = pinot.data.moonshot_with_date
     return ds
 

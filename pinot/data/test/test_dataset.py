@@ -1,5 +1,6 @@
 import pytest
 
+
 def test_import():
 
     import pinot.data.datasets
@@ -9,9 +10,11 @@ def test_import():
 def esol():
 
     import pinot
+
     ds = pinot.data.esol()
 
     return ds
+
 
 def test_esol(esol):
 

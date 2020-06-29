@@ -6,6 +6,7 @@ import pinot
 import abc
 import math
 from pinot.regressors.base_regressor import BaseRegressor
+
 # import gpytorch
 import numpy as np
 
@@ -66,12 +67,7 @@ class ExactGaussianProcessRegressor(GaussianProcessRegressor):
 
     """
 
-    def __init__(
-            self,
-            in_features,
-            kernel=None,
-            log_sigma=-3.0
-            ):
+    def __init__(self, in_features, kernel=None, log_sigma=-3.0):
         super(ExactGaussianProcessRegressor, self).__init__()
 
         if kernel is None:
@@ -85,13 +81,11 @@ class ExactGaussianProcessRegressor(GaussianProcessRegressor):
 
         self.in_features = in_features
 
-        self.log_sigma = torch.nn.Parameter(
-            torch.tensor(
-                log_sigma))
+        self.log_sigma = torch.nn.Parameter(torch.tensor(log_sigma))
 
     def _get_kernel_and_auxiliary_variables(
-            self, x_tr, y_tr, x_te=None,
-        ):
+        self, x_tr, y_tr, x_te=None,
+    ):
         """ Get kernel and auxiliary variables for forward pass. """
 
         # grab sigma
@@ -100,19 +94,19 @@ class ExactGaussianProcessRegressor(GaussianProcessRegressor):
         # compute the kernels
         k_tr_tr = self._perturb(self.kernel.forward(x_tr, x_tr))
 
-        if x_te is not None: # during test
+        if x_te is not None:  # during test
             k_te_te = self._perturb(self.kernel.forward(x_te, x_te))
             k_te_tr = self._perturb(self.kernel.forward(x_te, x_tr))
             # k_tr_te = self.forward(x_tr, x_te)
-            k_tr_te = k_te_tr.t() # save time
+            k_tr_te = k_te_tr.t()  # save time
 
-        else: # during train
+        else:  # during train
             k_te_te = k_te_tr = k_tr_te = k_tr_tr
 
         # (batch_size_tr, batch_size_tr)
         k_plus_sigma = k_tr_tr + torch.exp(self.log_sigma) * torch.eye(
-                k_tr_tr.shape[0],
-                device=k_tr_tr.device)
+            k_tr_tr.shape[0], device=k_tr_tr.device
+        )
 
         # (batch_size_tr, batch_size_tr)
         l_low = torch.cholesky(k_plus_sigma)
@@ -120,15 +114,13 @@ class ExactGaussianProcessRegressor(GaussianProcessRegressor):
 
         # (batch_size_tr. 1)
         l_low_over_y, _ = torch.triangular_solve(
-            input=y_tr,
-            A=l_low,
-            upper=False)
+            input=y_tr, A=l_low, upper=False
+        )
 
         # (batch_size_tr, 1)
         alpha, _ = torch.triangular_solve(
-            input=l_low_over_y,
-            A=l_up,
-            upper=True)
+            input=l_low_over_y, A=l_up, upper=True
+        )
 
         return k_tr_tr, k_te_te, k_te_tr, k_tr_te, l_low, alpha
 
@@ -160,12 +152,21 @@ class ExactGaussianProcessRegressor(GaussianProcessRegressor):
         self._y_tr = y_tr
 
         # get the parameters
-        k_tr_tr, k_te_te, k_te_tr, k_tr_te, l_low, alpha\
-            = self._get_kernel_and_auxiliary_variables(x_tr, y_tr)
+        (
+            k_tr_tr,
+            k_te_te,
+            k_te_tr,
+            k_tr_te,
+            l_low,
+            alpha,
+        ) = self._get_kernel_and_auxiliary_variables(x_tr, y_tr)
 
         # we return the exact nll with constant
-        nll = 0.5 * (y_tr.t() @ alpha) + torch.trace(l_low)\
+        nll = (
+            0.5 * (y_tr.t() @ alpha)
+            + torch.trace(l_low)
             + 0.5 * y_tr.shape[0] * math.log(2.0 * math.pi)
+        )
 
         return nll
 
@@ -202,19 +203,21 @@ class ExactGaussianProcessRegressor(GaussianProcessRegressor):
         """
 
         # get parameters
-        k_tr_tr, k_te_te, k_te_tr, k_tr_te, l_low, alpha\
-            = self._get_kernel_and_auxiliary_variables(
-                x_tr, y_tr, x_te)
+        (
+            k_tr_tr,
+            k_te_te,
+            k_te_tr,
+            k_tr_te,
+            l_low,
+            alpha,
+        ) = self._get_kernel_and_auxiliary_variables(x_tr, y_tr, x_te)
 
         # compute mean
         # (batch_size_te, 1)
         mean = k_te_tr @ alpha
 
         # (batch_size_tr, batch_size_te)
-        v, _ = torch.triangular_solve(
-            input=k_tr_te,
-            A=l_low,
-            upper=False)
+        v, _ = torch.triangular_solve(input=k_tr_te, A=l_low, upper=False)
 
         # (batch_size_te, batch_size_te)
         variance = k_te_te - v.t() @ v
@@ -229,8 +232,8 @@ class ExactGaussianProcessRegressor(GaussianProcessRegressor):
 
         # construct noise predictive distribution
         distribution = torch.distributions.multivariate_normal.MultivariateNormal(
-            mean.flatten(),
-            variance)
+            mean.flatten(), variance
+        )
 
         return distribution
 
@@ -253,14 +256,15 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
     """
 
     def __init__(
-            self,
-            in_features,
-            kernel=None,
-            log_sigma=-3.0,
-            n_inducing_points=100,
-            initializer_std=0.1,
-            kl_loss_scaling=1.0,
-            grid_boundary=10.0):
+        self,
+        in_features,
+        kernel=None,
+        log_sigma=-3.0,
+        n_inducing_points=100,
+        initializer_std=0.1,
+        kl_loss_scaling=1.0,
+        grid_boundary=10.0,
+    ):
         super(VariationalGaussianProcessRegressor, self).__init__()
         if kernel is None:
             kernel = pinot.regressors.kernels.rbf.RBF
@@ -273,47 +277,45 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
 
         self.in_features = in_features
 
-        self.log_sigma = torch.nn.Parameter(
-            torch.tensor(
-                log_sigma))
+        self.log_sigma = torch.nn.Parameter(torch.tensor(log_sigma))
 
         # uniform distribution within boundary
         # (n_inducing_points, hidden_dimension)
         self.x_tr = torch.nn.Parameter(
             torch.distributions.uniform.Uniform(
-                -1 * grid_boundary * torch.ones(
-                    n_inducing_points,
-                    in_features),
-                1 * grid_boundary * torch.ones(
-                    n_inducing_points,
-                    in_features)
-            ).sample())
+                -1
+                * grid_boundary
+                * torch.ones(n_inducing_points, in_features),
+                1 * grid_boundary * torch.ones(n_inducing_points, in_features),
+            ).sample()
+        )
 
         # variational mean for inducing points value
         # (n_inducing_points, 1)
         self.y_tr_mu = torch.nn.Parameter(
             torch.distributions.normal.Normal(
                 loc=torch.randn(n_inducing_points, 1),
-                scale=initializer_std*torch.ones(n_inducing_points, 1)
-            ).sample())
+                scale=initializer_std * torch.ones(n_inducing_points, 1),
+            ).sample()
+        )
 
         # to ensure lower cholesky
         # (n_inducing_points, )
         self.y_tr_sigma_diag = torch.nn.Parameter(
             torch.distributions.normal.Normal(
                 loc=torch.zeros(n_inducing_points),
-                scale=initializer_std*torch.ones(
-                    n_inducing_points)
-            ).sample())
+                scale=initializer_std * torch.ones(n_inducing_points),
+            ).sample()
+        )
 
         # (0.5 * n_inducing_points * (n_inducing_points - 1), )
         self.y_tr_sigma_tril = torch.nn.Parameter(
-            torch.zeros(int(n_inducing_points*(n_inducing_points-1)*0.5)))
+            torch.zeros(int(n_inducing_points * (n_inducing_points - 1) * 0.5))
+        )
 
         self.n_inducing_points = n_inducing_points
 
         self.kl_loss_scaling = kl_loss_scaling
-
 
     def _y_tr_sigma(self):
         """ Getting the covariance matrix for variational training input."""
@@ -322,26 +324,20 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
 
         # (n_inducing_points, n_inducing_points)
         mask = torch.gt(
-            torch.range(0, self.y_tr_sigma_diag.shape[0]-1)[:, None],
-            torch.range(0, self.y_tr_sigma_diag.shape[0]-1)[None, :])
+            torch.range(0, self.y_tr_sigma_diag.shape[0] - 1)[:, None],
+            torch.range(0, self.y_tr_sigma_diag.shape[0] - 1)[None, :],
+        )
 
         # (n_inducing_points, n_inducing_points)
-        y_tr_sigma = y_tr_diag.masked_scatter(
-            mask,
-            self.y_tr_sigma_tril)
+        y_tr_sigma = y_tr_diag.masked_scatter(mask, self.y_tr_sigma_tril)
 
         return y_tr_sigma
 
     def _k_tr_tr(self):
-        return self._perturb(
-            self.kernel(
-                self.x_tr))
+        return self._perturb(self.kernel(self.x_tr))
 
     def _k_tr_te(self, x_te):
-        return self._perturb(
-            self.kernel(
-                self.x_tr,
-                x_te))
+        return self._perturb(self.kernel(self.x_tr, x_te))
 
     def _k_te_tr(self, x_te):
         return self._k_tr_te(x_te).t()
@@ -368,16 +364,11 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
         """
 
         # get the kernels
-        (
-            k_tr_tr,
-            k_tr_te,
-            k_te_tr,
-            k_te_te
-        ) = (
+        (k_tr_tr, k_tr_te, k_te_tr, k_te_te) = (
             self._k_tr_tr(),
             self._k_tr_te(x_te),
             self._k_te_tr(x_te),
-            self._k_te_te(x_te)
+            self._k_te_te(x_te),
         )
 
         # (n_tr, n_tr)
@@ -385,49 +376,45 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
 
         # (n_tr, 1)
         l_k_tr_tr_inv_mu, _ = torch.triangular_solve(
-            input=self.y_tr_mu,
-            A=l_k_tr_tr,
-            upper=False
+            input=self.y_tr_mu, A=l_k_tr_tr, upper=False
         )
 
         # (n_tr, n_tr)
         l_k_tr_tr_inv_sigma, _ = torch.triangular_solve(
-            input=self._y_tr_sigma(),
-            A=l_k_tr_tr,
-            upper=False
+            input=self._y_tr_sigma(), A=l_k_tr_tr, upper=False
         )
 
         # (n_tr, te)
         l_k_tr_tr_inv_k_tr_te, _ = torch.triangular_solve(
-            input=k_tr_te,
-            A=l_k_tr_tr,
-            upper=False)
+            input=k_tr_te, A=l_k_tr_tr, upper=False
+        )
 
         # (n_te, 1)
         predictive_mean = l_k_tr_tr_inv_k_tr_te.t() @ l_k_tr_tr_inv_mu
 
         # (n_tr, n_te)
-        k_tr_tr_inv_k_tr_te = l_k_tr_tr_inv_k_tr_te.t()\
-            @ l_k_tr_tr_inv_k_tr_te
+        k_tr_tr_inv_k_tr_te = l_k_tr_tr_inv_k_tr_te.t() @ l_k_tr_tr_inv_k_tr_te
 
         # (n_te, n_te)
-        l_k_tr_tr_inv_sigma_t_at_l_k_tr_tr_inv_k_tr_te =\
+        l_k_tr_tr_inv_sigma_t_at_l_k_tr_tr_inv_k_tr_te = (
             l_k_tr_tr_inv_sigma.t() @ l_k_tr_tr_inv_k_tr_te
+        )
 
         # (n_te, n_te)
-        compose_l_k_tr_tr_inv_sigma_t_at_l_k_tr_tr_inv_k_tr_te =\
-            l_k_tr_tr_inv_sigma_t_at_l_k_tr_tr_inv_k_tr_te.t()\
+        compose_l_k_tr_tr_inv_sigma_t_at_l_k_tr_tr_inv_k_tr_te = (
+            l_k_tr_tr_inv_sigma_t_at_l_k_tr_tr_inv_k_tr_te.t()
             @ l_k_tr_tr_inv_sigma_t_at_l_k_tr_tr_inv_k_tr_te
+        )
 
         # (n_te, n_te)
-        predictive_cov\
-            = k_te_te\
-            - k_tr_tr_inv_k_tr_te\
+        predictive_cov = (
+            k_te_te
+            - k_tr_tr_inv_k_tr_te
             + compose_l_k_tr_tr_inv_sigma_t_at_l_k_tr_tr_inv_k_tr_te
+        )
 
         predictive_cov += torch.exp(self.log_sigma) * torch.eye(
-            k_te_te.shape[0],
-            device=k_te_te.device
+            k_te_te.shape[0], device=k_te_te.device
         )
 
         return predictive_mean, predictive_cov
@@ -449,8 +436,8 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
         predictive_mean, predictive_cov = self.forward(x_te)
 
         distribution = torch.distributions.multivariate_normal.MultivariateNormal(
-            loc=predictive_mean.flatten(),
-            covariance_matrix=predictive_cov)
+            loc=predictive_mean.flatten(), covariance_matrix=predictive_cov
+        )
 
         return distribution
 
@@ -484,14 +471,10 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
         prior_tril = torch.cholesky(self._k_tr_tr())
 
         log_p_u = self.exp_log_full_gaussian(
-            self.y_tr_mu,
-            self._y_tr_sigma(),
-            prior_mean,
-            prior_tril)
+            self.y_tr_mu, self._y_tr_sigma(), prior_mean, prior_tril
+        )
 
-        log_q_u = -self.entropy_full_gaussian(
-            self.y_tr_mu,
-            self._y_tr_sigma())
+        log_q_u = -self.entropy_full_gaussian(self.y_tr_mu, self._y_tr_sigma())
 
         loss = nll + self.kl_loss_scaling * (log_q_u - log_p_u)
 
@@ -501,14 +484,17 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
     def exp_log_full_gaussian(mean1, tril1, mean2, tril2):
         const_term = -0.5 * mean1.shape[0] * np.log(2 * np.pi * np.exp(1))
         log_det_prior = -torch.sum(torch.log(torch.diag(tril2)))
-        LpiLq = torch.triangular_solve(tril1.double(), tril2.double(), upper=False)[0]
+        LpiLq = torch.triangular_solve(
+            tril1.double(), tril2.double(), upper=False
+        )[0]
         trace_term = -0.5 * torch.sum(LpiLq ** 2)
         mu_diff = mean1 - mean2
-        quad_solve = torch.triangular_solve(mu_diff.double(), tril2.double(), upper=False)[0]
+        quad_solve = torch.triangular_solve(
+            mu_diff.double(), tril2.double(), upper=False
+        )[0]
         quad_term = -0.5 * torch.sum(quad_solve ** 2)
         res = const_term + log_det_prior + trace_term + quad_term
         return res
-
 
     @staticmethod
     def entropy_full_gaussian(mean1, tril1):
