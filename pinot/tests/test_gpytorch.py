@@ -18,7 +18,7 @@ def net():
 
     net = pinot.Net(
         net_representation,
-        output_regressor=pinot.regressors.VariationalGaussianProcessRegressor
+        output_regressor=pinot.regressors.VariationalGaussianProcessRegressor,
     )
 
     return net

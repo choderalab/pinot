@@ -19,6 +19,7 @@ class MultiTaskNet(pinot.Net):
     representation: a `pinot.representation` module
         the model that translates graphs to latent representations
     """
+
     def __init__(
         self,
         representation,
@@ -26,9 +27,10 @@ class MultiTaskNet(pinot.Net):
         **kwargs
     ):
 
-        super(MultiTaskNet, self).__init__(representation, output_regressor, **kwargs)
+        super(MultiTaskNet, self).__init__(
+            representation, output_regressor, **kwargs
+        )
         self.output_regressors = torch.nn.ModuleDict()
-
 
     def condition(self, g, assay):
         """Compute the output distribution with sampled weights.
@@ -53,7 +55,9 @@ class MultiTaskNet(pinot.Net):
         if assay not in self.output_regressors:
 
             # get the type of self.output_regressor, and instantiate it
-            self.output_regressors[assay] = type(self.output_regressor)(self.representation_out_features)
+            self.output_regressors[assay] = type(self.output_regressor)(
+                self.representation_out_features
+            )
 
             # move to cuda if the parent net is
             if next(self.parameters()).is_cuda:
@@ -66,7 +70,6 @@ class MultiTaskNet(pinot.Net):
         distribution = self.output_regressor.condition(h)
         return distribution
 
-        
     def condition_train(self, g, l, sampler=None):
         """Compute the output distribution with sampled weights.
 
@@ -88,19 +91,21 @@ class MultiTaskNet(pinot.Net):
         # find which assays are being used
         assays = [str(assay) for assay in range(l.shape[1])]
         distributions = []
-        
+
         for assay in assays:
-            
+
             # if we already instantiated the output_regressor
             if assay not in self.output_regressors:
-                
+
                 # get the type of self.output_regressor, and instantiate it
-                self.output_regressors[assay] = type(self.output_regressor)(self.representation_out_features)
-                
+                self.output_regressors[assay] = type(self.output_regressor)(
+                    self.representation_out_features
+                )
+
                 # move to cuda if the parent net is
                 if next(self.parameters()).is_cuda:
                     self.output_regressors[assay].cuda()
-                
+
             # switch to head for that assay
             self.output_regressor = self.output_regressors[assay]
 
@@ -132,7 +137,9 @@ class MultiTaskNet(pinot.Net):
         for idx, assay_mask in enumerate(l.T):
             if assay_mask.any():
                 # create dummy ys if unlabeled
-                y_dummy = torch.zeros(y.shape[0], device=y.get_device()).view(-1, 1)
+                y_dummy = torch.zeros(y.shape[0], device=y.get_device()).view(
+                    -1, 1
+                )
                 y_dummy[assay_mask] = y[assay_mask, idx].view(-1, 1)
                 # compute log probs
                 log_probs = distributions[idx].log_prob(y_dummy)

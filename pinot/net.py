@@ -36,7 +36,6 @@ class BaseNet(torch.nn.Module, abc.ABC):
         self.representation = representation
         self.output_regressor_cls = output_regressor
 
-
     @abc.abstractmethod
     def condition(self, g, sampler=None, *args, **kwargs):
         """
@@ -92,7 +91,7 @@ class BaseNet(torch.nn.Module, abc.ABC):
 
         """
         # use loss function from output_regressor, if already implemented
-        if hasattr(self.output_regressor, 'loss'):
+        if hasattr(self.output_regressor, "loss"):
             return self.output_regressor.loss(h, y)
 
         distribution = self._condition(h)
@@ -124,15 +123,12 @@ class Net(BaseNet):
     """
 
     def __init__(
-        self,
-        representation,
-        output_regressor=NeuralNetworkRegressor,
-        **kwargs
+        self, representation, output_regressor=NeuralNetworkRegressor, **kwargs
     ):
 
         super(Net, self).__init__(
-            representation=representation,
-            output_regressor=output_regressor)
+            representation=representation, output_regressor=output_regressor
+        )
 
         # read the representation hidden units here
         # grab the last dimension of `representation`
@@ -150,16 +146,12 @@ class Net(BaseNet):
             in_features=self.representation_out_features, **kwargs
         )
 
-
         self.representation = representation
         self.output_regressor = output_regressor
 
         # determine if the output regressor is an `ExactGaussianProcess`
         self.has_exact_gp = False
-        if isinstance(
-                self.output_regressor,
-                ExactGaussianProcessRegressor
-            ):
+        if isinstance(self.output_regressor, ExactGaussianProcessRegressor):
 
             self.has_exact_gp = True
 
@@ -227,10 +219,7 @@ class Net(BaseNet):
 
         if self.has_exact_gp is True:
             h_last = self.representation(self.g_last)
-            kwargs = {
-                'x_tr': h_last,
-                'y_tr': self.y_last
-            }
+            kwargs = {"x_tr": h_last, "y_tr": self.y_last}
 
         if sampler is None:
             return self._condition(h, **kwargs)

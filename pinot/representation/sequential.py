@@ -21,7 +21,6 @@ class Sequential(torch.nn.Module):
 
     """
 
-
     def __init__(
         self,
         layer,

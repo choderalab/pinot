@@ -11,6 +11,7 @@ import torch
 # =============================================================================
 class Dataset(abc.ABC, torch.utils.data.Dataset):
     """ The base class of map-style dataset."""
+
     def __init__(self, ds=None):
         super(Dataset, self).__init__()
         self.ds = ds
@@ -25,12 +26,12 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
 
     def __getitem__(self, idx):
         if self.ds is None:
-            raise RuntimeError('Empty molecule dataset.')
+            raise RuntimeError("Empty molecule dataset.")
 
-        if isinstance(idx, int): # sinlge element
+        if isinstance(idx, int):  # sinlge element
             return self.ds[idx]
 
-        elif isinstance(idx, slice): # implement slicing
+        elif isinstance(idx, slice):  # implement slicing
             # return a Dataset object rather than list
             return self.__class__(ds=self.ds[idx])
 
@@ -69,6 +70,7 @@ class TemporalDataset(Dataset):
     filter_by_time : Filter the data by a certain date.
 
     """
+
     def __init__(self, ds=None):
         super(TemporalDataset, self).__init__(ds)
 
@@ -128,7 +130,6 @@ class TemporalDataset(Dataset):
             df_y = df.iloc[:, y_cols]
             df_time = df.iloc[:, time_col]
 
-
             if toolkit == "rdkit":
                 from rdkit import Chem
 
@@ -148,7 +149,6 @@ class TemporalDataset(Dataset):
             elif toolkit == "openeye":
                 raise NotImplementedError
 
-
             ds = list(
                 zip(
                     gs,
@@ -157,7 +157,7 @@ class TemporalDataset(Dataset):
                             scale * df_y.values[idxs], dtype=torch.float32
                         )
                     ),
-                   list(df_time.values[idxs]),
+                    list(df_time.values[idxs]),
                 )
             )
 
@@ -179,13 +179,12 @@ class TemporalDataset(Dataset):
             if t >= time:
                 after.append((g, y))
 
-
         before = Dataset(before)
         after = Dataset(after)
 
         return before, after
 
-    def filter_by_time(self, after='1989-06-04', before='2666-12-31'):
+    def filter_by_time(self, after="1989-06-04", before="2666-12-31"):
         """ Filter the data by a certain date.
 
         Parameters

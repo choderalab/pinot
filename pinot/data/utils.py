@@ -258,7 +258,6 @@ def batch(ds, batch_size, seed=2666, shuffle=False):
         random.seed(seed)
         random.shuffle(ds)
 
-
     gs, ys = tuple(zip(*ds))
 
     gs_batched = [
@@ -272,6 +271,7 @@ def batch(ds, batch_size, seed=2666, shuffle=False):
     ]
 
     return list(zip(gs_batched, ys_batched))
+
 
 def prepare_semi_supervised_data(unlabelled_data, labelled_data, seed=2666):
     """Create a semi-supervised data by mixing unlabelled and labelled
@@ -292,7 +292,7 @@ def prepare_semi_supervised_data(unlabelled_data, labelled_data, seed=2666):
 
     """
     semi_supervised_data = []
-    
+
     for (g, y) in unlabelled_data:
         semi_supervised_data.append((g, torch.tensor([np.nan])))
     for (g, y) in labelled_data:
@@ -301,11 +301,13 @@ def prepare_semi_supervised_data(unlabelled_data, labelled_data, seed=2666):
     # Shuffle the combined data
     np.random.seed(seed)
     np.random.shuffle(semi_supervised_data)
-        
+
     return semi_supervised_data
 
 
-def prepare_semi_supeprvised_data_from_labeled_data(labelled_data, r=0.2, seed=2666):
+def prepare_semi_supeprvised_data_from_labeled_data(
+    labelled_data, r=0.2, seed=2666
+):
     """Create semi-supervised data from labelled data by randomly removing the
     labels for (1-r) of the data points.
 
@@ -330,12 +332,12 @@ def prepare_semi_supeprvised_data_from_labeled_data(labelled_data, r=0.2, seed=2
     """
     semi_data = []
     small_labelled_data = []
-    
+
     np.random.seed(seed)
-    for (g,y) in labelled_data:
+    for (g, y) in labelled_data:
         if np.random.rand() < r:
             semi_data.append((g, y))
-            small_labelled_data.append((g,y))
+            small_labelled_data.append((g, y))
         else:
             semi_data.append((g, torch.tensor([np.nan])))
     return semi_data, small_labelled_data

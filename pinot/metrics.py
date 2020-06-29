@@ -27,12 +27,14 @@ def _independent(distribution):
     """
     return torch.distributions.normal.Normal(
         loc=distribution.mean.flatten(),
-        scale=distribution.variance.pow(0.5).flatten()
+        scale=distribution.variance.pow(0.5).flatten(),
     )
+
 
 # =============================================================================
 # MODULE FUNCTIONS
 # =============================================================================
+
 
 def _mse(y, y_hat):
     """ Mean squarred error. """
@@ -93,6 +95,7 @@ def r2(net, g, y, sampler=None):
 def pearsonr(net, g, y, sampler=None):
     """ Pearson R """
     from scipy.stats import pearsonr as pr
+
     y_hat = net.condition(g, sampler=sampler).mean.detach().cpu()
     y = y.detach().cpu()
 
@@ -105,6 +108,7 @@ def log_sigma(net, g, y, sampler=None):
     """ Log sigma. """
     return net.log_sigma
 
+
 def avg_nll(net, g, y, sampler=None):
     """ Average negative log likelihood. """
 
@@ -112,9 +116,7 @@ def avg_nll(net, g, y, sampler=None):
     # generalize
 
     # ensure `y` is one-dimensional
-    assert ((y.dim() == 2 and y.shape[-1] == 1) or
-        (y.dim() == 1)
-    )
+    assert (y.dim() == 2 and y.shape[-1] == 1) or (y.dim() == 1)
 
     # make the predictive distribution
     distribution = net.condition(g, sampler=sampler)
