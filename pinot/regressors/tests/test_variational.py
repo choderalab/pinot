@@ -2,11 +2,16 @@ import pytest
 import torch
 import pinot
 
+
 def test_import():
+    """ """
     from pinot.regressors import VariationalGaussianProcessRegressor
 
+
 def test_init():
+    """ """
     from pinot.regressors import VariationalGaussianProcessRegressor
+
     ds_tr, ds_te, num_data = get_data()
 
     layer = pinot.representation.dgl_legacy.GN
@@ -20,8 +25,11 @@ def test_init():
         # num_data=num_data
     )
 
+
 def test_train_and_test():
+    """ """
     from pinot.regressors import VariationalGaussianProcessRegressor
+
     ds_tr, ds_te, num_data = get_data()
 
     layer = pinot.representation.dgl_legacy.GN
@@ -46,21 +54,19 @@ def test_train_and_test():
     optimizer = torch.optim.Adam(net.parameters(), 1e-3)
 
     train_and_test = pinot.TrainAndTest(
-        net=net,
-        optimizer=optimizer,
-        n_epochs=1,
-        data_tr=ds_tr,
-        data_te=ds_te,
+        net=net, optimizer=optimizer, n_epochs=1, data_tr=ds_tr, data_te=ds_te,
     )
 
     print(train_and_test)
 
 
 def test_train_and_test_cuda():
-    if torch.cuda.is_available() is False: # pass if no cuda
+    """ """
+    if torch.cuda.is_available() is False:  # pass if no cuda
         return None
 
     from pinot.regressors import VariationalGaussianProcessRegressor
+
     ds_tr, ds_te, num_data = get_data(cuda=True)
 
     layer = pinot.representation.dgl_legacy.GN
@@ -72,36 +78,47 @@ def test_train_and_test_cuda():
         representation,
         VariationalGaussianProcessRegressor,
         # num_data=num_data
-    ).to(torch.device('cuda:0'))
+    ).to(torch.device("cuda:0"))
 
     lr = 1e-4
-    optimizer = torch.optim.Adam([
-        {'params': net.representation.parameters(), 'weight_decay': lr},
-        {'params': net.output_regressor.hyperparameters(), 'lr': lr * 0.01},
-        {'params': net.output_regressor.variational_parameters()},
-        {'params': net.output_regressor.likelihood.parameters()}
-    ])
+    optimizer = torch.optim.Adam(
+        [
+            {"params": net.representation.parameters(), "weight_decay": lr},
+            {
+                "params": net.output_regressor.hyperparameters(),
+                "lr": lr * 0.01,
+            },
+            {"params": net.output_regressor.variational_parameters()},
+            {"params": net.output_regressor.likelihood.parameters()},
+        ]
+    )
 
     train_and_test = pinot.TrainAndTest(
-        net=net,
-        optimizer=optimizer,
-        n_epochs=1,
-        data_tr=ds_tr,
-        data_te=ds_te,
+        net=net, optimizer=optimizer, n_epochs=1, data_tr=ds_tr, data_te=ds_te,
     )
 
     print(train_and_test)
 
 
-
 def get_data(cuda=False):
+    """
+
+    Parameters
+    ----------
+    cuda :
+         (Default value = False)
+
+    Returns
+    -------
+
+    """
     # get data
     ds = pinot.data.esol()
     num_data = len(ds)
     if cuda:
         ds_new = []
         for d in ds:
-            d = tuple([i.to(torch.device('cuda:0')) for i in d])
+            d = tuple([i.to(torch.device("cuda:0")) for i in d])
             ds_new.append(d)
         ds = ds_new
     ds = pinot.data.utils.batch(ds, 64)

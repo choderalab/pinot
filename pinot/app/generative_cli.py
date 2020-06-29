@@ -13,10 +13,36 @@ import logging
 # MODULE FUNCTIONS
 # =============================================================================
 def negative_elbo_loss(net, g, y):
+    """
+
+    Parameters
+    ----------
+    net :
+        
+    g :
+        
+    y :
+        
+
+    Returns
+    -------
+
+    """
     return net.loss(g).detach()
 
 
 def run(args):
+    """
+
+    Parameters
+    ----------
+    args :
+        
+
+    Returns
+    -------
+
+    """
     if args.info:
         logging.basicConfig(level=logging.INFO)
     logs = logging.getLogger("generative")

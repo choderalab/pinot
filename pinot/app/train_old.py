@@ -11,6 +11,17 @@ import torch
 # MODULE FUNCTIONS
 # =============================================================================
 def run(args):
+    """
+
+    Parameters
+    ----------
+    args :
+        
+
+    Returns
+    -------
+
+    """
     layer = pinot.representation.dgl_legacy.gn(model_name=args.layer)
 
     net_representation = pinot.representation.Sequential(
@@ -18,10 +29,9 @@ def run(args):
     )
 
     net = pinot.Net(
-            net_representation,
-            output_regressor=getattr(
-                pinot.regressors,
-                args.output_regressor)(32))
+        net_representation,
+        output_regressor=getattr(pinot.regressors, args.output_regressor)(32),
+    )
 
     # get the entire dataset
     ds = getattr(pinot.data, args.data)()
@@ -36,7 +46,7 @@ def run(args):
 
     # batch
 
-    if 'Exact' in args.output_regressor:
+    if "Exact" in args.output_regressor:
         ds_tr, ds_te = pinot.data.utils.split(ds, partition)
 
         ds_tr = pinot.data.utils.batch(ds_tr, len(ds_tr))
@@ -108,7 +118,11 @@ if __name__ == "__main__":
     parser.add_argument("--lr", default=1e-5, type=float)
     parser.add_argument("--partition", default="4:1", type=str)
     parser.add_argument("--n_epochs", default=5)
-    parser.add_argument("--output_regressor", default="VariationalGaussianProcessOutputRegressor", type=str)
+    parser.add_argument(
+        "--output_regressor",
+        default="VariationalGaussianProcessOutputRegressor",
+        type=str,
+    )
     parser.add_argument("--n_inducing_points", default=100, type=int)
     args = parser.parse_args()
     run(args)

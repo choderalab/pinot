@@ -4,14 +4,24 @@ import pinot
 
 @torch.no_grad()
 def condition_mixture(net, g, sampler=None, n_samples=1):
-    """ Get the predicted distribution of measurement
+    """Get the predicted distribution of measurement
     conditioned on input.
+
     Parameters
     ----------
-    net : `pinot.Net` module
-    g : input of net
-    n_samples : int, default=1,
-        number of copies of distributions to be mixed.
+    net :
+        
+    g :
+        
+    sampler :
+         (Default value = None)
+    n_samples :
+         (Default value = 1)
+
+    Returns
+    -------
+
+    
     """
     # initialize a list of distributions
     distributions = []
@@ -51,19 +61,21 @@ def condition_mixture(net, g, sampler=None, n_samples=1):
 
 
 def confidence_interval(distribution, percentage=0.95, n_samples=1000):
-    """ Calculate the confidence interval of a distribution.
+    """Calculate the confidence interval of a distribution.
 
     Parameters
     ----------
-    distribution : `torch.distributions.Distribution` object
-        the distribution to be characterized.
-        the event dimension has to be [-1, 1].
-    percentage : float, default=0.95
-        percentage of confidence interval.
-    n_samples : int, default=100
-        number of samples to be drawn for confidence interval to be 
-        calculated.
+    distribution :
+        
+    percentage :
+         (Default value = 0.95)
+    n_samples :
+         (Default value = 1000)
 
+    Returns
+    -------
+
+    
     """
     percentage = torch.tensor(percentage)
 

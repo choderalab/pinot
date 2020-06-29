@@ -26,6 +26,8 @@ DEFAULT_MODEL_KWARGS = {
 # MODULE CLASSES
 # =============================================================================
 class GN(torch.nn.Module):
+    """ Graph net. """
+
     def __init__(
         self, in_features, out_features, model_name="GraphConv", kwargs={},
     ):
@@ -44,6 +46,7 @@ class GN(torch.nn.Module):
         self.out_features = out_features
 
     def forward(self, g, x):
+        """ Forward pass. """
         return self.gn(g, x)
 
 
@@ -53,6 +56,7 @@ class GN(torch.nn.Module):
 
 
 def gn(model_name="GraphConv", kwargs={}):
+    """ Graph net. """
     if model_name == "GINConv":
         return lambda in_features, out_features: dgl_pytorch.conv.GINConv(
             apply_func=torch.nn.Linear(in_features, out_features),

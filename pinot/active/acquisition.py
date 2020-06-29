@@ -13,55 +13,106 @@ from gpytorch.distributions import MultivariateNormal
 # MODULE FUNCTIONS
 # =============================================================================
 def dummy(distribution, y_best=0.0):
-    return torch.range(
-            start=0,
-            end=distribution.mean.flatten().shape[0]).flip(0)
+    r""" Dummy acquisition function that always picks the first in sequence.
+    Designed to be used with temporal datasets to compare with baselines.
+
+    Parameters
+    ----------
+    distribution : `torch.distributions.Distribution`
+        Predictive distribution.
+
+    y_best : float
+        The score for best candidate so far.
+         (Default value = 0.0)
+
+    Returns
+    -------
+    score : `torch.Tensor`, `shape=(n_candidates, )`
+        Score for candidates under predictive distribution.
+
+
+    """
+    return torch.range(start=0, end=distribution.mean.flatten().shape[0]).flip(
+        0
+    )
+
 
 def probability_of_improvement(distribution, y_best=0.0):
     r""" Probability of Improvement (PI).
+
     Parameters
     ----------
-    distribution : `torch.distributions.Distribution` object
-        the predictive distribution.
-    y_best : float or float tensor, default=0.0
-        the best value so far.
-    """
+    distribution : `torch.distributions.Distribution`
+        Predictive distribution.
 
+    y_best : float
+        The score for best candidate so far.
+         (Default value = 0.0)
+
+    Returns
+    -------
+    score : `torch.Tensor`, `shape=(n_candidates, )`
+        Score for candidates under predictive distribution.
+    """
     return 1.0 - distribution.cdf(y_best)
 
 
 def uncertainty(distribution, y_best=0.0):
     r""" Uncertainty.
+
     Parameters
     ----------
-    distribution : `torch.distributions.Distribution` object
-        the predictive distribution.
-    y_best : float or float tensor, default=0.0
-        the best value so far.
+    distribution : `torch.distributions.Distribution`
+        Predictive distribution.
+
+    y_best : float
+        The score for best candidate so far.
+         (Default value = 0.0)
+
+    Returns
+    -------
+    score : `torch.Tensor`, `shape=(n_candidates, )`
+        Score for candidates under predictive distribution.
     """
     return distribution.variance
 
 
 def expected_improvement(distribution, y_best=0.0):
     r""" Expected Improvement (EI).
+
     Parameters
     ----------
-    distribution : `torch.distributions.Distribution` object
-        the predictive distribution.
-    y_best : float or float tensor, default=0.0
-        the best value so far.
+    distribution : `torch.distributions.Distribution`
+        Predictive distribution.
+
+    y_best : float
+        The score for best candidate so far.
+         (Default value = 0.0)
+
+    Returns
+    -------
+    score : `torch.Tensor`, `shape=(n_candidates, )`
+        Score for candidates under predictive distribution.
     """
     return distribution.mean - y_best
 
 
-def upper_confidence_bound(distribution, y_best=0.0, kappa=0.5):
+def upper_confidence_bound(distribution, y_best=0.0, kappa=0.95):
     r""" Upper Confidence Bound (UCB).
+
     Parameters
     ----------
-    distribution : `torch.distributions.Distribution` object
-        the predictive distribution.
-    y_best : float or float tensor, default=0.0
-        the best value so far.
+    distribution : `torch.distributions.Distribution`
+        Predictive distribution.
+
+    y_best : float
+        The score for best candidate so far.
+         (Default value = 0.0)
+
+    Returns
+    -------
+    score : `torch.Tensor`, `shape=(n_candidates, )`
+        Score for candidates under predictive distribution.
     """
 
     from pinot.samplers.utils import confidence_interval
@@ -71,6 +122,29 @@ def upper_confidence_bound(distribution, y_best=0.0, kappa=0.5):
 
 
 def random(distribution, y_best=0.0, seed=2666):
+    """ Random assignment of scores under normal distribution.
+
+    Parameters
+    ----------
+    distribution : `torch.distributions.Distribution`
+        Predictive distribution.
+
+    y_best : float
+        The score for best candidate so far.
+         (Default value = 0.0)
+
+    Returns
+    -------
+    score : `torch.Tensor`, `shape=(n_candidates, )`
+        Score for candidates under predictive distribution.
+
+    Note
+    ----
+    Random seed set to `2666`, the title of the single greatest novel in
+    human literary history by Roberto Bolano.
+    This needs to be set to `None` if parallel experiments were to be performed.
+
+    """
     # torch.manual_seed(seed)
     return torch.rand(distribution.batch_shape)
 
@@ -81,8 +155,7 @@ def random(distribution, y_best=0.0, seed=2666):
 
 
 class MCAcquire:
-    """ Implements Monte Carlo acquisition.
-    """
+    """Implements Monte Carlo acquisition."""
 
     def __init__(
         self,
@@ -165,8 +238,7 @@ class MCAcquire:
 
 
 class SeqAcquire:
-    """ Wraps sequential to keep track of hyperparameters.
-    """
+    """Wraps sequential to keep track of hyperparameters."""
 
     def __init__(self, acq_fn, **kwargs):
         """
@@ -205,22 +277,99 @@ class SeqAcquire:
         )
 
     def PI(self, samples, axis=0, y_best=0.0):
+        """
+
+        Parameters
+        ----------
+        samples :
+
+        axis :
+             (Default value = 0)
+        y_best :
+             (Default value = 0.0)
+
+        Returns
+        -------
+
+        """
         return (samples > y_best).float().mean(axis=axis)
 
     def EI(self, samples, axis=0, y_best=0.0):
+        """
+
+        Parameters
+        ----------
+        samples :
+
+        axis :
+             (Default value = 0)
+        y_best :
+             (Default value = 0.0)
+
+        Returns
+        -------
+
+        """
         return (samples - y_best).mean(axis=axis)
 
     def VAR(self, samples, axis=0, y_best=0.0):
+        """
+
+        Parameters
+        ----------
+        samples :
+
+        axis :
+             (Default value = 0)
+        y_best :
+             (Default value = 0.0)
+
+        Returns
+        -------
+
+        """
         return samples.var(axis=axis)
 
     def RAND(self, samples, axis=0, y_best=0.0):
+        """
+
+        Parameters
+        ----------
+        samples :
+
+        axis :
+             (Default value = 0)
+        y_best :
+             (Default value = 0.0)
+
+        Returns
+        -------
+
+        """
         return torch.rand(samples.shape[1])
 
     def UCB(self, samples, beta, axis=0, y_best=0.0):
+        """
+
+        Parameters
+        ----------
+        samples :
+
+        beta :
+
+        axis :
+             (Default value = 0)
+        y_best :
+             (Default value = 0.0)
+
+        Returns
+        -------
+
+        """
         samples_sorted, idxs = torch.sort(samples, dim=0)
         high_idx = int(len(samples) * (1 - (1 - beta) / 2))
         if axis == 0:
             high = samples_sorted[high_idx, :]
         else:
-            high = samples_sorted[:,high_idx,:]
+            high = samples_sorted[:, high_idx, :]
         return high

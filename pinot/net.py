@@ -15,8 +15,15 @@ from pinot.regressors import ExactGaussianProcessRegressor
 # BASE CLASSES
 # =============================================================================
 class BaseNet(torch.nn.Module, abc.ABC):
-    """ Base class for `Net` object that inputs graphs and outputs
+    """Base class for `Net` object that inputs graphs and outputs
     distributions and is trainable.
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+
     Methods
     -------
     condition :
@@ -29,13 +36,40 @@ class BaseNet(torch.nn.Module, abc.ABC):
         self.representation = representation
         self.output_regressor_cls = output_regressor
 
-
     @abc.abstractmethod
     def condition(self, g, sampler=None, *args, **kwargs):
+        """
+
+        Parameters
+        ----------
+        g :
+
+        sampler :
+             (Default value = None)
+        *args :
+
+        **kwargs :
+
+
+        Returns
+        -------
+
+        """
         raise NotImplementedError
 
     def loss(self, g, y):
-        """ Negative log likelihood loss.
+        """Negative log likelihood loss.
+
+        Parameters
+        ----------
+        g :
+
+        y :
+
+
+        Returns
+        -------
+
         """
         # g -> h
         h = self.representation(g)
@@ -43,8 +77,21 @@ class BaseNet(torch.nn.Module, abc.ABC):
         return self._loss(h, y)
 
     def _loss(self, h, y):
+        """
+
+        Parameters
+        ----------
+        h :
+
+        y :
+
+
+        Returns
+        -------
+
+        """
         # use loss function from output_regressor, if already implemented
-        if hasattr(self.output_regressor, 'loss'):
+        if hasattr(self.output_regressor, "loss"):
             return self.output_regressor.loss(h, y)
 
         distribution = self._condition(h)
@@ -53,25 +100,35 @@ class BaseNet(torch.nn.Module, abc.ABC):
 
 
 class Net(BaseNet):
-    """ An object that combines the representation and parameter
+    """An object that combines the representation and parameter
     learning, puts into a predicted distribution and calculates the
     corresponding divergence.
-    Attributes
+
+    Parameters
     ----------
-    representation: a `pinot.representation` module
-        the model that translates graphs to latent representations
+    representation : `pinot.representation` module
+        The model that translates graphs to latent representations.
+
+    output_regressor : `pinot.regressors.BaseRegressor`
+        Output regressor that inputs latent encode and outputs distributions.
+
+
+
+    Methods
+    -------
+    loss : Compute loss function.
+
+    condition : Construct predictive distribution.
+
     """
 
     def __init__(
-        self,
-        representation,
-        output_regressor=NeuralNetworkRegressor,
-        **kwargs
+        self, representation, output_regressor=NeuralNetworkRegressor, **kwargs
     ):
 
         super(Net, self).__init__(
-            representation=representation,
-            output_regressor=output_regressor)
+            representation=representation, output_regressor=output_regressor
+        )
 
         # read the representation hidden units here
         # grab the last dimension of `representation`
@@ -89,21 +146,32 @@ class Net(BaseNet):
             in_features=self.representation_out_features, **kwargs
         )
 
-
         self.representation = representation
         self.output_regressor = output_regressor
 
         # determine if the output regressor is an `ExactGaussianProcess`
         self.has_exact_gp = False
-        if isinstance(
-                self.output_regressor,
-                ExactGaussianProcessRegressor
-            ):
+        if isinstance(self.output_regressor, ExactGaussianProcessRegressor):
 
             self.has_exact_gp = True
 
     def loss(self, g, y):
         """ Negative log likelihood loss.
+
+        Parameters
+        ----------
+        g : `dgl.DGLGraph`
+            Training input graph.
+
+        y : `torch.Tensor`, `shape=(n_tr, 1)`
+            Training target.
+
+
+        Returns
+        -------
+        loss : `torch.Tensor`, `shape=(, )`
+            Loss function value.
+
         """
         # g -> h
         h = self.representation(g)
@@ -115,8 +183,7 @@ class Net(BaseNet):
         return self._loss(h, y)
 
     def _condition(self, h, **kwargs):
-        """ Compute the output distribution.
-        """
+        """ Compute the output distribution from latent without sampling. """
 
         # h -> distribution
         distribution = self.output_regressor.condition(h, **kwargs)
@@ -125,6 +192,26 @@ class Net(BaseNet):
 
     def condition(self, g, sampler=None, n_samples=64):
         """ Compute the output distribution with sampled weights.
+
+        Parameters
+        ----------
+        g : `dgl.DGLGraph`
+            Input graph.
+
+        sampler : `torch.optim.Optimizer` or `pinot.Sampler`
+             (Default value = None)
+             Sampler to sample weights and come up with predictive distribution.
+
+        n_samples : `int`
+             (Default value = 64)
+             Number of samples to be drown to come up with predictive
+             distribution.
+
+        Returns
+        -------
+        distribution : `torch.distributions.Distribution`
+            Predictive distribution.
+
         """
         # g -> h
         h = self.representation(g)
@@ -132,10 +219,7 @@ class Net(BaseNet):
 
         if self.has_exact_gp is True:
             h_last = self.representation(self.g_last)
-            kwargs = {
-                'x_tr': h_last,
-                'y_tr': self.y_last
-            }
+            kwargs = {"x_tr": h_last, "y_tr": self.y_last}
 
         if sampler is None:
             return self._condition(h, **kwargs)

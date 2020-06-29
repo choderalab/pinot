@@ -21,31 +21,40 @@ import gpytorch
 
 
 class Train:
-    """ Training experiment.
+    """Training experiment.
 
-    Attributes
+    Parameters
     ----------
-    data : generator
-        training data
-    net : `pinot.Net` object
-        model with parameters to be trained
-    record_interval: int, default=1
-        interval at which `states` are being recorded
-    optimizer : `torch.optim.Optimizer` object, default=`torch.optim.Adam(1e-5)`
-        optimizer used for training
-    n_epochs : int, default=100
-        number of epochs
+    net : `pinot.Net`
+        Forward pass model that combines representation and output regression
+        and generates predictive distribution.
+
+    data : `List` of `tuple` of `(dgl.DGLGraph, torch.Tensor)`
+        or `pinot.data.dataset.Dataset`
+        Pairs of graph, measurement.
+
+    optimizer : `torch.optim.Optimizer` or `pinot.Sampler`
+        Optimizer for training.
+
+    n_epochs : `int`
+        Number of epochs.
+
+    record_interval : `int`
+        (Default value = 1)
+        Interval states are recorded.
+
+    Methods
+    -------
+    train_once : Train model once.
+
+    train : Train the model multiple times.
+
+
 
 
     """
 
-    def __init__(
-        self,
-        net,
-        data,
-        optimizer,
-        n_epochs=100,
-        record_interval=1):
+    def __init__(self, net, data, optimizer, n_epochs=100, record_interval=1):
 
         self.data = data
         self.optimizer = optimizer
@@ -55,10 +64,11 @@ class Train:
         self.states = {}
 
     def train_once(self):
-        """ Train the model for one batch.
-        """
+        """Train the model for one batch."""
         for g, y in self.data:
+
             def l():
+                """ """
                 self.optimizer.zero_grad()
                 loss = torch.sum(self.net.loss(g, y))
                 loss.backward()
@@ -67,9 +77,15 @@ class Train:
             self.optimizer.step(l)
 
     def train(self):
-        """ Train the model for multiple steps and
+        """Train the model for multiple steps and
         record the weights once every
         `record_interval`.
+
+        Parameters
+        ----------
+
+        Returns
+        -------
 
         """
 
@@ -88,19 +104,29 @@ class Train:
 
 
 class Test:
-    """ Run sequences of test on a trained model.
+    """ Test experiment. Metrics are applied to the saved states of the
+    model to characterize its performance.
 
-    Attributes
+
+    Parameters
     ----------
-    net : `pinot.Net` object
-        trained model to be tested
-    data : `pinot.data` object
-        test data
-    metrics : list of `pinot.metrics` functions
-        metrics used for testing
-    states : dictionary
-        nested dictionary of state dicts
+    net : `pinot.Net`
+        Forward pass model that combines representation and output regression
+        and generates predictive distribution.
 
+    data : `List` of `tuple` of `(dgl.DGLGraph, torch.Tensor)`
+        or `pinot.data.dataset.Dataset`
+        Pairs of graph, measurement.
+
+    optimizer : `torch.optim.Optimizer` or `pinot.Sampler`
+        Optimizer for training.
+
+    metrics : `List` of `callable`
+        Metrics used to characterize the performance.
+
+    Methods
+    -------
+    test : Run the test experiment.
 
     """
 
@@ -114,6 +140,7 @@ class Test:
         self.sampler = sampler
 
     def test(self):
+        """ Run test experiment. """
         # switch to test
         self.net.eval()
 
@@ -157,7 +184,35 @@ class Test:
 
 
 class TrainAndTest:
-    """ Train a model and then test it.
+    """ Run training and test experiment.
+
+    Parameters
+    ----------
+    net : `pinot.Net`
+        Forward pass model that combines representation and output regression
+        and generates predictive distribution.
+
+    data : `List` of `tuple` of `(dgl.DGLGraph, torch.Tensor)`
+        or `pinot.data.dataset.Dataset`
+        Pairs of graph, measurement.
+
+    optimizer : `torch.optim.Optimizer` or `pinot.Sampler`
+        Optimizer for training.
+
+    metrics : `List` of `callable`
+        (Default value: `[pinot.rmse, pinot.r2, pinot.pearsonr, pinot.avg_nll]`)
+        Metrics used to characterize the performance.
+
+    n_epochs : `int`
+        Number of epochs.
+
+    record_interval : `int`
+        (Default value = 1)
+        Interval states are recorded.
+
+    Methods
+    -------
+    run : conduct experiment
 
     """
 
@@ -201,6 +256,7 @@ class TrainAndTest:
         return _str
 
     def run(self):
+        """ Run train and test experiments. """
         train = Train(
             net=self.net,
             data=self.data_tr,
@@ -242,16 +298,14 @@ class TrainAndTest:
 
 
 class MultipleTrainAndTest:
-    """ A sequence of controlled experiment.
-
-
-    """
+    """A sequence of controlled experiment."""
 
     def __init__(self, experiment_generating_fn, param_dicts):
         self.experiment_generating_fn = experiment_generating_fn
         self.param_dicts = param_dicts
 
     def run(self):
+        """ """
         results = []
 
         for param_dict in self.param_dicts:

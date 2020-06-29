@@ -10,20 +10,8 @@ import torch
 # MODULE CLASSES
 # =============================================================================
 class Dataset(abc.ABC, torch.utils.data.Dataset):
-    """ The base class of map-style dataset.
+    """ The base class of map-style dataset."""
 
-    Parameters
-    ----------
-    graphs : list
-        objects in the dataset
-
-    Note
-    ----
-    This also supports iterative-style dataset by deleting `__getitem__`
-    and `__len__` function.
-
-
-    """
     def __init__(self, ds=None):
         super(Dataset, self).__init__()
         self.ds = ds
@@ -38,12 +26,12 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
 
     def __getitem__(self, idx):
         if self.ds is None:
-            raise RuntimeError('Empty molecule dataset.')
+            raise RuntimeError("Empty molecule dataset.")
 
-        if isinstance(idx, int): # sinlge element
+        if isinstance(idx, int):  # sinlge element
             return self.ds[idx]
 
-        elif isinstance(idx, slice): # implement slicing
+        elif isinstance(idx, slice):  # implement slicing
             # return a Dataset object rather than list
             return self.__class__(ds=self.ds[idx])
 
@@ -55,21 +43,17 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
         return ds
 
     def split(self, *args, **kwargs):
-        """ Split the dataset according to some partition.
-
-        Parameters
-        ----------
-        partition : sequence of integers or floats
-
-        """
+        """Split the dataset according to some partition. """
         ds = piont.data.utils.split(self, *args, **kwargs)
         return ds
 
     def batch(self, *args, **kwargs):
+        """Batch dataset."""
         ds = pinot.data.utils.batch(self, *args, **kwargs)
         return ds
 
     def from_csv(self, *args, **kwargs):
+        """Read csv dataset. """
         self.ds = pinot.data.utils.from_csv(*args, **kwargs)()
         return self
 
@@ -77,7 +61,16 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
 class TemporalDataset(Dataset):
     """ Dataset with time.
 
+    Methods
+    -------
+    from_csv : Read data from csv.
+
+    split_by_time : Split dataset by a certain date.
+
+    filter_by_time : Filter the data by a certain date.
+
     """
+
     def __init__(self, ds=None):
         super(TemporalDataset, self).__init__(ds)
 
@@ -92,10 +85,40 @@ class TemporalDataset(Dataset):
         dropna=False,
         toolkit="rdkit",
     ):
-        """ Read csv from file.
+        """Read csv from file.
+
+        Parameters
+        ----------
+        path : `str`
+            Path to the csv file.
+
+        smiles_col : `int`
+            The column with SMILES strings.
+
+        y_cols : `List` of `int`
+            The columns with SMILES strings.
+
+        time_col : `int`
+            The column with time.
+
+        scale : `float`
+             (Default value = 1.0)
+             Scaling the input.
+
+        dropna : `bool`
+             (Default value = False)
+             Whether to drop `NaN` values in the column.
+
+
+        toolkit : `str`. `rdkit` or `openeye`
+             (Default value = "rdkit")
+             Toolkit used to read molecules.
+
+
         """
 
         def _from_csv():
+            """ """
             df = pd.read_csv(path, error_bad_lines=False)
 
             df = df.sort_values(by=df.columns[time_col], ascending=True)
@@ -106,7 +129,6 @@ class TemporalDataset(Dataset):
             df_smiles = df.iloc[:, smiles_col]
             df_y = df.iloc[:, y_cols]
             df_time = df.iloc[:, time_col]
-
 
             if toolkit == "rdkit":
                 from rdkit import Chem
@@ -127,7 +149,6 @@ class TemporalDataset(Dataset):
             elif toolkit == "openeye":
                 raise NotImplementedError
 
-
             ds = list(
                 zip(
                     gs,
@@ -136,7 +157,7 @@ class TemporalDataset(Dataset):
                             scale * df_y.values[idxs], dtype=torch.float32
                         )
                     ),
-                   list(df_time.values[idxs]),
+                    list(df_time.values[idxs]),
                 )
             )
 
@@ -147,6 +168,7 @@ class TemporalDataset(Dataset):
         return self
 
     def split_by_time(self, time):
+        """ Split dataset by a certain date. """
         before = []
         after = []
 
@@ -157,13 +179,28 @@ class TemporalDataset(Dataset):
             if t >= time:
                 after.append((g, y))
 
-
         before = Dataset(before)
         after = Dataset(after)
 
         return before, after
 
-    def filter_by_time(self, after='1989-06-04', before='2666-12-31'):
+    def filter_by_time(self, after="1989-06-04", before="2666-12-31"):
+        """ Filter the data by a certain date.
+
+        Parameters
+        ----------
+        after : `str`
+             (Default value = '1989-06-04')
+
+
+        before : `str`
+             (Default value = '2666-12-31')
+
+        Returns
+        -------
+        between : `List` of `(dgl.DGLGraph, torch.Tensor)`
+
+        """
         between = []
         for g, y, t in self.ds:
             if after <= t <= before:

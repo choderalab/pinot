@@ -12,6 +12,17 @@ import pandas as pd
 # MODULE FUNCTIONS
 # =============================================================================
 def dataframe(results_dict):
+    """
+
+    Parameters
+    ----------
+    results_dict :
+        
+
+    Returns
+    -------
+
+    """
     # get all the results
     metrics = list(list(results_dict.values())[0].keys())
     ds_names = list(results_dict.keys())
@@ -28,6 +39,17 @@ def dataframe(results_dict):
 
 
 def curve(results_dict):
+    """
+
+    Parameters
+    ----------
+    results_dict :
+        
+
+    Returns
+    -------
+
+    """
     curve_dict = {}
 
     # get all the results
@@ -53,11 +75,33 @@ def curve(results_dict):
 
 
 def markdown(results_dict):
+    """
+
+    Parameters
+    ----------
+    results_dict :
+        
+
+    Returns
+    -------
+
+    """
     df = dataframe(results_dict)
     return df.to_markdown()
 
 
 def visual(results_dict):
+    """
+
+    Parameters
+    ----------
+    results_dict :
+        
+
+    Returns
+    -------
+
+    """
     # make plots less ugly
     from matplotlib import pyplot as plt
 
@@ -100,6 +144,17 @@ def visual(results_dict):
 
 
 def visual_multiple(results_dicts):
+    """
+
+    Parameters
+    ----------
+    results_dicts :
+        
+
+    Returns
+    -------
+
+    """
     from matplotlib import pyplot as plt
     from matplotlib import cm as cm
 
@@ -164,6 +219,17 @@ def visual_multiple(results_dicts):
 
 
 def visual_base64(results_dict):
+    """
+
+    Parameters
+    ----------
+    results_dict :
+        
+
+    Returns
+    -------
+
+    """
     fig = visual(results_dict)
     import io
     import base64
@@ -177,6 +243,17 @@ def visual_base64(results_dict):
 
 
 def html(results_dict):
+    """
+
+    Parameters
+    ----------
+    results_dict :
+        
+
+    Returns
+    -------
+
+    """
     html_string = ""
 
     if isinstance(results_dict, dict):
@@ -205,6 +282,17 @@ def html(results_dict):
 
 
 def html_multiple_train_and_test(results):
+    """
+
+    Parameters
+    ----------
+    results :
+        
+
+    Returns
+    -------
+
+    """
     html_string = ""
     for param, result in results:
         html_string += "<p><br><br><br>" + str(param) + "<p/>"
@@ -215,6 +303,17 @@ def html_multiple_train_and_test(results):
 
 
 def html_multiple_train_and_test_2d_grid(results):
+    """
+
+    Parameters
+    ----------
+    results :
+        
+
+    Returns
+    -------
+
+    """
     # make sure there are only two paramter types
     import copy
 

@@ -6,6 +6,21 @@ import dgl
 
 
 class Sequential(torch.nn.Module):
+    """ Sequentially staggered graph neural networks.
+
+    Parameters
+    ----------
+    layer : `torch.nn.Module`
+        Base layer for the neural networks.
+
+    config : `List` of `int` and `str`
+        Configuration of the neural networks.
+
+    
+
+
+    """
+
     def __init__(
         self,
         layer,
@@ -61,6 +76,7 @@ class Sequential(torch.nn.Module):
                 self.exes.append("o" + str(idx))
 
     def forward(self, g, x=None, pool=lambda g: dgl.sum_nodes(g, "h")):
+        """ Forward pass. """
 
         if x is None:
             x = g.ndata["h"]
@@ -81,6 +97,7 @@ class Sequential(torch.nn.Module):
         return x
 
     def pool(self, g, h, pool=lambda g: dgl.sum_nodes(g, "h")):
+        """ Pooling function. """
         with g.local_scope():
             g.ndata["h"] = h
             return pool(g)

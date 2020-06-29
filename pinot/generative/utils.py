@@ -11,8 +11,16 @@ import scipy.sparse as sp
 # MODULE FUNCTIONS
 # =============================================================================
 def graph_from_adjacency_matrix(a):
-    """ Utility function to convert adjacency matrix to graph while enforcing
+    """Utility function to convert adjacency matrix to graph while enforcing
     that all edges are bi-directionol.
+
+    Parameters
+    ----------
+    a :
+        
+
+    Returns
+    -------
 
     """
     # TODO: think about other strategies
@@ -31,6 +39,19 @@ def graph_from_adjacency_matrix(a):
 
 
 def prepare_semi_supervised_data(unlabeled_data, labeled_data):
+    """
+
+    Parameters
+    ----------
+    unlabeled_data :
+        
+    labeled_data :
+        
+
+    Returns
+    -------
+
+    """
     # Mix labelled and unlabelled data together
     semi_supervised_data = []
 
@@ -43,7 +64,20 @@ def prepare_semi_supervised_data(unlabeled_data, labeled_data):
 
 
 def batch_semi_supervised(ds, batch_size, seed=2666):
-    """ Batch graphs and values after shuffling.
+    """Batch graphs and values after shuffling.
+
+    Parameters
+    ----------
+    ds :
+        
+    batch_size :
+        
+    seed :
+         (Default value = 2666)
+
+    Returns
+    -------
+
     """
     # get the numebr of data
     n_data_points = len(ds)
@@ -69,8 +103,20 @@ def batch_semi_supervised(ds, batch_size, seed=2666):
 def prepare_semi_supervised_data_from_labeled_data(
     labeled_data, r=0.2, seed=2666
 ):
-    """
-    r is the ratio of labelled data turning into unlabelled
+    """r is the ratio of labelled data turning into unlabelled
+
+    Parameters
+    ----------
+    labeled_data :
+        
+    r :
+         (Default value = 0.2)
+    seed :
+         (Default value = 2666)
+
+    Returns
+    -------
+
     """
     semi_data = []
     small_labeled_data = []

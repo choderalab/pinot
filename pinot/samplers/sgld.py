@@ -7,10 +7,17 @@ from torch.optim import Optimizer
 
 
 class SGLD(Optimizer):
-    """ Stochastic Gradient Langevin Dynamics Sampler with preconditioning.
+    """Stochastic Gradient Langevin Dynamics Sampler with preconditioning.
         Optimization variable is viewed as a posterior sample under Stochastic
         Gradient Langevin Dynamics with noise rescaled in eaach dimension
         according to RMSProp.
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+
     """
 
     def __init__(
@@ -69,6 +76,17 @@ class SGLD(Optimizer):
         super().__init__(params, defaults)
 
     def step(self, closure=None):
+        """
+
+        Parameters
+        ----------
+        closure :
+             (Default value = None)
+
+        Returns
+        -------
+
+        """
         loss = None
 
         if closure is not None:

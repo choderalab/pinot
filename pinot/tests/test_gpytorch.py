@@ -2,11 +2,13 @@ import pytest
 
 
 def test_import():
+    """ """
     import pinot.net
 
 
 @pytest.fixture
 def net():
+    """ """
     import pinot
 
     layer = pinot.representation.dgl_legacy.GN
@@ -16,7 +18,7 @@ def net():
 
     net = pinot.Net(
         net_representation,
-        output_regressor=pinot.regressors.VariationalGaussianProcessRegressor
+        output_regressor=pinot.regressors.VariationalGaussianProcessRegressor,
     )
 
     return net
@@ -24,6 +26,7 @@ def net():
 
 @pytest.fixture
 def ds0():
+    """ """
     import torch
     import pinot
 
@@ -33,10 +36,32 @@ def ds0():
 
 
 def test_init(net):
+    """
+
+    Parameters
+    ----------
+    net :
+        
+
+    Returns
+    -------
+
+    """
     net
 
 
 def test_condition(net):
+    """
+
+    Parameters
+    ----------
+    net :
+        
+
+    Returns
+    -------
+
+    """
     import torch
     import pinot
 
@@ -48,11 +73,35 @@ def test_condition(net):
 
 
 def test_train_eval(net):
+    """
+
+    Parameters
+    ----------
+    net :
+        
+
+    Returns
+    -------
+
+    """
     net.train()
     net.eval()
 
 
 def test_train_one_step(net, ds0):
+    """
+
+    Parameters
+    ----------
+    net :
+        
+    ds0 :
+        
+
+    Returns
+    -------
+
+    """
     import torch
 
     g, y = ds0

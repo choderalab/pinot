@@ -10,27 +10,12 @@ from pinot.regressors.base_regressor import BaseRegressor
 # MODULE CLASSES
 # =============================================================================
 class NeuralNetworkRegressor(BaseRegressor):
-    """ Head for MaximumLikelihoodEstimation (MLE).
+    """Regressor for MaximumLikelihoodEstimation (MLE).
 
-    Methods
-    -------
-    condition :
-        input: latent representation, tensor (n, d)
-        output: distribution
-
-    Attributes
+    Parameters
     ----------
-    measurement_dimension : dimension of the measurements to be modeled.
-    output_regression : a `torch.nn.Module` or None,
-        if None, this will be set as a simple `Linear` layer that inputs
-        the latent dimension and output the number of parameters for
-        `self.distribution_class`
-    noise_model : either a string (
-        one of
-            'normal-homoschedastic',
-            'normal-heteroschedastic',
-            'normal-homoschedastic-fixed')
-        or a function that transforms a set of parameters.
+    in_features : `int`
+        Input features on the latent space.
 
     """
 
@@ -56,6 +41,17 @@ class NeuralNetworkRegressor(BaseRegressor):
             )
 
             def output_regression(theta):
+                """
+
+                Parameters
+                ----------
+                theta :
+
+
+                Returns
+                -------
+
+                """
                 return [f(theta) for f in self._output_regression]
 
         # bookkeeping
@@ -63,11 +59,18 @@ class NeuralNetworkRegressor(BaseRegressor):
         self.output_regression = output_regression
 
     def condition(self, h, **kwargs):
-        """ Compute the output distribution.
+        """Compute the output distribution.
 
         Parameters
         ----------
-        h : tensor, shape=(n, d)
+        h : `torch.Tensor`, `(n_te, hidden_dimension)`
+            Latent input.
+
+        Returns
+        -------
+        distribution : `torch.distributions.Distribution`
+            Predictie distribution.
+
 
         """
 

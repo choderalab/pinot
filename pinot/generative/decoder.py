@@ -4,6 +4,7 @@ import torch.nn.functional as F
 from pinot.generative.losses import negative_elbo
 import dgl
 
+
 class InnerProductDecoder(nn.Module):
     """Decoder for using inner product for edge prediction."""
 
@@ -12,8 +13,17 @@ class InnerProductDecoder(nn.Module):
         self.dropout = dropout
 
     def forward(self, z):
-        """ Returns a symmetric adjacency matrix of size (N,N)
+        """Returns a symmetric adjacency matrix of size (N,N)
         where A[i,j] = probability there is an edge between nodes i and j
+
+        Parameters
+        ----------
+        z :
+            
+
+        Returns
+        -------
+
         """
         z = F.dropout(z, self.dropout, training=self.training)
         adj = torch.mm(z, z.t())
@@ -21,8 +31,15 @@ class InnerProductDecoder(nn.Module):
 
 
 class EdgeAndNodeDecoder(nn.Module):
-    """ Decoder that returns both a predicted adjacency matrix
+    """Decoder that returns both a predicted adjacency matrix
         and node identities
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+
     """
 
     def __init__(self, feature_dim, num_atom_types, hidden_dim=64, dropout=0):
@@ -36,16 +53,24 @@ class EdgeAndNodeDecoder(nn.Module):
         )
 
     def forward(self, z):
-        """
-        Arg:
+        """Arg:
             z (FloatTensor):
                 Shape (N, hidden_dim)
-        Returns:
+
+        Parameters
+        ----------
+        z :
+            
+
+        Returns
+        -------
+        
             (adj, node_preds)
-                adj (FloatTensor): has shape (N, N) is a matrix where entry (i.j)
-                    stores the probability that there is an edge between atoms i,j
-                node_preds (FloatTensor): has shape (N, num_atom_types) where each
-                    row i stores the probability of the identity of atom i
+            adj (FloatTensor): has shape (N, N) is a matrix where entry (i.j)
+            stores the probability that there is an edge between atoms i,j
+            node_preds (FloatTensor): has shape (N, num_atom_types) where each
+            row i stores the probability of the identity of atom i
+
         """
         z_prime = F.dropout(z, self.dropout, training=self.training)
         adj = torch.mm(z_prime, z_prime.t())
@@ -54,8 +79,15 @@ class EdgeAndNodeDecoder(nn.Module):
 
 
 class SequentialDecoder(nn.Module):
-    """ Simple decoder where the node identity prediction is dependent
+    """Simple decoder where the node identity prediction is dependent
     on the adjacency matrix.
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+
     Attributes
     ----------
     z_to_zx : torch.nn.Module
@@ -107,6 +139,17 @@ class SequentialDecoder(nn.Module):
         )
 
     def forward(self, z):
+        """
+
+        Parameters
+        ----------
+        z :
+            
+
+        Returns
+        -------
+
+        """
         # (N, Dx)
         zx = self.z_to_zx(z)
         # (N, Da)
@@ -122,20 +165,34 @@ class SequentialDecoder(nn.Module):
 
 
 class DecoderNetwork(nn.Module):
-    """
-    """
+    """ """
+
     def __init__(self, embedding_dim, num_atom_types):
         super(DecoderNetwork, self).__init__()
         self.embedding_dim = embedding_dim
         self.decoder = SequentialDecoder(embedding_dim, num_atom_types)
 
     def forward(self, g, z_sample):
+        """
+
+        Parameters
+        ----------
+        g :
+            
+        z_sample :
+            
+
+        Returns
+        -------
+
+        """
         with g.local_scope():
             # Create a new graph with sampled representations
             g.ndata["h"] = z_sample
             # Unbatch into individual subgraphs
             gs_unbatched = dgl.unbatch(g)
             # Decode each subgraph
-            decoded_subgraphs = [self.decoder(g_sample.ndata["h"]) \
-                for g_sample in gs_unbatched]
+            decoded_subgraphs = [
+                self.decoder(g_sample.ndata["h"]) for g_sample in gs_unbatched
+            ]
             return decoded_subgraphs

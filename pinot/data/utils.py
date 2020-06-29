@@ -24,10 +24,36 @@ def from_csv(
     shuffle=True,
     **kwargs
 ):
-    """ Read csv from file.
+    """Read csv from file.
+
+    Parameters
+    ----------
+    path :
+        
+    toolkit :
+         (Default value = "rdkit")
+    smiles_col :
+         (Default value = -1)
+    y_cols :
+         (Default value = [-2])
+    seed :
+         (Default value = 2666)
+    scale :
+         (Default value = 1.0)
+    dropna :
+         (Default value = False)
+    shuffle :
+         (Default value = True)
+    **kwargs :
+        
+
+    Returns
+    -------
+
     """
 
     def _from_csv():
+        """ """
         df = pd.read_csv(path, error_bad_lines=False, **kwargs)
 
         if dropna is True:
@@ -76,10 +102,26 @@ def from_csv(
 
 
 def load_unlabeled_data(path, size=0.1, toolkit="rdkit", seed=2666):
-    """ Read from unlabeled data set as background data
+    """Read from unlabeled data set as background data
+
+    Parameters
+    ----------
+    path :
+        
+    size :
+         (Default value = 0.1)
+    toolkit :
+         (Default value = "rdkit")
+    seed :
+         (Default value = 2666)
+
+    Returns
+    -------
+
     """
 
     def _from_txt():
+        """ """
         f = open(path, "r")
         df_smiles = [line.rstrip() for line in f]
         # Shuffle the data
@@ -115,7 +157,16 @@ def load_unlabeled_data(path, size=0.1, toolkit="rdkit", seed=2666):
 
 
 def normalize(ds):
-    """ Get mean and std.
+    """Get mean and std.
+
+    Parameters
+    ----------
+    ds :
+        
+
+    Returns
+    -------
+
     """
 
     gs, ys = tuple(zip(*ds))
@@ -123,16 +174,49 @@ def normalize(ds):
     y_std = np.std(ys)
 
     def norm(y):
+        """
+
+        Parameters
+        ----------
+        y :
+            
+
+        Returns
+        -------
+
+        """
         return (y - y_mean) / y_std
 
     def unnorm(y):
+        """
+
+        Parameters
+        ----------
+        y :
+            
+
+        Returns
+        -------
+
+        """
         return y * y_std + y_mean
 
     return y_mean, y_std, norm, unnorm
 
 
 def split(ds, partition):
-    """ Split the dataset according to some partition.
+    """Split the dataset according to some partition.
+
+    Parameters
+    ----------
+    ds :
+        
+    partition :
+        
+
+    Returns
+    -------
+
     """
     n_data = len(ds)
 
@@ -149,7 +233,22 @@ def split(ds, partition):
 
 
 def batch(ds, batch_size, seed=2666, shuffle=False):
-    """ Batch graphs and values after shuffling.
+    """Batch graphs and values after shuffling.
+
+    Parameters
+    ----------
+    ds :
+        
+    batch_size :
+        
+    seed :
+         (Default value = 2666)
+    shuffle :
+         (Default value = False)
+
+    Returns
+    -------
+
     """
     # get the numebr of data
     n_data_points = len(ds)
@@ -158,7 +257,6 @@ def batch(ds, batch_size, seed=2666, shuffle=False):
     if shuffle is True:
         random.seed(seed)
         random.shuffle(ds)
-
 
     gs, ys = tuple(zip(*ds))
 
@@ -174,13 +272,27 @@ def batch(ds, batch_size, seed=2666, shuffle=False):
 
     return list(zip(gs_batched, ys_batched))
 
+
 def prepare_semi_supervised_data(unlabelled_data, labelled_data, seed=2666):
-    """ Create a semi-supervised data by mixing unlabelled and labelled
+    """Create a semi-supervised data by mixing unlabelled and labelled
     data. An example of labelled data can be readily accessed via
     `pinot.data.zinc_tiny()`
+
+    Parameters
+    ----------
+    unlabelled_data :
+        
+    labelled_data :
+        
+    seed :
+         (Default value = 2666)
+
+    Returns
+    -------
+
     """
     semi_supervised_data = []
-    
+
     for (g, y) in unlabelled_data:
         semi_supervised_data.append((g, torch.tensor([np.nan])))
     for (g, y) in labelled_data:
@@ -189,29 +301,43 @@ def prepare_semi_supervised_data(unlabelled_data, labelled_data, seed=2666):
     # Shuffle the combined data
     np.random.seed(seed)
     np.random.shuffle(semi_supervised_data)
-        
+
     return semi_supervised_data
 
 
-def prepare_semi_supeprvised_data_from_labeled_data(labelled_data, r=0.2, seed=2666):
-    """ Create semi-supervised data from labelled data by randomly removing the
-    labels for (1-r) of the data points. 
+def prepare_semi_supeprvised_data_from_labeled_data(
+    labelled_data, r=0.2, seed=2666
+):
+    """Create semi-supervised data from labelled data by randomly removing the
+    labels for (1-r) of the data points.
 
-    Returns:
-        semi_data: the semi-supervised data with the same number of
-            data points as labelled_data. However, only a fraction r
-            of the points have labels
+    Parameters
+    ----------
+    labelled_data :
+        
+    r :
+         (Default value = 0.2)
+    seed :
+         (Default value = 2666)
 
-        small_labelled_data: the fraction r of the points with labels
+    Returns
+    -------
+    semi_data
+        the semi-supervised data with the same number of
+        data points as labelled_data. However, only a fraction r
+        of the points have labels
+    small_labelled_data
+        the fraction r of the points with labels
+
     """
     semi_data = []
     small_labelled_data = []
-    
+
     np.random.seed(seed)
-    for (g,y) in labelled_data:
+    for (g, y) in labelled_data:
         if np.random.rand() < r:
             semi_data.append((g, y))
-            small_labelled_data.append((g,y))
+            small_labelled_data.append((g, y))
         else:
             semi_data.append((g, torch.tensor([np.nan])))
     return semi_data, small_labelled_data

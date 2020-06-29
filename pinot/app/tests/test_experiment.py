@@ -3,10 +3,12 @@ import torch
 
 
 def test_import():
+    """ """
     import pinot.app.experiment
 
 
 def test_train():
+    """ """
     import pinot
 
     layer = pinot.representation.dgl_legacy.GN
@@ -27,6 +29,7 @@ def test_train():
 
 
 def test_test():
+    """ """
     import pinot
     import copy
 
@@ -56,6 +59,7 @@ def test_test():
 
 
 def test_train_and_test():
+    """ """
     import pinot
 
     layer = pinot.representation.dgl_legacy.gn()
