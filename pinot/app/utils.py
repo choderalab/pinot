@@ -12,11 +12,25 @@ import numpy as np
 
 
 def train_once(net, ds_tr, opt):
-    """ Train the model for one batch.
+    """Train the model for one batch.
+
+    Parameters
+    ----------
+    net :
+        
+    ds_tr :
+        
+    opt :
+        
+
+    Returns
+    -------
+
     """
     for g, y in ds_tr:
 
         def l():
+            """ """
             loss = torch.sum(net.loss(g, y))
             opt.zero_grad()
             loss.backward()
@@ -28,6 +42,27 @@ def train_once(net, ds_tr, opt):
 
 
 def train(net, ds_tr, ds_te, opt, reporters, n_epochs):
+    """
+
+    Parameters
+    ----------
+    net :
+        
+    ds_tr :
+        
+    ds_te :
+        
+    opt :
+        
+    reporters :
+        
+    n_epochs :
+        
+
+    Returns
+    -------
+
+    """
     [reporter.before() for reporter in reporters]
 
     for _ in range(n_epochs):
@@ -40,6 +75,23 @@ def train(net, ds_tr, ds_te, opt, reporters, n_epochs):
 
 
 def optimizer_translation(opt_string, lr, *args, **kwargs):
+    """
+
+    Parameters
+    ----------
+    opt_string :
+        
+    lr :
+        
+    *args :
+        
+    **kwargs :
+        
+
+    Returns
+    -------
+
+    """
 
     if opt_string.lower() == "bbb":
         opt = lambda net: pinot.BBB(

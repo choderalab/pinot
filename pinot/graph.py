@@ -13,6 +13,17 @@ import torch
 
 
 def fp_oe(atom):
+    """
+
+    Parameters
+    ----------
+    atom :
+        
+
+    Returns
+    -------
+
+    """
     from openeye import oechem
 
     HYBRIDIZATION_OE = {
@@ -61,6 +72,17 @@ def fp_oe(atom):
 
 
 def fp_rdkit(atom):
+    """
+
+    Parameters
+    ----------
+    atom :
+        
+
+    Returns
+    -------
+
+    """
     from rdkit import Chem
 
     HYBRIDIZATION_RDKIT = {
@@ -114,6 +136,19 @@ def fp_rdkit(atom):
 
 
 def from_oemol(mol, use_fp=True):
+    """
+
+    Parameters
+    ----------
+    mol :
+        
+    use_fp :
+         (Default value = True)
+
+    Returns
+    -------
+
+    """
     from openeye import oechem
 
     # initialize graph
@@ -157,6 +192,19 @@ def from_oemol(mol, use_fp=True):
 
 
 def from_rdkit_mol(mol, use_fp=True):
+    """
+
+    Parameters
+    ----------
+    mol :
+        
+    use_fp :
+         (Default value = True)
+
+    Returns
+    -------
+
+    """
     from rdkit import Chem
 
     # initialize graph

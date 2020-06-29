@@ -3,6 +3,7 @@ import torch
 
 
 def test_import():
+    """ """
     import pinot
     import pinot.active
     import pinot.active.acquisition
@@ -13,10 +14,22 @@ def test_import():
 
 @pytest.fixture
 def normal():
+    """ """
     return torch.distributions.normal.Normal(0.0, 1.0)
 
 
 def test_pi(normal):
+    """
+
+    Parameters
+    ----------
+    normal :
+        
+
+    Returns
+    -------
+
+    """
     from pinot.active.acquisition import probability_of_improvement
 
     pi = probability_of_improvement(normal)
@@ -24,6 +37,17 @@ def test_pi(normal):
 
 
 def test_ei(normal):
+    """
+
+    Parameters
+    ----------
+    normal :
+        
+
+    Returns
+    -------
+
+    """
     from pinot.active.acquisition import expected_improvement
 
     ei = expected_improvement(normal)
@@ -31,6 +55,17 @@ def test_ei(normal):
 
 
 def test_ucb(normal):
+    """
+
+    Parameters
+    ----------
+    normal :
+        
+
+    Returns
+    -------
+
+    """
     from pinot.active.acquisition import upper_confidence_bound
 
     ucb = upper_confidence_bound(normal, kappa=0.95)

@@ -5,6 +5,7 @@ import numpy as np
 
 @pytest.fixture
 def representation():
+    """ """
     layer = pinot.representation.dgl_legacy.gn()
     representation = pinot.representation.Sequential(
         layer,
@@ -14,6 +15,7 @@ def representation():
 
 @pytest.fixture
 def ds():
+    """ """
     ds = pinot.data.esol()[:8]
     ds = pinot.data.utils.batch(ds, 4)
     return ds
@@ -33,6 +35,23 @@ def ds():
     ]
 )
 def test_train(net, regressor, representation, ds):
+    """
+
+    Parameters
+    ----------
+    net :
+        
+    regressor :
+        
+    representation :
+        
+    ds :
+        
+
+    Returns
+    -------
+
+    """
     net = net(
         output_regressor=regressor,
         representation=representation

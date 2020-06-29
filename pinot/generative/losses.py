@@ -6,27 +6,32 @@ import dgl
 
 def negative_ELBO(edge_preds, adj, mu, logvar, norm):
     """Compute negative ELBO loss for Graph Variational Auto Encoders
-    Args:
-        preds (FloatTensor):
-            shape (N, N): a matrix where entry (i,j) in [0,1] denotes the predicted
-            probability that there is an edge between atom i and j
 
-        labels (FloatTensor):
-            shape (N, N): the adjacency matrix of the molecular graph
+    Parameters
+    ----------
+    preds : FloatTensor
+        shape (N, N): a matrix where entry (i,j) in [0,1] denotes the predicted
+        probability that there is an edge between atom i and j
+    labels : FloatTensor
+        shape (N, N): the adjacency matrix of the molecular graph
+    mu : FloatTensor
+        shape (N, hidden_dim): The mean of the approximate posterior distribution over
+        the nodes' (atoms) latent representation
+    logvar : FloatTensor
+        shape (N, hidden_dim): The log variance of the approximate posterior distribution
+        over the nodes' latent representation
+    norm : Float
+        
+    edge_preds :
+        
+    adj :
+        
 
-        mu (FloatTensor):
-            shape (N, hidden_dim): The mean of the approximate posterior distribution over
-            the nodes' (atoms) latent representation
-
-        logvar (FloatTensor):
-            shape (N, hidden_dim): The log variance of the approximate posterior distribution
-            over the nodes' latent representation
+    Returns
+    -------
     
-        norm (Float):
-            Normalizing factor for the log likelihood term in the ELBO
-    Returns:
         loss (Float)
-            The negative ELBO
+        The negative ELBO
 
     """
     n_nodes = edge_preds.shape[0]
@@ -52,36 +57,34 @@ def negative_ELBO(edge_preds, adj, mu, logvar, norm):
 def negative_ELBO_with_node_prediction(
     edge_preds, node_preds, adj, node_types, mu, logvar
 ):
-    """ Compute the negative ELBO loss function used in variational auto-encoder
-    The difference between this loss function and negative_ELBO is that this 
+    """Compute the negative ELBO loss function used in variational auto-encoder
+    The difference between this loss function and negative_ELBO is that this
     function also computes loss term from node's identity (atom type) prediction.
 
-    Args:
-        edge_preds (FloatTensor):
-            shape (N, N): a matrix where entry (i,j) in [0,1] denotes the predicted
-            probability that there is an edge between atom i and j
-        
-        node_preds (FloatTensor):
-            shape (N, num_atom_types): Each row i stores the predicted probability
-            of the type for atom i
+    Parameters
+    ----------
+    edge_preds : FloatTensor
+        shape (N, N): a matrix where entry (i,j) in [0,1] denotes the predicted
+        probability that there is an edge between atom i and j
+    node_preds : FloatTensor
+        shape (N, num_atom_types): Each row i stores the predicted probability
+        of the type for atom i
+    adj : FloatTensor
+        shape (N, N): the adjacency matrix of the molecular graph
+    node_types :
+        shape (N, num_atom_types): the true atom types in 1-hot form
+    mu : FloatTensor
+        shape (N, hidden_dim): The mean of the approximate posterior distribution over
+        the nodes' (atoms) latent representation
+    logvar : FloatTensor
+        shape (N, hidden_dim): The log variance of the approximate posterior distribution
+        over the nodes' latent representation
 
-        adj (FloatTensor):
-            shape (N, N): the adjacency matrix of the molecular graph
-
-        node_types:
-            shape (N, num_atom_types): the true atom types in 1-hot form
-
-        mu (FloatTensor):
-            shape (N, hidden_dim): The mean of the approximate posterior distribution over
-            the nodes' (atoms) latent representation
-
-        logvar (FloatTensor):
-            shape (N, hidden_dim): The log variance of the approximate posterior distribution
-            over the nodes' latent representation
-
-    Returns:
+    Returns
+    -------
+    
         loss (Float)
-            The negative ELBO
+        The negative ELBO
 
     """
     n_nodes = edge_preds.shape[0]
@@ -105,6 +108,23 @@ def negative_ELBO_with_node_prediction(
 
 
 def negative_elbo(decoded_subgraphs, mu, logvar, g):
+    """
+
+    Parameters
+    ----------
+    decoded_subgraphs :
+        
+    mu :
+        
+    logvar :
+        
+    g :
+        
+
+    Returns
+    -------
+
+    """
     # First unbatch all the graphs into individual
     # subgraphs
     gs_unbatched = dgl.unbatch(g)

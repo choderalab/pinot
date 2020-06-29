@@ -4,10 +4,15 @@ import torch
 
 
 class MultiTaskNet(pinot.Net):
-    """ An object that combines the representation and parameter
+    """An object that combines the representation and parameter
     learning, puts into a predicted distribution and calculates the
     corresponding divergence.
 
+    Parameters
+    ----------
+
+    Returns
+    -------
 
     Attributes
     ----------
@@ -26,7 +31,18 @@ class MultiTaskNet(pinot.Net):
 
 
     def condition(self, g, assay):
-        """ Compute the output distribution with sampled weights.
+        """Compute the output distribution with sampled weights.
+
+        Parameters
+        ----------
+        g :
+            
+        assay :
+            
+
+        Returns
+        -------
+
         """
         self.eval()
         h = self.representation(g)
@@ -52,7 +68,20 @@ class MultiTaskNet(pinot.Net):
 
         
     def condition_train(self, g, l, sampler=None):
-        """ Compute the output distribution with sampled weights.
+        """Compute the output distribution with sampled weights.
+
+        Parameters
+        ----------
+        g :
+            
+        l :
+            
+        sampler :
+             (Default value = None)
+
+        Returns
+        -------
+
         """
         h = self.representation(g)
 
@@ -82,7 +111,18 @@ class MultiTaskNet(pinot.Net):
         return distributions
 
     def loss(self, g, y):
-        """ Compute the loss with a input graph and a set of parameters.
+        """Compute the loss with a input graph and a set of parameters.
+
+        Parameters
+        ----------
+        g :
+            
+        y :
+            
+
+        Returns
+        -------
+
         """
         loss = 0.0
         l = self._generate_mask(y)
@@ -101,4 +141,15 @@ class MultiTaskNet(pinot.Net):
         return loss
 
     def _generate_mask(self, y):
+        """
+
+        Parameters
+        ----------
+        y :
+            
+
+        Returns
+        -------
+
+        """
         return ~torch.isnan(y)

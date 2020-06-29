@@ -6,6 +6,7 @@ import pinot
 
 
 def test_shallow_normal():
+    """ """
     net_representation = torch.nn.Linear(8, 2)
     net = pinot.Net(net_representation)
 
@@ -21,6 +22,7 @@ def test_shallow_normal():
     for _ in range(10):
 
         def l():
+            """ """
             opt.zero_grad()
             loss = net.loss(x, y).sum()
             loss.backward()

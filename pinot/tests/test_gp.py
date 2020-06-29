@@ -2,11 +2,13 @@ import pytest
 
 
 def test_import():
+    """ """
     import pinot.net
 
 
 @pytest.fixture
 def net():
+    """ """
     import pinot
 
     layer = pinot.representation.dgl_legacy.GN
@@ -23,10 +25,32 @@ def net():
 
 
 def test_init(net):
+    """
+
+    Parameters
+    ----------
+    net :
+        
+
+    Returns
+    -------
+
+    """
     net
 
 
 def test_condition(net):
+    """
+
+    Parameters
+    ----------
+    net :
+        
+
+    Returns
+    -------
+
+    """
     import torch
     import pinot
 

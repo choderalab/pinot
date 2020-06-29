@@ -5,10 +5,12 @@ import torch
 
 
 def test_import():
+    """ """
     import pinot.metrics
 
 
 def test_mse_and_rmse():
+    """ """
     import pinot
 
     # we only test here that:
@@ -37,6 +39,7 @@ def test_mse_and_rmse():
 
 
 def test_r2():
+    """ """
     import pinot
 
     x = np.random.normal(size=(10,))

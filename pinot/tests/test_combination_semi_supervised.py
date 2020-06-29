@@ -4,6 +4,7 @@ import torch
 
 @pytest.fixture
 def representation():
+    """ """
     layer = pinot.representation.dgl_legacy.gn()
     representation = pinot.representation.Sequential(
         layer,
@@ -13,28 +14,34 @@ def representation():
 
 @pytest.fixture
 def ds():
+    """ """
     ds = pinot.data.esol()[:8]
     ds = pinot.data.utils.batch(ds, 4)
     return ds
 
 @pytest.fixture
 def neural_network_regressor():
+    """ """
     return pinot.regressors.NeuralNetworkRegressor
 
 @pytest.fixture
 def variational_gaussian_process_regressor():
+    """ """
     return pinot.regressors.VariationalGaussianProcessRegressor
 
 @pytest.fixture
 def exact_gaussian_process_regressor():
+    """ """
     return pinot.regressors.ExactGaussianProcessRegressor
 
 @pytest.fixture
 def vanilla_net():
+    """ """
     return pinot.Net
 
 @pytest.fixture
 def semisupervised_net():
+    """ """
     return pinot.generative.semi_supervised_net.SemiSupervisedNet
 
 
@@ -45,6 +52,25 @@ def test_import(
     vanilla_net,
     semisupervised_net,
 ):
+    """
+
+    Parameters
+    ----------
+    neural_network_regressor :
+        
+    variational_gaussian_process_regressor :
+        
+    exact_gaussian_process_regressor :
+        
+    vanilla_net :
+        
+    semisupervised_net :
+        
+
+    Returns
+    -------
+
+    """
     neural_network_regressor
     variational_gaussian_process_regressor
     exact_gaussian_process_regressor
@@ -72,6 +98,23 @@ def test_import(
     ]
 )
 def test_init(net, regressor, representation, decoder):
+    """
+
+    Parameters
+    ----------
+    net :
+        
+    regressor :
+        
+    representation :
+        
+    decoder :
+        
+
+    Returns
+    -------
+
+    """
     net(
         output_regressor=regressor,
         representation=representation,
@@ -98,6 +141,25 @@ def test_init(net, regressor, representation, decoder):
     ]
 )
 def test_loss(net, regressor, representation, decoder, ds):
+    """
+
+    Parameters
+    ----------
+    net :
+        
+    regressor :
+        
+    representation :
+        
+    decoder :
+        
+    ds :
+        
+
+    Returns
+    -------
+
+    """
     net = net(
         output_regressor=regressor,
         representation=representation,

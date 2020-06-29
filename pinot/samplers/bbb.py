@@ -13,8 +13,7 @@ from pinot.samplers.base_sampler import BaseSampler
 # MODULE CLASSES
 # =============================================================================
 class BBB(BaseSampler):
-    """ Gaussian Variational Posterior Bayesian-by-Backprop.
-    """
+    """Gaussian Variational Posterior Bayesian-by-Backprop."""
 
     def __init__(
         self,
@@ -75,12 +74,17 @@ class BBB(BaseSampler):
 
     @torch.no_grad()
     def step(self, closure):
-        """ Performs a single optimization step.
+        """Performs a single optimization step.
 
         Parameters
         ----------
-        closure : callable
-            a closure function that returns the loss
+        closure :
+            
+
+        Returns
+        -------
+
+        
         """
 
         # just in case
@@ -176,9 +180,11 @@ class BBB(BaseSampler):
         self.optimizer.step()
 
     def zero_grad(self):
+        """ """
         self.optimizer.zero_grad()
 
     def sample_params(self):
+        """ """
         with torch.no_grad():
             for p, sigma in zip(
                 *[
@@ -195,6 +201,7 @@ class BBB(BaseSampler):
                 )
 
     def expectation_params(self):
+        """ """
         with torch.no_grad():
             for p, sigma in zip(
                 *[

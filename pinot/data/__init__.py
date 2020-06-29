@@ -68,7 +68,21 @@ moonshot_sorted = utils.from_csv(
 
 
 def load_moonshot_semi_supervised(unlabeled_size=0.1, seed=2666):
+    """
+
+    Parameters
+    ----------
+    unlabeled_size :
+         (Default value = 0.1)
+    seed :
+         (Default value = 2666)
+
+    Returns
+    -------
+
+    """
     def load():
+        """ """
         moonshot_labeled = moonshot() # Get labeled and unlabeled data
         moonshot_unlabeled = utils.load_unlabeled_data(os.path.dirname(utils.__file__) + "/moonshot_activity_synthetic.txt", unlabeled_size, seed=seed)()
         np.random.seed(seed)
@@ -87,7 +101,21 @@ moonshot_semi_all   = load_moonshot_semi_supervised(1.0)
 
 
 def load_esol_semi_supervised(unlabeled_size=0.1, seed=2666):
+    """
+
+    Parameters
+    ----------
+    unlabeled_size :
+         (Default value = 0.1)
+    seed :
+         (Default value = 2666)
+
+    Returns
+    -------
+
+    """
     def load():
+        """ """
         esol_labeled = esol() # Get labeled and unlabeled data
         esol_unlabeled = utils.load_unlabeled_data(os.path.dirname(utils.__file__) + "/esol_synthetic_smiles.txt", unlabeled_size, seed=seed)()
         np.random.seed(seed)

@@ -7,7 +7,16 @@ import numpy as np
 
 
 def rbf_kernel(x):
-    """ Compute the pairwise RBF kernel for a stack of vectors.
+    """Compute the pairwise RBF kernel for a stack of vectors.
+
+    Parameters
+    ----------
+    x :
+        
+
+    Returns
+    -------
+
     """
     # compute pairwise distance
     pairwise_distance_square = torch.pow(x[:, None, :] - x[None, :, :], 2).sum(
@@ -26,6 +35,19 @@ def rbf_kernel(x):
 
 
 def svgd_grad(theta, grad):
+    """
+
+    Parameters
+    ----------
+    theta :
+        
+    grad :
+        
+
+    Returns
+    -------
+
+    """
     # theta and grad here is stacked among particles
 
     # compute kernel
