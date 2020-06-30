@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from pinot.generative.losses import negative_elbo
 import dgl
 
 
@@ -19,7 +18,7 @@ class InnerProductDecoder(nn.Module):
         Parameters
         ----------
         z :
-            
+
 
         Returns
         -------
@@ -60,11 +59,11 @@ class EdgeAndNodeDecoder(nn.Module):
         Parameters
         ----------
         z :
-            
+
 
         Returns
         -------
-        
+
             (adj, node_preds)
             adj (FloatTensor): has shape (N, N) is a matrix where entry (i.j)
             stores the probability that there is an edge between atoms i,j
@@ -144,7 +143,7 @@ class SequentialDecoder(nn.Module):
         Parameters
         ----------
         z :
-            
+
 
         Returns
         -------
@@ -178,9 +177,9 @@ class DecoderNetwork(nn.Module):
         Parameters
         ----------
         g :
-            
+
         z_sample :
-            
+
 
         Returns
         -------

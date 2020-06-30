@@ -4,8 +4,6 @@
 # IMPORTS
 # =============================================================================
 import torch
-import dgl
-import pinot
 from pinot.samplers.base_sampler import BaseSampler
 
 
@@ -79,12 +77,12 @@ class BBB(BaseSampler):
         Parameters
         ----------
         closure :
-            
+
 
         Returns
         -------
 
-        
+
         """
 
         # just in case

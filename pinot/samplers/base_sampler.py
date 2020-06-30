@@ -3,7 +3,6 @@
 # =============================================================================
 import torch
 import abc
-import copy
 from abc import abstractmethod
 
 # =============================================================================
@@ -22,9 +21,9 @@ class BaseSampler(torch.optim.Optimizer, abc.ABC):
         Parameters
         ----------
         *args :
-            
+
         **kwargs :
-            
+
 
         Returns
         -------
@@ -39,9 +38,9 @@ class BaseSampler(torch.optim.Optimizer, abc.ABC):
         Parameters
         ----------
         *args :
-            
+
         **kwargs :
-            
+
 
         Returns
         -------

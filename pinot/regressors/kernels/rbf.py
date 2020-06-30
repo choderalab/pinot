@@ -2,8 +2,6 @@
 # IMPORTS
 # =============================================================================
 import torch
-import pinot
-import abc
 from pinot.regressors.kernels.base_kernel import BaseKernel
 
 # =============================================================================

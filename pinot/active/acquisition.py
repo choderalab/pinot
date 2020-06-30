@@ -1,13 +1,7 @@
 # =============================================================================
 # IMPORTS
 # =============================================================================
-import math
-
 import torch
-from torch import nn
-
-from botorch.posteriors.gpytorch import GPyTorchPosterior
-from gpytorch.distributions import MultivariateNormal
 
 # =============================================================================
 # MODULE FUNCTIONS
@@ -83,7 +77,7 @@ def uncertainty(distribution, y_best=0.0):
 
 def expected_improvement(distribution, y_best=0.0):
     r""" Probability of Improvement (PI).
-    
+
     Closed-form derivation (https://arxiv.org/abs/1206.2944):
 
         EI(x) = (\mu(x) - f(x_best)) * cdf(Z)] + [\sigma(x) * pdf(Z)] if \sigma(x) > 0
@@ -110,7 +104,7 @@ def expected_improvement(distribution, y_best=0.0):
     mu = distribution.mean
     sigma = distribution.stddev
     Z = (mu - y_best)/sigma
-    
+
     normal = torch.distributions.Normal(0, 1)
     cdf = lambda x: normal.cdf(x)
     pdf = lambda x: torch.exp(normal.log_prob(x))
