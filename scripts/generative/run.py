@@ -6,7 +6,7 @@ import numpy as np
 def run():
     # construct the vgae object
     vgae = pinot.generative.VGAE(units=32)
-    
+
     # grab some data
     ds_tr = pinot.data.esol()[:10]
 
@@ -25,7 +25,7 @@ def run():
             kwargs={})
 
     net = pinot.representation.Sequential(
-        model=layer,
+        layer,
         config=[32, 'tanh', 32, 'tanh'])
 
 
@@ -43,9 +43,9 @@ def run():
         print(loss)
         loss.backward()
         opt.step()
-    
+
     a = vgae.generate(x)
-    
+
     g = pinot.generative.utils.graph_from_adjacency_matrix(a)
 
     print(g)

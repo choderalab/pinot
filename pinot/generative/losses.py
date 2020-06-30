@@ -21,15 +21,15 @@ def negative_ELBO(edge_preds, adj, mu, logvar, norm):
         shape (N, hidden_dim): The log variance of the approximate posterior distribution
         over the nodes' latent representation
     norm : Float
-        
+
     edge_preds :
-        
+
     adj :
-        
+
 
     Returns
     -------
-    
+
         loss (Float)
         The negative ELBO
 
@@ -82,7 +82,7 @@ def negative_ELBO_with_node_prediction(
 
     Returns
     -------
-    
+
         loss (Float)
         The negative ELBO
 
@@ -113,13 +113,13 @@ def negative_elbo(decoded_subgraphs, mu, logvar, g):
     Parameters
     ----------
     decoded_subgraphs :
-        
+
     mu :
-        
+
     logvar :
-        
+
     g :
-        
+
 
     Returns
     -------
@@ -144,13 +144,13 @@ def negative_elbo(decoded_subgraphs, mu, logvar, g):
         node_nll = torch.sum(F.cross_entropy(decoded_nodes, node_types))
 
         loss += node_nll + edge_nll
-
-    KLD = (
-        -0.5
-        / g.number_of_nodes()
-        * torch.sum(
-            torch.sum(1 + 2 * logvar - mu.pow(2) - logvar.exp().pow(2), 1)
-        )
-    )
+    #
+    # KLD = (
+    #     -0.5
+    #     / g.number_of_nodes()
+    #     * torch.sum(
+    #         torch.sum(1 + 2 * logvar - mu.pow(2) - logvar.exp().pow(2), 1)
+    #     )
+    # )
 
     return loss  # + KLD

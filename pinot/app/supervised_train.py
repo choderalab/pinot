@@ -18,7 +18,7 @@ def run(args):
     Parameters
     ----------
     args :
-        
+
 
     Returns
     -------
@@ -83,15 +83,8 @@ def run(args):
         for param in net_representation.parameters():
             param.requires_grad = False
 
-    # get the foreground data
-    ds = getattr(pinot.data, args.data)()
-
     # Initialize the Net from with the generative model
     net = pinot.Net(net_representation, noise_model=args.noise_model)
-
-    optimizer = pinot.app.utils.optimizer_translation(
-        args.optimizer, lr=args.lr
-    )(net)
 
     # get the entire dataset
     ds = getattr(pinot.data, args.data)()

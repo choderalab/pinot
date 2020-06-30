@@ -269,7 +269,7 @@ class AdLaLa(BaseSampler):
 
         # call closure
         with torch.enable_grad():
-            loss = closure()
+            closure()
 
         for group in self.param_groups:
             for w in group["params"]:
@@ -338,7 +338,7 @@ class AdLaLa(BaseSampler):
 
         # call closure again, so that gradients are up-to-date
         with torch.enable_grad():
-            loss = closure()
+            closure()
 
         self.B_step(1, 1.0)  # requires gradient
         self.B_step(0, 1.0)  # requires gradient
@@ -347,12 +347,13 @@ class AdLaLa(BaseSampler):
     def sample_params(self):
         """ """
         self.zero_grad()
-
-        def closure():
-            """ """
-            for group in self.param_groups:
-                for w in group["params"]:
-                    w.backward(torch.zeros_like(w))
+        
+        #
+        # def closure():
+        #     """ """
+        #     for group in self.param_groups:
+        #         for w in group["params"]:
+        #             w.backward(torch.zeros_like(w))
 
         # self.step(closure)
 
