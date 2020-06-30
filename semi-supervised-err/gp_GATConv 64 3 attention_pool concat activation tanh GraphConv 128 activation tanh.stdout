@@ -1,0 +1,124 @@
+Sender: LSF System <lsfadmin@lt09>
+Subject: Job 15088080: <gpu-semi> in cluster <lila> Done
+
+Job <gpu-semi> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Jun 29 15:22:15 2020
+Job was executed on host(s) <12*lt09>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Jun 29 15:22:16 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Jun 29 15:22:16 2020
+Terminated at Mon Jun 29 15:24:41 2020
+Results reported at Mon Jun 29 15:24:41 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/semi_supervised/semi_supervised_comparison.py --n_epochs 1 --cuda --regressor_type gp --architecture GATConv 64 3 attention_pool concat activation tanh GraphConv 128 activation tanh --output /home/nguyenm5/coding/pinot/semi-supervised-out-2020-06-29/ --labeled_data moonshot --unlabeled_data moonshot_unlabeled_small
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   543.27 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.54 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                20
+    Run time :                                   146 sec.
+    Turnaround time :                            146 sec.
+
+The output (if any) follows:
+
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/semi-supervised-err/gp_GATConv 64 3 attention_pool concat activation tanh GraphConv 128 activation tanh.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lt09>
+Subject: Job 15088083: <gpu-semi> in cluster <lila> Done
+
+Job <gpu-semi> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Jun 29 15:25:21 2020
+Job was executed on host(s) <12*lt09>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Jun 29 15:25:22 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Jun 29 15:25:22 2020
+Terminated at Mon Jun 29 15:27:25 2020
+Results reported at Mon Jun 29 15:27:25 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/semi_supervised/semi_supervised_comparison.py --n_epochs 1 --cuda --regressor_type gp --architecture GATConv 64 3 attention_pool concat activation tanh GraphConv 128 activation tanh --output /home/nguyenm5/coding/pinot/semi-supervised-out-2020-06-29/ --labeled_data moonshot --unlabeled_data moonshot_unlabeled_small
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   568.30 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.63 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                20
+    Run time :                                   124 sec.
+    Turnaround time :                            124 sec.
+
+The output (if any) follows:
+
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/semi-supervised-err/gp_GATConv 64 3 attention_pool concat activation tanh GraphConv 128 activation tanh.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lt05>
+Subject: Job 15088088: <gpu-semi> in cluster <lila> Exited
+
+Job <gpu-semi> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Jun 29 15:30:36 2020
+Job was executed on host(s) <12*lt05>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Jun 29 15:30:36 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Jun 29 15:30:36 2020
+Terminated at Tue Jun 30 01:30:37 2020
+Results reported at Tue Jun 30 01:30:37 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/semi_supervised/semi_supervised_comparison.py --n_epochs 1000 --cuda --regressor_type gp --architecture GATConv 64 3 attention_pool concat activation tanh GraphConv 128 activation tanh --output /home/nguyenm5/coding/pinot/semi-supervised-out-2020-06-29/ --labeled_data moonshot --unlabeled_data moonshot_unlabeled_small
+------------------------------------------------------------
+
+TERM_RUNLIMIT: job killed after reaching LSF run time limit.
+Exited with exit code 140.
+
+Resource usage summary:
+
+    CPU time :                                   197086.55 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                20
+    Run time :                                   36001 sec.
+    Turnaround time :                            36001 sec.
+
+The output (if any) follows:
+
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/semi-supervised-err/gp_GATConv 64 3 attention_pool concat activation tanh GraphConv 128 activation tanh.stderr> for stderr output of this job.
+

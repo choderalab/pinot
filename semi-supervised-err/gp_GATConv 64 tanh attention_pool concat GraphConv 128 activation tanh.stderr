@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "scripts/semi_supervised/semi_supervised_comparison.py", line 101, in <module>
+    import pinot
+ModuleNotFoundError: No module named 'pinot'
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/semi_supervised/semi_supervised_comparison.py", line 197, in <module>
+    supNet, optimizer = get_net_and_optimizer(args, 0.) # Note that with unsup_scale = 0., this becomes a supervised only model
+  File "scripts/semi_supervised/semi_supervised_comparison.py", line 156, in get_net_and_optimizer
+    representation = pinot.representation.sequential.SequentialMix(
+  File "/home/nguyenm5/coding/pinot/pinot/representation/sequential.py", line 275, in __init__
+    layer_type, initialized_layer, layer_params = initialize_layer(layer_config, last_out_dim)
+  File "/home/nguyenm5/coding/pinot/pinot/representation/sequential.py", line 199, in initialize_layer
+    parameters = get_parameter(layer_config)
+  File "/home/nguyenm5/coding/pinot/pinot/representation/sequential.py", line 165, in get_parameter
+    parameters[param] = all_parameters[param](config[i])
+ValueError: invalid literal for int() with base 10: 'tanh'
