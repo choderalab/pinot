@@ -5,13 +5,11 @@ from collections import defaultdict
 
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
 
 import torch
 
 import pinot
 import pinot.active.experiment as experiment
-from pinot import multitask
 from pinot.generative import SemiSupervisedNet
 
 
@@ -23,8 +21,8 @@ class ActivePlot():
     def __init__(self, net, layer, config,
                  lr, optimizer_type, weighted_acquire,
                  data, strategy, acquisition, marginalize_batch, num_samples, q,
-                 device, num_trials, num_rounds, num_epochs):        
-        
+                 device, num_trials, num_rounds, num_epochs):
+
         # net config
         self.net = net
         self.layer = layer
@@ -33,7 +31,7 @@ class ActivePlot():
         # optimizer config
         self.lr = lr
         self.optimizer_type = optimizer_type
-        
+
         # experiment config
         self.data = data
         self.strategy = strategy
@@ -48,8 +46,8 @@ class ActivePlot():
         if self.net == 'semi':
             self.bo_cls = experiment.SemiSupervisedBayesOptExperiment
         elif self.net == 'multitask':
-            self.bo_cls = multitask.MultitaskBayesOptExperiment
-            self.train = multitask.MultitaskTrain
+            self.bo_cls = pinot.multitask.MultitaskBayesOptExperiment
+            self.train = pinot.multitask.MultitaskTrain
         else:
             self.bo_cls = experiment.BayesOptExperiment
 
@@ -88,7 +86,7 @@ class ActivePlot():
     def run_trials(self, ds):
         """
         Plot the results of an active training loop
-        
+
         Parameters
         ----------
         results : defaultdict of dict
@@ -108,23 +106,23 @@ class ActivePlot():
         gs, ys = ds[0]
         self.feat_dim = gs.ndata['h'].shape[1]
         actual_sol = torch.max(ys).item()
-        
+
         acq_fn = self.get_acquisition(gs)
-        
+
         # acquistion functions to be tested
         for i in range(self.num_trials):
             print(i)
-            
+
             # make fresh net and optimizer
             net = self.get_net().to(self.device)
-            
+
             optimizer = pinot.app.utils.optimizer_translation(
                 opt_string=self.optimizer_type,
                 lr=self.lr,
                 weight_decay=0.01,
                 kl_loss_scaling=1.0/float(len(ds[0][1]))
                 )
-            
+
             # instantiate experiment
             self.bo = self.bo_cls(
                 net=net,
@@ -146,7 +144,7 @@ class ActivePlot():
             # pad if experiment stopped early
             # candidates_acquired = limit + 1 because we begin with a blind pick
             results_size = self.num_rounds * self.q + 1
-            
+
             if self.net == 'multitask':
                 results_data = actual_sol*np.ones((results_size, ys.size(1)))
                 output = ys[x]
@@ -175,8 +173,8 @@ class ActivePlot():
     def get_acquisition(self, gs):
         """ Retrieve acquisition function and prepare for BO Experiment
         """
-        
-        '''        
+
+        '''
         batch_acquisitions = {'Expected Improvement': SeqAcquire(acq_fn='ei'),
                               'Probability of Improvement': SeqAcquire(acq_fn='pi'),
                               'Upper Confidence Bound': SeqAcquire(acq_fn='ucb', beta=0.95),
@@ -189,15 +187,18 @@ class ActivePlot():
                                    'Uncertainty': pinot.active.acquisition.expected_improvement,
                                    'Human': pinot.active.acquisition.temporal,
                                    'Random': pinot.active.acquisition.expected_improvement}
-        
+
         if self.strategy == 'batch':
-            acq_fn = batch_acquisitions[self.acquisition]
-            acq_fn = MCAcquire(
-                sequential_acq=acq_fn,
-                batch_size=gs.batch_size,
-                q=self.q,
-                marginalize_batch=self.marginalize_batch,
-                num_samples=self.num_samples)
+            raise NotImplementedError
+            # acq_fn = batch_acquisitions[self.acquisition]
+            # acq_fn = MCAcquire(
+            #     sequential_acq=acq_fn,
+            #     batch_size=gs.batch_size,
+            #     q=self.q,
+            #     marginalize_batch=self.marginalize_batch,
+            #     num_samples=self.num_samples)
+
+
         else:
             acq_fn = sequential_acquisitions[self.acquisition]
 
@@ -237,7 +238,7 @@ class ActivePlot():
 
         elif self.net == 'multitask':
             output_regressor = pinot.regressors.ExactGaussianProcessRegressor
-            net = multitask.MultitaskNet(
+            net = pinot.multitask.MultitaskNet(
                 representation=representation,
                 output_regressor=output_regressor,
             )
@@ -259,7 +260,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--lr', type=float, default=1e-4)
     parser.add_argument('--optimizer', type=str, default='Adam')
-    
+
     parser.add_argument('--data', type=str, default='esol')
     parser.add_argument('--strategy', type=str, default='sequential')
     parser.add_argument('--acquisition', type=str, default='ExpectedImprovement')
@@ -272,7 +273,7 @@ if __name__ == '__main__':
     parser.add_argument('--num_trials', type=int, default=1)
     parser.add_argument('--num_rounds', type=int, default=50)
     parser.add_argument('--num_epochs', type=int, default=10)
-    
+
     parser.add_argument('--index_provided', type=bool, default=True)
     parser.add_argument('--index', type=int, default=0)
 
@@ -283,7 +284,7 @@ if __name__ == '__main__':
         net=args.net,
         layer=args.representation,
         config=[32, 'tanh', 32, 'tanh', 32, 'tanh'],
-        
+
         # optimizer config
         optimizer_type=args.optimizer,
         lr=args.lr,
@@ -310,5 +311,5 @@ if __name__ == '__main__':
     if args.index_provided and args.weighted_acquire:
         filename = f'{args.net}_{args.representation}_{args.optimizer}_{args.data}_{args.strategy}_{args.acquisition}_q{args.q}_weighted_{args.index}.csv'
     elif args.index_provided and not args.weighted_acquire:
-        filename = f'{args.net}_{args.representation}_{args.optimizer}_{args.data}_{args.strategy}_{args.acquisition}_q{args.q}_unweighted_{args.index}.csv'    
+        filename = f'{args.net}_{args.representation}_{args.optimizer}_{args.data}_{args.strategy}_{args.acquisition}_q{args.q}_unweighted_{args.index}.csv'
     best_df.to_csv(filename)

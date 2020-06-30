@@ -16,7 +16,7 @@ class Sequential(torch.nn.Module):
     config : `List` of `int` and `str`
         Configuration of the neural networks.
 
-    
+
 
 
     """
@@ -110,7 +110,7 @@ layer_param_type = {
     # Graph convolution layers
     "GraphConv": {"out_feats":int,},
     "GINConv":  {"out_feats":int,},
-    "SAGEConv": {"out_feats":int,},
+    # "SAGEConv": {"out_feats":int,},
     "EdgeConv": {"out_feats":int,},
     "SAGEConv": {"out_feats":int,},
     "GATConv":  {"out_feats":int, "num_heads":int},
@@ -166,7 +166,7 @@ def get_parameter(layer_config):
     return parameters
 
 def initialize_layer(layer_config, in_feats):
-    """ Initialize a layer given the layer configuration and the 
+    """ Initialize a layer given the layer configuration and the
     specified input dimension
 
     Arg:
@@ -292,7 +292,7 @@ class SequentialMix(torch.nn.Module):
                     self.exes.append("attn_" + initialized_layer)
 
                     # If we're concatenating the attention heads, the output dimension gets
-                    # multiplied by the number of heads, otherwise, it is the same as the 
+                    # multiplied by the number of heads, otherwise, it is the same as the
                     # output dimension per head
                     last_out_dim = prev_layer_param["out_feats"] * prev_layer_param["num_heads"]\
                         if layer_params["type"] == "concat" else last_out_dim
@@ -301,7 +301,7 @@ class SequentialMix(torch.nn.Module):
             else:
                 setattr(self, "conv" + str(idx), initialized_layer)
                 self.exes.append("conv" + str(idx))
-            
+
             # Keep track of the last layer
             prev_layer_type = layer_type
             prev_layer_param = layer_params
@@ -310,7 +310,7 @@ class SequentialMix(torch.nn.Module):
         # This will ensure that the `Net` properly initializes a output
         # regression with the correct dimension
         self.dummy_output = torch.nn.Linear(1, last_out_dim)
-        
+
 
     def forward(self, g, h=None, pool=lambda g: dgl.sum_nodes(g, "h")):
         if h is None:
