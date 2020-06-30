@@ -149,7 +149,6 @@ def from_oemol(mol, use_fp=True):
     -------
 
     """
-    from openeye import oechem
 
     # initialize graph
     g = dgl.DGLGraph()
@@ -179,7 +178,6 @@ def from_oemol(mol, use_fp=True):
     bonds = list(mol.GetBonds())
     bonds_begin_idxs = [bond.GetBgnIdx() for bond in bonds]
     bonds_end_idxs = [bond.GetEndIdx() for bond in bonds]
-    bonds_types = [bond.GetOrder() for bond in bonds]
 
     # NOTE: dgl edges are directional
     g.add_edges(bonds_begin_idxs, bonds_end_idxs)
@@ -205,7 +203,6 @@ def from_rdkit_mol(mol, use_fp=True):
     -------
 
     """
-    from rdkit import Chem
 
     # initialize graph
     g = dgl.DGLGraph()
