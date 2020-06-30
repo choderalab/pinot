@@ -75,10 +75,12 @@ def uncertainty(distribution, y_best=0.0):
     return distribution.variance
 
 
-def expected_improvement(distribution, y_best=0.0):
-    r""" Probability of Improvement (PI).
+def expected_improvement_analytical(distribution, y_best=0.0):
+    r""" Analytical Expected Improvement (EI).
 
-    Closed-form derivation (https://arxiv.org/abs/1206.2944):
+    Closed-form derivation assumes predictive posterior is a multivariate normal distribution.
+
+    From https://arxiv.org/abs/1206.2944:
 
         EI(x) = (\mu(x) - f(x_best)) * cdf(Z)] + [\sigma(x) * pdf(Z)] if \sigma(x) > 0
                 0                                                     if \sigma(x) = 0
@@ -101,6 +103,7 @@ def expected_improvement(distribution, y_best=0.0):
     score : `torch.Tensor`, `shape=(n_candidates, )`
         Score for candidates under predictive distribution.
     """
+    assert isinstance(distribution, torch.distributions.Normal)
     mu = distribution.mean
     sigma = distribution.stddev
     Z = (mu - y_best)/sigma
@@ -109,6 +112,30 @@ def expected_improvement(distribution, y_best=0.0):
     cdf = lambda x: normal.cdf(x)
     pdf = lambda x: torch.exp(normal.log_prob(x))
     return (mu - y_best) * cdf(Z) + sigma * pdf(Z)
+
+
+def expected_improvement_monte_carlo(distribution, y_best, n_samples=1000):
+    r""" Monte Carlo Expected Improvement (EI).
+
+    Parameters
+    ----------
+    distribution : `torch.distributions.Distribution`
+        Predictive distribution.
+
+    y_best : float
+        The score for best candidate so far.
+         (Default value = 0.0)
+
+    n_samples : int
+        The number of samples to use for the monte carlo estimation.
+
+    Returns
+    -------
+    score : `torch.Tensor`, `shape=(n_candidates, )`
+        Score for candidates under predictive distribution.
+    """
+    improvement = torch.nn.functional.relu(distribution.sample((n_samples, )) - y_best)
+    return improvement.mean(axis=0)
 
 
 def upper_confidence_bound(distribution, y_best=0.0, kappa=0.95):

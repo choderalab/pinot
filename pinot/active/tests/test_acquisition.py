@@ -7,9 +7,10 @@ def test_import():
     import pinot
     import pinot.active
     import pinot.active.acquisition
-    from pinot.active.acquisition import probability_of_improvement
-    from pinot.active.acquisition import expected_improvement
     from pinot.active.acquisition import upper_confidence_bound
+    from pinot.active.acquisition import probability_of_improvement
+    from pinot.active.acquisition import expected_improvement_analytical
+    from pinot.active.acquisition import expected_improvement_monte_carlo
 
 
 @pytest.fixture
@@ -36,7 +37,7 @@ def test_pi(normal):
     assert pi == 0.5
 
 
-def test_ei(normal):
+def test_ei_analytical_normal(normal):
     """
 
     Parameters
@@ -48,12 +49,30 @@ def test_ei(normal):
     -------
 
     """
-    from pinot.active.acquisition import expected_improvement
+    from pinot.active.acquisition import expected_improvement_analytical
 
-    ei = expected_improvement(normal)
-    assert ei == 0.0
+    ei = expected_improvement_analytical(normal, y_best=0.0)
+    assert torch.exp(normal.log_prob(0.0)) == ei
 
 
+def test_ei_monte_carlo(normal):
+    """
+
+    Parameters
+    ----------
+    normal :
+        
+
+    Returns
+    -------
+
+    """
+    from pinot.active.acquisition import expected_improvement_monte_carlo
+
+    ei = expected_improvement_monte_carlo(normal, y_best=0.0, n_samples=100000)
+    assert (torch.exp(normal.log_prob(0.0)) - ei) < 1e-2
+
+    
 def test_ucb(normal):
     """
 
