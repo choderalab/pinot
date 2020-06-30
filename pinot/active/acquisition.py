@@ -84,7 +84,7 @@ def uncertainty(distribution, y_best=0.0):
 def expected_improvement(distribution, y_best=0.0):
     r""" Probability of Improvement (PI).
     
-    Derivation (http://krasserm.github.io/2018/03/21/bayesian-optimization/):
+    Closed-form derivation (https://arxiv.org/abs/1206.2944):
 
         EI(x) = (\mu(x) - f(x_best)) * cdf(Z)] + [\sigma(x) * pdf(Z)] if \sigma(x) > 0
                 0                                                     if \sigma(x) = 0
