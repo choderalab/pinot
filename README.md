@@ -12,7 +12,7 @@ Probabilistic Inference for NOvel Therapeutics
 # install
 ```
 pip install .
-pip install -r requirements
+pip install -r requirements.txt
 ```
 
 Note that we support both RDKit and OpenEye for chemoinformatics modeling.
