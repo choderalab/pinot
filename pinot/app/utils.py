@@ -3,8 +3,6 @@
 # =============================================================================
 import pinot
 import torch
-import dgl
-import numpy as np
 
 # =============================================================================
 # MODULE FUNCTIONS
@@ -17,11 +15,11 @@ def train_once(net, ds_tr, opt):
     Parameters
     ----------
     net :
-        
+
     ds_tr :
-        
+
     opt :
-        
+
 
     Returns
     -------
@@ -47,17 +45,17 @@ def train(net, ds_tr, ds_te, opt, reporters, n_epochs):
     Parameters
     ----------
     net :
-        
+
     ds_tr :
-        
+
     ds_te :
-        
+
     opt :
-        
+
     reporters :
-        
+
     n_epochs :
-        
+
 
     Returns
     -------
@@ -80,13 +78,13 @@ def optimizer_translation(opt_string, lr, *args, **kwargs):
     Parameters
     ----------
     opt_string :
-        
+
     lr :
-        
+
     *args :
-        
+
     **kwargs :
-        
+
 
     Returns
     -------

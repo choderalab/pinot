@@ -18,7 +18,7 @@ def fp_oe(atom):
     Parameters
     ----------
     atom :
-        
+
 
     Returns
     -------
@@ -77,7 +77,7 @@ def fp_rdkit(atom):
     Parameters
     ----------
     atom :
-        
+
 
     Returns
     -------
@@ -141,7 +141,7 @@ def from_oemol(mol, use_fp=True):
     Parameters
     ----------
     mol :
-        
+
     use_fp :
          (Default value = True)
 
@@ -197,7 +197,7 @@ def from_rdkit_mol(mol, use_fp=True):
     Parameters
     ----------
     mol :
-        
+
     use_fp :
          (Default value = True)
 
@@ -235,7 +235,6 @@ def from_rdkit_mol(mol, use_fp=True):
     bonds = list(mol.GetBonds())
     bonds_begin_idxs = [bond.GetBeginAtomIdx() for bond in bonds]
     bonds_end_idxs = [bond.GetEndAtomIdx() for bond in bonds]
-    bonds_types = [bond.GetBondType().real for bond in bonds]
 
     # NOTE: dgl edges are directional
     g.add_edges(bonds_begin_idxs, bonds_end_idxs)

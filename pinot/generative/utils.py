@@ -3,9 +3,7 @@
 # =============================================================================
 import dgl
 import torch
-import pinot
 import numpy as np
-import scipy.sparse as sp
 
 # =============================================================================
 # MODULE FUNCTIONS
@@ -17,7 +15,7 @@ def graph_from_adjacency_matrix(a):
     Parameters
     ----------
     a :
-        
+
 
     Returns
     -------
@@ -44,9 +42,9 @@ def prepare_semi_supervised_data(unlabeled_data, labeled_data):
     Parameters
     ----------
     unlabeled_data :
-        
+
     labeled_data :
-        
+
 
     Returns
     -------
@@ -69,9 +67,9 @@ def batch_semi_supervised(ds, batch_size, seed=2666):
     Parameters
     ----------
     ds :
-        
+
     batch_size :
-        
+
     seed :
          (Default value = 2666)
 
@@ -108,7 +106,7 @@ def prepare_semi_supervised_data_from_labeled_data(
     Parameters
     ----------
     labeled_data :
-        
+
     r :
          (Default value = 0.2)
     seed :
