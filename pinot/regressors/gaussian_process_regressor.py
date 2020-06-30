@@ -88,9 +88,6 @@ class ExactGaussianProcessRegressor(GaussianProcessRegressor):
     ):
         """ Get kernel and auxiliary variables for forward pass. """
 
-        # grab sigma
-        sigma = torch.exp(self.log_sigma)
-
         # compute the kernels
         k_tr_tr = self._perturb(self.kernel.forward(x_tr, x_tr))
 

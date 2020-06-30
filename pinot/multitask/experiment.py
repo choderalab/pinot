@@ -96,7 +96,7 @@ class MultitaskTrainAndTest(TrainAndTest):
         n_epochs=100,
         record_interval=1,
         metrics=[]):
-        super(MultitaskTrain, self).__init__(
+        super(MultitaskTrainAndTest, self).__init__(
             net=net,
             data_tr=data_tr,
             optimizer=optimizer,
