@@ -3,9 +3,7 @@
 # =============================================================================
 # IMPORTS
 # =============================================================================
-import dgl
 import torch
-import pinot
 from scipy.stats import pearsonr as pr
 from sklearn.metrics import r2_score, mean_squared_error
 
@@ -28,7 +26,7 @@ _convert = lambda x: x.detach().cpu().numpy()
 def mse(net, g, y, **kwargs):
     task_metrics = torch.zeros(y.size(1))
 
-    l = net._generate_mask(y)    
+    l = net._generate_mask(y)
     for task, mask in enumerate(l.T):
         y_hat_task = net.condition(g, task).mean[mask]
         y_task = y[:, task][mask]
@@ -39,7 +37,7 @@ def mse(net, g, y, **kwargs):
 def rmse(net, g, y, **kwargs):
     task_metrics = torch.zeros(y.size(1))
 
-    l = net._generate_mask(y)    
+    l = net._generate_mask(y)
     for task, mask in enumerate(l.T):
         y_hat_task = net.condition(g, task).mean[mask]
         y_task = y[:, task][mask]
@@ -51,7 +49,7 @@ def rmse(net, g, y, **kwargs):
 def r2(net, g, y, **kwargs):
     task_metrics = torch.zeros(y.size(1))
 
-    l = net._generate_mask(y)    
+    l = net._generate_mask(y)
     for task, mask in enumerate(l.T):
         y_hat_task = net.condition(g, task).mean[mask]
         y_task = y[:, task][mask]
@@ -61,7 +59,7 @@ def r2(net, g, y, **kwargs):
 
 def pearson(net, g, y, **kwargs):
     task_metrics = torch.zeros(y.size(1))
-    
+
     l = net._generate_mask(y)
     for task, mask in enumerate(l.T):
         y_hat_task = net.condition(g, task).mean[mask]
@@ -72,13 +70,13 @@ def pearson(net, g, y, **kwargs):
 
 def avg_nll(net, g, y, **kwargs):
     task_metrics = torch.zeros(y.size(1))
-    
+
     l = net._generate_mask(y)
     for task, mask in enumerate(l.T):
         distribution = net.condition(g, task)
         distribution = _independent(distribution, mask)
         y_task = y[:, task][mask]
-        
+
         # calculate the log_prob
         log_prob = distribution.log_prob(y_task.flatten()).mean()
         task_metrics[task] = -log_prob

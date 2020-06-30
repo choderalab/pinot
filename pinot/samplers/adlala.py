@@ -2,7 +2,6 @@
 # IMPORTS
 # =============================================================================
 import torch
-import pinot
 from pinot.samplers.base_sampler import BaseSampler
 
 # =============================================================================
@@ -10,19 +9,19 @@ from pinot.samplers.base_sampler import BaseSampler
 # =============================================================================
 class AdLaLa(BaseSampler):
     """Adaptive Langevin-Langevin Integrator.
-    
+
     Apply the following kinds of update steps to different "partitions" (i.e. param_groups)
-    
+
     A: w := w + hp
     B: p := p-h nabla L(w)
     C: p := e^{-h * xi} p
     D: p := p + sigma sqrt{h}R_n
     E: xi := xi + h * epsilon [p^T p - N * tau]
     O: p := c p + d R
-    
+
     By default, apply "adaptive Langevin" to self.param_groups[0],
         and apply "Langevin" to self.param_groups[1].
-    
+
     Specifically, apply the following sequence of substeps:
     A^0_(h/2) A^1_(h/2) C^0_(h/2) D^0_(h/2) E^0_(h/2) O^0_h E^0_(h/2) D^0_(h/2) C^0_(h/2) A^1_(h/2) A^0_(h/2) B^1_h B^0_h
 
@@ -35,7 +34,7 @@ class AdLaLa(BaseSampler):
     Methods
     -------
     step(closure): apply gradient
-    
+
     TODO
     ----
     * h should be an optimizer-wide constant, not a per-group parameter
@@ -101,7 +100,7 @@ class AdLaLa(BaseSampler):
         Parameters
         ----------
         group :
-            
+
         fraction :
              (Default value = 0.5)
 
@@ -121,7 +120,7 @@ class AdLaLa(BaseSampler):
         Parameters
         ----------
         group :
-            
+
         fraction :
              (Default value = 0.5)
 
@@ -141,7 +140,7 @@ class AdLaLa(BaseSampler):
         Parameters
         ----------
         group :
-            
+
         fraction :
              (Default value = 0.5)
 
@@ -161,7 +160,7 @@ class AdLaLa(BaseSampler):
         Parameters
         ----------
         group :
-            
+
         fraction :
              (Default value = 0.5)
 
@@ -188,7 +187,7 @@ class AdLaLa(BaseSampler):
         Parameters
         ----------
         group :
-            
+
         fraction :
              (Default value = 0.5)
 
@@ -214,7 +213,7 @@ class AdLaLa(BaseSampler):
 
     def O_step(self, group, fraction=0.5):
         """O_fraction: p := c p + d R
-        
+
         where
             c = exp(- (fraction h) gamma)
             d = sqrt(1 - exp(-2 (fraction h) gamma)) sqrt(tau)
@@ -222,7 +221,7 @@ class AdLaLa(BaseSampler):
         Parameters
         ----------
         group :
-            
+
         fraction :
              (Default value = 0.5)
 
@@ -247,21 +246,21 @@ class AdLaLa(BaseSampler):
 
     def initialize(self, closure):
         """Initialize state and group parameters, and take a half kick step.
-        
+
         Initialize state:
             * p : initialized to 0
                 # TODO: should this be initialized using layer temperature?
             * xi : initialized to xi_init for any layers treated by Adaptive Langevin
-        
+
         Initialized group variables:
             * c, d : parameters for Langevin OU step
-        
+
         For all layers i, take a B^i_(h/2) step.
 
         Parameters
         ----------
         closure :
-            
+
 
         Returns
         -------
@@ -270,7 +269,7 @@ class AdLaLa(BaseSampler):
 
         # call closure
         with torch.enable_grad():
-            loss = closure()
+            closure()
 
         for group in self.param_groups:
             for w in group["params"]:
@@ -339,7 +338,7 @@ class AdLaLa(BaseSampler):
 
         # call closure again, so that gradients are up-to-date
         with torch.enable_grad():
-            loss = closure()
+            closure()
 
         self.B_step(1, 1.0)  # requires gradient
         self.B_step(0, 1.0)  # requires gradient
@@ -348,12 +347,13 @@ class AdLaLa(BaseSampler):
     def sample_params(self):
         """ """
         self.zero_grad()
-
-        def closure():
-            """ """
-            for group in self.param_groups:
-                for w in group["params"]:
-                    w.backward(torch.zeros_like(w))
+        
+        #
+        # def closure():
+        #     """ """
+        #     for group in self.param_groups:
+        #         for w in group["params"]:
+        #             w.backward(torch.zeros_like(w))
 
         # self.step(closure)
 

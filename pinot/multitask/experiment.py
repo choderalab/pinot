@@ -1,7 +1,7 @@
-from pinot.app.experiment import Train, Test, TrainAndTest
+from pinot.app.experiment import Train, TrainAndTest
 import torch
 import copy
-
+import dgl
 
 class MultitaskTrain(Train):
     """ Training experiment when heads need to be masked for each task.
@@ -67,7 +67,7 @@ class MultitaskTrain(Train):
                       {'params': output_regressor.likelihood.parameters()}]
         else:
             params = [{'params': output_regressor.parameters()}]
-        
+
         for p in params:
             self.optimizer.add_param_group(p)
 
@@ -96,9 +96,9 @@ class MultitaskTrainAndTest(TrainAndTest):
         n_epochs=100,
         record_interval=1,
         metrics=[]):
-        super(MultitaskTrain, self).__init__(
+        super(MultitaskTrainAndTest, self).__init__(
             net=net,
-            data_tr=data,
+            data_tr=data_tr,
             optimizer=optimizer,
             n_epochs=n_epochs,
             record_interval=record_interval,
@@ -175,6 +175,6 @@ class MultitaskTrainAndTest(TrainAndTest):
                       {'params': output_regressor.likelihood.parameters()}]
         else:
             params = [{'params': output_regressor.parameters()}]
-        
+
         for p in params:
             self.optimizer.add_param_group(p)

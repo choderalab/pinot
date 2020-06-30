@@ -1,11 +1,7 @@
 # =============================================================================
 # IMPORTS
 # =============================================================================
-import torch
 import numpy as np
-import matplotlib
-from matplotlib import pyplot as plt
-import pinot
 import pandas as pd
 
 # =============================================================================
@@ -17,7 +13,7 @@ def dataframe(results_dict):
     Parameters
     ----------
     results_dict :
-        
+
 
     Returns
     -------
@@ -26,7 +22,6 @@ def dataframe(results_dict):
     # get all the results
     metrics = list(list(results_dict.values())[0].keys())
     ds_names = list(results_dict.keys())
-    n_metrics = len(metrics)
     df = pd.DataFrame(
         [
             [value["final"].round(4) for metric, value in results.items()]
@@ -44,7 +39,7 @@ def curve(results_dict):
     Parameters
     ----------
     results_dict :
-        
+
 
     Returns
     -------
@@ -54,7 +49,6 @@ def curve(results_dict):
 
     # get all the results
     metrics = list(list(results_dict.values())[0].keys())
-    n_metrics = len(metrics)
 
     # loop through metrics
     for idx_metric, metric in enumerate(metrics):
@@ -80,7 +74,7 @@ def markdown(results_dict):
     Parameters
     ----------
     results_dict :
-        
+
 
     Returns
     -------
@@ -96,7 +90,7 @@ def visual(results_dict):
     Parameters
     ----------
     results_dict :
-        
+
 
     Returns
     -------
@@ -149,7 +143,7 @@ def visual_multiple(results_dicts):
     Parameters
     ----------
     results_dicts :
-        
+
 
     Returns
     -------
@@ -224,7 +218,7 @@ def visual_base64(results_dict):
     Parameters
     ----------
     results_dict :
-        
+
 
     Returns
     -------
@@ -248,7 +242,7 @@ def html(results_dict):
     Parameters
     ----------
     results_dict :
-        
+
 
     Returns
     -------
@@ -287,7 +281,7 @@ def html_multiple_train_and_test(results):
     Parameters
     ----------
     results :
-        
+
 
     Returns
     -------
@@ -308,7 +302,7 @@ def html_multiple_train_and_test_2d_grid(results):
     Parameters
     ----------
     results :
-        
+
 
     Returns
     -------

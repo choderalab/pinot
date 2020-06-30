@@ -1,5 +1,4 @@
 import torch
-import pinot
 
 
 @torch.no_grad()
@@ -10,9 +9,9 @@ def condition_mixture(net, g, sampler=None, n_samples=1):
     Parameters
     ----------
     net :
-        
+
     g :
-        
+
     sampler :
          (Default value = None)
     n_samples :
@@ -21,7 +20,7 @@ def condition_mixture(net, g, sampler=None, n_samples=1):
     Returns
     -------
 
-    
+
     """
     # initialize a list of distributions
     distributions = []
@@ -66,7 +65,7 @@ def confidence_interval(distribution, percentage=0.95, n_samples=1000):
     Parameters
     ----------
     distribution :
-        
+
     percentage :
          (Default value = 0.95)
     n_samples :
@@ -75,7 +74,7 @@ def confidence_interval(distribution, percentage=0.95, n_samples=1000):
     Returns
     -------
 
-    
+
     """
     percentage = torch.tensor(percentage)
 

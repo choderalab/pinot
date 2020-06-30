@@ -16,21 +16,22 @@ args = parser.parse_args()
 
 import torch
 from torch import optim
-import time
-import numpy as np
-import scipy.sparse as sp
+# import time
+# import numpy as np
+# import scipy.sparse as sp
 import dgl
 import pinot
 from pinot.data.utils import batch, split
 from pinot.generative.torch_gvae.model import GCNModelVAE
-from pinot.generative.torch_gvae.loss import negative_ELBO
-from pinot.app.experiment import Train, Test, TrainAndTest, MultipleTrainAndTest
+# from pinot.generative.torch_gvae.loss import negative_ELBO
+# from pinot.app.experiment import Train, Test, TrainAndTest, MultipleTrainAndTest
+from pinot.app.experiment import TrainAndTest
 from pinot.app.report import html
 
 def run(args):
     # Grab some data from esol
     ds = pinot.data.esol()
-    
+
     # Divide the molecules into train/test/val
     train_data, test_data, _ = split(ds, args.split)
     N_molecules = len(train_data)
@@ -45,7 +46,7 @@ def run(args):
     num_atom_types = 100
     model = GCNModelVAE(feat_dim, gcn_hidden_dims=args.hidden_dims,
         embedding_dim=64, num_atom_types=num_atom_types)
-    
+
     optimizer = optim.Adam(model.parameters(), args.lr)
 
     # Setting up training and testing
@@ -59,7 +60,7 @@ def run(args):
 
     print("Optimization Finished! Now printing results to", args.html)
     html_string = html(results)
-    
+
     f_handle = open(args.html, 'w')
     f_handle.write(html_string)
     f_handle.close()

@@ -4,10 +4,8 @@ to construct a model.
 # =============================================================================
 # IMPORTS
 # =============================================================================
-import dgl
 import torch
 import abc
-import pinot
 from pinot.regressors import NeuralNetworkRegressor
 from pinot.regressors import ExactGaussianProcessRegressor
 

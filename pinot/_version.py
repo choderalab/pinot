@@ -61,9 +61,9 @@ def register_vcs_handler(vcs, method):  # decorator
     Parameters
     ----------
     vcs :
-        
+
     method :
-        
+
 
     Returns
     -------
@@ -76,7 +76,7 @@ def register_vcs_handler(vcs, method):  # decorator
         Parameters
         ----------
         f :
-            
+
 
         Returns
         -------
@@ -98,9 +98,9 @@ def run_command(
     Parameters
     ----------
     commands :
-        
+
     args :
-        
+
     cwd :
          (Default value = None)
     verbose :
@@ -153,7 +153,7 @@ def run_command(
 
 def versions_from_parentdir(parentdir_prefix, root, verbose):
     """Try to determine the version from the parent directory name.
-    
+
     Source tarballs conventionally unpack into a directory that includes both
     the project name and a version string. We will also support searching up
     two directory levels for an appropriately named parent directory
@@ -161,11 +161,11 @@ def versions_from_parentdir(parentdir_prefix, root, verbose):
     Parameters
     ----------
     parentdir_prefix :
-        
+
     root :
-        
+
     verbose :
-        
+
 
     Returns
     -------
@@ -202,7 +202,7 @@ def git_get_keywords(versionfile_abs):
     Parameters
     ----------
     versionfile_abs :
-        
+
 
     Returns
     -------
@@ -241,11 +241,11 @@ def git_versions_from_keywords(keywords, tag_prefix, verbose):
     Parameters
     ----------
     keywords :
-        
+
     tag_prefix :
-        
+
     verbose :
-        
+
 
     Returns
     -------
@@ -313,7 +313,7 @@ def git_versions_from_keywords(keywords, tag_prefix, verbose):
 @register_vcs_handler("git", "pieces_from_vcs")
 def git_pieces_from_vcs(tag_prefix, root, verbose, run_command=run_command):
     """Get version from 'git describe' in the root of the source tree.
-    
+
     This only gets called if the git-archive 'subst' keywords were *not*
     expanded, and _version.py hasn't already been rewritten with a short
     version string, meaning we're inside a checked out source tree.
@@ -321,11 +321,11 @@ def git_pieces_from_vcs(tag_prefix, root, verbose, run_command=run_command):
     Parameters
     ----------
     tag_prefix :
-        
+
     root :
-        
+
     verbose :
-        
+
     run_command :
          (Default value = run_command)
 
@@ -438,12 +438,12 @@ def plus_or_dot(pieces):
     Parameters
     ----------
     pieces :
-        
+
 
     Returns
     -------
     type
-        
+
 
     """
     if "+" in pieces.get("closest-tag", ""):
@@ -453,14 +453,14 @@ def plus_or_dot(pieces):
 
 def render_pep440(pieces):
     """Build up version string, with post-release "local version identifier".
-    
+
     Our goal: TAG[+DISTANCE.gHEX[.dirty]] . Note that if you
     get a tagged build and then dirty it, you'll get TAG+0.gHEX.dirty
 
     Parameters
     ----------
     pieces :
-        
+
 
     Returns
     -------
@@ -492,7 +492,7 @@ def render_pep440_pre(pieces):
     Parameters
     ----------
     pieces :
-        
+
 
     Returns
     -------
@@ -515,7 +515,7 @@ def render_pep440_pre(pieces):
 
 def render_pep440_post(pieces):
     """TAG[.postDISTANCE[.dev0]+gHEX] .
-    
+
     The ".dev0" means dirty. Note that .dev0 sorts backwards
     (a dirty tree will appear "older" than the corresponding clean one),
     but you shouldn't be releasing software with -dirty anyways.
@@ -523,7 +523,7 @@ def render_pep440_post(pieces):
     Parameters
     ----------
     pieces :
-        
+
 
     Returns
     -------
@@ -553,16 +553,16 @@ def render_pep440_post(pieces):
 
 def render_pep440_old(pieces):
     """TAG[.postDISTANCE[.dev0]] .
-    
+
     The ".dev0" means dirty.
-    
+
     Eexceptions:
     1: no tags. 0.postDISTANCE[.dev0]
 
     Parameters
     ----------
     pieces :
-        
+
 
     Returns
     -------
@@ -584,13 +584,13 @@ def render_pep440_old(pieces):
 
 def render_git_describe(pieces):
     """TAG[-DISTANCE-gHEX][-dirty].
-    
+
     Like 'git describe --tags --dirty --always'.
 
     Parameters
     ----------
     pieces :
-        
+
 
     Returns
     -------
@@ -615,14 +615,14 @@ def render_git_describe(pieces):
 
 def render_git_describe_long(pieces):
     """TAG-DISTANCE-gHEX[-dirty].
-    
+
     Like 'git describe --tags --dirty --always -long'.
     The distance/hash is unconditional.
 
     Parameters
     ----------
     pieces :
-        
+
 
     Returns
     -------
@@ -650,9 +650,9 @@ def render(pieces, style):
     Parameters
     ----------
     pieces :
-        
+
     style :
-        
+
 
     Returns
     -------
@@ -716,7 +716,7 @@ def get_versions():
         # versionfile_source is the relative path from the top of the source
         # tree (where the .git directory might live) to this file. Invert
         # this to find the root from __file__.
-        for i in cfg.versionfile_source.split("/"):
+        for _ in cfg.versionfile_source.split("/"):
             root = os.path.dirname(root)
     except NameError:
         return {

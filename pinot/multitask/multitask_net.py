@@ -14,30 +14,45 @@ class MultitaskNet(Net):
     def __init__(
         self,
         representation,
-        regressor=NeuralNetworkRegressor,
+        output_regressor=NeuralNetworkRegressor,
         **kwargs
     ):
         super(MultitaskNet, self).__init__(
             representation,
-            regressor,
+            output_regressor,
             **kwargs)
         
-        self.regressors = torch.nn.ModuleDict()
+        self.has_exact_gp = output_regressor == ExactGaussianProcessRegressor
+        self.output_regressors = torch.nn.ModuleDict()
         self.kwargs = kwargs
 
     def condition(self, g, task):
         """ Compute the output distribution with sampled weights.
-        """
+        """        
+        kwargs = {}
+        
+        if self.has_exact_gp:
+            
+            # adjust the representations
+            h_last = self.representation(self.g_last)
+            mask_last = self._generate_mask(self.y_last)[:,task]
+            
+            # mask input
+            h_last = self._mask_tensor(h_last, mask_last)
+            y_last = self._mask_tensor(self.y_last, mask_last, task)
+            kwargs = {"x_tr": h_last, "y_tr": y_last}
+        
+        # moduledicts like string keys
         task = str(task)
-
+        
         # get representation
         h = self.representation(g)
         
-        # get output regressor for a particular task
-        self.regressor = self._get_regressor(task)
+        # get output output_regressor for a particular task
+        self.output_regressor = self._get_output_regressor(task)
 
         # get distribution for input
-        distribution = self.regressor.condition(h)
+        distribution = self.output_regressor.condition(h, **kwargs)
 
         return distribution
 
@@ -46,6 +61,10 @@ class MultitaskNet(Net):
         """
         loss = 0.0
         
+        if self.has_exact_gp:
+            self.g_last = g
+            self.y_last = y
+        
         # for each task in the data, split up data
         h = self.representation(g)
         l = self._generate_mask(y)
@@ -53,43 +72,42 @@ class MultitaskNet(Net):
         for task, mask in enumerate(l.T):
 
             if mask.any():
-            
-                # switch to regressor for that task
-                self.regressor = self._get_regressor(task)
 
-                if isinstance(self.regressor, ExactGaussianProcessRegressor):
+                # switch to output_regressor for that task
+                self.output_regressor = self._get_output_regressor(task)
+
+                if self.has_exact_gp:
                     # mask input if ExactGP
                     h_task = self._mask_tensor(h, mask)
                     y_task = self._mask_tensor(y, mask, task)
-                    loss += self.regressor.loss(h_task, y_task).mean()
+                    loss += self.output_regressor.loss(h_task, y_task).mean()
                 else:
                     # mask output if VariationalGP
-                    distribution = self.regressor.condition(h)
+                    distribution = self.output_regressor.condition(h)
                     y_dummy = self._generate_y_dummy(y, task)
                     loss += -distribution.log_prob(y_dummy)[mask].mean()
-
         return loss
     
-    def _get_regressor(self, task):
-        """ Returns regressor for a task.
+    def _get_output_regressor(self, task):
+        """ Returns output_regressor for a task.
         """
         # ModuleDict needs str
         task = str(task)
         
-        # if we already instantiated the regressor
-        if task not in self.regressors:
+        # if we already instantiated the output_regressor
+        if task not in self.output_regressors:
 
-            # get the type of self.regressor, and instantiate it
-            self.regressors[task] = self.regressor_cls(
+            # get the type of self.output_regressor, and instantiate it
+            self.output_regressors[task] = self.output_regressor_cls(
                 self.representation_out_features,
                 **self.kwargs
                 )
 
             # move to cuda if the parent net is
             if next(self.parameters()).is_cuda:
-                self.regressors[task].cuda()
+                self.output_regressors[task].cuda()
         
-        return self.regressors[task]
+        return self.output_regressors[task]
     
     def _generate_y_dummy(self, y, task):
         """ Generates y dummy - fill nans with zeros.
