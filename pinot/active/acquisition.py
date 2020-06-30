@@ -82,7 +82,16 @@ def uncertainty(distribution, y_best=0.0):
 
 
 def expected_improvement(distribution, y_best=0.0):
-    r""" Expected Improvement (EI).
+    r""" Probability of Improvement (PI).
+    
+    Derivation (http://krasserm.github.io/2018/03/21/bayesian-optimization/):
+
+        EI(x) = (\mu(x) - f(x_best)) * cdf(Z)] + [\sigma(x) * pdf(Z)] if \sigma(x) > 0
+                0                                                     if \sigma(x) = 0
+
+        where
+
+        Z = \frac{\mu(x) - f(x_best)}{\sigma(x)}
 
     Parameters
     ----------
@@ -98,8 +107,14 @@ def expected_improvement(distribution, y_best=0.0):
     score : `torch.Tensor`, `shape=(n_candidates, )`
         Score for candidates under predictive distribution.
     """
-    return distribution.mean - y_best
-
+    mu = distribution.mean
+    sigma = distribution.stddev
+    Z = (mu - y_best)/sigma
+    
+    std_normal = torch.distributions.Normal(0, 1)
+    cdf = lambda x: std_normal.cdf(x)
+    pdf = lambda x: torch.exp(std_normal.log_prob(x))
+    return (mu - y_best) * cdf(Z) + sigma * pdf(Z)
 
 def upper_confidence_bound(distribution, y_best=0.0, kappa=0.95):
     r""" Upper Confidence Bound (UCB).

@@ -146,6 +146,7 @@ class ActivePlot():
             # pad if experiment stopped early
             # candidates_acquired = limit + 1 because we begin with a blind pick
             results_size = self.num_rounds * self.q + 1
+            
             if self.net == 'multitask':
                 results_data = actual_sol*np.ones((results_size, ys.size(1)))
                 output = ys[x]
@@ -191,10 +192,12 @@ class ActivePlot():
         
         if self.strategy == 'batch':
             acq_fn = batch_acquisitions[self.acquisition]
-            acq_fn = MCAcquire(sequential_acq=acq_fn, batch_size=gs.batch_size,
-                               q=self.q,
-                               marginalize_batch=self.marginalize_batch,
-                               num_samples=self.num_samples)
+            acq_fn = MCAcquire(
+                sequential_acq=acq_fn,
+                batch_size=gs.batch_size,
+                q=self.q,
+                marginalize_batch=self.marginalize_batch,
+                num_samples=self.num_samples)
         else:
             acq_fn = sequential_acquisitions[self.acquisition]
 
@@ -213,7 +216,7 @@ class ActivePlot():
 
         output_regressor = getattr(pinot.regressors, self.net)
 
-        net = SemiSupervisedNet(
+        net = pinot.Net(
             representation=representation,
             output_regressor=output_regressor,
         )
