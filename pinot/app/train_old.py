@@ -30,7 +30,7 @@ def run(args):
 
     net = pinot.Net(
         net_representation,
-        output_regressor=getattr(pinot.regressors, args.output_regressor)(32),
+        output_regressor=getattr(pinot.regressors, args.output_regressor),
     )
 
     # get the entire dataset

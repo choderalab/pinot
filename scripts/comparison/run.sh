@@ -7,7 +7,7 @@ do
     do
         for lr in '1e-3'
         do
-            for output_regressor in 'NeuralNetworkRegressor'
+            for output_regressor in 'VariationalGaussianProcessRegressor'
             do
                 
                 name="__"$output_regressor

@@ -328,6 +328,9 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
             torch.range(0, self.y_tr_sigma_diag.shape[0] - 1)[None, :],
         )
 
+        mask = mask.to(
+            device=y_tr_diag.device)
+
         # (n_inducing_points, n_inducing_points)
         y_tr_sigma = y_tr_diag.masked_scatter(mask, self.y_tr_sigma_tril)
 
@@ -463,12 +466,12 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
         prior_mean = torch.zeros(self.n_inducing_points, 1)
         prior_tril = self._k_tr_tr().cholesky()
 
+        prior_tril = prior_tril.to(
+                device=prior_mean.device)
+
         distribution = self.condition(x_te)
 
         nll = -distribution.log_prob(y_te.flatten()).mean()
-
-        prior_mean = torch.zeros(self.n_inducing_points, 1)
-        prior_tril = torch.cholesky(self._k_tr_tr())
 
         log_p_u = self.exp_log_full_gaussian(
             self.y_tr_mu, self._y_tr_sigma(), prior_mean, prior_tril
