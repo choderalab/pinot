@@ -46,12 +46,12 @@ class ActivePlot():
 
         # handle semi
         if self.net == 'semi':
-            self.bo_class = experiment.SemiSupervisedBayesOptExperiment
+            self.bo_cls = experiment.SemiSupervisedBayesOptExperiment
         elif self.net == 'multitask':
-            self.bo_class = multitask.MultitaskBayesOptExperiment
+            self.bo_cls = multitask.MultitaskBayesOptExperiment
             self.train = multitask.MultitaskTrain
         else:
-            self.bo_class = experiment.BayesOptExperiment
+            self.bo_cls = experiment.BayesOptExperiment
 
         # housekeeping
         self.device = torch.device(device)
@@ -126,7 +126,7 @@ class ActivePlot():
                 )
             
             # instantiate experiment
-            self.bo = self.bo_class(
+            self.bo = self.bo_cls(
                 net=net,
                 data=ds[0],
                 optimizer=optimizer(net),
@@ -187,7 +187,7 @@ class ActivePlot():
                                    'ProbabilityOfImprovement': pinot.active.acquisition.probability_of_improvement,
                                    'UpperConfidenceBound': pinot.active.acquisition.expected_improvement,
                                    'Uncertainty': pinot.active.acquisition.expected_improvement,
-                                   'Human': pinot.active.acquisition.dummy,
+                                   'Human': pinot.active.acquisition.temporal,
                                    'Random': pinot.active.acquisition.expected_improvement}
         
         if self.strategy == 'batch':

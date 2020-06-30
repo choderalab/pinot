@@ -12,8 +12,8 @@ from gpytorch.distributions import MultivariateNormal
 # =============================================================================
 # MODULE FUNCTIONS
 # =============================================================================
-def dummy(distribution, y_best=0.0):
-    r""" Dummy acquisition function that always picks the first in sequence.
+def temporal(distribution, y_best=0.0):
+    r"""Picks the first in sequence.
     Designed to be used with temporal datasets to compare with baselines.
 
     Parameters
@@ -111,10 +111,11 @@ def expected_improvement(distribution, y_best=0.0):
     sigma = distribution.stddev
     Z = (mu - y_best)/sigma
     
-    std_normal = torch.distributions.Normal(0, 1)
-    cdf = lambda x: std_normal.cdf(x)
-    pdf = lambda x: torch.exp(std_normal.log_prob(x))
+    normal = torch.distributions.Normal(0, 1)
+    cdf = lambda x: normal.cdf(x)
+    pdf = lambda x: torch.exp(normal.log_prob(x))
     return (mu - y_best) * cdf(Z) + sigma * pdf(Z)
+
 
 def upper_confidence_bound(distribution, y_best=0.0, kappa=0.95):
     r""" Upper Confidence Bound (UCB).
