@@ -1,3 +1,3 @@
-from . import multitask_net
-from . import experiment
-from .multitask_net import MultiTaskNet
+from pinot.multitask.multitask_net import MultitaskNet
+from pinot.multitask.active.experiment import MultitaskBayesOptExperiment
+from pinot.multitask.experiment import MultitaskTrain, MultitaskTrainAndTest

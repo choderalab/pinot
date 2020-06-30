@@ -12,8 +12,8 @@ from gpytorch.distributions import MultivariateNormal
 # =============================================================================
 # MODULE FUNCTIONS
 # =============================================================================
-def dummy(distribution, y_best=0.0):
-    r""" Dummy acquisition function that always picks the first in sequence.
+def temporal(distribution, y_best=0.0):
+    r"""Picks the first in sequence.
     Designed to be used with temporal datasets to compare with baselines.
 
     Parameters
@@ -32,9 +32,13 @@ def dummy(distribution, y_best=0.0):
 
 
     """
-    return torch.range(start=0, end=distribution.mean.flatten().shape[0]).flip(
-        0
-    )
+    score = torch.range(
+        start=0,
+        end=len(distribution.mean.flatten()) - 1
+        ).flip(0)
+    if torch.cuda.is_available():
+        score = score.cuda()
+    return score
 
 
 def probability_of_improvement(distribution, y_best=0.0):
@@ -78,7 +82,16 @@ def uncertainty(distribution, y_best=0.0):
 
 
 def expected_improvement(distribution, y_best=0.0):
-    r""" Expected Improvement (EI).
+    r""" Probability of Improvement (PI).
+    
+    Closed-form derivation (https://arxiv.org/abs/1206.2944):
+
+        EI(x) = (\mu(x) - f(x_best)) * cdf(Z)] + [\sigma(x) * pdf(Z)] if \sigma(x) > 0
+                0                                                     if \sigma(x) = 0
+
+        where
+
+        Z = \frac{\mu(x) - f(x_best)}{\sigma(x)}
 
     Parameters
     ----------
@@ -94,7 +107,14 @@ def expected_improvement(distribution, y_best=0.0):
     score : `torch.Tensor`, `shape=(n_candidates, )`
         Score for candidates under predictive distribution.
     """
-    return distribution.mean - y_best
+    mu = distribution.mean
+    sigma = distribution.stddev
+    Z = (mu - y_best)/sigma
+    
+    normal = torch.distributions.Normal(0, 1)
+    cdf = lambda x: normal.cdf(x)
+    pdf = lambda x: torch.exp(normal.log_prob(x))
+    return (mu - y_best) * cdf(Z) + sigma * pdf(Z)
 
 
 def upper_confidence_bound(distribution, y_best=0.0, kappa=0.95):

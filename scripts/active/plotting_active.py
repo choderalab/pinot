@@ -10,17 +10,9 @@ from tqdm import tqdm
 import torch
 
 import pinot
-# from pinot.active.acquisition import BTModel, SeqAcquire, MCAcquire
-# from pinot.generative.torch_gvae.model import GCNModelVAE
-
-import sys
-sys.path.append('../../pinot/active/')
-
-import experiment
-
-sys.path.append('../../pinot/')
-# import semisupervised
-# import semisupervised_gp
+import pinot.active.experiment as experiment
+from pinot import multitask
+from pinot.generative import SemiSupervisedNet
 
 
 ######################
@@ -29,7 +21,7 @@ sys.path.append('../../pinot/')
 class ActivePlot():
 
     def __init__(self, net, layer, config,
-                 lr, optimizer_type,
+                 lr, optimizer_type, weighted_acquire,
                  data, strategy, acquisition, marginalize_batch, num_samples, q,
                  device, num_trials, num_rounds, num_epochs):        
         
@@ -47,14 +39,19 @@ class ActivePlot():
         self.strategy = strategy
         self.acquisition = acquisition
         self.marginalize_batch = marginalize_batch
+        self.weighted_acquire = weighted_acquire
         self.num_samples = num_samples
         self.q = q
+        self.train = pinot.app.experiment.Train
 
         # handle semi
-        if self.net != 'semi':
-            self.bo = experiment.BayesOptExperiment
+        if self.net == 'semi':
+            self.bo_cls = experiment.SemiSupervisedBayesOptExperiment
+        elif self.net == 'multitask':
+            self.bo_cls = multitask.MultitaskBayesOptExperiment
+            self.train = multitask.MultitaskTrain
         else:
-            self.bo = experiment.SemiSupervisedBayesOptExperiment
+            self.bo_cls = experiment.BayesOptExperiment
 
         # housekeeping
         self.device = torch.device(device)
@@ -106,7 +103,6 @@ class ActivePlot():
         -------
         results
         """
-        
         # get the real solution
         ds = self.generate_data()
         gs, ys = ds[0]
@@ -117,6 +113,7 @@ class ActivePlot():
         
         # acquistion functions to be tested
         for i in range(self.num_trials):
+            print(i)
             
             # make fresh net and optimizer
             net = self.get_net().to(self.device)
@@ -129,27 +126,37 @@ class ActivePlot():
                 )
             
             # instantiate experiment
-            bo = self.bo(net=net,
-                         data=ds[0],
-                         optimizer=optimizer(net),
-                         acquisition=acq_fn,
-                         n_epochs=self.num_epochs,
-                         strategy=self.strategy,
-                         q=self.q,
-                         slice_fn=experiment._slice_fn_tuple, # pinot.active.
-                         collate_fn=experiment._collate_fn_graph # pinot.active.
-                         )
+            self.bo = self.bo_cls(
+                net=net,
+                data=ds[0],
+                optimizer=optimizer(net),
+                acquisition=acq_fn,
+                n_epochs=self.num_epochs,
+                strategy=self.strategy,
+                q=self.q,
+                weighted_acquire=self.weighted_acquire,
+                slice_fn=experiment._slice_fn_tuple, # pinot.active.
+                collate_fn=experiment._collate_fn_graph, # pinot.active.
+                train_class=self.train
+            )
 
             # run experiment
-            x = bo.run(num_rounds=self.num_rounds)
+            x = self.bo.run(num_rounds=self.num_rounds)
 
             # pad if experiment stopped early
             # candidates_acquired = limit + 1 because we begin with a blind pick
-            results_shape = self.num_rounds * self.q + 1
-            results_data = actual_sol*np.ones(results_shape)
-            results_data[:len(x)] = np.maximum.accumulate(ys[x].cpu().squeeze())
+            results_size = self.num_rounds * self.q + 1
             
-            # print(len(x), results_data[-1])
+            if self.net == 'multitask':
+                results_data = actual_sol*np.ones((results_size, ys.size(1)))
+                output = ys[x]
+                output[torch.isnan(output)] = -np.inf
+            else:
+                results_data = actual_sol*np.ones(results_size)
+                output = ys[x]
+
+            results_data[:len(x)] = np.maximum.accumulate(output.cpu().squeeze())
+
             # record results
             self.results[self.acquisition][i] = results_data
 
@@ -176,21 +183,21 @@ class ActivePlot():
                               'Uncertainty': SeqAcquire(acq_fn='uncertainty'),
                               'Random': SeqAcquire(acq_fn='random')}
         '''
-
-
         sequential_acquisitions = {'ExpectedImprovement': pinot.active.acquisition.expected_improvement,
                                    'ProbabilityOfImprovement': pinot.active.acquisition.probability_of_improvement,
                                    'UpperConfidenceBound': pinot.active.acquisition.expected_improvement,
                                    'Uncertainty': pinot.active.acquisition.expected_improvement,
-                                   'Human': pinot.active.acquisition.dummy,
+                                   'Human': pinot.active.acquisition.temporal,
                                    'Random': pinot.active.acquisition.expected_improvement}
         
         if self.strategy == 'batch':
             acq_fn = batch_acquisitions[self.acquisition]
-            acq_fn = MCAcquire(sequential_acq=acq_fn, batch_size=gs.batch_size,
-                               q=self.q,
-                               marginalize_batch=self.marginalize_batch,
-                               num_samples=self.num_samples)
+            acq_fn = MCAcquire(
+                sequential_acq=acq_fn,
+                batch_size=gs.batch_size,
+                q=self.q,
+                marginalize_batch=self.marginalize_batch,
+                num_samples=self.num_samples)
         else:
             acq_fn = sequential_acquisitions[self.acquisition]
 
@@ -203,17 +210,40 @@ class ActivePlot():
         """
         layer = pinot.representation.dgl_legacy.gn(model_name=self.layer)
 
-        net_representation = pinot.representation.Sequential(
+        representation = pinot.representation.Sequential(
             layer=layer,
             config=self.config)
 
+        output_regressor = getattr(pinot.regressors, self.net)
 
         net = pinot.Net(
-                net_representation,
-                getattr(pinot.regressors, self.net))
+            representation=representation,
+            output_regressor=output_regressor,
+        )
 
-        if self.strategy == 'batch':
-            net = BTModel(net)
+        if self.net == 'semi':
+            net = SemiSupervisedNet(
+                representation=representation,
+                unsup_scale=0.1 # <------ if unsup_scale = 0., reduces to supervised model
+            )
+
+        elif self.net == 'semi_gp':
+            output_regressor = pinot.regressors.ExactGaussianProcessRegressor
+
+            net = SemiSupervisedNet(
+                representation=representation,
+                output_regressor=output_regressor,
+            )
+
+        elif self.net == 'multitask':
+            output_regressor = pinot.regressors.ExactGaussianProcessRegressor
+            net = multitask.MultitaskNet(
+                representation=representation,
+                output_regressor=output_regressor,
+            )
+
+        # if self.strategy == 'batch':
+        #     net = BTModel(net)
 
         return net
 
@@ -227,7 +257,7 @@ if __name__ == '__main__':
     parser.add_argument('--net', type=str, default='ExactGaussianProcessRegressor')
     parser.add_argument('--representation', type=str, default='GraphConv')
 
-    parser.add_argument('--lr', type=float, default=1e-3)
+    parser.add_argument('--lr', type=float, default=1e-4)
     parser.add_argument('--optimizer', type=str, default='Adam')
     
     parser.add_argument('--data', type=str, default='esol')
@@ -235,6 +265,7 @@ if __name__ == '__main__':
     parser.add_argument('--acquisition', type=str, default='ExpectedImprovement')
     parser.add_argument('--marginalize_batch', type=bool, default=True)
     parser.add_argument('--num_samples', type=int, default=1000)
+    parser.add_argument('--weighted_acquire', type=bool, default=True)
     parser.add_argument('--q', type=int, default=1)
 
     parser.add_argument('--device', type=str, default='cuda:0')
@@ -247,7 +278,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    Plot = ActivePlot(
+    plot = ActivePlot(
         # net config
         net=args.net,
         layer=args.representation,
@@ -263,6 +294,7 @@ if __name__ == '__main__':
         acquisition=args.acquisition,
         marginalize_batch=args.marginalize_batch,
         num_samples=args.num_samples,
+        weighted_acquire=args.weighted_acquire,
         q=args.q,
 
         # housekeeping
@@ -272,9 +304,11 @@ if __name__ == '__main__':
         num_epochs=args.num_epochs,
         )
 
-    best_df = Plot.generate()
+    best_df = plot.generate()
 
     # save to disk
-    if args.index_provided:
-        filename = f'{args.net}_{args.representation}_{args.optimizer}_{args.data}_{args.strategy}_{args.acquisition}_q{args.q}_{args.index}.csv'
+    if args.index_provided and args.weighted_acquire:
+        filename = f'{args.net}_{args.representation}_{args.optimizer}_{args.data}_{args.strategy}_{args.acquisition}_q{args.q}_weighted_{args.index}.csv'
+    elif args.index_provided and not args.weighted_acquire:
+        filename = f'{args.net}_{args.representation}_{args.optimizer}_{args.data}_{args.strategy}_{args.acquisition}_q{args.q}_unweighted_{args.index}.csv'    
     best_df.to_csv(filename)
