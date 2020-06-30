@@ -13,7 +13,6 @@ import os
 from abc import ABC
 import copy
 import pinot
-import gpytorch
 
 # =============================================================================
 # MODULE CLASSES

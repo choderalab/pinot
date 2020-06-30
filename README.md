@@ -16,7 +16,7 @@ pip install -r requirements.txt
 ```
 
 Note that we support both RDKit and OpenEye for chemoinformatics modeling.
-To install RDKit: `conda install rdkit`.
+To install RDKit: `conda install -c conda-forge rdkit`.
 
 # license
 This package is licensed under MIT license.
