@@ -256,11 +256,12 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
         self,
         in_features,
         kernel=None,
-        log_sigma=-3.0,
+        log_sigma=-1.0,
         n_inducing_points=100,
-        initializer_std=0.1,
-        kl_loss_scaling=1.0,
-        grid_boundary=10.0,
+        mu_initializer_std=0.1,
+        sigma_initializer_value=-3.0,
+        kl_loss_scaling=1e-4,
+        grid_boundary=1.0,
     ):
         super(VariationalGaussianProcessRegressor, self).__init__()
         if kernel is None:
@@ -280,10 +281,13 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
         # (n_inducing_points, hidden_dimension)
         self.x_tr = torch.nn.Parameter(
             torch.distributions.uniform.Uniform(
-                -1
+                -1.0
                 * grid_boundary
                 * torch.ones(n_inducing_points, in_features),
-                1 * grid_boundary * torch.ones(n_inducing_points, in_features),
+                
+                1.0
+                * grid_boundary 
+                * torch.ones(n_inducing_points, in_features),
             ).sample()
         )
 
@@ -291,19 +295,15 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
         # (n_inducing_points, 1)
         self.y_tr_mu = torch.nn.Parameter(
             torch.distributions.normal.Normal(
-                loc=torch.randn(n_inducing_points, 1),
-                scale=initializer_std * torch.ones(n_inducing_points, 1),
+                loc=torch.zeros(n_inducing_points, 1),
+                scale=mu_initializer_std * torch.ones(n_inducing_points, 1),
             ).sample()
         )
 
+
         # to ensure lower cholesky
-        # (n_inducing_points, )
         self.y_tr_sigma_diag = torch.nn.Parameter(
-            torch.distributions.normal.Normal(
-                loc=torch.zeros(n_inducing_points),
-                scale=initializer_std * torch.ones(n_inducing_points),
-            ).sample()
-        )
+            sigma_initializer_value * torch.ones(n_inducing_points))
 
         # (0.5 * n_inducing_points * (n_inducing_points - 1), )
         self.y_tr_sigma_tril = torch.nn.Parameter(
