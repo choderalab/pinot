@@ -171,6 +171,15 @@ class SemiSupervisedNet(pinot.Net):
             loc=mu, scale=torch.exp(logvar)
         )
         z_sample = distribution.rsample()
-        decoded_subgraphs = self.decoder(g, z_sample)
-        loss = negative_elbo(decoded_subgraphs, mu, logvar, g)
-        return loss
+        # Compute the ELBO loss
+        # First the reconstruction loss (~~ expected log likelihood)
+        recon_loss = self.decoder.decode_and_compute_recon_error(g, z_sample)
+        # KL-divergence term
+        KLD = (
+            -0.5
+            / g.number_of_nodes()
+            * torch.sum(
+                torch.sum(1 + 2 * logvar - mu.pow(2) - logvar.exp().pow(2), 1)
+            )
+        )
+        return recon_loss + KLD
