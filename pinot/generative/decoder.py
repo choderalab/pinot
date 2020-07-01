@@ -2,82 +2,11 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import dgl
+import scipy
+from torch.autograd import Variable
 
 
-class InnerProductDecoder(nn.Module):
-    """Decoder for using inner product for edge prediction."""
-
-    def __init__(self, dropout):
-        super(InnerProductDecoder, self).__init__()
-        self.dropout = dropout
-
-    def forward(self, z):
-        """Returns a symmetric adjacency matrix of size (N,N)
-        where A[i,j] = probability there is an edge between nodes i and j
-
-        Parameters
-        ----------
-        z :
-
-
-        Returns
-        -------
-
-        """
-        z = F.dropout(z, self.dropout, training=self.training)
-        adj = torch.mm(z, z.t())
-        return adj
-
-
-class EdgeAndNodeDecoder(nn.Module):
-    """Decoder that returns both a predicted adjacency matrix
-        and node identities
-
-    Parameters
-    ----------
-
-    Returns
-    -------
-
-    """
-
-    def __init__(self, feature_dim, num_atom_types, hidden_dim=64, dropout=0):
-        super(EdgeAndNodeDecoder, self).__init__()
-        self.dropout = dropout
-        self.hidden_dim = hidden_dim
-        self.decode_nodes = nn.Sequential(
-            nn.Linear(feature_dim, self.hidden_dim),
-            nn.ReLU(),
-            nn.Linear(self.hidden_dim, num_atom_types),
-        )
-
-    def forward(self, z):
-        """Arg:
-            z (FloatTensor):
-                Shape (N, hidden_dim)
-
-        Parameters
-        ----------
-        z :
-
-
-        Returns
-        -------
-
-            (adj, node_preds)
-            adj (FloatTensor): has shape (N, N) is a matrix where entry (i.j)
-            stores the probability that there is an edge between atoms i,j
-            node_preds (FloatTensor): has shape (N, num_atom_types) where each
-            row i stores the probability of the identity of atom i
-
-        """
-        z_prime = F.dropout(z, self.dropout, training=self.training)
-        adj = torch.mm(z_prime, z_prime.t())
-        node_preds = self.decode_nodes(z_prime)
-        return (adj, node_preds)
-
-
-class SequentialDecoder(nn.Module):
+class DecoderNetwork(nn.Module):
     """Simple decoder where the node identity prediction is dependent
     on the adjacency matrix.
 
@@ -100,9 +29,8 @@ class SequentialDecoder(nn.Module):
         predictions $\hat{x}$
     """
 
-    def __init__(
-        self,
-        embedding_dim,
+    def __init__(self, 
+        embedding_dim=128,
         num_atom_types=100,
         Dx1=64,
         Dx2=64,
@@ -110,7 +38,7 @@ class SequentialDecoder(nn.Module):
         Da2=64,
         hidden_dim=64,
     ):
-        super(SequentialDecoder, self).__init__()
+        super(DecoderNetwork, self).__init__()
         self.embedding_dim = embedding_dim
         self.num_atom_types = num_atom_types
 
@@ -137,40 +65,6 @@ class SequentialDecoder(nn.Module):
             nn.Linear(self.hidden_dim, self.num_atom_types),
         )
 
-    def forward(self, z):
-        """
-
-        Parameters
-        ----------
-        z :
-
-
-        Returns
-        -------
-
-        """
-        # (N, Dx)
-        zx = self.z_to_zx(z)
-        # (N, Da)
-        za = self.z_to_za(z)
-        # before rounding
-        # (N, N)
-        A_tilde = za @ za.T
-        zx = A_tilde @ zx
-        # predicted x
-        # (N, n_classes)
-        x_hat = self.zx_to_x(zx)
-        return (A_tilde, x_hat)
-
-
-class DecoderNetwork(nn.Module):
-    """ """
-
-    def __init__(self, embedding_dim, num_atom_types):
-        super(DecoderNetwork, self).__init__()
-        self.embedding_dim = embedding_dim
-        self.decoder = SequentialDecoder(embedding_dim, num_atom_types)
-
     def forward(self, g, z_sample):
         """
 
@@ -192,6 +86,54 @@ class DecoderNetwork(nn.Module):
             gs_unbatched = dgl.unbatch(g)
             # Decode each subgraph
             decoded_subgraphs = [
-                self.decoder(g_sample.ndata["h"]) for g_sample in gs_unbatched
+                self.decode(g_sample.ndata["h"]) for g_sample in gs_unbatched
             ]
             return decoded_subgraphs
+
+    def decode_and_compute_recon_error(self, g, z_sample):
+        decoded_subgraphs = self.forward(g, z_sample)
+        gs_unbatched = dgl.unbatch(g)
+        assert len(decoded_subgraphs) == len(gs_unbatched)
+        loss = 0.0
+        for i, subgraph in enumerate(gs_unbatched):
+            # Compute decoding loss for each individual sub-graphs
+            decoded_edges, decoded_nodes = decoded_subgraphs[i]
+            adj_mat = subgraph.adjacency_matrix(True).to_dense()
+            if torch.cuda.is_available and decoded_edges.is_cuda:
+                adj_mat = adj_mat.cuda()
+            node_types = subgraph.ndata["type"].flatten().long()
+            edge_nll = torch.sum(
+                F.binary_cross_entropy_with_logits(decoded_edges, adj_mat)
+            )
+            node_nll = torch.sum(F.cross_entropy(decoded_nodes, node_types))
+
+            loss += node_nll + edge_nll
+        return loss
+
+    def decode(self, z):
+        """
+
+        Parameters
+        ----------
+        z :
+            a FloatTensor of size (number_of_nodes, embedding_dim)
+
+
+        Returns
+        -------
+            (A_tilde, x_hat)
+                A_tilde is a FloatTensor of size (number_of_nodes, number_of_nodes)
+                x_hat is a FloatTensor of size (number_of_nodes, num_atom_types)
+        """
+        # (N, Dx)
+        zx = self.z_to_zx(z)
+        # (N, Da)
+        za = self.z_to_za(z)
+        # before rounding
+        # (N, N)
+        A_tilde = za @ za.T
+        zx = A_tilde @ zx
+        # predicted x
+        # (N, n_classes)
+        x_hat = self.zx_to_x(zx)
+        return (A_tilde, x_hat)
