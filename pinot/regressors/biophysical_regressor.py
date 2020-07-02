@@ -57,6 +57,20 @@ class BiophysicalRegressor(torch.nn.Module):
     	return loss_measurement
 
 
+   	def marginal_sample(self, h=None, n_samples=100, test_ligand_concentration=1e-3, **kwargs):
+   		"""
+   		Note:
+   		This is currently inefficient bebcause we would normally only need 
+   		to redo the sampling bit and the final nonlinearity
+   		We can make this efficient later
+   		"""
+   		samples_measurement = []
+   		for ns in range(n_samples):
+    		distribution_measurement += self.condition(h=h, test_ligand_concentration=test_ligand_concentration, kwargs)
+    		samples_measurement.append(distribution_measurement.sample())
+    	return samples_measurement
+
+
     def marginal_loss(self, h=None, y=None, test_ligand_concentration=1e-3, n_samples=10, **kwargs):
     	"""
     	sample n_samples often from loss in order to get a better approximation
