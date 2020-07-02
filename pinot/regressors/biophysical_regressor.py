@@ -48,30 +48,30 @@ class BiophysicalRegressor(torch.nn.Module):
 		return loss_measurement
 
 
-   	def marginal_sample(self, h=None, n_samples=100, test_ligand_concentration=1e-3, **kwargs):
-   		distribution_base_regressor = self.base_regressor.condition(h, **kwargs)
-   		samples_measurement = []
-   		for ns in range(n_samples):
-   			f_sample = distribution_base_regressor.rsample()
-	        mu_m = self.g(func_value=f_sample, test_ligand_concentration=test_ligand_concentration)
-	        sigma_m = torch.exp(self.log_sigma_measurement)
-	        distribution_measurement = torch.distributions.normal.Normal(loc=mu_m, scale=sigma_m)
-    		samples_measurement.append(distribution_measurement.sample())
-    	return samples_measurement
+	def marginal_sample(self, h=None, n_samples=100, test_ligand_concentration=1e-3, **kwargs):
+		distribution_base_regressor = self.base_regressor.condition(h, **kwargs)
+		samples_measurement = []
+		for ns in range(n_samples):
+			f_sample = distribution_base_regressor.rsample()
+			mu_m = self.g(func_value=f_sample, test_ligand_concentration=test_ligand_concentration)
+			sigma_m = torch.exp(self.log_sigma_measurement)
+			distribution_measurement = torch.distributions.normal.Normal(loc=mu_m, scale=sigma_m)
+			samples_measurement.append(distribution_measurement.sample())
+		return samples_measurement
 
 
-    def marginal_loss(self, h=None, y=None, test_ligand_concentration=1e-3, n_samples=10, **kwargs):
-    	"""
-    	sample n_samples often from loss in order to get a better approximation
-    	"""
-    	distribution_base_regressor = self.base_regressor.condition(h, **kwargs)
-    	marginal_loss_measurement = 0
-    	for ns in range(n_samples):
-   			f_sample = distribution_base_regressor.rsample()
-	        mu_m = self.g(func_value=f_sample, test_ligand_concentration=test_ligand_concentration)
-	        sigma_m = torch.exp(self.log_sigma_measurement)
-	        distribution_measurement = torch.distributions.normal.Normal(loc=mu_m, scale=sigma_m)
-	        marginal_loss_measurement += -distribution_measurement.log_prob(y)
-    	marginal_loss_measurement/=n_samples
-    	return marginal_loss_measurement
+	def marginal_loss(self, h=None, y=None, test_ligand_concentration=1e-3, n_samples=10, **kwargs):
+		"""
+		sample n_samples often from loss in order to get a better approximation
+		"""
+		distribution_base_regressor = self.base_regressor.condition(h, **kwargs)
+		marginal_loss_measurement = 0
+		for ns in range(n_samples):
+			f_sample = distribution_base_regressor.rsample()
+			mu_m = self.g(func_value=f_sample, test_ligand_concentration=test_ligand_concentration)
+			sigma_m = torch.exp(self.log_sigma_measurement)
+			distribution_measurement = torch.distributions.normal.Normal(loc=mu_m, scale=sigma_m)
+			marginal_loss_measurement += -distribution_measurement.log_prob(y)
+		marginal_loss_measurement/=n_samples
+		return marginal_loss_measurement
 
