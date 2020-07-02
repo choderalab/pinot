@@ -15,7 +15,50 @@ from pinot.regressors.neural_network_regressor import NeuralNetworkRegressor
 
 
 class SemiSupervisedNet(pinot.Net):
-    """ """
+    """ SemiSupervisedNet that could work seemlessly with both
+    labeled and unlabeled data
+    
+    Parameters
+    ----------
+        representation: Object
+            Representation layer
+
+        output_regressor: Class
+            `Class` of output regressor to be initialized
+
+        decoder: Class
+            `Class` of the decoder to be initialized
+
+        unsup_scale: Float
+        
+        embedding_dim: Int
+            Embedding dim of the variational auto-encoder
+
+        generative_hidden_dim: Int
+
+    Returns
+    -------
+
+    Attributes
+    ----------
+    representation: nn.Module
+        Graph neural network that maps from input graph onto 
+        latent representations
+
+    output_regressor_generative: nn.Module
+        Neural network that maps from latent representation
+        to the parameters of the approximate posterior distribution
+        (Variational Auto Encoder)
+
+    decoder: nn.Module
+        Neural network that maps from z variables sampled from the 
+        approximate posterior to reconstruct the original graphs
+
+    output_regressor: nn.Module
+        Neural network that maps from latent representations to
+        measurements
+
+    """
 
     def __init__(
         self,
@@ -88,14 +131,16 @@ class SemiSupervisedNet(pinot.Net):
 
         Parameters
         ----------
-        g :
+        g : DGLGraph
+            The batched graph 
             
-        y :
-            
+        y : FloatTensor
+            of shape (number of subgraphs,)
+            The measurements associated with the subgraphs
 
         Returns
         -------
-
+            ELBO loss
         """
         # Compute the node representation
         # Call this function to compute the nodes representations
@@ -134,14 +179,18 @@ class SemiSupervisedNet(pinot.Net):
 
         Parameters
         ----------
-        h :
+        h : FloatTensor
+            Of shape (num_subgraphs, latent_dim)
+            The latent representation of the subgraphs
             
-        y :
-            
+        y : FloatTensor
+            Of shape (num_subgraphs,)
+            The measurements associated with the subgraphs
 
         Returns
         -------
-
+            loss:
+                Invokes loss function of the output regressor
         """
         # If output regressor has loss function implemented
         return self._loss(h, y)
@@ -151,14 +200,16 @@ class SemiSupervisedNet(pinot.Net):
 
         Parameters
         ----------
-        g :
-            
-        h :
-            
+        g : DGLGraph
+            The batched graph 
+                        
+        h : FloatTensor
+            Of shape (num_subgraphs, latent_dim)
+            The latent representation of the subgraphs            
 
         Returns
         -------
-
+            ELBO loss of the VAE
         """
         # h = (number of nodes, embedding_dim)
         theta = [
@@ -172,7 +223,7 @@ class SemiSupervisedNet(pinot.Net):
         )
         z_sample = distribution.rsample()
         # Compute the ELBO loss
-        # First the reconstruction loss (~~ expected log likelihood)
+        # First the reconstruction loss (~~ negative expected log likelihood)
         recon_loss = self.decoder.decode_and_compute_recon_error(g, z_sample)
         # KL-divergence term
         KLD = (

@@ -232,12 +232,13 @@ def from_rdkit_mol(mol, use_fp=True):
     bonds = list(mol.GetBonds())
     bonds_begin_idxs = [bond.GetBeginAtomIdx() for bond in bonds]
     bonds_end_idxs = [bond.GetEndAtomIdx() for bond in bonds]
+    bonds_types = torch.Tensor([bond.GetBondType() for bond in bonds])
 
     # NOTE: dgl edges are directional
-    g.add_edges(bonds_begin_idxs, bonds_end_idxs)
-    g.add_edges(bonds_end_idxs, bonds_begin_idxs)
+    g.add_edges(bonds_begin_idxs, bonds_end_idxs, data={"type": bonds_types})
+    g.add_edges(bonds_end_idxs, bonds_begin_idxs, data={"type": bonds_types})
 
     # no edge data for now
-    # g.edata["type"] = torch.Tensor(bonds_types)[:, None].repeat(2, 1)
+    # g.edata["type"] = bonds_types[:, None].repeat(2, 1)
 
     return g
