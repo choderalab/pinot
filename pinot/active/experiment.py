@@ -366,8 +366,11 @@ class BayesOptExperiment(ActiveLearningExperiment):
         # grab old data
         self.old_data = self.slice_fn(self.data, self.old)
 
-        # set y_max
-        gs, ys = self.old_data
+        if isinstance(self.old_data, torch.Tensor):
+            gs, ys = self.old_data.unbind(dim=-1)
+        else:
+            # set y_max
+            gs, ys = self.old_data
         self.y_best = torch.max(ys)
 
     def run(self, num_rounds=999999, seed=None):
