@@ -49,7 +49,7 @@ class BiophysicalRegressor(torch.nn.Module):
 
 
    	def marginal_sample(self, h=None, n_samples=100, test_ligand_concentration=1e-3, **kwargs):
-   		distribution_base_regressor = self.base_regressor.condition(h, kwargs)
+   		distribution_base_regressor = self.base_regressor.condition(h, **kwargs)
    		samples_measurement = []
    		for ns in range(n_samples):
    			f_sample = distribution_base_regressor.rsample()
