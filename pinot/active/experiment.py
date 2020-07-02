@@ -51,7 +51,7 @@ def _slice_fn_tensor_pair(x, idxs):
         Output tensor.
 
     """
-    return x[idxs].unbind(dim=-1)
+    return x[0][idxs], x[1][idxs]
 
 def _collate_fn_tensor(x):
     """ Collate function for tensors.
