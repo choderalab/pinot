@@ -67,7 +67,6 @@ class BiophysicalRegressor(torch.nn.Module):
     	distribution_base_regressor = self.base_regressor.condition(h, **kwargs)
     	marginal_loss_measurement = 0
     	for ns in range(n_samples):
-    		for ns in range(n_samples):
    			f_sample = distribution_base_regressor.rsample()
 	        mu_m = self.g(func_value=f_sample, test_ligand_concentration=test_ligand_concentration)
 	        sigma_m = torch.exp(self.log_sigma_measurement)
