@@ -1,0 +1,5 @@
+root - DEBUG - Namespace(architecture_file='scripts/semi_supervised/architectures_search.txt', batch_size=32, const_unsup_scale=False, cuda=True, decoder='EdgeDecoder', embedding_dim=64, label_split=[0.8, 0.2], labeled_data='moonshot', lr=0.0001, n_epochs=1000, optimizer='Adam', output='/home/nguyenm5/coding/pinot/semi-supervised-out-2020-07-02-arch-search/', regressor_type='gp', unlabeled_data='moonshot_unlabeled_small', weight_decay=0.01)
+root - DEBUG - Finished loading all data after 20.63135814666748 seconds
+root - DEBUG - We have 374 labeled and 5831 unlabeled molecules
+root - DEBUG - All architectures: 
+root - DEBUG - [['GATConv', '64', '3', 'attention_pool', 'concat', 'activation', 'tanh', 'GATConv', '64', '3', 'attention_pool', 'sum', 'activation', 'tanh'], ['GATConv', '128', '2', 'attention_pool', 'concat', 'activation', 'tanh', 'GATConv', '128', '2', 'attention_pool', 'sum', 'activation', 'tanh'], ['GraphConv', '128', 'activation', 'tanh', 'GraphConv', '128', 'activation', 'tanh'], ['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh']]
