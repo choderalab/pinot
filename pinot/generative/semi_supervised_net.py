@@ -100,6 +100,7 @@ class SemiSupervisedNet(pinot.Net):
         # Output_regressor_generative:
         assert hasattr(self.decoder, "forward")
         assert hasattr(self.decoder, "embedding_dim")
+        assert hasattr(self.decoder, "decode_and_compute_recon_error")
         # Generative hidden dim is the size of the hidden layer of the
         # generative output regressor network
         self.generative_hidden_dim = generative_hidden_dim
