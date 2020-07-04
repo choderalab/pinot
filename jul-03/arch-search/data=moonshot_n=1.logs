@@ -1,0 +1,331 @@
+root - DEBUG - Namespace(architecture_file='scripts/semi_supervised/architectures_search.txt', batch_size=32, const_unsup_scale=False, cuda=True, embedding_dim=64, label_split=[0.8, 0.2], labeled_data='moonshot', lr=0.0001, n_epochs=1, optimizer='Adam', output='/home/nguyenm5/coding/pinot/jul-03/arch-search', regressor_type='gp', unlabeled_data='moonshot_unlabeled_small', weight_decay=0.0001)
+root - DEBUG - Finished loading all data after 16.78664255142212 seconds
+root - DEBUG - We have 374 labeled and 5831 unlabeled molecules
+root - DEBUG - Finished training architecture = ['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], semi = False, decoder=DecoderNetwork
+root - DEBUG - All legends:
+root - DEBUG - ['0_False_DecoderNetwork']
+root - DEBUG - Train:
+root - DEBUG - {'r2': {0: array(0.9938946, dtype=float32), 'final': array(0.9938946, dtype=float32)}, 'avg_nll': {0: array(-0.62347806, dtype=float32), 'final': array(-0.62347615, dtype=float32)}, 'rmse': {0: array(0.02023529, dtype=float32), 'final': array(0.0202352, dtype=float32)}}
+root - DEBUG - Test:
+root - DEBUG - {'r2': {0: array(-0.07692766, dtype=float32), 'final': array(-0.07692742, dtype=float32)}, 'avg_nll': {0: array(0.68479896, dtype=float32), 'final': array(0.68479884, dtype=float32)}, 'rmse': {0: array(0.22718622, dtype=float32), 'final': array(0.2271862, dtype=float32)}}
+root - DEBUG - Finished training architecture = ['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], semi = True, decoder=DecoderNetwork
+root - DEBUG - All legends:
+root - DEBUG - ['0_False_DecoderNetwork', '0_True_DecoderNetwork']
+root - DEBUG - Train:
+root - DEBUG - {'r2': {0: array(0.9931454, dtype=float32), 'final': array(0.9931454, dtype=float32)}, 'avg_nll': {0: array(-0.62367827, dtype=float32), 'final': array(-0.6236776, dtype=float32)}, 'rmse': {0: array(0.02144087, dtype=float32), 'final': array(0.02144087, dtype=float32)}}
+root - DEBUG - Test:
+root - DEBUG - {'r2': {0: array(-0.04351592, dtype=float32), 'final': array(-0.04351592, dtype=float32)}, 'avg_nll': {0: array(0.6804368, dtype=float32), 'final': array(0.68043685, dtype=float32)}, 'rmse': {0: array(0.22363424, dtype=float32), 'final': array(0.22363421, dtype=float32)}}
+root - DEBUG - Finished training architecture = ['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], semi = False, decoder=EdgeDecoder
+root - DEBUG - All legends:
+root - DEBUG - ['0_False_DecoderNetwork', '0_True_DecoderNetwork', '0_False_EdgeDecoder']
+root - DEBUG - Train:
+root - DEBUG - {'r2': {0: array(0.99209535, dtype=float32), 'final': array(0.9920954, dtype=float32)}, 'avg_nll': {0: array(-0.624956, dtype=float32), 'final': array(-0.6249553, dtype=float32)}, 'rmse': {0: array(0.02302459, dtype=float32), 'final': array(0.02302451, dtype=float32)}}
+root - DEBUG - Test:
+root - DEBUG - {'r2': {0: array(-0.14120102, dtype=float32), 'final': array(-0.14120042, dtype=float32)}, 'avg_nll': {0: array(0.6675084, dtype=float32), 'final': array(0.66750824, dtype=float32)}, 'rmse': {0: array(0.23386744, dtype=float32), 'final': array(0.23386745, dtype=float32)}}
+root - DEBUG - Finished training architecture = ['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], semi = True, decoder=EdgeDecoder
+root - DEBUG - All legends:
+root - DEBUG - ['0_False_DecoderNetwork', '0_True_DecoderNetwork', '0_False_EdgeDecoder', '0_True_EdgeDecoder']
+root - DEBUG - Train:
+root - DEBUG - {'r2': {0: array(0.9924436, dtype=float32), 'final': array(0.9924436, dtype=float32)}, 'avg_nll': {0: array(-0.6253855, dtype=float32), 'final': array(-0.62538457, dtype=float32)}, 'rmse': {0: array(0.02251171, dtype=float32), 'final': array(0.02251161, dtype=float32)}}
+root - DEBUG - Test:
+root - DEBUG - {'r2': {0: array(-0.16530597, dtype=float32), 'final': array(-0.16530561, dtype=float32)}, 'avg_nll': {0: array(0.6655631, dtype=float32), 'final': array(0.66556275, dtype=float32)}, 'rmse': {0: array(0.23632441, dtype=float32), 'final': array(0.23632447, dtype=float32)}}
+root - DEBUG - Finished training architecture = ['GATConv', '32', '3', 'attention_pool', 'concat', 'activation', 'tanh', 'GATConv', '32', '3', 'attention_pool', 'concat', 'activation', 'tanh', 'GATConv', '32', '3', 'attention_pool', 'sum', 'activation', 'tanh'], semi = False, decoder=DecoderNetwork
+root - DEBUG - All legends:
+root - DEBUG - ['0_False_DecoderNetwork', '0_True_DecoderNetwork', '0_False_EdgeDecoder', '0_True_EdgeDecoder', '1_False_DecoderNetwork']
+root - DEBUG - Train:
+root - DEBUG - {'r2': {0: array(0.9919465, dtype=float32), 'final': array(0.9919466, dtype=float32)}, 'avg_nll': {0: array(-0.62462115, dtype=float32), 'final': array(-0.62462103, dtype=float32)}, 'rmse': {0: array(0.02324033, dtype=float32), 'final': array(0.02324024, dtype=float32)}}
+root - DEBUG - Test:
+root - DEBUG - {'r2': {0: array(-0.08214533, dtype=float32), 'final': array(-0.08214557, dtype=float32)}, 'avg_nll': {0: array(0.6815856, dtype=float32), 'final': array(0.68158567, dtype=float32)}, 'rmse': {0: array(0.2277359, dtype=float32), 'final': array(0.22773594, dtype=float32)}}
+root - DEBUG - Finished training architecture = ['GATConv', '32', '3', 'attention_pool', 'concat', 'activation', 'tanh', 'GATConv', '32', '3', 'attention_pool', 'concat', 'activation', 'tanh', 'GATConv', '32', '3', 'attention_pool', 'sum', 'activation', 'tanh'], semi = True, decoder=DecoderNetwork
+root - DEBUG - All legends:
+root - DEBUG - ['0_False_DecoderNetwork', '0_True_DecoderNetwork', '0_False_EdgeDecoder', '0_True_EdgeDecoder', '1_False_DecoderNetwork', '1_True_DecoderNetwork']
+root - DEBUG - Train:
+root - DEBUG - {'r2': {0: array(0.9928645, dtype=float32), 'final': array(0.99286443, dtype=float32)}, 'avg_nll': {0: array(-0.61675954, dtype=float32), 'final': array(-0.6167589, dtype=float32)}, 'rmse': {0: array(0.02187554, dtype=float32), 'final': array(0.02187568, dtype=float32)}}
+root - DEBUG - Test:
+root - DEBUG - {'r2': {0: array(-0.06560242, dtype=float32), 'final': array(-0.06560242, dtype=float32)}, 'avg_nll': {0: array(0.7499025, dtype=float32), 'final': array(0.7499023, dtype=float32)}, 'rmse': {0: array(0.22598849, dtype=float32), 'final': array(0.2259885, dtype=float32)}}
+root - DEBUG - Finished training architecture = ['GATConv', '32', '3', 'attention_pool', 'concat', 'activation', 'tanh', 'GATConv', '32', '3', 'attention_pool', 'concat', 'activation', 'tanh', 'GATConv', '32', '3', 'attention_pool', 'sum', 'activation', 'tanh'], semi = False, decoder=EdgeDecoder
+root - DEBUG - All legends:
+root - DEBUG - ['0_False_DecoderNetwork', '0_True_DecoderNetwork', '0_False_EdgeDecoder', '0_True_EdgeDecoder', '1_False_DecoderNetwork', '1_True_DecoderNetwork', '1_False_EdgeDecoder']
+root - DEBUG - Train:
+root - DEBUG - {'r2': {0: array(0.98856854, dtype=float32), 'final': array(0.9885684, dtype=float32)}, 'avg_nll': {0: array(-0.6234528, dtype=float32), 'final': array(-0.6234551, dtype=float32)}, 'rmse': {0: array(0.02768854, dtype=float32), 'final': array(0.02768845, dtype=float32)}}
+root - DEBUG - Test:
+root - DEBUG - {'r2': {0: array(-0.02015257, dtype=float32), 'final': array(-0.02015173, dtype=float32)}, 'avg_nll': {0: array(0.6348208, dtype=float32), 'final': array(0.63482064, dtype=float32)}, 'rmse': {0: array(0.22111653, dtype=float32), 'final': array(0.22111647, dtype=float32)}}
+root - DEBUG - Finished training architecture = ['GATConv', '32', '3', 'attention_pool', 'concat', 'activation', 'tanh', 'GATConv', '32', '3', 'attention_pool', 'concat', 'activation', 'tanh', 'GATConv', '32', '3', 'attention_pool', 'sum', 'activation', 'tanh'], semi = True, decoder=EdgeDecoder
+root - DEBUG - All legends:
+root - DEBUG - ['0_False_DecoderNetwork', '0_True_DecoderNetwork', '0_False_EdgeDecoder', '0_True_EdgeDecoder', '1_False_DecoderNetwork', '1_True_DecoderNetwork', '1_False_EdgeDecoder', '1_True_EdgeDecoder']
+root - DEBUG - Train:
+root - DEBUG - {'r2': {0: array(0.9933129, dtype=float32), 'final': array(0.99331284, dtype=float32)}, 'avg_nll': {0: array(-0.6177065, dtype=float32), 'final': array(-0.61770505, dtype=float32)}, 'rmse': {0: array(0.02117739, dtype=float32), 'final': array(0.02117749, dtype=float32)}}
+root - DEBUG - Test:
+root - DEBUG - {'r2': {0: array(-0.06723654, dtype=float32), 'final': array(-0.06723714, dtype=float32)}, 'avg_nll': {0: array(0.7337635, dtype=float32), 'final': array(0.7337633, dtype=float32)}, 'rmse': {0: array(0.22616172, dtype=float32), 'final': array(0.22616169, dtype=float32)}}
+root - DEBUG - Finished training architecture = ['GATConv', '64', '3', 'attention_pool', 'concat', 'activation', 'tanh', 'GATConv', '64', '3', 'attention_pool', 'concat', 'activation', 'tanh', 'GATConv', '64', '3', 'attention_pool', 'sum', 'activation', 'tanh'], semi = False, decoder=DecoderNetwork
+root - DEBUG - All legends:
+root - DEBUG - ['0_False_DecoderNetwork', '0_True_DecoderNetwork', '0_False_EdgeDecoder', '0_True_EdgeDecoder', '1_False_DecoderNetwork', '1_True_DecoderNetwork', '1_False_EdgeDecoder', '1_True_EdgeDecoder', '2_False_DecoderNetwork']
+root - DEBUG - Train:
+root - DEBUG - {'r2': {0: array(0.9912095, dtype=float32), 'final': array(0.99120986, dtype=float32)}, 'avg_nll': {0: array(-0.62552166, dtype=float32), 'final': array(-0.62551934, dtype=float32)}, 'rmse': {0: array(0.02428032, dtype=float32), 'final': array(0.02428036, dtype=float32)}}
+root - DEBUG - Test:
+root - DEBUG - {'r2': {0: array(-0.11559522, dtype=float32), 'final': array(-0.11559582, dtype=float32)}, 'avg_nll': {0: array(0.6613878, dtype=float32), 'final': array(0.6613877, dtype=float32)}, 'rmse': {0: array(0.23122886, dtype=float32), 'final': array(0.23122895, dtype=float32)}}
+root - DEBUG - Finished training architecture = ['GATConv', '64', '3', 'attention_pool', 'concat', 'activation', 'tanh', 'GATConv', '64', '3', 'attention_pool', 'concat', 'activation', 'tanh', 'GATConv', '64', '3', 'attention_pool', 'sum', 'activation', 'tanh'], semi = True, decoder=DecoderNetwork
+root - DEBUG - All legends:
+root - DEBUG - ['0_False_DecoderNetwork', '0_True_DecoderNetwork', '0_False_EdgeDecoder', '0_True_EdgeDecoder', '1_False_DecoderNetwork', '1_True_DecoderNetwork', '1_False_EdgeDecoder', '1_True_EdgeDecoder', '2_False_DecoderNetwork', '2_True_DecoderNetwork']
+root - DEBUG - Train:
+root - DEBUG - {'r2': {0: array(0.99572766, dtype=float32), 'final': array(0.9957277, dtype=float32)}, 'avg_nll': {0: array(-0.6122412, dtype=float32), 'final': array(-0.61224127, dtype=float32)}, 'rmse': {0: array(0.01692691, dtype=float32), 'final': array(0.01692713, dtype=float32)}}
+root - DEBUG - Test:
+root - DEBUG - {'r2': {0: array(-0.09096563, dtype=float32), 'final': array(-0.09096611, dtype=float32)}, 'avg_nll': {0: array(0.81097436, dtype=float32), 'final': array(0.81097424, dtype=float32)}, 'rmse': {0: array(0.22866215, dtype=float32), 'final': array(0.22866215, dtype=float32)}}
+root - DEBUG - Finished training architecture = ['GATConv', '64', '3', 'attention_pool', 'concat', 'activation', 'tanh', 'GATConv', '64', '3', 'attention_pool', 'concat', 'activation', 'tanh', 'GATConv', '64', '3', 'attention_pool', 'sum', 'activation', 'tanh'], semi = False, decoder=EdgeDecoder
+root - DEBUG - All legends:
+root - DEBUG - ['0_False_DecoderNetwork', '0_True_DecoderNetwork', '0_False_EdgeDecoder', '0_True_EdgeDecoder', '1_False_DecoderNetwork', '1_True_DecoderNetwork', '1_False_EdgeDecoder', '1_True_EdgeDecoder', '2_False_DecoderNetwork', '2_True_DecoderNetwork', '2_False_EdgeDecoder']
+root - DEBUG - Train:
+root - DEBUG - {'r2': {0: array(0.9924325, dtype=float32), 'final': array(0.99243265, dtype=float32)}, 'avg_nll': {0: array(-0.6200006, dtype=float32), 'final': array(-0.619998, dtype=float32)}, 'rmse': {0: array(0.02252804, dtype=float32), 'final': array(0.02252802, dtype=float32)}}
+root - DEBUG - Test:
+root - DEBUG - {'r2': {0: array(-0.08710122, dtype=float32), 'final': array(-0.08710217, dtype=float32)}, 'avg_nll': {0: array(0.7061319, dtype=float32), 'final': array(0.70613205, dtype=float32)}, 'rmse': {0: array(0.22825682, dtype=float32), 'final': array(0.22825678, dtype=float32)}}
+root - DEBUG - Finished training architecture = ['GATConv', '64', '3', 'attention_pool', 'concat', 'activation', 'tanh', 'GATConv', '64', '3', 'attention_pool', 'concat', 'activation', 'tanh', 'GATConv', '64', '3', 'attention_pool', 'sum', 'activation', 'tanh'], semi = True, decoder=EdgeDecoder
+root - DEBUG - All legends:
+root - DEBUG - ['0_False_DecoderNetwork', '0_True_DecoderNetwork', '0_False_EdgeDecoder', '0_True_EdgeDecoder', '1_False_DecoderNetwork', '1_True_DecoderNetwork', '1_False_EdgeDecoder', '1_True_EdgeDecoder', '2_False_DecoderNetwork', '2_True_DecoderNetwork', '2_False_EdgeDecoder', '2_True_EdgeDecoder']
+root - DEBUG - Train:
+root - DEBUG - {'r2': {0: array(0.99550813, dtype=float32), 'final': array(0.9955081, dtype=float32)}, 'avg_nll': {0: array(-0.61347264, dtype=float32), 'final': array(-0.6134709, dtype=float32)}, 'rmse': {0: array(0.01735668, dtype=float32), 'final': array(0.01735669, dtype=float32)}}
+root - DEBUG - Test:
+root - DEBUG - {'r2': {0: array(-0.00983322, dtype=float32), 'final': array(-0.00983357, dtype=float32)}, 'avg_nll': {0: array(0.7976335, dtype=float32), 'final': array(0.7976335, dtype=float32)}, 'rmse': {0: array(0.21999536, dtype=float32), 'final': array(0.21999536, dtype=float32)}}
+matplotlib.font_manager - DEBUG - findfont: Matching sans\-serif:style=normal:variant=normal:weight=normal:stretch=normal:size=10.0.
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeFourSym' (STIXSizFourSymReg.ttf) normal normal regular normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'cmtt10' (cmtt10.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Mono' (DejaVuSansMono-Oblique.ttf) oblique normal 400 normal>) = 11.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'cmmi10' (cmmi10.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeThreeSym' (STIXSizThreeSymBol.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'cmsy10' (cmsy10.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeOneSym' (STIXSizOneSymBol.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'cmex10' (cmex10.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Display' (DejaVuSansDisplay.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Serif Display' (DejaVuSerifDisplay.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans-BoldOblique.ttf) oblique normal 700 normal>) = 1.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Serif' (DejaVuSerif-BoldItalic.ttf) italic normal 700 normal>) = 11.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans.ttf) normal normal 400 normal>) = 0.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeOneSym' (STIXSizOneSymReg.ttf) normal normal regular normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'cmss10' (cmss10.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeThreeSym' (STIXSizThreeSymReg.ttf) normal normal regular normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeTwoSym' (STIXSizTwoSymBol.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXNonUnicode' (STIXNonUniIta.ttf) italic normal 400 normal>) = 11.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXGeneral' (STIXGeneralBolIta.ttf) italic normal 700 normal>) = 11.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXGeneral' (STIXGeneral.ttf) normal normal regular normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'cmr10' (cmr10.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXGeneral' (STIXGeneralItalic.ttf) italic normal 400 normal>) = 11.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Serif' (DejaVuSerif.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXNonUnicode' (STIXNonUniBol.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeTwoSym' (STIXSizTwoSymReg.ttf) normal normal regular normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans-Oblique.ttf) oblique normal 400 normal>) = 1.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXGeneral' (STIXGeneralBol.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Mono' (DejaVuSansMono.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'cmb10' (cmb10.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeFiveSym' (STIXSizFiveSymReg.ttf) normal normal regular normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXNonUnicode' (STIXNonUniBolIta.ttf) italic normal 700 normal>) = 11.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Serif' (DejaVuSerif-Italic.ttf) italic normal 400 normal>) = 11.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Serif' (DejaVuSerif-Bold.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXNonUnicode' (STIXNonUni.ttf) normal normal regular normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans-Bold.ttf) normal normal 700 normal>) = 0.33499999999999996
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Mono' (DejaVuSansMono-Bold.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeFourSym' (STIXSizFourSymBol.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Mono' (DejaVuSansMono-BoldOblique.ttf) oblique normal 700 normal>) = 11.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'Liberation Sans' (LiberationSans-Regular.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans-BoldOblique.ttf) oblique normal 700 normal>) = 1.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'Liberation Sans' (LiberationSans-BoldItalic.ttf) italic normal 700 normal>) = 11.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSansCondensed-Oblique.ttf) oblique normal 400 condensed>) = 1.25
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIX' (STIX-BoldItalic.otf) italic normal 700 normal>) = 11.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSansCondensed.ttf) normal normal 400 condensed>) = 0.25
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIX' (STIX-Regular.otf) normal normal regular normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans-ExtraLight.ttf) normal normal light normal>) = 0.24
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIX' (STIX-Bold.otf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'Liberation Sans' (LiberationSans-Italic.ttf) italic normal 400 normal>) = 11.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSansCondensed-BoldOblique.ttf) oblique normal 700 condensed>) = 1.535
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans-Oblique.ttf) oblique normal 400 normal>) = 1.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Mono' (DejaVuSansMono-Oblique.ttf) oblique normal 400 normal>) = 11.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Mono' (DejaVuSansMono-Bold.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSansCondensed-Bold.ttf) normal normal 700 condensed>) = 0.5349999999999999
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'Liberation Sans' (LiberationSans-Bold.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIX' (STIX-Italic.otf) italic normal 400 normal>) = 11.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Mono' (DejaVuSansMono.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans-Bold.ttf) normal normal 700 normal>) = 0.33499999999999996
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans.ttf) normal normal 400 normal>) = 0.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Mono' (DejaVuSansMono-BoldOblique.ttf) oblique normal 700 normal>) = 11.335
+matplotlib.font_manager - DEBUG - findfont: Matching sans\-serif:style=normal:variant=normal:weight=normal:stretch=normal:size=10.0 to DejaVu Sans ('/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf') with score of 0.050000.
+matplotlib.font_manager - DEBUG - findfont: Matching serif:style=normal:variant=normal:weight=normal:stretch=normal:size=12.0.
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeFourSym' (STIXSizFourSymReg.ttf) normal normal regular normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'cmtt10' (cmtt10.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Mono' (DejaVuSansMono-Oblique.ttf) oblique normal 400 normal>) = 11.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'cmmi10' (cmmi10.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeThreeSym' (STIXSizThreeSymBol.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'cmsy10' (cmsy10.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeOneSym' (STIXSizOneSymBol.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'cmex10' (cmex10.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Display' (DejaVuSansDisplay.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Serif Display' (DejaVuSerifDisplay.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans-BoldOblique.ttf) oblique normal 700 normal>) = 11.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Serif' (DejaVuSerif-BoldItalic.ttf) italic normal 700 normal>) = 1.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeOneSym' (STIXSizOneSymReg.ttf) normal normal regular normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'cmss10' (cmss10.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeThreeSym' (STIXSizThreeSymReg.ttf) normal normal regular normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeTwoSym' (STIXSizTwoSymBol.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXNonUnicode' (STIXNonUniIta.ttf) italic normal 400 normal>) = 11.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXGeneral' (STIXGeneralBolIta.ttf) italic normal 700 normal>) = 11.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXGeneral' (STIXGeneral.ttf) normal normal regular normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'cmr10' (cmr10.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXGeneral' (STIXGeneralItalic.ttf) italic normal 400 normal>) = 11.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Serif' (DejaVuSerif.ttf) normal normal 400 normal>) = 0.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXNonUnicode' (STIXNonUniBol.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeTwoSym' (STIXSizTwoSymReg.ttf) normal normal regular normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans-Oblique.ttf) oblique normal 400 normal>) = 11.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXGeneral' (STIXGeneralBol.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Mono' (DejaVuSansMono.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'cmb10' (cmb10.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeFiveSym' (STIXSizFiveSymReg.ttf) normal normal regular normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXNonUnicode' (STIXNonUniBolIta.ttf) italic normal 700 normal>) = 11.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Serif' (DejaVuSerif-Italic.ttf) italic normal 400 normal>) = 1.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Serif' (DejaVuSerif-Bold.ttf) normal normal 700 normal>) = 0.33499999999999996
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXNonUnicode' (STIXNonUni.ttf) normal normal regular normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans-Bold.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Mono' (DejaVuSansMono-Bold.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeFourSym' (STIXSizFourSymBol.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Mono' (DejaVuSansMono-BoldOblique.ttf) oblique normal 700 normal>) = 11.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'Liberation Sans' (LiberationSans-Regular.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans-BoldOblique.ttf) oblique normal 700 normal>) = 11.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'Liberation Sans' (LiberationSans-BoldItalic.ttf) italic normal 700 normal>) = 11.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSansCondensed-Oblique.ttf) oblique normal 400 condensed>) = 11.25
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIX' (STIX-BoldItalic.otf) italic normal 700 normal>) = 11.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSansCondensed.ttf) normal normal 400 condensed>) = 10.25
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIX' (STIX-Regular.otf) normal normal regular normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans-ExtraLight.ttf) normal normal light normal>) = 10.24
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIX' (STIX-Bold.otf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'Liberation Sans' (LiberationSans-Italic.ttf) italic normal 400 normal>) = 11.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSansCondensed-BoldOblique.ttf) oblique normal 700 condensed>) = 11.535
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans-Oblique.ttf) oblique normal 400 normal>) = 11.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Mono' (DejaVuSansMono-Oblique.ttf) oblique normal 400 normal>) = 11.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Mono' (DejaVuSansMono-Bold.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSansCondensed-Bold.ttf) normal normal 700 condensed>) = 10.535
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'Liberation Sans' (LiberationSans-Bold.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIX' (STIX-Italic.otf) italic normal 400 normal>) = 11.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Mono' (DejaVuSansMono.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans-Bold.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Mono' (DejaVuSansMono-BoldOblique.ttf) oblique normal 700 normal>) = 11.335
+matplotlib.font_manager - DEBUG - findfont: Matching serif:style=normal:variant=normal:weight=normal:stretch=normal:size=12.0 to DejaVu Serif ('/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSerif.ttf') with score of 0.050000.
+matplotlib.font_manager - DEBUG - findfont: Matching serif:style=normal:variant=normal:weight=normal:stretch=normal:size=16.0.
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeFourSym' (STIXSizFourSymReg.ttf) normal normal regular normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'cmtt10' (cmtt10.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Mono' (DejaVuSansMono-Oblique.ttf) oblique normal 400 normal>) = 11.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'cmmi10' (cmmi10.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeThreeSym' (STIXSizThreeSymBol.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'cmsy10' (cmsy10.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeOneSym' (STIXSizOneSymBol.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'cmex10' (cmex10.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Display' (DejaVuSansDisplay.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Serif Display' (DejaVuSerifDisplay.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans-BoldOblique.ttf) oblique normal 700 normal>) = 11.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Serif' (DejaVuSerif-BoldItalic.ttf) italic normal 700 normal>) = 1.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeOneSym' (STIXSizOneSymReg.ttf) normal normal regular normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'cmss10' (cmss10.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeThreeSym' (STIXSizThreeSymReg.ttf) normal normal regular normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeTwoSym' (STIXSizTwoSymBol.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXNonUnicode' (STIXNonUniIta.ttf) italic normal 400 normal>) = 11.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXGeneral' (STIXGeneralBolIta.ttf) italic normal 700 normal>) = 11.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXGeneral' (STIXGeneral.ttf) normal normal regular normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'cmr10' (cmr10.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXGeneral' (STIXGeneralItalic.ttf) italic normal 400 normal>) = 11.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Serif' (DejaVuSerif.ttf) normal normal 400 normal>) = 0.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXNonUnicode' (STIXNonUniBol.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeTwoSym' (STIXSizTwoSymReg.ttf) normal normal regular normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans-Oblique.ttf) oblique normal 400 normal>) = 11.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXGeneral' (STIXGeneralBol.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Mono' (DejaVuSansMono.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'cmb10' (cmb10.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeFiveSym' (STIXSizFiveSymReg.ttf) normal normal regular normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXNonUnicode' (STIXNonUniBolIta.ttf) italic normal 700 normal>) = 11.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Serif' (DejaVuSerif-Italic.ttf) italic normal 400 normal>) = 1.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Serif' (DejaVuSerif-Bold.ttf) normal normal 700 normal>) = 0.33499999999999996
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXNonUnicode' (STIXNonUni.ttf) normal normal regular normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans-Bold.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Mono' (DejaVuSansMono-Bold.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeFourSym' (STIXSizFourSymBol.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Mono' (DejaVuSansMono-BoldOblique.ttf) oblique normal 700 normal>) = 11.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'Liberation Sans' (LiberationSans-Regular.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans-BoldOblique.ttf) oblique normal 700 normal>) = 11.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'Liberation Sans' (LiberationSans-BoldItalic.ttf) italic normal 700 normal>) = 11.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSansCondensed-Oblique.ttf) oblique normal 400 condensed>) = 11.25
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIX' (STIX-BoldItalic.otf) italic normal 700 normal>) = 11.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSansCondensed.ttf) normal normal 400 condensed>) = 10.25
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIX' (STIX-Regular.otf) normal normal regular normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans-ExtraLight.ttf) normal normal light normal>) = 10.24
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIX' (STIX-Bold.otf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'Liberation Sans' (LiberationSans-Italic.ttf) italic normal 400 normal>) = 11.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSansCondensed-BoldOblique.ttf) oblique normal 700 condensed>) = 11.535
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans-Oblique.ttf) oblique normal 400 normal>) = 11.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Mono' (DejaVuSansMono-Oblique.ttf) oblique normal 400 normal>) = 11.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Mono' (DejaVuSansMono-Bold.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSansCondensed-Bold.ttf) normal normal 700 condensed>) = 10.535
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'Liberation Sans' (LiberationSans-Bold.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIX' (STIX-Italic.otf) italic normal 400 normal>) = 11.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Mono' (DejaVuSansMono.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans-Bold.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Mono' (DejaVuSansMono-BoldOblique.ttf) oblique normal 700 normal>) = 11.335
+matplotlib.font_manager - DEBUG - findfont: Matching serif:style=normal:variant=normal:weight=normal:stretch=normal:size=16.0 to DejaVu Serif ('/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSerif.ttf') with score of 0.050000.
+matplotlib.font_manager - DEBUG - findfont: Matching serif:style=normal:variant=normal:weight=normal:stretch=normal:size=10.0.
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeFourSym' (STIXSizFourSymReg.ttf) normal normal regular normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'cmtt10' (cmtt10.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Mono' (DejaVuSansMono-Oblique.ttf) oblique normal 400 normal>) = 11.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'cmmi10' (cmmi10.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeThreeSym' (STIXSizThreeSymBol.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'cmsy10' (cmsy10.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeOneSym' (STIXSizOneSymBol.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'cmex10' (cmex10.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Display' (DejaVuSansDisplay.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Serif Display' (DejaVuSerifDisplay.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans-BoldOblique.ttf) oblique normal 700 normal>) = 11.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Serif' (DejaVuSerif-BoldItalic.ttf) italic normal 700 normal>) = 1.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeOneSym' (STIXSizOneSymReg.ttf) normal normal regular normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'cmss10' (cmss10.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeThreeSym' (STIXSizThreeSymReg.ttf) normal normal regular normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeTwoSym' (STIXSizTwoSymBol.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXNonUnicode' (STIXNonUniIta.ttf) italic normal 400 normal>) = 11.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXGeneral' (STIXGeneralBolIta.ttf) italic normal 700 normal>) = 11.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXGeneral' (STIXGeneral.ttf) normal normal regular normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'cmr10' (cmr10.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXGeneral' (STIXGeneralItalic.ttf) italic normal 400 normal>) = 11.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Serif' (DejaVuSerif.ttf) normal normal 400 normal>) = 0.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXNonUnicode' (STIXNonUniBol.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeTwoSym' (STIXSizTwoSymReg.ttf) normal normal regular normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans-Oblique.ttf) oblique normal 400 normal>) = 11.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXGeneral' (STIXGeneralBol.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Mono' (DejaVuSansMono.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'cmb10' (cmb10.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeFiveSym' (STIXSizFiveSymReg.ttf) normal normal regular normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXNonUnicode' (STIXNonUniBolIta.ttf) italic normal 700 normal>) = 11.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Serif' (DejaVuSerif-Italic.ttf) italic normal 400 normal>) = 1.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Serif' (DejaVuSerif-Bold.ttf) normal normal 700 normal>) = 0.33499999999999996
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXNonUnicode' (STIXNonUni.ttf) normal normal regular normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans-Bold.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Mono' (DejaVuSansMono-Bold.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIXSizeFourSym' (STIXSizFourSymBol.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Mono' (DejaVuSansMono-BoldOblique.ttf) oblique normal 700 normal>) = 11.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'Liberation Sans' (LiberationSans-Regular.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans-BoldOblique.ttf) oblique normal 700 normal>) = 11.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'Liberation Sans' (LiberationSans-BoldItalic.ttf) italic normal 700 normal>) = 11.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSansCondensed-Oblique.ttf) oblique normal 400 condensed>) = 11.25
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIX' (STIX-BoldItalic.otf) italic normal 700 normal>) = 11.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSansCondensed.ttf) normal normal 400 condensed>) = 10.25
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIX' (STIX-Regular.otf) normal normal regular normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans-ExtraLight.ttf) normal normal light normal>) = 10.24
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIX' (STIX-Bold.otf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'Liberation Sans' (LiberationSans-Italic.ttf) italic normal 400 normal>) = 11.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSansCondensed-BoldOblique.ttf) oblique normal 700 condensed>) = 11.535
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans-Oblique.ttf) oblique normal 400 normal>) = 11.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Mono' (DejaVuSansMono-Oblique.ttf) oblique normal 400 normal>) = 11.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Mono' (DejaVuSansMono-Bold.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSansCondensed-Bold.ttf) normal normal 700 condensed>) = 10.535
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'Liberation Sans' (LiberationSans-Bold.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'STIX' (STIX-Italic.otf) italic normal 400 normal>) = 11.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Mono' (DejaVuSansMono.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans-Bold.ttf) normal normal 700 normal>) = 10.335
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans' (DejaVuSans.ttf) normal normal 400 normal>) = 10.05
+matplotlib.font_manager - DEBUG - findfont: score(<Font 'DejaVu Sans Mono' (DejaVuSansMono-BoldOblique.ttf) oblique normal 700 normal>) = 11.335
+matplotlib.font_manager - DEBUG - findfont: Matching serif:style=normal:variant=normal:weight=normal:stretch=normal:size=10.0 to DejaVu Serif ('/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSerif.ttf') with score of 0.050000.
