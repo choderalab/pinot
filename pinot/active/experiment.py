@@ -34,6 +34,24 @@ def _slice_fn_tensor(x, idxs):
     """
     return x[idxs]
 
+def _slice_fn_tensor_pair(x, idxs):
+    """ Slice function for tensors.
+
+    Parameters
+    ----------
+    x : `torch.Tensor`, `shape=(n_data, )`
+        Input tensor.
+
+    idxs : `List` of `int`
+        Indices to be taken.
+
+    Returns
+    -------
+    x : `torch.Tensor`, `shape=(n_data_chosen, )`
+        Output tensor.
+
+    """
+    return x[0][idxs], x[1][idxs]
 
 def _collate_fn_tensor(x):
     """ Collate function for tensors.
@@ -368,6 +386,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
 
         # set y_max
         gs, ys = self.old_data
+        
         self.y_best = torch.max(ys)
 
     def run(self, num_rounds=999999, seed=None):
