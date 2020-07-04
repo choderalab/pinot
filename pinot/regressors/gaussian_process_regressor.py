@@ -256,11 +256,11 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
         self,
         in_features,
         kernel=None,
-        log_sigma=-1.0,
+        log_sigma=-3.0,
         n_inducing_points=100,
         mu_initializer_std=0.1,
-        sigma_initializer_value=-3.0,
-        kl_loss_scaling=1e-4,
+        sigma_initializer_value=-2.0,
+        kl_loss_scaling=1e-2,
         grid_boundary=1.0,
     ):
         super(VariationalGaussianProcessRegressor, self).__init__()
@@ -290,6 +290,7 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
                 * torch.ones(n_inducing_points, in_features),
             ).sample()
         )
+
 
         # variational mean for inducing points value
         # (n_inducing_points, 1)
