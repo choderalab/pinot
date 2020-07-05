@@ -293,7 +293,11 @@ class EdgeDecoder(nn.Module):
         decoded_subgraphs = self.forward(g, z_sample)
         gs_unbatched = dgl.unbatch(g)
         assert len(decoded_subgraphs) == len(gs_unbatched)
-        loss = 0.0
+
+        loss = torch.tensor([0.])
+        if z_sample.is_cuda:
+            loss.cuda()
+
         for i, subgraph in enumerate(gs_unbatched):
             # Compute decoding loss for each individual sub-graphs
 
@@ -302,8 +306,9 @@ class EdgeDecoder(nn.Module):
 
             # get E_true
             E_true = self.edge_tensor_from_g(subgraph)
-            if torch.cuda.is_available and E_tilde.is_cuda:
+            if z_sample.is_cuda:
                 E_true.cuda()
+                E_tilde.cuda()
 
             node_types = subgraph.ndata["type"].flatten().long()
             edge_nll = torch.sum(

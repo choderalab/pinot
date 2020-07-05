@@ -254,15 +254,20 @@ class SequentialMix(torch.nn.Module):
         feature_units=117,
         input_units=128,
         model_kwargs={},
+        input_transform=True,
     ):
         super(SequentialMix, self).__init__()
 
         # the initial dimensionality
-        last_out_dim = input_units
-        # initial featurization
-        self.f_in = torch.nn.Sequential(
-            torch.nn.Linear(feature_units, input_units), torch.nn.Tanh()
-        )
+        last_out_dim = feature_units
+        self.input_transform = input_transform
+
+        if input_transform:
+            last_out_dim = input_units
+            # initial featurization
+            self.f_in = torch.nn.Sequential(
+                torch.nn.Linear(feature_units, input_units), torch.nn.Tanh()
+            )
 
         self.exes = []
         # Extract the invidual layers
@@ -315,7 +320,8 @@ class SequentialMix(torch.nn.Module):
     def forward(self, g, h=None, pool=lambda g: dgl.sum_nodes(g, "h")):
         if h is None:
             h = g.ndata["h"]
-        h = self.f_in(h)
+        if hasattr(self, "f_in"):
+            h = self.f_in(h)
 
         with g.local_scope():
             for exe in self.exes:
