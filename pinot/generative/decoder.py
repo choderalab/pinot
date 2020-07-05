@@ -307,13 +307,15 @@ class EdgeDecoder(nn.Module):
             # get E_true
             E_true = self.edge_tensor_from_g(subgraph)
             if z_sample.is_cuda:
-                E_true.cuda()
-                E_tilde.cuda()
+                edge_nll = torch.sum(
+                    F.binary_cross_entropy_with_logits(E_tilde.cuda(), E_true.cuda())
+                )
+            else:
+                edge_nll = torch.sum(
+                    F.binary_cross_entropy_with_logits(E_tilde, E_true)
+                )
 
             node_types = subgraph.ndata["type"].flatten().long()
-            edge_nll = torch.sum(
-                F.binary_cross_entropy_with_logits(E_tilde, E_true)
-            )
             # Note that F.cross_entropy combines log_softmax so we don't
             # have to do sigmoid of x_tilde before calling this function
             node_nll = torch.sum(F.cross_entropy(x_tilde, node_types))
