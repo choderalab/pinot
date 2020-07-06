@@ -42,6 +42,10 @@ class Train:
         (Default value = 1)
         Interval states are recorded.
 
+    lr_scheduler: `torch.optim.lr_scheduler`
+        (Default value = None)
+        Learning rate scheduler, will apply after every training epoch
+
     Methods
     -------
     train_once : Train model once.
@@ -53,7 +57,8 @@ class Train:
 
     """
 
-    def __init__(self, net, data, optimizer, n_epochs=100, record_interval=1):
+    def __init__(self, net, data, optimizer, n_epochs=100, record_interval=1,
+            lr_scheduler=None):
 
         self.data = data
         self.optimizer = optimizer
@@ -61,6 +66,7 @@ class Train:
         self.net = net
         self.record_interval = record_interval
         self.states = {}
+        self.lr_scheduler = lr_scheduler
 
     def train_once(self):
         """Train the model for one batch."""
@@ -90,6 +96,8 @@ class Train:
 
         for epoch_idx in range(int(self.n_epochs)):
             self.train_once()
+            if self.lr_scheduler is not None:
+                self.lr_scheduler.step()
 
             if epoch_idx % self.record_interval == 0:
                 self.states[epoch_idx] = copy.deepcopy(self.net.state_dict())
@@ -209,6 +217,14 @@ class TrainAndTest:
         (Default value = 1)
         Interval states are recorded.
 
+    train_cls: `Train`
+        (Default value = Train)
+        Train class to use
+    
+    lr_scheduler: `torch.optim.lr_scheduler`
+        (Default value = None)
+        Learning rate scheduler, will apply after every training epoch
+
     Methods
     -------
     run : conduct experiment
@@ -225,6 +241,7 @@ class TrainAndTest:
         n_epochs=100,
         record_interval=1,
         train_cls=Train,
+        lr_scheduler=None,
     ):
         self.net = net  # deepcopy the model object
         self.data_tr = data_tr
@@ -234,6 +251,7 @@ class TrainAndTest:
         self.n_epochs = n_epochs
         self.record_interval = record_interval
         self.train_cls = train_cls
+        self.lr_scheduler = lr_scheduler
 
     def __str__(self):
         _str = ""
@@ -263,6 +281,7 @@ class TrainAndTest:
             data=self.data_tr,
             optimizer=self.optimizer,
             n_epochs=self.n_epochs,
+            lr_scheduler=self.lr_scheduler
         )
 
         train.train()

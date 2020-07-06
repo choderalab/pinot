@@ -293,7 +293,11 @@ class EdgeDecoder(nn.Module):
         decoded_subgraphs = self.forward(g, z_sample)
         gs_unbatched = dgl.unbatch(g)
         assert len(decoded_subgraphs) == len(gs_unbatched)
-        loss = 0.0
+
+        loss = torch.tensor([0.])
+        if z_sample.is_cuda:
+            loss.cuda()
+
         for i, subgraph in enumerate(gs_unbatched):
             # Compute decoding loss for each individual sub-graphs
 
@@ -302,13 +306,16 @@ class EdgeDecoder(nn.Module):
 
             # get E_true
             E_true = self.edge_tensor_from_g(subgraph)
-            if torch.cuda.is_available and E_tilde.is_cuda:
-                E_true.cuda()
+            if z_sample.is_cuda:
+                edge_nll = torch.sum(
+                    F.binary_cross_entropy_with_logits(E_tilde.cuda(), E_true.cuda())
+                )
+            else:
+                edge_nll = torch.sum(
+                    F.binary_cross_entropy_with_logits(E_tilde, E_true)
+                )
 
             node_types = subgraph.ndata["type"].flatten().long()
-            edge_nll = torch.sum(
-                F.binary_cross_entropy_with_logits(E_tilde, E_true)
-            )
             # Note that F.cross_entropy combines log_softmax so we don't
             # have to do sigmoid of x_tilde before calling this function
             node_nll = torch.sum(F.cross_entropy(x_tilde, node_types))
