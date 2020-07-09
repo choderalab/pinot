@@ -16,7 +16,7 @@ def run(args):
     Parameters
     ----------
     args :
-        
+
 
     Returns
     -------
@@ -120,7 +120,7 @@ if __name__ == "__main__":
     parser.add_argument("--n_epochs", default=5)
     parser.add_argument(
         "--output_regressor",
-        default="VariationalGaussianProcessOutputRegressor",
+        default="VariationalGaussianProcessRegressor",
         type=str,
     )
     parser.add_argument("--n_inducing_points", default=100, type=int)

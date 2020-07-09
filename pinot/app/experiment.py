@@ -138,13 +138,15 @@ class Test:
     """
 
     def __init__(
-        self, net, data, states, sampler=None, metrics=[pinot.rmse, pinot.r2]
+        self, net, data, states, sampler=None,
+        metrics=[pinot.rmse, pinot.r2], bootstrap=False,
     ):
         self.net = net  # deepcopy the model object
         self.data = data
         self.metrics = metrics
         self.states = states
         self.sampler = sampler
+        self.bootstrap = bootstrap
 
     def test(self):
         """ Run test experiment. """
@@ -179,12 +181,40 @@ class Test:
             g = dgl.batch(g)
 
             for metric in self.metrics:  # loop through the metrics
-                results[metric.__name__][state_name] = (
-                    metric(self.net, g, y, sampler=self.sampler)
-                    .detach()
-                    .cpu()
-                    .numpy()
-                )
+
+
+                if self.bootstrap is False or isinstance(state_name, int):
+                    _metric = metric(
+                        self.net, g, y, sampler=self.sampler,
+                        bootstrap=False,
+                    )
+
+                    results[metric.__name__][state_name] = (
+                        _metric
+                        .detach()
+                        .cpu()
+                        .numpy()
+                    )
+
+                else:
+                    _metric = metric(
+                        self.net, g, y, sampler=self.sampler,
+                        bootstrap=self.bootstrap,
+                    )
+
+                    # if bootstrap
+                    _metric, _low, _high = _metric
+
+                    _metric = _metric.detach().cpu().numpy()
+                    _low = _low.detach().cpu().numpy()
+                    _high = _high.detach().cpu().numpy()
+
+                    results[metric.__name__][state_name
+                        ] = (
+                            _metric,
+                            _low,
+                            _high,
+                        )
 
         self.results = results
         return dict(results)
@@ -220,7 +250,7 @@ class TrainAndTest:
     train_cls: `Train`
         (Default value = Train)
         Train class to use
-    
+
     lr_scheduler: `torch.optim.lr_scheduler`
         (Default value = None)
         Learning rate scheduler, will apply after every training epoch
@@ -237,9 +267,10 @@ class TrainAndTest:
         data_tr,
         data_te,
         optimizer,
-        metrics=[pinot.rmse, pinot.r2, pinot.pearsonr, pinot.avg_nll],
+        metrics=[pinot.rmse, pinot.r2, pinot.avg_nll],
         n_epochs=100,
         record_interval=1,
+        bootstrap=True,
         train_cls=Train,
         lr_scheduler=None,
     ):
@@ -252,6 +283,7 @@ class TrainAndTest:
         self.record_interval = record_interval
         self.train_cls = train_cls
         self.lr_scheduler = lr_scheduler
+        self.bootstrap = bootstrap
 
     def __str__(self):
         _str = ""
@@ -294,6 +326,7 @@ class TrainAndTest:
             metrics=self.metrics,
             states=self.states,
             sampler=self.optimizer,
+            bootstrap=self.bootstrap,
         )
 
         test.test()
@@ -306,6 +339,7 @@ class TrainAndTest:
             metrics=self.metrics,
             states=self.states,
             sampler=self.optimizer,
+            bootstrap=self.bootstrap,
         )
 
         test.test()

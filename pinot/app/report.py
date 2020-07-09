@@ -22,9 +22,17 @@ def dataframe(results_dict):
     # get all the results
     metrics = list(list(results_dict.values())[0].keys())
     ds_names = list(results_dict.keys())
+
+    def _round(value):
+        if isinstance(value, tuple):
+            return '%.4f (%.4f, %.4f)' % value
+
+        else:
+            return value.round(4)
+
     df = pd.DataFrame(
         [
-            [value["final"].round(4) for metric, value in results.items()]
+            [_round(value["final"]) for metric, value in results.items()]
             for ds_name, results in results_dict.items()
         ],
         columns=metrics,
