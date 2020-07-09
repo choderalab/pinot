@@ -44,7 +44,7 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
 
     def split(self, *args, **kwargs):
         """Split the dataset according to some partition. """
-        ds = piont.data.utils.split(self, *args, **kwargs)
+        ds = pinot.data.utils.split(self, *args, **kwargs)
         return ds
 
     def batch(self, *args, **kwargs):
