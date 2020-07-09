@@ -158,6 +158,117 @@ class AttributedDataset(Dataset):
         self.ds = ds
         return self
 
+
+
+
+class NamedAttributedDataset(Dataset):
+    """ Dataset with attributes. """
+
+    def __init__(self, ds=None):
+        super(NamedAttributedDataset, self).__init__()
+        self.ds = ds
+
+    def from_csv(
+        self,
+        path,
+        smiles_col,
+        y_cols,
+        seed=2666,
+        scale=1.0,
+        dropna=False,
+        toolkit="rdkit",
+        **kwargs,
+    ):
+        """Read csv from file.
+
+        Parameters
+        ----------
+        path : `str`
+            Path to the csv file.
+
+        smiles_col : `int`
+            The column with SMILES strings.
+
+        y_cols : `List` of `int`
+            The columns with SMILES strings.
+
+        scale : `float`
+             (Default value = 1.0)
+             Scaling the input.
+
+        dropna : `bool`
+             (Default value = False)
+             Whether to drop `NaN` values in the column.
+
+
+        toolkit : `str`. `rdkit` or `openeye`
+             (Default value = "rdkit")
+             Toolkit used to read molecules.
+
+
+        """
+
+        def _from_csv():
+            """ """
+            df = pd.read_csv(path, error_bad_lines=False)
+
+            if dropna is True:
+                df = df.dropna(axis=0, subset=[df.columns[y_cols[0]]])
+
+            df_smiles = df.iloc[:, smiles_col]
+            df_y = df.iloc[:, y_cols]
+
+            # initialize dataframes
+            dfs = {}
+
+            for attr_name, col in kwargs:
+                if attr_name.endswith('col'):
+                    assert isinstance(col, int)
+                    dfs[attr_name] = df.iloc[:, col]
+
+            if toolkit == "rdkit":
+                from rdkit import Chem
+
+                df_smiles = [str(x) for x in df_smiles]
+
+                idxs = [
+                    idx
+                    for idx in range(len(df_smiles))
+                    if "nan" not in df_smiles[idx]
+                ]
+
+                df_smiles = [df_smiles[idx] for idx in idxs]
+
+                mols = [Chem.MolFromSmiles(smiles) for smiles in df_smiles]
+                gs = [pinot.graph.from_rdkit_mol(mol) for mol in mols]
+
+            elif toolkit == "openeye":
+                raise NotImplementedError
+
+            ds = list(
+                zip(
+                    gs,
+                    list(
+                        torch.tensor(
+                            scale * df_y.values[idxs], dtype=torch.float32
+                        )
+                    ),
+                    *[
+                        list(df.values[idxs]) for df in dfs
+                    ],
+                )
+            )
+
+            return ds
+
+        ds = _from_csv()
+        self.ds = ds
+        self.attr_names = list(kwargs.keys())
+        return self
+
+
+
+
 class TemporalDataset(Dataset):
     """ Dataset with time.
 
