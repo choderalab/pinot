@@ -5,6 +5,8 @@ import pinot
 import pandas as pd
 import abc
 import torch
+import os
+from pinot.data import utils
 
 # =============================================================================
 # MODULE CLASSES
@@ -44,7 +46,7 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
 
     def split(self, *args, **kwargs):
         """Split the dataset according to some partition. """
-        ds = piont.data.utils.split(self, *args, **kwargs)
+        ds = pinot.data.utils.split(self, *args, **kwargs)
         return ds
 
     def batch(self, *args, **kwargs):
@@ -57,6 +59,104 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
         self.ds = pinot.data.utils.from_csv(*args, **kwargs)()
         return self
 
+
+class AttributedDataset(Dataset):
+    """ Dataset with attributes. """
+
+    def __init__(self, ds=None):
+        super(AttributedDataset, self).__init__()
+        self.ds = ds
+
+    def from_csv(
+        self,
+        path,
+        smiles_col,
+        y_cols,
+        attr_cols,
+        seed=2666,
+        scale=1.0,
+        dropna=False,
+        toolkit="rdkit",
+    ):
+        """Read csv from file.
+
+        Parameters
+        ----------
+        path : `str`
+            Path to the csv file.
+
+        smiles_col : `int`
+            The column with SMILES strings.
+
+        y_cols : `List` of `int`
+            The columns with SMILES strings.
+
+        attr_cols : `int`
+            The columns with attributes.
+
+        scale : `float`
+             (Default value = 1.0)
+             Scaling the input.
+
+        dropna : `bool`
+             (Default value = False)
+             Whether to drop `NaN` values in the column.
+
+
+        toolkit : `str`. `rdkit` or `openeye`
+             (Default value = "rdkit")
+             Toolkit used to read molecules.
+
+
+        """
+
+        def _from_csv():
+            """ """
+            df = pd.read_csv(path, error_bad_lines=False)
+
+            if dropna is True:
+                df = df.dropna(axis=0, subset=[df.columns[y_cols[0]]])
+
+            df_smiles = df.iloc[:, smiles_col]
+            df_y = df.iloc[:, y_cols]
+            df_attr = df.iloc[:, attr_cols]
+
+            if toolkit == "rdkit":
+                from rdkit import Chem
+
+                df_smiles = [str(x) for x in df_smiles]
+
+                idxs = [
+                    idx
+                    for idx in range(len(df_smiles))
+                    if "nan" not in df_smiles[idx]
+                ]
+
+                df_smiles = [df_smiles[idx] for idx in idxs]
+
+                mols = [Chem.MolFromSmiles(smiles) for smiles in df_smiles]
+                gs = [pinot.graph.from_rdkit_mol(mol) for mol in mols]
+
+            elif toolkit == "openeye":
+                raise NotImplementedError
+
+            ds = list(
+                zip(
+                    gs,
+                    list(
+                        torch.tensor(
+                            scale * df_y.values[idxs], dtype=torch.float32
+                        )
+                    ),
+                    list(df_attr.values[idxs]),
+                )
+            )
+
+            return ds
+
+        ds = _from_csv()
+        self.ds = ds
+        return self
 
 class TemporalDataset(Dataset):
     """ Dataset with time.
@@ -207,3 +307,20 @@ class TemporalDataset(Dataset):
                 between.append((g, y))
 
         return between
+
+
+# =============================================================================
+# PRESETS
+# =============================================================================
+def esol():
+    return Dataset().from_csv(os.path.dirname(utils.__file__) + "/esol.csv")
+
+def lipophilicity():
+    return Dataset().from_csv(
+        os.path.dirname(utils.__file__) + "/SAMPL.csv", smiles_col=1, y_cols=[2]
+    )
+
+def freesolv():
+    return Dataset().from_csv(
+        os.path.dirname(utils.__file__) + "/SAMPL.csv", smiles_col=1, y_cols=[2]
+    )
