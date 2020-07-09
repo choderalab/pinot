@@ -6,7 +6,7 @@ import numpy as np
 import sys
 
 
-from datasets import esol, freesolv, lipophilicity
+from .datasets import esol, freesolv, lipophilicity
 
 zinc_tiny = utils.load_unlabeled_data(
     os.path.dirname(utils.__file__) + "/zinc/all.txt", size=0.01
