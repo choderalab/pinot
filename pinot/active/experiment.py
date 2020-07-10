@@ -342,39 +342,26 @@ class BayesOptExperiment(ActiveLearningExperiment):
         if self.strategy == "batch":
 
             # batch acquisition
-            indices, q_samples = self.acquisition(
-                posterior=distribution,
-                batch_size=gs.batch_size,
-                y_best=self.y_best,
+            pending_pts = self.acquisition(
+                net,
+                unseen_data,
+                q=5,
+                y_best=0.0
             )
-
-            # argmax sample batch
-            best = indices[:, torch.argmax(q_samples)].squeeze()
 
         else:
             # workup
             distribution = self.workup(distribution)
 
-            # get score
-            score = self.acquisition(distribution, y_best=self.y_best)
-
-            if not self.weighted_acquire:
-                # argmax
-                best = torch.topk(score, self.q).indices
-            else:
-                # generate probability distribution
-                weights = torch.exp(-score)
-                weights = weights/weights.sum()
-                best = WeightedRandomSampler(
-                    weights=weights,
-                    num_samples=self.q,
-                    replacement=False)
-                best = torch.IntTensor(list(best))
+            # get utility score
+            utility = self.acquisition(distribution, y_best=self.y_best)
+            pending_pts = torch.argmax(score)
 
         # pop from the back so you don't disrupt the order
-        best = best.sort(descending=True).values
+        pending_pts = pending_pts.sort(descending=True).values
         # print(len(self.new), best)
-        self.old.extend([self.new.pop(b) for b in best])
+        self.old.extend([self.new.pop(p) for p in pending_pts])
+
 
     def update_data(self):
         """Update the internal data using old and new."""
