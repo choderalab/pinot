@@ -181,12 +181,12 @@ class ActivePlot():
                               'Uncertainty': SeqAcquire(acq_fn='uncertainty'),
                               'Random': SeqAcquire(acq_fn='random')}
         '''
-        sequential_acquisitions = {'ExpectedImprovement': pinot.active.acquisition.expected_improvement,
+        sequential_acquisitions = {'ExpectedImprovement': pinot.active.acquisition.expected_improvement_analytical,
                                    'ProbabilityOfImprovement': pinot.active.acquisition.probability_of_improvement,
-                                   'UpperConfidenceBound': pinot.active.acquisition.expected_improvement,
-                                   'Uncertainty': pinot.active.acquisition.expected_improvement,
+                                   'UpperConfidenceBound': pinot.active.acquisition.upper_confidence_bound,
+                                   'Uncertainty': pinot.active.acquisition.uncertainty,
                                    'Human': pinot.active.acquisition.temporal,
-                                   'Random': pinot.active.acquisition.expected_improvement}
+                                   'Random': pinot.active.acquisition.random}
 
         if self.strategy == 'batch':
             raise NotImplementedError

@@ -505,8 +505,9 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
         log_det_prior = torch.sum(torch.log(torch.diag(tril1)))
         return log_det_prior + const_term
 
-
 #
+# GPyTorch implementation
+# 
 # class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
 #     """
 #     """
