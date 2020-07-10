@@ -435,3 +435,10 @@ def freesolv():
     return Dataset().from_csv(
         os.path.dirname(utils.__file__) + "/SAMPL.csv", smiles_col=1, y_cols=[2]
     )
+
+
+def curve():
+    return AttributedDataset().from_csv(
+        os.path.dirname(utils.__file__) + "/curve.csv", smiles_col=1, y_cols=[2],
+        attr_cols=[3],
+    )
