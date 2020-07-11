@@ -29,7 +29,7 @@ def from_csv(
     Parameters
     ----------
     path :
-        
+
     toolkit :
          (Default value = "rdkit")
     smiles_col :
@@ -45,7 +45,7 @@ def from_csv(
     shuffle :
          (Default value = True)
     **kwargs :
-        
+
 
     Returns
     -------
@@ -107,7 +107,7 @@ def load_unlabeled_data(path, size=0.1, toolkit="rdkit", seed=2666):
     Parameters
     ----------
     path :
-        
+
     size :
          (Default value = 0.1)
     toolkit :
@@ -162,7 +162,7 @@ def normalize(ds):
     Parameters
     ----------
     ds :
-        
+
 
     Returns
     -------
@@ -179,7 +179,7 @@ def normalize(ds):
         Parameters
         ----------
         y :
-            
+
 
         Returns
         -------
@@ -193,7 +193,7 @@ def normalize(ds):
         Parameters
         ----------
         y :
-            
+
 
         Returns
         -------
@@ -210,9 +210,9 @@ def split(ds, partition):
     Parameters
     ----------
     ds :
-        
+
     partition :
-        
+
 
     Returns
     -------
@@ -238,7 +238,7 @@ def batch(ds, batch_size, seed=2666, shuffle=False):
     Parameters
     ----------
     ds :
-        
+
     batch_size :
         
     seed :
@@ -281,9 +281,9 @@ def prepare_semi_supervised_data(unlabelled_data, labelled_data, seed=2666):
     Parameters
     ----------
     unlabelled_data :
-        
+
     labelled_data :
-        
+
     seed :
          (Default value = 2666)
 
@@ -314,7 +314,7 @@ def prepare_semi_supeprvised_data_from_labeled_data(
     Parameters
     ----------
     labelled_data :
-        
+
     r :
          (Default value = 0.2)
     seed :
