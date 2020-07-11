@@ -60,6 +60,7 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
     def shuffle(self, *args, **kwargs):
         """ Shuffle the records in the dataset. """
         import random
+
         random.shuffle(self.ds)
         return self
 
@@ -67,6 +68,7 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
         """Read csv dataset. """
         self.ds = pinot.data.utils.from_csv(*args, **kwargs)()
         return self
+
 
 class AttributedDataset(Dataset):
     """ Dataset with attributes. """
@@ -167,8 +169,6 @@ class AttributedDataset(Dataset):
         return self
 
 
-
-
 class NamedAttributedDataset(Dataset):
     """ Dataset with attributes. """
 
@@ -230,7 +230,7 @@ class NamedAttributedDataset(Dataset):
             dfs = {}
 
             for attr_name, col in kwargs:
-                if attr_name.endswith('col'):
+                if attr_name.endswith("col"):
                     assert isinstance(col, int)
                     dfs[attr_name] = df.iloc[:, col]
 
@@ -261,9 +261,7 @@ class NamedAttributedDataset(Dataset):
                             scale * df_y.values[idxs], dtype=torch.float32
                         )
                     ),
-                    *[
-                        list(df.values[idxs]) for df in dfs
-                    ],
+                    *[list(df.values[idxs]) for df in dfs],
                 )
             )
 
@@ -273,6 +271,7 @@ class NamedAttributedDataset(Dataset):
         self.ds = ds
         self.attr_names = list(kwargs.keys())
         return self
+
 
 class TemporalDataset(Dataset):
     """ Dataset with time.
@@ -427,64 +426,55 @@ class TemporalDataset(Dataset):
 
 class MixedSingleAndMultipleDataset(Dataset):
     """ Dataset object with Dictionary view. """
+
     def __init__(self, ds=None):
         super(MixedSingleAndMultipleDataset, self).__init__(ds)
 
     def from_csv(
-            self,
-            # paths
-            single_path,
-            multiple_path,
-
-            # simles column
-            smiles_col_name='SMILES',
-
-            # specification for multiple
-            multiple_concentration_col_name='f_concentration_uM',
-            multiple_measurement_col_name='f_inhibition_list',
-
-            # specification for signel
-            single_concentrations=[20, 50],
-            single_col_names=[
-                'f_inhibition_at_20_uM',
-                'f_inhibition_at_50_uM',
-            ],
-
-        ):
-
+        self,
+        # paths
+        single_path,
+        multiple_path,
+        # simles column
+        smiles_col_name="SMILES",
+        # specification for multiple
+        multiple_concentration_col_name="f_concentration_uM",
+        multiple_measurement_col_name="f_inhibition_list",
+        # specification for signel
+        single_concentrations=[20, 50],
+        single_col_names=["f_inhibition_at_20_uM", "f_inhibition_at_50_uM",],
+    ):
         def _from_csv():
             # read single and multiple data
             df_single = pd.read_csv(single_path)
             df_multiple = pd.read_csv(multiple_path)
 
             # merge it
-            df = df_single.merge(
-                right=df_multiple,
-                how='left',
-                on='SMILES'
-            )
+            df = df_single.merge(right=df_multiple, how="left", on="SMILES")
 
             # filter it
-            df = df.filter(items=[
-                smiles_col_name,
-                multiple_concentration_col_name,
-                multiple_measurement_col_name,
-                *single_col_names,
-                ])
+            df = df.filter(
+                items=[
+                    smiles_col_name,
+                    multiple_concentration_col_name,
+                    multiple_measurement_col_name,
+                    *single_col_names,
+                ]
+            )
 
-            df['cs_single'] = np.nan
-            df['ys_single'] = np.nan
+            df["cs_single"] = np.nan
+            df["ys_single"] = np.nan
 
             df = df.rename(
                 columns={
-                    multiple_concentration_col_name: 'cs_multiple',
-                    multiple_measurement_col_name: 'ys_multiple'
+                    multiple_concentration_col_name: "cs_multiple",
+                    multiple_measurement_col_name: "ys_multiple",
                 }
             )
 
             def flatten_multiple(record):
-                cs = record['cs_multiple']
-                ys = record['ys_multiple']
+                cs = record["cs_multiple"]
+                ys = record["ys_multiple"]
 
                 if isinstance(cs, str):
                     cs = eval(cs)
@@ -493,8 +483,8 @@ class MixedSingleAndMultipleDataset(Dataset):
                     cs = [x for c in cs for x in c]
                     ys = [x for y in ys for x in y]
 
-                    record['cs_multiple'] = cs
-                    record['ys_multiple'] = ys
+                    record["cs_multiple"] = cs
+                    record["ys_multiple"] = ys
 
                 return record
 
@@ -504,18 +494,18 @@ class MixedSingleAndMultipleDataset(Dataset):
                 cs = single_concentrations
                 ys = [record[name] for name in single_col_names]
 
-                record['cs_single'] = cs
-                record['ys_single'] = ys
+                record["cs_single"] = cs
+                record["ys_single"] = ys
 
                 return record
 
             df = df.apply(flatten_single, axis=1)
 
-            self.ds = df.to_dict(orient='records')
+            self.ds = df.to_dict(orient="records")
 
             for record in self.ds:
-                record['g'] = pinot.graph.from_rdkit_mol(
-                    Chem.MolFromSmiles(record['SMILES'])
+                record["g"] = pinot.graph.from_rdkit_mol(
+                    Chem.MolFromSmiles(record["SMILES"])
                 )
 
             # print(self.ds)
@@ -531,17 +521,17 @@ class MixedSingleAndMultipleDataset(Dataset):
         cs = []
         ys = []
 
-        for x in xs: # loop through the data
+        for x in xs:  # loop through the data
             # get the graph
-            g = x['g']
+            g = x["g"]
 
             # get the single point measurements
-            ys_single = x['ys_single']
-            cs_single = x['cs_single']
+            ys_single = x["ys_single"]
+            cs_single = x["cs_single"]
 
             # get the multiple point measurements
-            ys_multiple = x['ys_multiple']
-            cs_multiple = x['cs_multiple']
+            ys_multiple = x["ys_multiple"]
+            cs_multiple = x["cs_multiple"]
 
             # print(type(ys_single), ys_single)
             # print(type(cs_single), cs_single)
@@ -572,26 +562,19 @@ class MixedSingleAndMultipleDataset(Dataset):
 
     @staticmethod
     def all_graphs(xs):
-        return dgl.batch(
-            [
-                x['g'] for x in xs
-            ]
-        )
+        return dgl.batch([x["g"] for x in xs])
 
-    def view(self, collate_fn='all_available_pairs', *args, **kwargs):
+    def view(self, collate_fn="all_available_pairs", *args, **kwargs):
         """ View the dataset as loader. """
-        if collate_fn == 'all_graphs':
-            kwargs['batch_size'] = len(self) # ensure all the graph
+        if collate_fn == "all_graphs":
+            kwargs["batch_size"] = len(self)  # ensure all the graph
 
         if isinstance(collate_fn, str):
             collate_fn = getattr(self, collate_fn)
 
         return torch.utils.data.DataLoader(
-            dataset=self,
-            collate_fn=collate_fn,
-            *args, **kwargs,
+            dataset=self, collate_fn=collate_fn, *args, **kwargs,
         )
-
 
 
 # =============================================================================
@@ -600,19 +583,27 @@ class MixedSingleAndMultipleDataset(Dataset):
 def esol():
     return Dataset().from_csv(os.path.dirname(utils.__file__) + "/esol.csv")
 
+
 def lipophilicity():
     return Dataset().from_csv(
-        os.path.dirname(utils.__file__) + "/SAMPL.csv", smiles_col=1, y_cols=[2]
+        os.path.dirname(utils.__file__) + "/SAMPL.csv",
+        smiles_col=1,
+        y_cols=[2],
     )
+
 
 def freesolv():
     return Dataset().from_csv(
-        os.path.dirname(utils.__file__) + "/SAMPL.csv", smiles_col=1, y_cols=[2]
+        os.path.dirname(utils.__file__) + "/SAMPL.csv",
+        smiles_col=1,
+        y_cols=[2],
     )
 
 
 def curve():
     return AttributedDataset().from_csv(
-        os.path.dirname(utils.__file__) + "/curve.csv", smiles_col=1, y_cols=[2],
+        os.path.dirname(utils.__file__) + "/curve.csv",
+        smiles_col=1,
+        y_cols=[2],
         attr_cols=[3],
     )
