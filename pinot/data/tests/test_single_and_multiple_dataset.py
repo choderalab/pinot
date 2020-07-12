@@ -22,7 +22,22 @@ def test_mix_default():
     import os
 
     df = pinot.data.moonshot_mixed()
-    
-    list(iter(df.view(batch_size=32)))
 
-    list(iter(df.view("all_graphs")))
+    view = df.view('all_available_pairs', batch_size=32)
+
+    for g, y, c in view:
+        g
+        y
+        c
+
+def test_rebatch():
+    import pinot
+    from pinot.data import utils
+    import os
+
+    df = pinot.data.moonshot_mixed()
+
+    view = df.view('fixed_size_batch', batch_size=32, drop_last=True)
+
+    for g, c, y in view:
+        assert g.batch_size == 32
