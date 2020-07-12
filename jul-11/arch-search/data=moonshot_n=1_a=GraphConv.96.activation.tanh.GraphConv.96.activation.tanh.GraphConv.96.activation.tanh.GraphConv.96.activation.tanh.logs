@@ -1,0 +1,13 @@
+root - DEBUG - Namespace(architecture=['GraphConv', '96', 'activation', 'tanh', 'GraphConv', '96', 'activation', 'tanh', 'GraphConv', '96', 'activation', 'tanh', 'GraphConv', '96', 'activation', 'tanh'], batch_size=32, const_unsup_scale=False, cuda=True, embedding_dim=64, label_split=[0.8, 0.1, 0.1], labeled_data='moonshot', lr=0.0001, n_epochs=1, optimizer='Adam', output='/home/nguyenm5/coding/pinot/jul-11/arch-search', regressor_type='gp', unlabeled_data='moonshot_unlabeled_small', weight_decay=0.0001)
+root - DEBUG - Finished loading all data after 15.232853889465332 seconds
+root - DEBUG - We have 374 labeled and 5831 unlabeled molecules
+root - DEBUG - Finished training SEMI-SUPERVISED model with architecture = ['GraphConv', '96', 'activation', 'tanh', 'GraphConv', '96', 'activation', 'tanh', 'GraphConv', '96', 'activation', 'tanh', 'GraphConv', '96', 'activation', 'tanh'], volume = 0.2, lr=0.0001
+root - DEBUG - That took 22.954838275909424 seconds
+root - DEBUG - All legends:
+root - DEBUG - ['semi_a=GraphConv.96.activation.tanh.GraphConv.96.activation.tanh.GraphConv.96.activation.tanh.GraphConv.96.activation.tanh_0.0001']
+root - DEBUG - Train:
+root - DEBUG - {'r2': {0: array(-565.2683, dtype=float32), 'final': array(-565.2683, dtype=float32)}, 'avg_nll': {0: array(-0.6221275, dtype=float32), 'final': array(-0.6221276, dtype=float32)}, 'rmse': {0: array(0.02212682, dtype=float32), 'final': array(0.02212685, dtype=float32)}}
+root - DEBUG - Test:
+root - DEBUG - {'r2': {0: array(-57.09101, dtype=float32), 'final': array(-57.091045, dtype=float32)}, 'avg_nll': {0: array(0.7345233, dtype=float32), 'final': array(0.7345235, dtype=float32)}, 'rmse': {0: array(0.25180465, dtype=float32), 'final': array(0.2518047, dtype=float32)}}
+root - DEBUG - Validataion:
+root - DEBUG - {'r2': {0: array(-42.72741, dtype=float32), 'final': array(-42.727413, dtype=float32)}, 'avg_nll': {0: array(0.6443338, dtype=float32), 'final': array(0.6443339, dtype=float32)}, 'rmse': {0: array(0.22482283, dtype=float32), 'final': array(0.22482285, dtype=float32)}}

@@ -1,0 +1,13 @@
+root - DEBUG - Namespace(architecture=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], batch_size=32, const_unsup_scale=False, cuda=True, embedding_dim=64, label_split=[0.8, 0.1, 0.1], labeled_data='moonshot', lr=0.0001, n_epochs=1, optimizer='Adam', output='/home/nguyenm5/coding/pinot/jul-11/arch-search', regressor_type='gp', unlabeled_data='moonshot_unlabeled_small', weight_decay=0.0001)
+root - DEBUG - Finished loading all data after 15.299423933029175 seconds
+root - DEBUG - We have 374 labeled and 5831 unlabeled molecules
+root - DEBUG - Finished training SEMI-SUPERVISED model with architecture = ['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], volume = 0.2, lr=0.0001
+root - DEBUG - That took 23.174009561538696 seconds
+root - DEBUG - All legends:
+root - DEBUG - ['semi_a=GraphConv.64.activation.tanh.GraphConv.64.activation.tanh.GraphConv.64.activation.tanh.GraphConv.64.activation.tanh.GraphConv.64.activation.tanh.GraphConv.64.activation.tanh.GraphConv.64.activation.tanh_0.0001']
+root - DEBUG - Train:
+root - DEBUG - {'r2': {0: array(-556.9231, dtype=float32), 'final': array(-556.92303, dtype=float32)}, 'avg_nll': {0: array(-0.6381388, dtype=float32), 'final': array(-0.6381397, dtype=float32)}, 'rmse': {0: array(0.0293478, dtype=float32), 'final': array(0.02934771, dtype=float32)}}
+root - DEBUG - Test:
+root - DEBUG - {'r2': {0: array(-52.88116, dtype=float32), 'final': array(-52.881123, dtype=float32)}, 'avg_nll': {0: array(0.58876866, dtype=float32), 'final': array(0.5887688, dtype=float32)}, 'rmse': {0: array(0.23744194, dtype=float32), 'final': array(0.23744188, dtype=float32)}}
+root - DEBUG - Validataion:
+root - DEBUG - {'r2': {0: array(-45.310825, dtype=float32), 'final': array(-45.310825, dtype=float32)}, 'avg_nll': {0: array(0.47650242, dtype=float32), 'final': array(0.4765022, dtype=float32)}, 'rmse': {0: array(0.22499216, dtype=float32), 'final': array(0.22499216, dtype=float32)}}

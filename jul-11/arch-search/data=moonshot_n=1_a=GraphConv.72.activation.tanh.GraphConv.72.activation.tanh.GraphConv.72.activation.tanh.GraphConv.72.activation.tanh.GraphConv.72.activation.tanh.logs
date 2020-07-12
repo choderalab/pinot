@@ -1,0 +1,13 @@
+root - DEBUG - Namespace(architecture=['GraphConv', '72', 'activation', 'tanh', 'GraphConv', '72', 'activation', 'tanh', 'GraphConv', '72', 'activation', 'tanh', 'GraphConv', '72', 'activation', 'tanh', 'GraphConv', '72', 'activation', 'tanh'], batch_size=32, const_unsup_scale=False, cuda=True, embedding_dim=64, label_split=[0.8, 0.1, 0.1], labeled_data='moonshot', lr=0.0001, n_epochs=1, optimizer='Adam', output='/home/nguyenm5/coding/pinot/jul-11/arch-search', regressor_type='gp', unlabeled_data='moonshot_unlabeled_small', weight_decay=0.0001)
+root - DEBUG - Finished loading all data after 15.332098007202148 seconds
+root - DEBUG - We have 374 labeled and 5831 unlabeled molecules
+root - DEBUG - Finished training SEMI-SUPERVISED model with architecture = ['GraphConv', '72', 'activation', 'tanh', 'GraphConv', '72', 'activation', 'tanh', 'GraphConv', '72', 'activation', 'tanh', 'GraphConv', '72', 'activation', 'tanh', 'GraphConv', '72', 'activation', 'tanh'], volume = 0.2, lr=0.0001
+root - DEBUG - That took 22.79404377937317 seconds
+root - DEBUG - All legends:
+root - DEBUG - ['semi_a=GraphConv.72.activation.tanh.GraphConv.72.activation.tanh.GraphConv.72.activation.tanh.GraphConv.72.activation.tanh.GraphConv.72.activation.tanh_0.0001']
+root - DEBUG - Train:
+root - DEBUG - {'r2': {0: array(-562.1, dtype=float32), 'final': array(-562.0998, dtype=float32)}, 'avg_nll': {0: array(-0.6285387, dtype=float32), 'final': array(-0.62854, dtype=float32)}, 'rmse': {0: array(0.02517929, dtype=float32), 'final': array(0.02517929, dtype=float32)}}
+root - DEBUG - Test:
+root - DEBUG - {'r2': {0: array(-56.39834, dtype=float32), 'final': array(-56.39833, dtype=float32)}, 'avg_nll': {0: array(0.6575813, dtype=float32), 'final': array(0.65758103, dtype=float32)}, 'rmse': {0: array(0.24383546, dtype=float32), 'final': array(0.24383551, dtype=float32)}}
+root - DEBUG - Validataion:
+root - DEBUG - {'r2': {0: array(-44.180977, dtype=float32), 'final': array(-44.180984, dtype=float32)}, 'avg_nll': {0: array(0.56180185, dtype=float32), 'final': array(0.561802, dtype=float32)}, 'rmse': {0: array(0.2202362, dtype=float32), 'final': array(0.22023621, dtype=float32)}}
