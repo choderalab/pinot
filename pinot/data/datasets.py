@@ -607,3 +607,10 @@ def curve():
         y_cols=[2],
         attr_cols=[3],
     )
+
+def moonshot_mixed():
+    return pinot.data.datasets.MixedSingleAndMultipleDataset().from_csv(
+        os.path.dirname(utils.__file__) + "/activity_data.csv",
+        os.path.dirname(utils.__file__)
+        + "/fluorescence_df_for_chodera_lab.csv",
+    )()

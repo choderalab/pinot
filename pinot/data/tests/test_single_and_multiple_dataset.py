@@ -15,3 +15,14 @@ def test_mix():
     list(iter(df.view(batch_size=32)))
 
     list(iter(df.view("all_graphs")))
+
+def test_mix_default():
+    import pinot
+    from pinot.data import utils
+    import os
+
+    df = pinot.data.moonshot_mixed()
+    
+    list(iter(df.view(batch_size=32)))
+
+    list(iter(df.view("all_graphs")))
