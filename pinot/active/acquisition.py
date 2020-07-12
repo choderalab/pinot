@@ -285,10 +285,9 @@ def thompson_sampling(net, unseen_data, q=5, y_best=0.0):
     # obtain samples from posterior
     thetas = distribution.sample((q,))
     
-    # optimize samples
-    pending_pts = torch.unique(torch.argmax(thetas, axis=1)).tolist()
-
     # enforce no duplicates in batch
+    pending_pts = torch.unique(torch.argmax(thetas, axis=1)).tolist()
+    
     while len(pending_pts) < q:
         theta = distribution.sample()
         pending_pts.append(torch.argmax(theta).item())
@@ -567,6 +566,7 @@ def batch_random(net, unseen_data, q=5, y_best=0.0):
     )
 
     return pending_pts
+
 
 def batch_temporal(net, unseen_data, q=5, y_best=0.0):
     r"""Picks the first q points in sequence.
