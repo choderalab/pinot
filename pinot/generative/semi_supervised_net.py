@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 import pinot
 from pinot.generative.losses import negative_elbo
-from pinot.generative.decoder import DecoderNetwork
+from pinot.generative.decoder import EdgeDecoder
 from pinot.regressors.neural_network_regressor import NeuralNetworkRegressor
 
 # =============================================================================
@@ -64,7 +64,7 @@ class SemiSupervisedNet(pinot.Net):
         self,
         representation,
         output_regressor=NeuralNetworkRegressor,
-        decoder=DecoderNetwork,
+        decoder=EdgeDecoder,
         unsup_scale=1.0,
         embedding_dim=64,
         generative_hidden_dim=64,
