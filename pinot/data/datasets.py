@@ -429,6 +429,20 @@ class MixedSingleAndMultipleDataset(Dataset):
 
     def __init__(self, ds=None):
         super(MixedSingleAndMultipleDataset, self).__init__(ds)
+        self._number_of_measurements = None
+
+    @property
+    def number_of_measurements(self):
+        if self._number_of_measurements is None:
+            raise RuntimeError('Only available after viewing all the pairs.')
+
+        else:
+            return self._number_of_measurements
+
+    @property
+    def number_of_unique_graphs(self):
+        return len(self)
+
 
     def from_csv(
         self,
@@ -593,6 +607,7 @@ class MixedSingleAndMultipleDataset(Dataset):
         """ View the dataset as loader. """
         if collate_fn == 'fixed_size_batch':
             _ds = [self.all_available_pairs(self.ds)]
+            self._number_of_measurements = _ds[0][1].shape[0]
             return self._rebatch(_ds, *args, **kwargs)
 
         if collate_fn == "all_graphs":

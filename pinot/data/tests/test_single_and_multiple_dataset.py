@@ -39,5 +39,7 @@ def test_rebatch():
 
     view = df.view('fixed_size_batch', batch_size=32, drop_last=True)
 
+    df.number_of_measurements
+
     for g, c, y in view:
         assert g.batch_size == 32
