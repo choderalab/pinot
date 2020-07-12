@@ -533,11 +533,6 @@ class MixedSingleAndMultipleDataset(Dataset):
             ys_multiple = x["ys_multiple"]
             cs_multiple = x["cs_multiple"]
 
-            # print(type(ys_single), ys_single)
-            # print(type(cs_single), cs_single)
-            # print(type(ys_multiple), ys_multiple)
-            # print(type(cs_multiple), cs_multiple)
-
             # append the results
             if isinstance(cs_single, list) and isinstance(ys_single, list):
                 for c, y in zip(cs_single, ys_single):
@@ -564,8 +559,42 @@ class MixedSingleAndMultipleDataset(Dataset):
     def all_graphs(xs):
         return dgl.batch([x["g"] for x in xs])
 
+    @staticmethod
+    def _rebatch(xs, *args, **kwargs):
+        assert len(xs) == 1
+        g, c, y = xs[0]
+        gs = dgl.unbatch(g)
+        cs = c.numpy().tolist()
+        ys = y.numpy().tolist()
+
+        _ds = list(zip(gs, cs, ys))
+
+        def _collate_fn(_xs):
+            _gs = []
+            _cs = []
+            _ys = []
+
+            for _g, _c, _y in _xs:
+                _gs.append(_g)
+                _cs.append(_c)
+                _ys.append(_y)
+
+            _gs = dgl.batch(_gs)
+            _cs = torch.tensor(_cs)
+            _ys = torch.tensor(_ys)
+
+            return _gs, _cs, _ys
+
+        return torch.utils.data.DataLoader(
+            dataset=_ds, collate_fn=_collate_fn, *args, **kwargs
+        )
+
     def view(self, collate_fn="all_available_pairs", *args, **kwargs):
         """ View the dataset as loader. """
+        if collate_fn == 'fixed_size_batch':
+            _ds = [self.all_available_pairs(self.ds)]
+            return self._rebatch(_ds, *args, **kwargs)
+
         if collate_fn == "all_graphs":
             kwargs["batch_size"] = len(self)  # ensure all the graph
 
@@ -575,6 +604,8 @@ class MixedSingleAndMultipleDataset(Dataset):
         return torch.utils.data.DataLoader(
             dataset=self, collate_fn=collate_fn, *args, **kwargs,
         )
+
+
 
 
 # =============================================================================
