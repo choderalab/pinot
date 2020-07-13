@@ -181,9 +181,6 @@ class ActivePlot():
             'Uncertainty': pinot.active.acquisition.expected_improvement,
             'Human': pinot.active.acquisition.temporal,
             'Random': pinot.active.acquisition.expected_improvement,
-            
-            # batch acquisition
-            'BatchExpectedImprovement': pinot.active.acquisition.
         }
 
         acq_fn = sequential_acquisitions[self.acquisition]
