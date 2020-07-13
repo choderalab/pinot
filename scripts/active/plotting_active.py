@@ -163,7 +163,6 @@ class ActivePlot():
         # Load and batch data
         ds = getattr(pinot.data, self.data)()
         ds = pinot.data.utils.batch(ds, len(ds), seed=None)
-        print(ds[0][0].to(self.device))
         ds = [tuple([i.to(self.device) for i in ds[0]])]
         return ds
 
