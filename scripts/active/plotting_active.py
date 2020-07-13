@@ -19,8 +19,8 @@ from pinot.generative import SemiSupervisedNet
 class ActivePlot():
 
     def __init__(self, net, layer, config,
-                 lr, optimizer_type, weighted_acquire,
-                 data, strategy, acquisition, marginalize_batch, num_samples, q,
+                 lr, optimizer_type,
+                 data, acquisition, num_samples, q,
                  device, num_trials, num_rounds, num_epochs):
 
         # net config
@@ -34,10 +34,7 @@ class ActivePlot():
 
         # experiment config
         self.data = data
-        self.strategy = strategy
         self.acquisition = acquisition
-        self.marginalize_batch = marginalize_batch
-        self.weighted_acquire = weighted_acquire
         self.num_samples = num_samples
         self.q = q
         self.train = pinot.app.experiment.Train
@@ -132,7 +129,6 @@ class ActivePlot():
                 n_epochs=self.num_epochs,
                 strategy=self.strategy,
                 q=self.q,
-                weighted_acquire=self.weighted_acquire,
                 slice_fn=experiment._slice_fn_tuple, # pinot.active.
                 collate_fn=experiment._collate_fn_graph, # pinot.active.
                 train_class=self.train
@@ -167,6 +163,7 @@ class ActivePlot():
         # Load and batch data
         ds = getattr(pinot.data, self.data)()
         ds = pinot.data.utils.batch(ds, len(ds), seed=None)
+        print(ds[0][0].to(self.device))
         ds = [tuple([i.to(self.device) for i in ds[0]])]
         return ds
 
@@ -195,9 +192,7 @@ class ActivePlot():
             'BatchTemporal': pinot.active.acquisition.batch_temporal
         }
 
-        acq_fn = sequential_acquisitions[self.acquisition]
-
-        return acq_fn
+        return acquisitions[self.acquisition]
 
 
     def get_net(self):
@@ -283,11 +278,8 @@ if __name__ == '__main__':
 
         # experiment config
         data=args.data,
-        strategy=args.strategy,
         acquisition=args.acquisition,
-        marginalize_batch=args.marginalize_batch,
         num_samples=args.num_samples,
-        weighted_acquire=args.weighted_acquire,
         q=args.q,
 
         # housekeeping
@@ -295,7 +287,7 @@ if __name__ == '__main__':
         num_trials=args.num_trials,
         num_rounds=args.num_rounds,
         num_epochs=args.num_epochs,
-        )
+    )
 
     best_df = plot.generate()
 
