@@ -173,34 +173,20 @@ class ActivePlot():
     def get_acquisition(self, gs):
         """ Retrieve acquisition function and prepare for BO Experiment
         """
+        acquisitions = {
+            # sequential
+            'ExpectedImprovement': pinot.active.acquisition.expected_improvement_analytical,
+            'ProbabilityOfImprovement': pinot.active.acquisition.probability_of_improvement,
+            'UpperConfidenceBound': pinot.active.acquisition.expected_improvement,
+            'Uncertainty': pinot.active.acquisition.expected_improvement,
+            'Human': pinot.active.acquisition.temporal,
+            'Random': pinot.active.acquisition.expected_improvement,
+            
+            # batch acquisition
+            'BatchExpectedImprovement': pinot.active.acquisition.
+        }
 
-        '''
-        batch_acquisitions = {'Expected Improvement': SeqAcquire(acq_fn='ei'),
-                              'Probability of Improvement': SeqAcquire(acq_fn='pi'),
-                              'Upper Confidence Bound': SeqAcquire(acq_fn='ucb', beta=0.95),
-                              'Uncertainty': SeqAcquire(acq_fn='uncertainty'),
-                              'Random': SeqAcquire(acq_fn='random')}
-        '''
-        sequential_acquisitions = {'ExpectedImprovement': pinot.active.acquisition.expected_improvement,
-                                   'ProbabilityOfImprovement': pinot.active.acquisition.probability_of_improvement,
-                                   'UpperConfidenceBound': pinot.active.acquisition.expected_improvement,
-                                   'Uncertainty': pinot.active.acquisition.expected_improvement,
-                                   'Human': pinot.active.acquisition.temporal,
-                                   'Random': pinot.active.acquisition.expected_improvement}
-
-        if self.strategy == 'batch':
-            raise NotImplementedError
-            # acq_fn = batch_acquisitions[self.acquisition]
-            # acq_fn = MCAcquire(
-            #     sequential_acq=acq_fn,
-            #     batch_size=gs.batch_size,
-            #     q=self.q,
-            #     marginalize_batch=self.marginalize_batch,
-            #     num_samples=self.num_samples)
-
-
-        else:
-            acq_fn = sequential_acquisitions[self.acquisition]
+        acq_fn = sequential_acquisitions[self.acquisition]
 
         return acq_fn
 
@@ -262,11 +248,8 @@ if __name__ == '__main__':
     parser.add_argument('--optimizer', type=str, default='Adam')
 
     parser.add_argument('--data', type=str, default='esol')
-    parser.add_argument('--strategy', type=str, default='sequential')
     parser.add_argument('--acquisition', type=str, default='ExpectedImprovement')
-    parser.add_argument('--marginalize_batch', type=bool, default=True)
     parser.add_argument('--num_samples', type=int, default=1000)
-    parser.add_argument('--weighted_acquire', type=bool, default=True)
     parser.add_argument('--q', type=int, default=1)
 
     parser.add_argument('--device', type=str, default='cuda:0')
