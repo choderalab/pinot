@@ -233,7 +233,7 @@ class Net(BaseNet):
 
         for _ in range(n_samples):
             sampler.sample_params()
-            distributions.append(self._condition(g))
+            distributions.append(self._condition(g, *args, **kwargs))
 
         # get the parameter of these distributions
         # NOTE: this is not necessarily the most efficienct solution
