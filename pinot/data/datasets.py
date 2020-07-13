@@ -502,7 +502,7 @@ class MixedSingleAndMultipleDataset(Dataset):
 
                 return record
 
-            df.apply(flatten_multiple, axis=1)
+            df = df.apply(flatten_multiple, axis=1)
 
             def flatten_single(record):
                 cs = single_concentrations
@@ -555,7 +555,7 @@ class MixedSingleAndMultipleDataset(Dataset):
                         cs.append(c)
                         ys.append(y)
 
-            if isinstance(cs_multiple, list) and isinstance(cs_multiple, list):
+            if isinstance(cs_multiple, list) and isinstance(ys_multiple, list):
                 for c, y in zip(cs_multiple, ys_multiple):
                     if ~np.isnan(c) and ~np.isnan(y):
                         gs.append(g)
