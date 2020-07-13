@@ -125,9 +125,9 @@ class ActivePlot():
                 net=net,
                 data=ds[0],
                 optimizer=optimizer(net),
+                strategy=self.strategy,
                 acquisition=acq_fn,
                 n_epochs=self.num_epochs,
-                strategy=self.strategy,
                 q=self.q,
                 slice_fn=experiment._slice_fn_tuple, # pinot.active.
                 collate_fn=experiment._collate_fn_graph, # pinot.active.
@@ -169,17 +169,17 @@ class ActivePlot():
     def get_acquisition(self, gs):
         """ Retrieve acquisition function and prepare for BO Experiment
         """
-        acquisitions = {
-
-            # sequential
+        sequential_acquisitions = {
             'ExpectedImprovement': pinot.active.acquisition.expected_improvement_analytical,
             'ProbabilityOfImprovement': pinot.active.acquisition.probability_of_improvement,
-            'UpperConfidenceBound': pinot.active.acquisition.expected_improvement,
-            'Uncertainty': pinot.active.acquisition.expected_improvement,
+            'UpperConfidenceBound': pinot.active.acquisition.upper_confidence_bound,
+            'Uncertainty': pinot.active.acquisition.uncertainty,
             'Human': pinot.active.acquisition.temporal,
-            'Random': pinot.active.acquisition.expected_improvement,
+            'Random': pinot.active.acquisition.random,
             
-            # batch
+        }
+
+        batch_acquisitions = {
             'ThompsonSampling': pinot.active.acquisition.thompson_sampling,
             'WeightedSamplingExpectedImprovement': pinot.active.acquisition.exponential_weighted_ei_analytical,
             'WeightedSamplingProbabilityOfImprovement': pinot.active.acquisition.exponential_weighted_pi,
@@ -191,7 +191,15 @@ class ActivePlot():
             'BatchTemporal': pinot.active.acquisition.batch_temporal
         }
 
-        return acquisitions[self.acquisition]
+        if self.acquisition in sequential_acquisitions:
+            self.strategy = 'sequential'
+            acq_fn = sequential_acquisitions[self.acquisition]
+        
+        elif self.acquisition in batch_acquisitions:
+            self.strategy = 'batch'
+            acq_fn = batch_acquisitions[self.acquisition]
+        
+        return acq_fn
 
 
     def get_net(self):
@@ -231,9 +239,6 @@ class ActivePlot():
                 representation=representation,
                 output_regressor=output_regressor,
             )
-
-        # if self.strategy == 'batch':
-        #     net = BTModel(net)
 
         return net
 
@@ -291,8 +296,6 @@ if __name__ == '__main__':
     best_df = plot.generate()
 
     # save to disk
-    if args.index_provided and args.weighted_acquire:
-        filename = f'{args.net}_{args.representation}_{args.optimizer}_{args.data}_{args.strategy}_{args.acquisition}_q{args.q}_weighted_{args.index}.csv'
-    elif args.index_provided and not args.weighted_acquire:
-        filename = f'{args.net}_{args.representation}_{args.optimizer}_{args.data}_{args.strategy}_{args.acquisition}_q{args.q}_unweighted_{args.index}.csv'
+    if args.index_provided:
+        filename = f'{args.net}_{args.representation}_{args.optimizer}_{args.data}_{args.acquisition}_q{args.q}_{args.index}.csv'
     best_df.to_csv(filename)

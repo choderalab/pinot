@@ -279,7 +279,7 @@ def thompson_sampling(net, unseen_data, q=5, y_best=0.0):
         The indices corresponding to pending points.
     """
     # obtain predictive posterior
-    gs, ys = data
+    gs, ys = unseen_data
     distribution = net.condition(gs)
     
     # obtain samples from posterior
