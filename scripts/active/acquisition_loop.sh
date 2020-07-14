@@ -4,7 +4,7 @@ do
 	do
 		for acquisition in 'ThompsonSampling' 'WeightedSamplingExpectedImprovement' 'WeightedSamplingProbabilityOfImprovement' 'WeightedSamplingUpperConfidenceBound' 'GreedyExpectedImprovement' 'GreedyProbabilityOfImprovement' 'GreedyUpperConfidenceBound' 'BatchRandom' 'BatchTemporal'
 		do
-			python plotting_active.py --acquisition $acquisition --q $q --index $index
+			bsub -q gpuqueue -m "ld-gpu ls-gpu lt-gpu lg-gpu lu-gpu" -n 4 -gpu "num=1:j_exclusive=yes" -R "rusage[mem=4] span[hosts=1]" -W 1:00 -o %J.stdout -eo %J.stderr python plotting_active.py --acquisition $acquisition --q $q --index $index
 		done
 	done
 done
