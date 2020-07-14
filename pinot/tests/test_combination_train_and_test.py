@@ -38,19 +38,19 @@ def test_train(net, regressor, representation, ds):
     Parameters
     ----------
     net :
-        
+
     regressor :
-        
+
     representation :
-        
+
     ds :
-        
+
 
     Returns
     -------
 
     """
-    net = net(output_regressor=regressor, representation=representation)
+    net = net(output_regressor_class=regressor, representation=representation)
 
     optimizer = torch.optim.Adam(net.parameters(), 1e-3)
 
