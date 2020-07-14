@@ -284,9 +284,9 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
                 -1.0
                 * grid_boundary
                 * torch.ones(n_inducing_points, in_features),
-                
+
                 1.0
-                * grid_boundary 
+                * grid_boundary
                 * torch.ones(n_inducing_points, in_features),
             ).sample()
         )
@@ -481,7 +481,7 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
 
         loss = nll + self.kl_loss_scaling * (log_q_u - log_p_u)
 
-        import pdb; pdb.set_trace()
+        # import pdb; pdb.set_trace()
         return loss
 
     @staticmethod
@@ -544,7 +544,7 @@ class BiophysicalVariationalGaussianProcessRegressor(VariationalGaussianProcessR
         * torch.ones(n_inducing_points, in_features),
 
         1.0
-        * grid_boundary 
+        * grid_boundary
         * torch.ones(n_inducing_points, in_features),
         ).sample()
         )

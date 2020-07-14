@@ -120,7 +120,10 @@ class Net(BaseNet):
     """
 
     def __init__(
-        self, representation, output_regressor_class, output_likelihood_class=None, **kwargs
+        self,
+        representation,
+        output_regressor_class=NeuralNetworkRegressor,
+        output_likelihood_class=None, **kwargs
     ):
 
         super(Net, self).__init__(
@@ -153,7 +156,7 @@ class Net(BaseNet):
         else:
             self.output_regressor = output_regressor
 
-        
+
 
     def loss(self, g, y, *args, **kwargs):
         """ Negative log likelihood loss.
