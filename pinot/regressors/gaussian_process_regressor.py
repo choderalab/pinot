@@ -581,7 +581,8 @@ class BiophysicalVariationalGaussianProcessRegressor(
         return 1 / (1 + torch.exp(-func_value) / test_ligand_concentration)
 
     def condition(
-        self, x_te, test_ligand_concentration=None, *args, **kwargs
+        self, x_te, test_ligand_concentration=None, output='measurement',
+        *args, **kwargs
     ):
         """
 
@@ -592,17 +593,41 @@ class BiophysicalVariationalGaussianProcessRegressor(
         sampler :
              (Default value = None)
 
+        output : str
+            Either 'measurement' or 'delta_g'
+            The type of quantities to construct distribution on.
+
         Returns
         -------
 
         """
-        predictive_mean, predictive_cov = self.forward(x_te)
+        assert isinstance(output, str)
 
-        distribution_delta_g = torch.distributions.multivariate_normal.MultivariateNormal(
-            loc=predictive_mean.flatten(), covariance_matrix=predictive_cov
-        )
+        distribution_delta_g = self._condition_delta_g(x_te)
 
-        f_sample = distribution_delta_g.rsample()
+        if output == 'delta_g':
+            return distribution_delta_g
+
+        elif output == 'measurement':
+            f_sample = self._sample_f(distribution_delta_g)
+            distribution_measurement = self._condition_measurement(
+                f_sample,
+                test_ligand_concentration=test_ligand_concentration
+            )
+            return distribution_measurement
+
+        else:
+            raise RuntimeError(
+                'Only measurement or delta g for now.'
+            )
+
+    def condition_deltaG(self, x_te):
+        distribution_delta_g = self._condition_delta_g(x_te)
+        f_sample = self._sample_f(distribution_delta_g)
+        return f_sample, distribution_delta_g
+
+
+    def _condition_measurement(self, f_sample, test_ligand_concentration):
         mu_m = self.g(
             func_value=f_sample[:, None],
             test_ligand_concentration=test_ligand_concentration,
@@ -611,8 +636,25 @@ class BiophysicalVariationalGaussianProcessRegressor(
         distribution_measurement = torch.distributions.normal.Normal(
             loc=mu_m, scale=sigma_m
         )
+        return distribution_measurement
 
-        return distribution_measurement, f_sample, distribution_delta_g
+    def _condition_delta_g(self, x_te):
+        predictive_mean, predictive_cov = self.forward(x_te)
+
+        distribution_delta_g = torch.distributions.multivariate_normal.MultivariateNormal(
+            loc=predictive_mean.flatten(), covariance_matrix=predictive_cov
+        )
+        return distribution_delta_g
+
+
+    def _sample_f(self, distribution_delta_g):
+        f_sample = distribution_delta_g.rsample()
+        return f_sample
+
+
+    def _sample_measurement(self, distribution_measurement):
+        return distribution_measurement.sample()
+
 
     def loss(
         self, x_te, y_te, test_ligand_concentration=None, *args, **kwargs
@@ -641,7 +683,7 @@ class BiophysicalVariationalGaussianProcessRegressor(
         prior_tril = prior_tril.to(device=x_te.device)
         prior_mean = prior_mean.to(device=x_te.device)
 
-        distribution_measurement, _, distribution_delta_g = self.condition(
+        distribution_measurement = self.condition(
             x_te=x_te, test_ligand_concentration=test_ligand_concentration
         )
 

@@ -125,6 +125,7 @@ class Net(BaseNet):
         self,
         representation,
         output_regressor_class=NeuralNetworkRegressor,
+        output_regressor=None,
         output_likelihood_class=None,
         **kwargs
     ):
@@ -143,11 +144,14 @@ class Net(BaseNet):
             if hasattr(layer, "out_features")
         ][-1].out_features
 
+        # `output_regressor` overwrites `output_regressor_class`
         # if nothing is specified for head,
         # use the MLE with heteroschedastic model
-        output_regressor = output_regressor_class(
-            in_features=self.representation_out_features, **kwargs
-        )
+        if output_regressor is None and output_regressor_class is not None:
+            output_regressor = output_regressor_class(
+                in_features=self.representation_out_features, **kwargs
+            )
+
 
         # determine if the output regressor is an `ExactGaussianProcess`
         self.has_exact_gp = False
@@ -198,15 +202,6 @@ class Net(BaseNet):
 
         return distribution
 
-    def condition_delta_g(self, g, *args, **kwargs):
-        h = self.representation(g)
-        (
-            distribution_measurement,
-            f_sample,
-            distribution_delta_g,
-        ) = self._condition(h, *args, **kwargs)
-        return distribution_delta_g
-
     def condition(self, g, sampler=None, n_samples=64, *args, **kwargs):
         """ Compute the output distribution with sampled weights.
 
@@ -232,7 +227,7 @@ class Net(BaseNet):
         """
         # g -> h
         h = self.representation(g)
-        kwargs = {}
+        # kwargs = {}
 
         if self.has_exact_gp is True:
             h_last = self.representation(self.g_last)
