@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 import pinot
 from pinot.generative.losses import negative_elbo
-from pinot.generative.decoder import DecoderNetwork
+from pinot.generative.decoder import EdgeDecoder
 from pinot.regressors.neural_network_regressor import NeuralNetworkRegressor
 
 # =============================================================================
@@ -64,7 +64,7 @@ class SemiSupervisedNet(pinot.Net):
         self,
         representation,
         output_regressor_class=NeuralNetworkRegressor,
-        decoder=DecoderNetwork,
+        decoder_class=EdgeDecoder,
         unsup_scale=1.0,
         embedding_dim=64,
         generative_hidden_dim=64,
@@ -86,14 +86,14 @@ class SemiSupervisedNet(pinot.Net):
         self.representation_dim = self.representation_out_features
 
         # pass in decoder as class
-        self.decoder_cls = decoder
+        self.decoder_cls = decoder_class
         # Recommended class: pinot.generative.decoder.DecoderNetwork
         # Decoder needs to satisfy:
         # decoder.loss(g, z_sample) -> compute reconstruction loss
         # Embedding_dim is the dimension of the z_sample vector, or the
         # input of the decoder
         self.embedding_dim = embedding_dim
-        self.decoder = decoder(
+        self.decoder = decoder_class(
             embedding_dim=embedding_dim, num_atom_types=100
         )
 

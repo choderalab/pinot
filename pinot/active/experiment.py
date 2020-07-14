@@ -5,10 +5,6 @@ import torch
 import abc
 import dgl
 import pinot
-from pinot.generative.utils import (
-    batch_semi_supervised,
-    prepare_semi_supervised_data,
-)
 from pinot.metrics import _independent
 from torch.utils.data import WeightedRandomSampler
 
@@ -250,8 +246,15 @@ class BayesOptExperiment(ActiveLearningExperiment):
         self.seen = []
         if isinstance(data, tuple):
             self.unseen = list(range(len(data[1])))
+            self.g_all = data[0]
         else:
             self.unseen = list(range(len(data)))
+            # If the data is DGLGraph
+            if type(data[0][0]) == dgl.DGLGraph:
+                self.g_all = dgl.batch([g for (g, y) in data])
+            # If numerical data
+            else:
+                self.g_all = torch.tensor([g for (g,y) in data])
 
         # acquisition
         self.acquisition = acquisition
@@ -357,9 +360,19 @@ class BayesOptExperiment(ActiveLearningExperiment):
 
             # get utility score
             utility = self.acquisition(distribution, y_best=self.y_best)
-            pending_pts = torch.argmax(score)
+            pending_pts = torch.argmax(utility)
 
+            # Compute the max probability of improvement needed for later plots
+            # Note that this probability of improvement is computed for all graphs
+            prob_improvement = pinot.active.acquisition.probability_of_improvement(
+                    pinot.metrics._independent(self.net.condition(self.g_all)),
+                                y_best=self.y_best)
+            print("Max probability of improvement:")
+            print(prob_improvement.max().detach())
+
+        # print(len(self.new), best)
         self.seen.extend([self.unseen.pop(p) for p in pending_pts])
+
 
     def update_data(self):
         """Update the internal data using old and new."""
@@ -410,31 +423,45 @@ class BayesOptExperiment(ActiveLearningExperiment):
 
 
 class SemiSupervisedBayesOptExperiment(BayesOptExperiment):
-    """Implements active learning experiment with single task target."""
+    """Implements active learning experiment with single task target
+    with Semi Supervised model."""
 
-    def __init__(self, *args, **kwargs):
-
-        super(SemiSupervisedBayesOptExperiment, self).__init__(
-            *args, **kwargs
-        )
+    def __init__(self, unlabeled_data=None, *args, **kwargs):
+        
+        super(SemiSupervisedBayesOptExperiment, self).__init__(*args, **kwargs)
+        self.unlabeled_data = unlabeled_data
 
     def train(self):
         """Train the model with new data."""
         # combine new (unlabeled!) and old (labeled!)
         # Flatten the labeled_data and remove labels to be ready
-        semi_supervised_data = prepare_semi_supervised_data(
+        semi_supervised_data = pinot.data.utils.prepare_semi_supervised_data(
             self.flatten_data(self.unseen_data),
             self.flatten_data(self.seen_data),
         )
+        
+        # Combine this also with the background unlabeled data (if any)
+        if self.unlabeled_data:
+            semi_supervised_data = pinot.data.utils.prepare_semi_supervised_data(
+                self.unlabeled_data, semi_supervised_data
+            )
 
-        # NOTE that we have to use a special version of batch here
-        # because torch.tensor doesn't take in `None`
-        batched_semi_supervised_data = batch_semi_supervised(
+        batched_semi_supervised_data = pinot.data.utils.batch(
             semi_supervised_data, batch_size=len(semi_supervised_data)
         )
 
         # reset
         self.reset_net()
+
+        # Compute the unsupervised scaling constant and reset it
+        # as the number of labeled data points change after every epoch
+        if self.unlabeled_data:
+            unsup_scale = float(len(self.old_data))/(len(self.new_data) + len(self.unlabeled_data))
+        else:
+            unsup_scale = float(len(self.old_data))/len(self.new_data)
+        
+        # Update the unsupervised scale constant of SemiSupervisedNet
+        self.net.unsup_scale = unsup_scale
 
         # set to train status
         self.net.train()

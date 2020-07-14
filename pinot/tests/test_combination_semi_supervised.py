@@ -118,7 +118,7 @@ def test_init(net, regressor, representation, decoder):
     net(
         output_regressor_class=regressor,
         representation=representation,
-        decoder=decoder,
+        decoder_class=decoder,
     )
 
 
@@ -157,7 +157,7 @@ def test_loss(net, regressor, representation, decoder, ds):
     net = net(
         output_regressor_class=regressor,
         representation=representation,
-        decoder=decoder,
+        decoder_class=decoder,
     )
 
     g, y = ds[0]

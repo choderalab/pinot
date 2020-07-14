@@ -7,7 +7,6 @@ import numpy as np
 import pandas as pd
 
 import torch
-
 import pinot
 import pinot.active.experiment as experiment
 from pinot.generative import SemiSupervisedNet
@@ -18,14 +17,13 @@ from pinot.generative import SemiSupervisedNet
 
 class ActivePlot():
 
-    def __init__(self, net, layer, config,
+    def __init__(self, net, config,
                  lr, optimizer_type,
                  data, acquisition, num_samples, q,
                  device, num_trials, num_rounds, num_epochs):
 
         # net config
         self.net = net
-        self.layer = layer
         self.config = config
 
         # optimizer config
@@ -40,7 +38,7 @@ class ActivePlot():
         self.train = pinot.app.experiment.Train
 
         # handle semi
-        if self.net == 'semi':
+        if self.net == 'semi' or self.net == "semi_gp":
             self.bo_cls = experiment.SemiSupervisedBayesOptExperiment
         elif self.net == 'multitask':
             self.bo_cls = pinot.multitask.MultitaskBayesOptExperiment
@@ -206,23 +204,21 @@ class ActivePlot():
         """
         Retrive GP using representation provided in args.
         """
-        layer = pinot.representation.dgl_legacy.gn(model_name=self.layer)
-
-        representation = pinot.representation.Sequential(
-            layer=layer,
+        representation = pinot.representation.SequentialMix(
             config=self.config)
 
-        output_regressor = getattr(pinot.regressors, self.net)
-
-        net = pinot.Net(
-            representation=representation,
-            output_regressor_class=output_regressor,
-        )
+        if hasattr(pinot.regressors, self.net):
+            output_regressor = getattr(pinot.regressors, self.net)
+            net = pinot.Net(
+                representation=representation,
+                output_regressor_class=output_regressor,
+            )
 
         if self.net == 'semi':
+            output_regressor = pinot.regressors.NeuralNetworkRegressor
             net = SemiSupervisedNet(
                 representation=representation,
-                unsup_scale=0.1 # <------ if unsup_scale = 0., reduces to supervised model
+                output_regressor=output_regressor
             )
 
         elif self.net == 'semi_gp':
@@ -250,7 +246,10 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--net', type=str, default='ExactGaussianProcessRegressor')
-    parser.add_argument('--representation', type=str, default='GraphConv')
+    parser.add_argument('--config', nargs="+", type=str,
+        default=["GraphConv", "32", "activation", "tanh",
+        "GraphConv", "32", "activation", "tanh",
+        "GraphConv", "32", "activation", "tanh"])
 
     parser.add_argument('--lr', type=float, default=1e-4)
     parser.add_argument('--optimizer', type=str, default='Adam')
@@ -273,8 +272,7 @@ if __name__ == '__main__':
     plot = ActivePlot(
         # net config
         net=args.net,
-        layer=args.representation,
-        config=[32, 'tanh', 32, 'tanh', 32, 'tanh'],
+        config=args.config,
 
         # optimizer config
         optimizer_type=args.optimizer,
@@ -294,8 +292,9 @@ if __name__ == '__main__':
     )
 
     best_df = plot.generate()
+    representation = args.config[0]
 
     # save to disk
     if args.index_provided:
-        filename = f'{args.net}_{args.representation}_{args.optimizer}_{args.data}_{args.acquisition}_q{args.q}_{args.index}.csv'
+        filename = f'{args.net}_{representation}_{args.optimizer}_{args.data}_{args.acquisition}_q{args.q}_{args.index}.csv'
     best_df.to_csv(filename)

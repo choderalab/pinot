@@ -132,7 +132,7 @@ def load_unlabeled_data(path, size=0.1, toolkit="rdkit", seed=2666):
         num_mols = int(len(df_smiles) * size)
         df_smiles = df_smiles[:num_mols]
         # Create "fake" labels
-        df_y = torch.FloatTensor([1 for _ in range(num_mols)])
+        df_y = torch.FloatTensor([np.nan for _ in range(num_mols)])
 
         if toolkit == "rdkit":
             from rdkit import Chem
@@ -294,7 +294,7 @@ def prepare_semi_supervised_data(unlabelled_data, labelled_data, seed=2666):
     semi_supervised_data = []
 
     for (g, y) in unlabelled_data:
-        semi_supervised_data.append((g, torch.tensor([np.nan])))
+        semi_supervised_data.append((g, y))
     for (g, y) in labelled_data:
         semi_supervised_data.append((g, y))
 

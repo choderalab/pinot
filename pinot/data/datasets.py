@@ -638,6 +638,16 @@ class MixedSingleAndMultipleDataset(Dataset):
         )
 
 
+class UnlabeledDataset(Dataset):
+    def __init__(self, ds=None):
+        super(UnlabeledDataset, self).__init__(ds)
+    
+    def from_txt(self, *args, **kwargs):
+        """ Read from txt file """
+        self.ds = pinot.data.utils.load_unlabeled_data(*args, **kwargs)()
+        return self
+
+
 # =============================================================================
 # PRESETS
 # =============================================================================
