@@ -18,7 +18,7 @@ def net():
 
     net = pinot.Net(
         net_representation,
-        output_regressor=pinot.regressors.ExactGaussianProcessRegressor,
+        output_regressor_class=pinot.regressors.ExactGaussianProcessRegressor,
     )
 
     return net
@@ -30,7 +30,7 @@ def test_init(net):
     Parameters
     ----------
     net :
-        
+
 
     Returns
     -------
@@ -45,7 +45,7 @@ def test_condition(net):
     Parameters
     ----------
     net :
-        
+
 
     Returns
     -------

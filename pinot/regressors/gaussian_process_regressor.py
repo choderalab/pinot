@@ -262,7 +262,7 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
         sigma_initializer_value=-2.0,
         kl_loss_scaling=1e-2,
         grid_boundary=1.0,
-    ):
+        ):
         super(VariationalGaussianProcessRegressor, self).__init__()
         if kernel is None:
             kernel = pinot.regressors.kernels.rbf.RBF
@@ -284,9 +284,9 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
                 -1.0
                 * grid_boundary
                 * torch.ones(n_inducing_points, in_features),
-                
+
                 1.0
-                * grid_boundary 
+                * grid_boundary
                 * torch.ones(n_inducing_points, in_features),
             ).sample()
         )
@@ -481,6 +481,7 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
 
         loss = nll + self.kl_loss_scaling * (log_q_u - log_p_u)
 
+        # import pdb; pdb.set_trace()
         return loss
 
     @staticmethod
@@ -504,6 +505,149 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
         const_term = 0.5 * mean1.shape[0] * np.log(2 * np.pi * np.exp(1))
         log_det_prior = torch.sum(torch.log(torch.diag(tril1)))
         return log_det_prior + const_term
+
+
+
+class BiophysicalVariationalGaussianProcessRegressor(VariationalGaussianProcessRegressor):
+
+    def __init__(
+        self,
+        in_features,
+        kernel=None,
+        log_sigma=-3.0,
+        n_inducing_points=100,
+        mu_initializer_std=0.1,
+        sigma_initializer_value=-2.0,
+        kl_loss_scaling=1e-2,
+        grid_boundary=1.0,
+        ):
+        super(VariationalGaussianProcessRegressor, self).__init__()
+        if kernel is None:
+            kernel = pinot.regressors.kernels.rbf.RBF
+
+        # point unintialized class to self
+        self.kernel_cls = kernel
+
+        # put representation hidden units
+        self.kernel = kernel(in_features)
+
+        self.in_features = in_features
+
+        self.log_sigma = torch.nn.Parameter(torch.tensor(log_sigma))
+
+        # uniform distribution within boundary
+        # (n_inducing_points, hidden_dimension)
+        self.x_tr = torch.nn.Parameter(
+        torch.distributions.uniform.Uniform(
+        -1.0
+        * grid_boundary
+        * torch.ones(n_inducing_points, in_features),
+
+        1.0
+        * grid_boundary
+        * torch.ones(n_inducing_points, in_features),
+        ).sample()
+        )
+
+
+        # variational mean for inducing points value
+        # (n_inducing_points, 1)
+        self.y_tr_mu = torch.nn.Parameter(
+        torch.distributions.normal.Normal(
+        loc=torch.zeros(n_inducing_points, 1),
+        scale=mu_initializer_std * torch.ones(n_inducing_points, 1),
+        ).sample()
+        )
+
+
+        # to ensure lower cholesky
+        self.y_tr_sigma_diag = torch.nn.Parameter(
+        sigma_initializer_value * torch.ones(n_inducing_points))
+
+        # (0.5 * n_inducing_points * (n_inducing_points - 1), )
+        self.y_tr_sigma_tril = torch.nn.Parameter(
+        torch.zeros(int(n_inducing_points * (n_inducing_points - 1) * 0.5))
+        )
+
+        self.n_inducing_points = n_inducing_points
+
+        self.kl_loss_scaling = kl_loss_scaling
+
+        self.log_sigma_measurement = torch.nn.Parameter(torch.zeros(1))
+
+
+    def g(self, func_value=None, test_ligand_concentration=None):
+        #normally test_ligand_concentration=1e-3
+        return 1 / (1 + torch.exp(-func_value) / test_ligand_concentration)
+
+    def condition(self, x_te, test_ligand_concentration=None, *args, **kwargs):
+        """
+
+        Parameters
+        ----------
+        x_te :
+
+        sampler :
+             (Default value = None)
+
+        Returns
+        -------
+
+        """
+        predictive_mean, predictive_cov = self.forward(x_te)
+
+        distribution_delta_g = torch.distributions.multivariate_normal.MultivariateNormal(
+            loc=predictive_mean.flatten(), covariance_matrix=predictive_cov
+        )
+
+        f_sample = distribution_delta_g.rsample()
+        mu_m = self.g(func_value=f_sample[:,None], test_ligand_concentration=test_ligand_concentration)
+        sigma_m = torch.exp(self.log_sigma_measurement)
+        distribution_measurement = torch.distributions.normal.Normal(loc=mu_m, scale=sigma_m)
+
+        return distribution_measurement, f_sample, distribution_delta_g
+
+
+    def loss(self, x_te, y_te, test_ligand_concentration=None, *args, **kwargs):
+        """ Loss function.
+
+        Parameters
+        ----------
+        x_te : `torch.Tensor`, `shape=(n_te, hidden_dimension)`
+            Training input.
+
+        y_te : `torch.Tensor`, `shape=(n_te, )`
+            Training target.
+
+
+        Returns
+        -------
+        loss : `torch.Tensor`, `shape=(,)`
+            Loss function.
+
+        """
+        # define prior
+        prior_mean = torch.zeros(self.n_inducing_points, 1)
+        prior_tril = self._k_tr_tr().cholesky()
+
+        prior_tril = prior_tril.to(
+                device=x_te.device)
+        prior_mean = prior_mean.to(
+                device=x_te.device)
+
+        distribution_measurement, _, distribution_delta_g = self.condition(x_te=x_te, test_ligand_concentration=test_ligand_concentration)
+
+        nll = -distribution_measurement.log_prob(y_te.flatten()).mean()
+
+        log_p_u = self.exp_log_full_gaussian(
+            self.y_tr_mu, self._y_tr_sigma(), prior_mean, prior_tril
+        )
+
+        log_q_u = -self.entropy_full_gaussian(self.y_tr_mu, self._y_tr_sigma())
+
+        loss = nll + self.kl_loss_scaling * (log_q_u - log_p_u)
+
+        return loss
 
 #
 # GPyTorch implementation

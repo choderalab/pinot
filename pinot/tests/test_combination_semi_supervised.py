@@ -64,15 +64,15 @@ def test_import(
     Parameters
     ----------
     neural_network_regressor :
-        
+
     variational_gaussian_process_regressor :
-        
+
     exact_gaussian_process_regressor :
-        
+
     vanilla_net :
-        
+
     semisupervised_net :
-        
+
 
     Returns
     -------
@@ -103,20 +103,20 @@ def test_init(net, regressor, representation, decoder):
     Parameters
     ----------
     net :
-        
+
     regressor :
-        
+
     representation :
-        
+
     decoder :
-        
+
 
     Returns
     -------
 
     """
     net(
-        output_regressor=regressor,
+        output_regressor_class=regressor,
         representation=representation,
         decoder=decoder,
     )
@@ -140,22 +140,22 @@ def test_loss(net, regressor, representation, decoder, ds):
     Parameters
     ----------
     net :
-        
+
     regressor :
-        
+
     representation :
-        
+
     decoder :
-        
+
     ds :
-        
+
 
     Returns
     -------
 
     """
     net = net(
-        output_regressor=regressor,
+        output_regressor_class=regressor,
         representation=representation,
         decoder=decoder,
     )
