@@ -234,7 +234,7 @@ def _multinomial_sampling(score, q=5):
     """
     """    
     # perform multinomial sampling
-    pending_pts = WeightedRandomSampler(
+    pending_pts = torch.WeightedRandomSampler(
         weights=weights_norm,
         num_samples=q,
         replacement=False)
