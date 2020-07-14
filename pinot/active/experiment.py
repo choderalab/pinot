@@ -249,7 +249,12 @@ class BayesOptExperiment(ActiveLearningExperiment):
             self.g_all = data[0]
         else:
             self.unseen = list(range(len(data)))
-            self.g_all = dgl.batch([g for (g, y) in data]) 
+            # If the data is DGLGraph
+            if type(data[0][0]) == dgl.DGLGraph:
+                self.g_all = dgl.batch([g for (g, y) in data])
+            # If numerical data
+            else:
+                self.g_all = torch.tensor([g for (g,y) in data])
 
         # acquisition
         self.acquisition = acquisition
