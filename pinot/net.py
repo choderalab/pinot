@@ -231,7 +231,6 @@ class Net(BaseNet):
                 **{"x_tr": h_last, "y_tr": self.y_last},
                 **kwargs
             }
-            print("catch gp")
 
         if sampler is None:
             return self._condition(h, *args, **kwargs)
