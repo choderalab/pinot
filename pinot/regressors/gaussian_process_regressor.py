@@ -581,7 +581,7 @@ class BiophysicalVariationalGaussianProcessRegressor(
         return 1 / (1 + torch.exp(-func_value) / test_ligand_concentration)
 
     def condition(
-        self, x_te, test_ligand_concentration=None, on='measurement',
+        self, x_te, test_ligand_concentration=None, output='measurement',
         *args, **kwargs
     ):
         """
@@ -593,18 +593,22 @@ class BiophysicalVariationalGaussianProcessRegressor(
         sampler :
              (Default value = None)
 
+        output : str
+            Either 'measurement' or 'delta_g'
+            The type of quantities to construct distribution on.
+
         Returns
         -------
 
         """
-        assert isinstance(on, str)
+        assert isinstance(output, str)
 
         distribution_delta_g = self._condition_delta_g(x_te)
 
-        if on == 'delta_g':
+        if output == 'delta_g':
             return distribution_delta_g
 
-        elif on == 'measurement':
+        elif output == 'measurement':
             f_sample = self._sample_f(distribution_delta_g)
             distribution_measurement = self._condition_measurement(
                 f_sample,
