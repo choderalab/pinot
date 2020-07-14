@@ -27,12 +27,11 @@ class BaseNet(torch.nn.Module, abc.ABC):
     condition :
     """
 
-    def __init__(self, representation, output_regressor, *args, **kwargs):
+    def __init__(self, representation, output_regressor_class, *args, **kwargs):
         super(BaseNet, self).__init__()
 
         # bookkeeping
         self.representation = representation
-        self.output_regressor_cls = output_regressor
 
     @abc.abstractmethod
     def condition(self, g, sampler=None, *args, **kwargs):
@@ -121,11 +120,11 @@ class Net(BaseNet):
     """
 
     def __init__(
-        self, representation, output_regressor=NeuralNetworkRegressor, **kwargs
+        self, representation, output_regressor_class, output_likelihood_class=None, **kwargs
     ):
 
         super(Net, self).__init__(
-            representation=representation, output_regressor=output_regressor
+            representation=representation, output_regressor_class=output_regressor_class, output_likelihood_class=output_likelihood_class
         )
 
         # read the representation hidden units here
@@ -136,22 +135,25 @@ class Net(BaseNet):
             if hasattr(layer, "out_features")
         ][-1].out_features
 
-        self.output_regressor_cls = output_regressor
-
         # if nothing is specified for head,
         # use the MLE with heteroschedastic model
-        output_regressor = output_regressor(
+        output_regressor = output_regressor_class(
             in_features=self.representation_out_features, **kwargs
         )
 
-        self.representation = representation
-        self.output_regressor = output_regressor
-
         # determine if the output regressor is an `ExactGaussianProcess`
         self.has_exact_gp = False
-        if isinstance(self.output_regressor, ExactGaussianProcessRegressor):
-
+        if isinstance(output_regressor, ExactGaussianProcessRegressor):
             self.has_exact_gp = True
+
+        self.representation = representation
+
+        if output_likelihood_class is not None:
+            self.output_regressor = output_likelihood_class(base_regressor=output_regressor)
+        else:
+            self.output_regressor = output_regressor
+
+        
 
     def loss(self, g, y, *args, **kwargs):
         """ Negative log likelihood loss.
@@ -188,6 +190,11 @@ class Net(BaseNet):
 
         return distribution
 
+    def condition_delta_g(self, g, *args, **kwargs):
+        h = self.representation(g)
+        distribution_measurement, f_sample, distribution_delta_g = self._condition(h, *args, **kwargs)
+        return distribution_delta_g
+
     def condition(self, g, sampler=None, n_samples=64, *args, **kwargs):
         """ Compute the output distribution with sampled weights.
 
@@ -221,6 +228,7 @@ class Net(BaseNet):
                 **{"x_tr": h_last, "y_tr": self.y_last},
                 **kwargs
             }
+            print("catch gp")
 
         if sampler is None:
             return self._condition(h, *args, **kwargs)
