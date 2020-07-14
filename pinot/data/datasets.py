@@ -457,6 +457,8 @@ class MixedSingleAndMultipleDataset(Dataset):
         # specification for signel
         single_concentrations=[20, 50],
         single_col_names=["f_inhibition_at_20_uM", "f_inhibition_at_50_uM",],
+        # scaling
+        concentration_unit_scaling=0.001,
     ):
         def _from_csv():
             # read single and multiple data
@@ -497,6 +499,9 @@ class MixedSingleAndMultipleDataset(Dataset):
                     cs = [x for c in cs for x in c]
                     ys = [x for y in ys for x in y]
 
+                    # scaling
+                    cs = [c * concentration_unit_scaling for c in cs]
+
                     record["cs_multiple"] = cs
                     record["ys_multiple"] = ys
 
@@ -508,12 +513,16 @@ class MixedSingleAndMultipleDataset(Dataset):
                 cs = single_concentrations
                 ys = [record[name] for name in single_col_names]
 
+                # scaling
+                cs = [c * concentration_unit_scaling for c in cs]
+
                 record["cs_single"] = cs
                 record["ys_single"] = ys
 
                 return record
 
             df = df.apply(flatten_single, axis=1)
+
 
             self.ds = df.to_dict(orient="records")
 
