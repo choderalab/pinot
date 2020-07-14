@@ -41,10 +41,10 @@ def _mse(y, y_hat):
     return torch.nn.functional.mse_loss(y, y_hat)
 
 
-def mse(net, g, y, sampler=None):
+def mse(net, g, y, *args, **kwargs):
     """ Mean squarred error. """
 
-    y_hat = net.condition(g, sampler=sampler).mean.cpu()
+    y_hat = net.condition(g, *args, **kwargs).mean.cpu()
     y = y.cpu()
 
     # gp
@@ -62,9 +62,10 @@ def _rmse(y, y_hat):
     )
 
 
-def rmse(net, g, y, sampler=None):
+def rmse(net, g, y, *args, **kwargs):
     """ Rooted mean squarred error. """
-    y_hat = net.condition(g, sampler=sampler).mean.cpu()
+
+    y_hat = net.condition(g, *args, **kwargs).mean.cpu()
     y = y.cpu()
 
     # gp
@@ -81,9 +82,9 @@ def _r2(y, y_hat):
     return 1 - torch.div(ss_res, ss_tot)
 
 
-def r2(net, g, y, sampler=None):
+def r2(net, g, y, *args, **kwargs):
     """ R2 """
-    y_hat = net.condition(g, sampler=sampler).mean.cpu()
+    y_hat = net.condition(g, *args, **kwargs).mean.cpu()
     y = y.cpu()
 
     if y_hat.dim() == 1:
@@ -92,11 +93,12 @@ def r2(net, g, y, sampler=None):
     return _r2(y, y_hat)
 
 
-def pearsonr(net, g, y, sampler=None):
+def pearsonr(net, g, y, *args, **kwargs):
     """ Pearson R """
     from scipy.stats import pearsonr as pr
 
-    y_hat = net.condition(g, sampler=sampler).mean.detach().cpu()
+    y_hat = net.condition(g, *args, **kwargs
+        ).mean.detach().cpu()
     y = y.detach().cpu()
 
     result = pr(y.flatten().numpy(), y_hat.flatten().numpy())
@@ -104,12 +106,8 @@ def pearsonr(net, g, y, sampler=None):
     return torch.Tensor([correlation])[0]
 
 
-def log_sigma(net, g, y, sampler=None):
-    """ Log sigma. """
-    return net.log_sigma
 
-
-def avg_nll(net, g, y, sampler=None):
+def avg_nll(net, g, y, *args, **kwargs):
     """ Average negative log likelihood. """
 
     # TODO:
@@ -119,7 +117,7 @@ def avg_nll(net, g, y, sampler=None):
     assert (y.dim() == 2 and y.shape[-1] == 1) or (y.dim() == 1)
 
     # make the predictive distribution
-    distribution = net.condition(g, sampler=sampler)
+    distribution = net.condition(g, *args, **kwargs)
 
     # make independent
     distribution = _independent(distribution)

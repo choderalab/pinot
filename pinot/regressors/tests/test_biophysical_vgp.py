@@ -33,7 +33,7 @@ def test_forward(net):
             'c1ccccc1'
         )
     )
-    distribution, _, _ = net.condition(g, test_ligand_concentration=0.001)
+    distribution = net.condition(g, test_ligand_concentration=0.001)
 
     assert distribution.mean.shape == torch.Size([1, 1])
 
@@ -59,6 +59,21 @@ def test_train(net):
         net=net,
         data=view,
         optimizer=torch.optim.Adam(net.parameters(), 1e-3),
-        n_epochs=10,
+        n_epochs=2,
     )
     train.train()
+
+def test_train_and_test(net):
+    import pinot
+    import torch
+    ds = pinot.data.moonshot_mixed()
+    view = ds.view('fixed_size_batch', batch_size=32)
+    experiment = pinot.TrainAndTest(
+        net=net,
+        data_tr=view,
+        data_te=view,
+        optimizer=torch.optim.Adam(net.parameters(), 1e-3),
+        n_epochs=2,
+    )
+
+    experiment.run()
