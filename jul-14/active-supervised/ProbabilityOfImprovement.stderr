@@ -1,0 +1,120 @@
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/plotting_active.py", line 324, in <module>
+    best_df = plot.generate()
+  File "scripts/active/plotting_active.py", line 71, in generate
+    final_results = self.run_trials(ds)
+  File "scripts/active/plotting_active.py", line 161, in run_trials
+    x = self.bo.run(num_rounds=self.num_rounds)
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 414, in run
+    self.train()
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 317, in train
+    self.net = self.train_class(
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 98, in train
+    self.train_once()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 82, in train_once
+    self.optimizer.step(l)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/autograd/grad_mode.py", line 15, in decorate_context
+    return func(*args, **kwargs)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/optim/adam.py", line 62, in step
+    loss = closure()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 78, in l
+    loss = torch.sum(self.net.loss(g, y))
+  File "/home/nguyenm5/coding/pinot/pinot/net.py", line 181, in loss
+    return self._loss(h, y)
+  File "/home/nguyenm5/coding/pinot/pinot/net.py", line 93, in _loss
+    return self.output_regressor.loss(h, y)
+  File "/home/nguyenm5/coding/pinot/pinot/regressors/gaussian_process_regressor.py", line 159, in loss
+    ) = self._get_kernel_and_auxiliary_variables(x_tr, y_tr)
+  File "/home/nguyenm5/coding/pinot/pinot/regressors/gaussian_process_regressor.py", line 109, in _get_kernel_and_auxiliary_variables
+    l_low = torch.cholesky(k_plus_sigma)
+KeyboardInterrupt
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/plotting_active.py", line 324, in <module>
+    best_df = plot.generate()
+  File "scripts/active/plotting_active.py", line 71, in generate
+    final_results = self.run_trials(ds)
+  File "scripts/active/plotting_active.py", line 161, in run_trials
+    x = self.bo.run(num_rounds=self.num_rounds)
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 414, in run
+    self.train()
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 317, in train
+    self.net = self.train_class(
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 98, in train
+    self.train_once()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 82, in train_once
+    self.optimizer.step(l)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/autograd/grad_mode.py", line 15, in decorate_context
+    return func(*args, **kwargs)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/optim/adam.py", line 62, in step
+    loss = closure()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 79, in l
+    loss.backward()
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/tensor.py", line 198, in backward
+    torch.autograd.backward(self, gradient, retain_graph, create_graph)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/autograd/__init__.py", line 98, in backward
+    Variable._execution_engine.run_backward(
+KeyboardInterrupt
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/plotting_active.py", line 324, in <module>
+    best_df = plot.generate()
+  File "scripts/active/plotting_active.py", line 68, in generate
+    ds = self.generate_data()
+  File "scripts/active/plotting_active.py", line 192, in generate_data
+    ds = [tuple([i.to(self.device) for i in ds[0]])]
+  File "scripts/active/plotting_active.py", line 192, in <listcomp>
+    ds = [tuple([i.to(self.device) for i in ds[0]])]
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/graph.py", line 3858, in to
+    self.ndata[k] = F.copy_to(self.ndata[k], ctx)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/backend/pytorch/tensor.py", line 95, in copy_to
+    return input.cuda()
+KeyboardInterrupt
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/plotting_active.py", line 324, in <module>
+    best_df = plot.generate()
+  File "scripts/active/plotting_active.py", line 68, in generate
+    ds = self.generate_data()
+  File "scripts/active/plotting_active.py", line 192, in generate_data
+    ds = [tuple([i.to(self.device) for i in ds[0]])]
+  File "scripts/active/plotting_active.py", line 192, in <listcomp>
+    ds = [tuple([i.to(self.device) for i in ds[0]])]
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/graph.py", line 3858, in to
+    self.ndata[k] = F.copy_to(self.ndata[k], ctx)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/backend/pytorch/tensor.py", line 95, in copy_to
+    return input.cuda()
+KeyboardInterrupt
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/plotting_active.py", line 324, in <module>
+    best_df = plot.generate()
+  File "scripts/active/plotting_active.py", line 68, in generate
+    ds = self.generate_data()
+  File "scripts/active/plotting_active.py", line 192, in generate_data
+    ds = [tuple([i.to(self.device) for i in ds[0]])]
+  File "scripts/active/plotting_active.py", line 192, in <listcomp>
+    ds = [tuple([i.to(self.device) for i in ds[0]])]
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/graph.py", line 3858, in to
+    self.ndata[k] = F.copy_to(self.ndata[k], ctx)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/backend/pytorch/tensor.py", line 95, in copy_to
+    return input.cuda()
+KeyboardInterrupt
+Using backend: pytorch
+Using backend: pytorch
+Using backend: pytorch
+Using backend: pytorch
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/plotting_active.py", line 324, in <module>
+    best_df = plot.generate()
+  File "scripts/active/plotting_active.py", line 71, in generate
+    final_results = self.run_trials(ds)
+  File "scripts/active/plotting_active.py", line 161, in run_trials
+    x = self.bo.run(num_rounds=self.num_rounds)
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 415, in run
+    self.acquire()
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 362, in acquire
+    best = torch.topk(score, self.q).indices
+RuntimeError: invalid argument 5: k not in range for dimension at /opt/conda/conda-bld/pytorch_1591914743399/work/aten/src/THC/generic/THCTensorTopK.cu:23

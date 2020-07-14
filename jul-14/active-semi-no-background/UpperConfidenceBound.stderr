@@ -1,0 +1,94 @@
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/plotting_active.py", line 324, in <module>
+    best_df = plot.generate()
+  File "scripts/active/plotting_active.py", line 71, in generate
+    final_results = self.run_trials(ds)
+  File "scripts/active/plotting_active.py", line 161, in run_trials
+    x = self.bo.run(num_rounds=self.num_rounds)
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 414, in run
+    self.train()
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 463, in train
+    unsup_scale.cuda()
+AttributeError: 'float' object has no attribute 'cuda'
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/plotting_active.py", line 324, in <module>
+    best_df = plot.generate()
+  File "scripts/active/plotting_active.py", line 71, in generate
+    final_results = self.run_trials(ds)
+  File "scripts/active/plotting_active.py", line 161, in run_trials
+    x = self.bo.run(num_rounds=self.num_rounds)
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 414, in run
+    self.train()
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 463, in train
+    unsup_scale.cuda()
+AttributeError: 'float' object has no attribute 'cuda'
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/plotting_active.py", line 324, in <module>
+    best_df = plot.generate()
+  File "scripts/active/plotting_active.py", line 71, in generate
+    final_results = self.run_trials(ds)
+  File "scripts/active/plotting_active.py", line 161, in run_trials
+    x = self.bo.run(num_rounds=self.num_rounds)
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 414, in run
+    self.train()
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 463, in train
+    unsup_scale.cuda()
+AttributeError: 'float' object has no attribute 'cuda'
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/plotting_active.py", line 324, in <module>
+    best_df = plot.generate()
+  File "scripts/active/plotting_active.py", line 71, in generate
+    final_results = self.run_trials(ds)
+  File "scripts/active/plotting_active.py", line 161, in run_trials
+    x = self.bo.run(num_rounds=self.num_rounds)
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 414, in run
+    self.train()
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 463, in train
+    unsup_scale.cuda()
+AttributeError: 'float' object has no attribute 'cuda'
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/plotting_active.py", line 324, in <module>
+    best_df = plot.generate()
+  File "scripts/active/plotting_active.py", line 71, in generate
+    final_results = self.run_trials(ds)
+  File "scripts/active/plotting_active.py", line 161, in run_trials
+    x = self.bo.run(num_rounds=self.num_rounds)
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 414, in run
+    self.train()
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 463, in train
+    unsup_scale.cuda()
+AttributeError: 'float' object has no attribute 'cuda'
+Using backend: pytorch
+Using backend: pytorch
+Using backend: pytorch
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/plotting_active.py", line 324, in <module>
+    # save to disk
+  File "scripts/active/plotting_active.py", line 71, in generate
+    final_results = self.run_trials(ds)
+  File "scripts/active/plotting_active.py", line 161, in run_trials
+    # pad if experiment stopped early
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 415, in run
+    self.acquire()
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 362, in acquire
+    best = torch.topk(score, self.q).indices
+RuntimeError: invalid argument 5: k not in range for dimension at /opt/conda/conda-bld/pytorch_1591914743399/work/aten/src/THC/generic/THCTensorTopK.cu:23
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/plotting_active.py", line 324, in <module>
+    # save to disk
+  File "scripts/active/plotting_active.py", line 71, in generate
+    final_results = self.run_trials(ds)
+  File "scripts/active/plotting_active.py", line 161, in run_trials
+    # pad if experiment stopped early
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 415, in run
+    self.acquire()
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 362, in acquire
+    best = torch.topk(score, self.q).indices
+RuntimeError: invalid argument 5: k not in range for dimension at /opt/conda/conda-bld/pytorch_1591914743399/work/aten/src/THC/generic/THCTensorTopK.cu:23
