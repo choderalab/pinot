@@ -198,7 +198,7 @@ class ActivePlot():
         elif self.acquisition in batch_acquisitions:
             self.strategy = 'batch'
             acq_fn = batch_acquisitions[self.acquisition]
-        
+
         return acq_fn
 
 
