@@ -16,6 +16,7 @@ def test_mix():
 
     list(iter(df.view("all_graphs")))
 
+
 def test_mix_default():
     import pinot
     from pinot.data import utils
@@ -23,12 +24,13 @@ def test_mix_default():
 
     df = pinot.data.moonshot_mixed()
 
-    view = df.view('all_available_pairs', batch_size=32)
+    view = df.view("all_available_pairs", batch_size=32)
 
     for g, y, c in view:
         g
         y
         c
+
 
 def test_rebatch():
     import pinot
@@ -37,7 +39,7 @@ def test_rebatch():
 
     df = pinot.data.moonshot_mixed()
 
-    view = df.view('fixed_size_batch', batch_size=32, drop_last=True)
+    view = df.view("fixed_size_batch", batch_size=32, drop_last=True)
 
     df.number_of_measurements
 

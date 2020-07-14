@@ -3,6 +3,7 @@ import torch
 import copy
 import dgl
 
+
 class MultitaskTrain(Train):
     """ Training experiment when heads need to be masked for each task.
     Attributes
@@ -27,7 +28,6 @@ class MultitaskTrain(Train):
             n_epochs=n_epochs,
             record_interval=record_interval,
         )
-
 
     def train(self):
         """ Train the model for multiple steps and
@@ -55,18 +55,22 @@ class MultitaskTrain(Train):
 
         return self.net
 
-
     def update_optimizer(self, output_regressor):
         """
         Adds parameters from a specific regressor to the optimizer.
         """
-        lr = self.optimizer.param_groups[0]['lr']
-        if hasattr(output_regressor, 'likelihood'):
-            params = [{'params': output_regressor.hyperparameters(), 'lr': lr * 1e-3},
-                      {'params': output_regressor.variational_parameters()},
-                      {'params': output_regressor.likelihood.parameters()}]
+        lr = self.optimizer.param_groups[0]["lr"]
+        if hasattr(output_regressor, "likelihood"):
+            params = [
+                {
+                    "params": output_regressor.hyperparameters(),
+                    "lr": lr * 1e-3,
+                },
+                {"params": output_regressor.variational_parameters()},
+                {"params": output_regressor.likelihood.parameters()},
+            ]
         else:
-            params = [{'params': output_regressor.parameters()}]
+            params = [{"params": output_regressor.parameters()}]
 
         for p in params:
             self.optimizer.add_param_group(p)
@@ -87,6 +91,7 @@ class MultitaskTrainAndTest(TrainAndTest):
     n_epochs : int, default=100
         number of epochs
     """
+
     def __init__(
         self,
         net,
@@ -95,7 +100,8 @@ class MultitaskTrainAndTest(TrainAndTest):
         optimizer,
         n_epochs=100,
         record_interval=1,
-        metrics=[]):
+        metrics=[],
+    ):
         super(MultitaskTrainAndTest, self).__init__(
             net=net,
             data_tr=data_tr,
@@ -117,6 +123,7 @@ class MultitaskTrainAndTest(TrainAndTest):
         `record_interval`.
         """
         from tqdm import tqdm
+
         for epoch_idx in tqdm(range(int(self.n_epochs))):
             self.net.train()
             self.train_once()
@@ -139,7 +146,6 @@ class MultitaskTrainAndTest(TrainAndTest):
 
         return self.results
 
-
     def test(self):
         self.net.eval()
         y = []
@@ -157,24 +163,25 @@ class MultitaskTrainAndTest(TrainAndTest):
 
         for metric in self.metrics:  # loop through the metrics
             self.results[metric.__name__] = (
-                metric(self.net, g, y)
-                .detach()
-                .cpu()
-                .numpy()
+                metric(self.net, g, y).detach().cpu().numpy()
             )
-
 
     def update_optimizer(self, output_regressor):
         """
         Adds parameters from a specific regressor to the optimizer.
         """
-        lr = self.optimizer.param_groups[0]['lr']
-        if hasattr(output_regressor, 'likelihood'):
-            params = [{'params': output_regressor.hyperparameters(), 'lr': lr * 1e-3},
-                      {'params': output_regressor.variational_parameters()},
-                      {'params': output_regressor.likelihood.parameters()}]
+        lr = self.optimizer.param_groups[0]["lr"]
+        if hasattr(output_regressor, "likelihood"):
+            params = [
+                {
+                    "params": output_regressor.hyperparameters(),
+                    "lr": lr * 1e-3,
+                },
+                {"params": output_regressor.variational_parameters()},
+                {"params": output_regressor.likelihood.parameters()},
+            ]
         else:
-            params = [{'params': output_regressor.parameters()}]
+            params = [{"params": output_regressor.parameters()}]
 
         for p in params:
             self.optimizer.add_param_group(p)

@@ -69,10 +69,12 @@ def test_ei_monte_carlo(normal):
     """
     from pinot.active.acquisition import expected_improvement_monte_carlo
 
-    ei = expected_improvement_monte_carlo(normal, y_best=0.0, n_samples=100000)
+    ei = expected_improvement_monte_carlo(
+        normal, y_best=0.0, n_samples=100000
+    )
     assert (torch.exp(normal.log_prob(0.0)) - ei) < 1e-2
 
-    
+
 def test_ucb(normal):
     """
 

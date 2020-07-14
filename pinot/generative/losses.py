@@ -3,6 +3,7 @@ import torch.nn.modules.loss
 import torch.nn.functional as F
 import dgl
 
+
 def negative_elbo(decoded_subgraphs, mu, logvar, g):
     """Compute the negative ELBO loss function used in variational auto-encoder
     The difference between this loss function and negative_ELBO is that this
@@ -47,7 +48,7 @@ def negative_elbo(decoded_subgraphs, mu, logvar, g):
         node_nll = torch.sum(F.cross_entropy(decoded_nodes, node_types))
 
         loss += node_nll + edge_nll
-    
+
     KLD = (
         -0.5
         / g.number_of_nodes()

@@ -430,12 +430,12 @@ class MixedSingleAndMultipleDataset(Dataset):
     def __init__(self, ds=None):
         super(MixedSingleAndMultipleDataset, self).__init__(ds)
         self._number_of_measurements = None
-        self.device = torch.device('cpu') # initialize on cpu
+        self.device = torch.device("cpu")  # initialize on cpu
 
     @property
     def number_of_measurements(self):
         if self._number_of_measurements is None:
-            raise RuntimeError('Only available after viewing all the pairs.')
+            raise RuntimeError("Only available after viewing all the pairs.")
 
         else:
             return self._number_of_measurements
@@ -526,7 +526,6 @@ class MixedSingleAndMultipleDataset(Dataset):
 
             df = df.apply(flatten_single, axis=1)
 
-
             self.ds = df.to_dict(orient="records")
 
             for record in self.ds:
@@ -541,7 +540,7 @@ class MixedSingleAndMultipleDataset(Dataset):
         return _from_csv
 
     @staticmethod
-    def all_available_pairs(xs, device=torch.device('cpu')):
+    def all_available_pairs(xs, device=torch.device("cpu")):
         # initialize return lists
         gs = []
         cs = []
@@ -567,7 +566,9 @@ class MixedSingleAndMultipleDataset(Dataset):
                         cs.append(c)
                         ys.append(y)
 
-            if isinstance(cs_multiple, list) and isinstance(ys_multiple, list):
+            if isinstance(cs_multiple, list) and isinstance(
+                ys_multiple, list
+            ):
                 for c, y in zip(cs_multiple, ys_multiple):
                     if ~np.isnan(c) and ~np.isnan(y):
                         gs.append(g)
@@ -582,11 +583,11 @@ class MixedSingleAndMultipleDataset(Dataset):
         return g, c, y
 
     @staticmethod
-    def all_graphs(xs, device=torch.device('cpu')):
+    def all_graphs(xs, device=torch.device("cpu")):
         return dgl.batch([x["g"] for x in xs]).to(device)
 
     @staticmethod
-    def _rebatch(xs, device=torch.device('cpu'), *args, **kwargs):
+    def _rebatch(xs, device=torch.device("cpu"), *args, **kwargs):
         assert len(xs) == 1
         g, c, y = xs[0]
         gs = dgl.unbatch(g)
@@ -617,7 +618,7 @@ class MixedSingleAndMultipleDataset(Dataset):
 
     def view(self, collate_fn="all_available_pairs", *args, **kwargs):
         """ View the dataset as loader. """
-        if collate_fn == 'fixed_size_batch':
+        if collate_fn == "fixed_size_batch":
             _ds = [self.all_available_pairs(self.ds)]
             self._number_of_measurements = _ds[0][1].shape[0]
             return self._rebatch(_ds, device=self.device, *args, **kwargs)
@@ -629,14 +630,12 @@ class MixedSingleAndMultipleDataset(Dataset):
             collate_fn = getattr(self, collate_fn)
 
         from functools import partial
-        
+
         collate_fn = partial(collate_fn, device=self.device)
 
         return torch.utils.data.DataLoader(
             dataset=self, collate_fn=collate_fn, *args, **kwargs,
         )
-
-
 
 
 # =============================================================================
@@ -669,6 +668,7 @@ def curve():
         y_cols=[2],
         attr_cols=[3],
     )
+
 
 def moonshot_mixed():
     return pinot.data.datasets.MixedSingleAndMultipleDataset().from_csv(

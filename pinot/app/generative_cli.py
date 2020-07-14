@@ -53,7 +53,9 @@ def run(args):
     # layer as a variational auto-encoder
     input_feat_dim = background_data[0][0].ndata["h"].shape[1]
 
-    train_data, test_data = pinot.data.utils.split(background_data, args.split)
+    train_data, test_data = pinot.data.utils.split(
+        background_data, args.split
+    )
     batched_train_data = pinot.data.utils.batch(
         train_data, args.batch_size_gen
     )

@@ -19,9 +19,9 @@ def rbf_kernel(x):
 
     """
     # compute pairwise distance
-    pairwise_distance_square = torch.pow(x[:, None, :] - x[None, :, :], 2).sum(
-        dim=-1
-    )
+    pairwise_distance_square = torch.pow(
+        x[:, None, :] - x[None, :, :], 2
+    ).sum(dim=-1)
 
     # compute bandwidth
     h = torch.div(

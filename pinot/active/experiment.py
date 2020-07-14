@@ -34,6 +34,7 @@ def _slice_fn_tensor(x, idxs):
     """
     return x[idxs]
 
+
 def _slice_fn_tensor_pair(x, idxs):
     """ Slice function for tensors.
 
@@ -52,6 +53,7 @@ def _slice_fn_tensor_pair(x, idxs):
 
     """
     return x[0][idxs], x[1][idxs]
+
 
 def _collate_fn_tensor(x):
     """ Collate function for tensors.
@@ -343,15 +345,12 @@ class BayesOptExperiment(ActiveLearningExperiment):
 
             # batch acquisition
             pending_pts = self.acquisition(
-                self.net,
-                self.unseen_data,
-                q=5,
-                y_best=0.0
+                self.net, self.unseen_data, q=5, y_best=0.0
             )
-            
+
             # pop from the back so you don't disrupt the order
             pending_pts = pending_pts.sort(descending=True).values
-        
+
         else:
             # workup
             distribution = self.workup(distribution)
@@ -361,7 +360,6 @@ class BayesOptExperiment(ActiveLearningExperiment):
             pending_pts = torch.argmax(score)
 
         self.seen.extend([self.unseen.pop(p) for p in pending_pts])
-
 
     def update_data(self):
         """Update the internal data using old and new."""
@@ -373,9 +371,8 @@ class BayesOptExperiment(ActiveLearningExperiment):
 
         # set y_max
         gs, ys = self.seen_data
-        
-        self.y_best = torch.max(ys)
 
+        self.y_best = torch.max(ys)
 
     def run(self, num_rounds=999999, seed=None):
         """Run the model and conduct rounds of acquisition and training.
@@ -417,14 +414,17 @@ class SemiSupervisedBayesOptExperiment(BayesOptExperiment):
 
     def __init__(self, *args, **kwargs):
 
-        super(SemiSupervisedBayesOptExperiment, self).__init__(*args, **kwargs)
+        super(SemiSupervisedBayesOptExperiment, self).__init__(
+            *args, **kwargs
+        )
 
     def train(self):
         """Train the model with new data."""
         # combine new (unlabeled!) and old (labeled!)
         # Flatten the labeled_data and remove labels to be ready
         semi_supervised_data = prepare_semi_supervised_data(
-            self.flatten_data(self.unseen_data), self.flatten_data(self.seen_data)
+            self.flatten_data(self.unseen_data),
+            self.flatten_data(self.seen_data),
         )
 
         # NOTE that we have to use a special version of batch here
@@ -447,7 +447,6 @@ class SemiSupervisedBayesOptExperiment(BayesOptExperiment):
             net=self.net,
             record_interval=999999,
         ).train()
-
 
     def flatten_data(self, data):
         """

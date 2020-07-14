@@ -347,7 +347,7 @@ class AdLaLa(BaseSampler):
     def sample_params(self):
         """ """
         self.zero_grad()
-        
+
         #
         # def closure():
         #     """ """

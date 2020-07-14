@@ -27,7 +27,9 @@ class BaseNet(torch.nn.Module, abc.ABC):
     condition :
     """
 
-    def __init__(self, representation, output_regressor_class, *args, **kwargs):
+    def __init__(
+        self, representation, output_regressor_class, *args, **kwargs
+    ):
         super(BaseNet, self).__init__()
 
         # bookkeeping
@@ -123,11 +125,14 @@ class Net(BaseNet):
         self,
         representation,
         output_regressor_class=NeuralNetworkRegressor,
-        output_likelihood_class=None, **kwargs
+        output_likelihood_class=None,
+        **kwargs
     ):
 
         super(Net, self).__init__(
-            representation=representation, output_regressor_class=output_regressor_class, output_likelihood_class=output_likelihood_class
+            representation=representation,
+            output_regressor_class=output_regressor_class,
+            output_likelihood_class=output_likelihood_class,
         )
 
         # read the representation hidden units here
@@ -152,11 +157,11 @@ class Net(BaseNet):
         self.representation = representation
 
         if output_likelihood_class is not None:
-            self.output_regressor = output_likelihood_class(base_regressor=output_regressor)
+            self.output_regressor = output_likelihood_class(
+                base_regressor=output_regressor
+            )
         else:
             self.output_regressor = output_regressor
-
-
 
     def loss(self, g, y, *args, **kwargs):
         """ Negative log likelihood loss.
@@ -195,7 +200,11 @@ class Net(BaseNet):
 
     def condition_delta_g(self, g, *args, **kwargs):
         h = self.representation(g)
-        distribution_measurement, f_sample, distribution_delta_g = self._condition(h, *args, **kwargs)
+        (
+            distribution_measurement,
+            f_sample,
+            distribution_delta_g,
+        ) = self._condition(h, *args, **kwargs)
         return distribution_delta_g
 
     def condition(self, g, sampler=None, n_samples=64, *args, **kwargs):
@@ -227,10 +236,7 @@ class Net(BaseNet):
 
         if self.has_exact_gp is True:
             h_last = self.representation(self.g_last)
-            kwargs = {
-                **{"x_tr": h_last, "y_tr": self.y_last},
-                **kwargs
-            }
+            kwargs = {**{"x_tr": h_last, "y_tr": self.y_last}, **kwargs}
 
         if sampler is None:
             return self._condition(h, *args, **kwargs)

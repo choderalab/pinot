@@ -57,8 +57,15 @@ class Train:
 
     """
 
-    def __init__(self, net, data, optimizer, n_epochs=100, record_interval=1,
-            lr_scheduler=None):
+    def __init__(
+        self,
+        net,
+        data,
+        optimizer,
+        n_epochs=100,
+        record_interval=1,
+        lr_scheduler=None,
+    ):
 
         self.data = data
         self.optimizer = optimizer
@@ -189,9 +196,7 @@ class Test:
                         return torch.cat(x)
 
             xs = list(zip(*self.data))
-            xs = [
-                _batch(x) for x in xs
-            ]
+            xs = [_batch(x) for x in xs]
 
             for metric in self.metrics:  # loop through the metrics
                 results[metric.__name__][state_name] = (
@@ -296,7 +301,7 @@ class TrainAndTest:
             data=self.data_tr,
             optimizer=self.optimizer,
             n_epochs=self.n_epochs,
-            lr_scheduler=self.lr_scheduler
+            lr_scheduler=self.lr_scheduler,
         )
 
         train.train()

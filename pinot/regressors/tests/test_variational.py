@@ -54,7 +54,11 @@ def test_train_and_test():
     optimizer = torch.optim.Adam(net.parameters(), 1e-3)
 
     train_and_test = pinot.TrainAndTest(
-        net=net, optimizer=optimizer, n_epochs=1, data_tr=ds_tr, data_te=ds_te,
+        net=net,
+        optimizer=optimizer,
+        n_epochs=1,
+        data_tr=ds_tr,
+        data_te=ds_te,
     )
 
     print(train_and_test)
@@ -94,7 +98,11 @@ def test_train_and_test_cuda():
     )
 
     train_and_test = pinot.TrainAndTest(
-        net=net, optimizer=optimizer, n_epochs=1, data_tr=ds_tr, data_te=ds_te,
+        net=net,
+        optimizer=optimizer,
+        n_epochs=1,
+        data_tr=ds_tr,
+        data_te=ds_te,
     )
 
     print(train_and_test)

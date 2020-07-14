@@ -72,7 +72,7 @@ class SemiSupervisedNet(pinot.Net):
 
         super(SemiSupervisedNet, self).__init__(
             representation=representation,
-            output_regressor_class=output_regressor_class
+            output_regressor_class=output_regressor_class,
         )
 
         # Recommended class: pinot.representation.sequential.Sequential
@@ -93,7 +93,9 @@ class SemiSupervisedNet(pinot.Net):
         # Embedding_dim is the dimension of the z_sample vector, or the
         # input of the decoder
         self.embedding_dim = embedding_dim
-        self.decoder = decoder(embedding_dim=embedding_dim, num_atom_types=100)
+        self.decoder = decoder(
+            embedding_dim=embedding_dim, num_atom_types=100
+        )
 
         # Output_regressor_generative:
         assert hasattr(self.decoder, "forward")
