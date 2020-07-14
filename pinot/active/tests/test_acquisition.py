@@ -91,3 +91,6 @@ def test_ucb(normal):
 
     ucb = upper_confidence_bound(normal, kappa=0.95)
     assert ucb == normal.icdf(torch.tensor(0.975))
+
+
+# BATCH

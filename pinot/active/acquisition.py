@@ -230,12 +230,12 @@ def _exponential_weighted_sampling(net, unseen_data, acq_func, q=5, y_best=0.0):
     
     return pending_pts
 
-def _multinomial_sampling(score, q=5):
+def _multinomial_sampling(weights, q=5):
     """
     """    
     # perform multinomial sampling
-    pending_pts = torch.WeightedRandomSampler(
-        weights=weights_norm,
+    pending_pts = torch.utils.data.WeightedRandomSampler(
+        weights=weights,
         num_samples=q,
         replacement=False)
     
