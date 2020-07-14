@@ -245,11 +245,11 @@ class BayesOptExperiment(ActiveLearningExperiment):
 
         # data
         self.data = data
-        self.old = []
+        self.seen = []
         if isinstance(data, tuple):
-            self.new = list(range(len(data[1])))
+            self.unseen = list(range(len(data[1])))
         else:
-            self.new = list(range(len(data)))
+            self.unseen = list(range(len(data)))
 
         # acquisition
         self.acquisition = acquisition
@@ -305,8 +305,8 @@ class BayesOptExperiment(ActiveLearningExperiment):
         import random
 
         random.seed(seed)
-        best = random.choice(self.new)
-        self.old.append(self.new.pop(best))
+        best = random.choice(self.unseen)
+        self.seen.append(self.unseen.pop(best))
         return best
 
     def train(self):
@@ -319,7 +319,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
 
         # train the model
         self.net = self.train_class(
-            data=[self.old_data],
+            data=[self.seen_data],
             optimizer=self.optimizer,
             n_epochs=self.n_epochs,
             net=self.net,
@@ -332,7 +332,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
         self.net.eval()
 
         # split input target
-        gs, ys = self.new_data
+        gs, ys = self.unseen_data
 
         # get the predictive distribution
         # TODO:
@@ -342,52 +342,40 @@ class BayesOptExperiment(ActiveLearningExperiment):
         if self.strategy == "batch":
 
             # batch acquisition
-            indices, q_samples = self.acquisition(
-                posterior=distribution,
-                batch_size=gs.batch_size,
-                y_best=self.y_best,
+            pending_pts = self.acquisition(
+                self.net,
+                self.unseen_data,
+                q=5,
+                y_best=0.0
             )
-
-            # argmax sample batch
-            best = indices[:, torch.argmax(q_samples)].squeeze()
-
+            
+            # pop from the back so you don't disrupt the order
+            pending_pts = pending_pts.sort(descending=True).values
+        
         else:
             # workup
             distribution = self.workup(distribution)
 
-            # get score
-            score = self.acquisition(distribution, y_best=self.y_best)
+            # get utility score
+            utility = self.acquisition(distribution, y_best=self.y_best)
+            pending_pts = torch.argmax(score)
 
-            if not self.weighted_acquire:
-                # argmax
-                best = torch.topk(score, self.q).indices
-            else:
-                # generate probability distribution
-                weights = torch.exp(-score)
-                weights = weights/weights.sum()
-                best = WeightedRandomSampler(
-                    weights=weights,
-                    num_samples=self.q,
-                    replacement=False)
-                best = torch.IntTensor(list(best))
+        self.seen.extend([self.unseen.pop(p) for p in pending_pts])
 
-        # pop from the back so you don't disrupt the order
-        best = best.sort(descending=True).values
-        # print(len(self.new), best)
-        self.old.extend([self.new.pop(b) for b in best])
 
     def update_data(self):
         """Update the internal data using old and new."""
         # grab new data
-        self.new_data = self.slice_fn(self.data, self.new)
+        self.unseen_data = self.slice_fn(self.data, self.unseen)
 
         # grab old data
-        self.old_data = self.slice_fn(self.data, self.old)
+        self.seen_data = self.slice_fn(self.data, self.seen)
 
         # set y_max
-        gs, ys = self.old_data
+        gs, ys = self.seen_data
         
         self.y_best = torch.max(ys)
+
 
     def run(self, num_rounds=999999, seed=None):
         """Run the model and conduct rounds of acquisition and training.
@@ -411,7 +399,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
         self.blind_pick(seed=seed)
         self.update_data()
 
-        while idx < num_rounds and len(self.new) > 0:
+        while idx < num_rounds and len(self.unseen) > 0:
             self.train()
             self.acquire()
             self.update_data()
@@ -421,7 +409,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
 
             idx += 1
 
-        return self.old
+        return self.seen
 
 
 class SemiSupervisedBayesOptExperiment(BayesOptExperiment):
@@ -436,7 +424,7 @@ class SemiSupervisedBayesOptExperiment(BayesOptExperiment):
         # combine new (unlabeled!) and old (labeled!)
         # Flatten the labeled_data and remove labels to be ready
         semi_supervised_data = prepare_semi_supervised_data(
-            self.flatten_data(self.new_data), self.flatten_data(self.old_data)
+            self.flatten_data(self.unseen_data), self.flatten_data(self.seen_data)
         )
 
         # NOTE that we have to use a special version of batch here
