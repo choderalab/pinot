@@ -4,7 +4,7 @@ do
 	do
 		for acquisition in 'ThompsonSampling' 'WeightedSamplingExpectedImprovement' 'WeightedSamplingProbabilityOfImprovement' 'WeightedSamplingUpperConfidenceBound' 'GreedyExpectedImprovement' 'GreedyProbabilityOfImprovement' 'GreedyUpperConfidenceBound' 'BatchRandom' 'BatchTemporal'
 		do
-			python plotting_active.py --acquisition $acquisition --q 10 --index $index
+			python plotting_active.py --acquisition $acquisition --q $q --index $index
 		done
 	done
 done
