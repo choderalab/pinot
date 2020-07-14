@@ -220,7 +220,7 @@ def _exponential_weighted_sampling(net, unseen_data, acq_func, q=5, y_best=0.0):
     )
 
     # generate probability distribution
-    weights = torch.exp(-score)
+    weights = torch.exp(-utility)
 
     # normalize weights to make distribution
     weights_norm = weights/weights.sum()
