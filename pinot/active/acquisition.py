@@ -2,6 +2,7 @@
 # IMPORTS
 # =============================================================================
 import torch
+from pinot.metrics import _independent
 
 # =============================================================================
 # MODULE FUNCTIONS [SEQUENTIAL]
@@ -27,8 +28,9 @@ def temporal(distribution, y_best=0.0):
 
     """
     score = torch.range(
-        start=0, end=len(distribution.mean.flatten()) - 1
-    ).flip(0)
+        start=0,
+        end=len(distribution.mean.flatten()) - 1
+        ).flip(0)
     if torch.cuda.is_available():
         score = score.cuda()
     return score
@@ -105,7 +107,7 @@ def expected_improvement_analytical(distribution, y_best=0.0):
     assert isinstance(distribution, torch.distributions.Normal)
     mu = distribution.mean
     sigma = distribution.stddev
-    Z = (mu - y_best) / sigma
+    Z = (mu - y_best)/sigma
 
     normal = torch.distributions.Normal(0, 1)
     cdf = lambda x: normal.cdf(x)
@@ -133,9 +135,7 @@ def expected_improvement_monte_carlo(distribution, y_best, n_samples=1000):
     score : `torch.Tensor`, `shape=(n_candidates, )`
         Score for candidates under predictive distribution.
     """
-    improvement = torch.nn.functional.relu(
-        distribution.sample((n_samples,)) - y_best
-    )
+    improvement = torch.nn.functional.relu(distribution.sample((n_samples, )) - y_best)
     return improvement.mean(axis=0)
 
 
@@ -195,7 +195,6 @@ def random(distribution, y_best=0.0, seed=2666):
 # BATCH Utilities
 # =============================================================================
 
-
 def _get_utility(net, unseen_data, acq_func, y_best=0.0):
     """ Obtain distribution and utility from acquisition func.
     """
@@ -203,59 +202,66 @@ def _get_utility(net, unseen_data, acq_func, y_best=0.0):
     gs, ys = unseen_data
     distribution = net.condition(gs)
 
+    # workup distribution
+    distribution = _independent(distribution)
+
     # obtain utility from vanilla acquisition func
     utility = acq_func(distribution, y_best=y_best)
     return utility
 
-
-def _exponential_weighted_sampling(
-    net, unseen_data, acq_func, q=5, y_best=0.0
-):
+def _exponential_weighted_sampling(net, unseen_data, acq_func, q=5, y_best=0.0):
     """ Exponential weighted expected improvement
     """
-    utility = _get_utility(net, unseen_data, acq_func, y_best=y_best)
+    utility = _get_utility(
+        net,
+        unseen_data,
+        acq_func,
+        y_best=y_best
+    )
 
     # generate probability distribution
-    weights = torch.exp(-score)
+    weights = torch.exp(-utility)
 
     # normalize weights to make distribution
-    weights_norm = weights / weights.sum()
+    weights_norm = weights/weights.sum()
 
     # perform multinomial sampling from exp-transformed acq score
     pending_pts = _multinomial_sampling(weights_norm)
-
+    
     return pending_pts
 
-
-def _multinomial_sampling(score, q=5):
+def _multinomial_sampling(weights, q=5):
     """
-    """
+    """    
     # perform multinomial sampling
-    pending_pts = WeightedRandomSampler(
-        weights=weights_norm, num_samples=q, replacement=False
-    )
-
+    pending_pts = torch.utils.data.WeightedRandomSampler(
+        weights=weights,
+        num_samples=q,
+        replacement=False)
+    
     # convert to tensor
     pending_pts = torch.LongTensor(list(pending_pts))
 
     return pending_pts
 
-
 def _greedy(net, unseen_data, acq_func, q=5, y_best=0.0):
     """ Greedy batch acquisition
     """
-    utility = _get_utility(net, unseen_data, acq_func, y_best=y_best)
-
+    utility = _get_utility(
+        net,
+        unseen_data,
+        acq_func,
+        y_best=y_best
+    )
+    
     # fill batch greedily
     pending_pts = torch.topk(utility, q).indices
-
+    
     return pending_pts
-
 
 # =============================================================================
 # MODULE FUNCTIONS [BATCH]
 # =============================================================================
-
 
 def thompson_sampling(net, unseen_data, q=5, y_best=0.0):
     """ Generates m Thompson samples and maximizes them.
@@ -279,20 +285,20 @@ def thompson_sampling(net, unseen_data, q=5, y_best=0.0):
     # obtain predictive posterior
     gs, ys = unseen_data
     distribution = net.condition(gs)
-
+    
     # obtain samples from posterior
     thetas = distribution.sample((q,))
-
+    
     # enforce no duplicates in batch
     pending_pts = torch.unique(torch.argmax(thetas, axis=1)).tolist()
-
+    
     while len(pending_pts) < q:
         theta = distribution.sample()
         pending_pts.append(torch.argmax(theta).item())
-
+    
     # convert to tensor
     pending_pts = torch.LongTensor(pending_pts)
-
+    
     return pending_pts
 
 
@@ -316,9 +322,13 @@ def exponential_weighted_ei_analytical(net, unseen_data, q=5, y_best=0.0):
         The indices corresponding to pending points.
     """
     pending_pts = _exponential_weighted_sampling(
-        net, unseen_data, expected_improvement_analytical, q=q, y_best=y_best,
+        net,
+        unseen_data,
+        expected_improvement_analytical,
+        q=q,
+        y_best=y_best,
     )
-
+    
     return pending_pts
 
 
@@ -348,7 +358,7 @@ def exponential_weighted_ei_monte_carlo(net, unseen_data, q=5, y_best=0.0):
         q=q,
         y_best=y_best,
     )
-
+    
     return pending_pts
 
 
@@ -372,9 +382,13 @@ def exponential_weighted_pi(net, unseen_data, q=5, y_best=0.0):
         The indices corresponding to pending points.
     """
     pending_pts = _exponential_weighted_sampling(
-        net, unseen_data, probability_of_improvement, q=q, y_best=y_best,
+        net,
+        unseen_data,
+        probability_of_improvement,
+        q=q,
+        y_best=y_best,
     )
-
+    
     return pending_pts
 
 
@@ -398,9 +412,13 @@ def exponential_weighted_ucb(net, unseen_data, q=5, y_best=0.0):
         The indices corresponding to pending points.
     """
     pending_pts = _exponential_weighted_sampling(
-        net, unseen_data, upper_confidence_bound, q=q, y_best=y_best,
+        net,
+        unseen_data,
+        upper_confidence_bound,
+        q=q,
+        y_best=y_best,
     )
-
+    
     return pending_pts
 
 
@@ -424,9 +442,13 @@ def greedy_ucb(net, unseen_data, q=5, y_best=0.0):
         The indices corresponding to pending points.    
     """
     pending_pts = _greedy(
-        net, unseen_data, upper_confidence_bound, q=q, y_best=y_best,
+        net,
+        unseen_data,
+        upper_confidence_bound,
+        q=q,
+        y_best=y_best,
     )
-
+    
     return pending_pts
 
 
@@ -450,9 +472,13 @@ def greedy_ei_analytical(net, unseen_data, q=5, y_best=0.0):
         The indices corresponding to pending points.
     """
     pending_pts = _greedy(
-        net, unseen_data, expected_improvement_analytical, q=q, y_best=y_best,
+        net,
+        unseen_data,
+        expected_improvement_analytical,
+        q=q,
+        y_best=y_best,
     )
-
+    
     return pending_pts
 
 
@@ -475,14 +501,14 @@ def greedy_ei_monte_carlo(net, unseen_data, q=5, y_best=0.0):
     pending_pts : torch.LongTensor
         The indices corresponding to pending points.
     """
-    pending_pts = greedy(
+    pending_pts = _greedy(
         net,
         unseen_data,
         expected_improvement_monte_carlo,
         q=q,
         y_best=y_best,
     )
-
+    
     return pending_pts
 
 
@@ -506,9 +532,13 @@ def greedy_pi(net, unseen_data, q=5, y_best=0.0):
         The indices corresponding to pending points.
     """
     pending_pts = _greedy(
-        net, unseen_data, probability_of_improvement, q=q, y_best=y_best,
+        net,
+        unseen_data,
+        probability_of_improvement,
+        q=q,
+        y_best=y_best,
     )
-
+    
     return pending_pts
 
 
@@ -531,7 +561,13 @@ def batch_random(net, unseen_data, q=5, y_best=0.0):
     pending_pts : torch.LongTensor
         The indices corresponding to pending points.
     """
-    pending_pts = greedy(net, unseen_data, random, q=q, y_best=y_best,)
+    pending_pts = _greedy(
+        net,
+        unseen_data,
+        random,
+        q=q,
+        y_best=y_best,
+    )
 
     return pending_pts
 
@@ -556,6 +592,12 @@ def batch_temporal(net, unseen_data, q=5, y_best=0.0):
     pending_pts : torch.LongTensor
         The indices corresponding to pending points.
     """
-    pending_pts = greedy(net, unseen_data, temporal, q=q, y_best=y_best,)
+    pending_pts = _greedy(
+        net,
+        unseen_data,
+        temporal,
+        q=q,
+        y_best=y_best,
+    )
 
     return pending_pts

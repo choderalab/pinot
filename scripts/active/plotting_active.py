@@ -216,7 +216,7 @@ class ActivePlot():
 
         net = pinot.Net(
             representation=representation,
-            output_regressor=output_regressor,
+            output_regressor_class=output_regressor,
         )
 
         if self.net == 'semi':
