@@ -7,7 +7,9 @@ import abc
 import math
 import numpy as np
 
-
+# =============================================================================
+# MODULE CLASSES
+# =============================================================================
 class BiophysicalRegressor(torch.nn.Module):
     r""" Biophysically inspired model
 
@@ -36,10 +38,12 @@ class BiophysicalRegressor(torch.nn.Module):
             h, *args, **kwargs
         )
         # we sample from the latent f to push things through the likelihood
-        # Note: if we do this, in order to get good estimates of LLK we may need to draw multiple samples
+        # Note: if we do this,
+        # in order to get good estimates of LLK
+        # we may need to draw multiple samples
         f_sample = distribution_base_regressor.rsample()
         mu_m = self.g(
-            func_value=f_sample[:, None],
+            func_value=f_sample,
             test_ligand_concentration=test_ligand_concentration,
         )
         sigma_m = torch.exp(self.log_sigma_measurement)

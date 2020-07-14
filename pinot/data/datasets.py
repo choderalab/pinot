@@ -580,7 +580,7 @@ class MixedSingleAndMultipleDataset(Dataset):
         c = torch.tensor(cs)[:, None].to(device)
         y = torch.tensor(ys)[:, None].to(device)
 
-        return g, c, y
+        return g, y, c
 
     @staticmethod
     def all_graphs(xs, device=torch.device("cpu")):
@@ -594,14 +594,14 @@ class MixedSingleAndMultipleDataset(Dataset):
         cs = c.numpy().tolist()
         ys = y.numpy().tolist()
 
-        _ds = list(zip(gs, cs, ys))
+        _ds = list(zip(gs, ys, cs))
 
         def _collate_fn(_xs):
             _gs = []
             _cs = []
             _ys = []
 
-            for _g, _c, _y in _xs:
+            for _g, _y, _c in _xs:
                 _gs.append(_g)
                 _cs.append(_c)
                 _ys.append(_y)
@@ -610,7 +610,7 @@ class MixedSingleAndMultipleDataset(Dataset):
             _cs = torch.tensor(_cs).to(device)
             _ys = torch.tensor(_ys).to(device)
 
-            return _gs, _cs, _ys
+            return _gs, _ys, _cs
 
         return torch.utils.data.DataLoader(
             dataset=_ds, collate_fn=_collate_fn, *args, **kwargs

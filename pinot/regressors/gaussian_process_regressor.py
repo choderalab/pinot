@@ -596,6 +596,7 @@ class BiophysicalVariationalGaussianProcessRegressor(
         -------
 
         """
+
         predictive_mean, predictive_cov = self.forward(x_te)
 
         distribution_delta_g = torch.distributions.multivariate_normal.MultivariateNormal(
