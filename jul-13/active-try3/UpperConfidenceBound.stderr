@@ -1,0 +1,17 @@
+Using backend: pytorch
+Using backend: pytorch
+Using backend: pytorch
+Using backend: pytorch
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/plotting_active.py", line 319, in <module>
+    num_rounds=args.num_rounds,
+  File "scripts/active/plotting_active.py", line 71, in generate
+    final_results = self.run_trials(ds)
+  File "scripts/active/plotting_active.py", line 144, in run_trials
+    "n_epochs":self.num_epochs,
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 412, in run
+    self.acquire()
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 359, in acquire
+    best = torch.topk(score, self.q).indices
+RuntimeError: invalid argument 5: k not in range for dimension at /opt/conda/conda-bld/pytorch_1591914743399/work/aten/src/THC/generic/THCTensorTopK.cu:23

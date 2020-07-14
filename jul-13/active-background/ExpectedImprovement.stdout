@@ -1,0 +1,86 @@
+Sender: LSF System <lsfadmin@ls08>
+Subject: Job 15330019: <active-semi> in cluster <lila> Done
+
+Job <active-semi> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Jul 13 17:21:39 2020
+Job was executed on host(s) <12*ls08>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Jul 13 17:33:19 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Jul 13 17:33:19 2020
+Terminated at Mon Jul 13 18:37:27 2020
+Results reported at Mon Jul 13 18:37:27 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/plotting_active.py --net semi --num_rounds 4 --num_trials 1 --num_epoch 750 --data moonshot --q 96 --acquisition ExpectedImprovement --output_folder /home/nguyenm5/coding/pinot/jul-13/active-background --index 2 --unlabeled_data moonshot_unlabeled_small
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   37053.42 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.99 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                20
+    Run time :                                   3848 sec.
+    Turnaround time :                            4548 sec.
+
+The output (if any) follows:
+
+0
+That took 3816.8254368305206 seconds
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-13/active-background/ExpectedImprovement.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls15>
+Subject: Job 15330021: <active-semi> in cluster <lila> Done
+
+Job <active-semi> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Jul 13 17:21:40 2020
+Job was executed on host(s) <12*ls15>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Jul 13 17:41:16 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Jul 13 17:41:16 2020
+Terminated at Mon Jul 13 18:53:02 2020
+Results reported at Mon Jul 13 18:53:02 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/plotting_active.py --net semi --num_rounds 4 --num_trials 1 --num_epoch 750 --data moonshot --q 96 --acquisition ExpectedImprovement --output_folder /home/nguyenm5/coding/pinot/jul-13/active-background --index 4 --unlabeled_data moonshot_unlabeled_small
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   42295.15 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.99 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                20
+    Run time :                                   4307 sec.
+    Turnaround time :                            5482 sec.
+
+The output (if any) follows:
+
+0
+That took 4275.915956735611 seconds
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-13/active-background/ExpectedImprovement.stderr> for stderr output of this job.
+

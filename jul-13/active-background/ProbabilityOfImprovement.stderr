@@ -1,0 +1,16 @@
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/plotting_active.py", line 335, in <module>
+    best_df = plot.generate()
+  File "scripts/active/plotting_active.py", line 71, in generate
+    final_results = self.run_trials(ds)
+  File "scripts/active/plotting_active.py", line 115, in run_trials
+    ds_unlabeled, _ = pinot.data.utils.split(ds_unlabeled, [0.2, 0.8]) #<------ Note the split
+  File "/home/nguyenm5/coding/pinot/pinot/data/utils.py", line 221, in split
+    n_data = len(ds)
+TypeError: object of type 'function' has no len()
+Using backend: pytorch
+Using backend: pytorch
+Using backend: pytorch
+Using backend: pytorch
+Using backend: pytorch
