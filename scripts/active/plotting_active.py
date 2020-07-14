@@ -7,7 +7,6 @@ import numpy as np
 import pandas as pd
 
 import torch
-
 import pinot
 import pinot.active.experiment as experiment
 from pinot.generative import SemiSupervisedNet
@@ -18,14 +17,13 @@ from pinot.generative import SemiSupervisedNet
 
 class ActivePlot():
 
-    def __init__(self, net, layer, config,
-                 lr, optimizer_type, weighted_acquire,
-                 data, strategy, acquisition, marginalize_batch, num_samples, q,
+    def __init__(self, net, config,
+                 lr, optimizer_type,
+                 data, acquisition, num_samples, q,
                  device, num_trials, num_rounds, num_epochs):
 
         # net config
         self.net = net
-        self.layer = layer
         self.config = config
 
         # optimizer config
@@ -34,16 +32,13 @@ class ActivePlot():
 
         # experiment config
         self.data = data
-        self.strategy = strategy
         self.acquisition = acquisition
-        self.marginalize_batch = marginalize_batch
-        self.weighted_acquire = weighted_acquire
         self.num_samples = num_samples
         self.q = q
         self.train = pinot.app.experiment.Train
 
         # handle semi
-        if self.net == 'semi':
+        if self.net == 'semi' or self.net == "semi_gp":
             self.bo_cls = experiment.SemiSupervisedBayesOptExperiment
         elif self.net == 'multitask':
             self.bo_cls = pinot.multitask.MultitaskBayesOptExperiment
@@ -128,11 +123,10 @@ class ActivePlot():
                 net=net,
                 data=ds[0],
                 optimizer=optimizer(net),
+                strategy=self.strategy,
                 acquisition=acq_fn,
                 n_epochs=self.num_epochs,
-                strategy=self.strategy,
                 q=self.q,
-                weighted_acquire=self.weighted_acquire,
                 slice_fn=experiment._slice_fn_tuple, # pinot.active.
                 collate_fn=experiment._collate_fn_graph, # pinot.active.
                 train_class=self.train
@@ -173,34 +167,35 @@ class ActivePlot():
     def get_acquisition(self, gs):
         """ Retrieve acquisition function and prepare for BO Experiment
         """
+        sequential_acquisitions = {
+            'ExpectedImprovement': pinot.active.acquisition.expected_improvement_analytical,
+            'ProbabilityOfImprovement': pinot.active.acquisition.probability_of_improvement,
+            'UpperConfidenceBound': pinot.active.acquisition.upper_confidence_bound,
+            'Uncertainty': pinot.active.acquisition.uncertainty,
+            'Human': pinot.active.acquisition.temporal,
+            'Random': pinot.active.acquisition.random,
+            
+        }
 
-        '''
-        batch_acquisitions = {'Expected Improvement': SeqAcquire(acq_fn='ei'),
-                              'Probability of Improvement': SeqAcquire(acq_fn='pi'),
-                              'Upper Confidence Bound': SeqAcquire(acq_fn='ucb', beta=0.95),
-                              'Uncertainty': SeqAcquire(acq_fn='uncertainty'),
-                              'Random': SeqAcquire(acq_fn='random')}
-        '''
-        sequential_acquisitions = {'ExpectedImprovement': pinot.active.acquisition.expected_improvement,
-                                   'ProbabilityOfImprovement': pinot.active.acquisition.probability_of_improvement,
-                                   'UpperConfidenceBound': pinot.active.acquisition.expected_improvement,
-                                   'Uncertainty': pinot.active.acquisition.expected_improvement,
-                                   'Human': pinot.active.acquisition.temporal,
-                                   'Random': pinot.active.acquisition.expected_improvement}
+        batch_acquisitions = {
+            'ThompsonSampling': pinot.active.acquisition.thompson_sampling,
+            'WeightedSamplingExpectedImprovement': pinot.active.acquisition.exponential_weighted_ei_analytical,
+            'WeightedSamplingProbabilityOfImprovement': pinot.active.acquisition.exponential_weighted_pi,
+            'WeightedSamplingUpperConfidenceBound': pinot.active.acquisition.exponential_weighted_ucb,
+            'GreedyExpectedImprovement': pinot.active.acquisition.greedy_ei_analytical,
+            'GreedyProbabilityOfImprovement': pinot.active.acquisition.greedy_pi,
+            'GreedyUpperConfidenceBound': pinot.active.acquisition.greedy_ucb,
+            'BatchRandom': pinot.active.acquisition.batch_random,
+            'BatchTemporal': pinot.active.acquisition.batch_temporal
+        }
 
-        if self.strategy == 'batch':
-            raise NotImplementedError
-            # acq_fn = batch_acquisitions[self.acquisition]
-            # acq_fn = MCAcquire(
-            #     sequential_acq=acq_fn,
-            #     batch_size=gs.batch_size,
-            #     q=self.q,
-            #     marginalize_batch=self.marginalize_batch,
-            #     num_samples=self.num_samples)
-
-
-        else:
+        if self.acquisition in sequential_acquisitions:
+            self.strategy = 'sequential'
             acq_fn = sequential_acquisitions[self.acquisition]
+        
+        elif self.acquisition in batch_acquisitions:
+            self.strategy = 'batch'
+            acq_fn = batch_acquisitions[self.acquisition]
 
         return acq_fn
 
@@ -209,23 +204,21 @@ class ActivePlot():
         """
         Retrive GP using representation provided in args.
         """
-        layer = pinot.representation.dgl_legacy.gn(model_name=self.layer)
-
-        representation = pinot.representation.Sequential(
-            layer=layer,
+        representation = pinot.representation.SequentialMix(
             config=self.config)
 
-        output_regressor = getattr(pinot.regressors, self.net)
-
-        net = pinot.Net(
-            representation=representation,
-            output_regressor=output_regressor,
-        )
+        if hasattr(pinot.regressors, self.net):
+            output_regressor = getattr(pinot.regressors, self.net)
+            net = pinot.Net(
+                representation=representation,
+                output_regressor_class=output_regressor,
+            )
 
         if self.net == 'semi':
+            output_regressor = pinot.regressors.NeuralNetworkRegressor
             net = SemiSupervisedNet(
                 representation=representation,
-                unsup_scale=0.1 # <------ if unsup_scale = 0., reduces to supervised model
+                output_regressor=output_regressor
             )
 
         elif self.net == 'semi_gp':
@@ -243,9 +236,6 @@ class ActivePlot():
                 output_regressor=output_regressor,
             )
 
-        # if self.strategy == 'batch':
-        #     net = BTModel(net)
-
         return net
 
 
@@ -256,17 +246,17 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--net', type=str, default='ExactGaussianProcessRegressor')
-    parser.add_argument('--representation', type=str, default='GraphConv')
+    parser.add_argument('--config', nargs="+", type=str,
+        default=["GraphConv", "32", "activation", "tanh",
+        "GraphConv", "32", "activation", "tanh",
+        "GraphConv", "32", "activation", "tanh"])
 
     parser.add_argument('--lr', type=float, default=1e-4)
     parser.add_argument('--optimizer', type=str, default='Adam')
 
     parser.add_argument('--data', type=str, default='esol')
-    parser.add_argument('--strategy', type=str, default='sequential')
     parser.add_argument('--acquisition', type=str, default='ExpectedImprovement')
-    parser.add_argument('--marginalize_batch', type=bool, default=True)
     parser.add_argument('--num_samples', type=int, default=1000)
-    parser.add_argument('--weighted_acquire', type=bool, default=True)
     parser.add_argument('--q', type=int, default=1)
 
     parser.add_argument('--device', type=str, default='cuda:0')
@@ -282,8 +272,7 @@ if __name__ == '__main__':
     plot = ActivePlot(
         # net config
         net=args.net,
-        layer=args.representation,
-        config=[32, 'tanh', 32, 'tanh', 32, 'tanh'],
+        config=args.config,
 
         # optimizer config
         optimizer_type=args.optimizer,
@@ -291,11 +280,8 @@ if __name__ == '__main__':
 
         # experiment config
         data=args.data,
-        strategy=args.strategy,
         acquisition=args.acquisition,
-        marginalize_batch=args.marginalize_batch,
         num_samples=args.num_samples,
-        weighted_acquire=args.weighted_acquire,
         q=args.q,
 
         # housekeeping
@@ -303,13 +289,12 @@ if __name__ == '__main__':
         num_trials=args.num_trials,
         num_rounds=args.num_rounds,
         num_epochs=args.num_epochs,
-        )
+    )
 
     best_df = plot.generate()
+    representation = args.config[0]
 
     # save to disk
-    if args.index_provided and args.weighted_acquire:
-        filename = f'{args.net}_{args.representation}_{args.optimizer}_{args.data}_{args.strategy}_{args.acquisition}_q{args.q}_weighted_{args.index}.csv'
-    elif args.index_provided and not args.weighted_acquire:
-        filename = f'{args.net}_{args.representation}_{args.optimizer}_{args.data}_{args.strategy}_{args.acquisition}_q{args.q}_unweighted_{args.index}.csv'
+    if args.index_provided:
+        filename = f'{args.net}_{representation}_{args.optimizer}_{args.data}_{args.acquisition}_q{args.q}_{args.index}.csv'
     best_df.to_csv(filename)
