@@ -649,8 +649,9 @@ class BiophysicalVariationalGaussianProcessRegressor(VariationalGaussianProcessR
 
         return loss
 
-
 #
+# GPyTorch implementation
+# 
 # class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
 #     """
 #     """

@@ -430,6 +430,7 @@ class MixedSingleAndMultipleDataset(Dataset):
     def __init__(self, ds=None):
         super(MixedSingleAndMultipleDataset, self).__init__(ds)
         self._number_of_measurements = None
+        self.device = torch.device('cpu') # initialize on cpu
 
     @property
     def number_of_measurements(self):
@@ -443,6 +444,8 @@ class MixedSingleAndMultipleDataset(Dataset):
     def number_of_unique_graphs(self):
         return len(self)
 
+    def to(self, device):
+        self.device = device
 
     def from_csv(
         self,
@@ -457,6 +460,8 @@ class MixedSingleAndMultipleDataset(Dataset):
         # specification for signel
         single_concentrations=[20, 50],
         single_col_names=["f_inhibition_at_20_uM", "f_inhibition_at_50_uM",],
+        # scaling
+        concentration_unit_scaling=0.001,
     ):
         def _from_csv():
             # read single and multiple data
@@ -497,6 +502,9 @@ class MixedSingleAndMultipleDataset(Dataset):
                     cs = [x for c in cs for x in c]
                     ys = [x for y in ys for x in y]
 
+                    # scaling
+                    cs = [c * concentration_unit_scaling for c in cs]
+
                     record["cs_multiple"] = cs
                     record["ys_multiple"] = ys
 
@@ -508,12 +516,16 @@ class MixedSingleAndMultipleDataset(Dataset):
                 cs = single_concentrations
                 ys = [record[name] for name in single_col_names]
 
+                # scaling
+                cs = [c * concentration_unit_scaling for c in cs]
+
                 record["cs_single"] = cs
                 record["ys_single"] = ys
 
                 return record
 
             df = df.apply(flatten_single, axis=1)
+
 
             self.ds = df.to_dict(orient="records")
 
@@ -529,7 +541,7 @@ class MixedSingleAndMultipleDataset(Dataset):
         return _from_csv
 
     @staticmethod
-    def all_available_pairs(xs):
+    def all_available_pairs(xs, device=torch.device('cpu')):
         # initialize return lists
         gs = []
         cs = []
@@ -563,18 +575,18 @@ class MixedSingleAndMultipleDataset(Dataset):
                         ys.append(y)
 
         # batch
-        g = dgl.batch(gs)
-        c = torch.tensor(cs)[:, None]
-        y = torch.tensor(ys)[:, None]
+        g = dgl.batch(gs).to(device)
+        c = torch.tensor(cs)[:, None].to(device)
+        y = torch.tensor(ys)[:, None].to(device)
 
         return g, c, y
 
     @staticmethod
-    def all_graphs(xs):
-        return dgl.batch([x["g"] for x in xs])
+    def all_graphs(xs, device=torch.device('cpu')):
+        return dgl.batch([x["g"] for x in xs]).to(device)
 
     @staticmethod
-    def _rebatch(xs, *args, **kwargs):
+    def _rebatch(xs, device=torch.device('cpu'), *args, **kwargs):
         assert len(xs) == 1
         g, c, y = xs[0]
         gs = dgl.unbatch(g)
@@ -593,9 +605,9 @@ class MixedSingleAndMultipleDataset(Dataset):
                 _cs.append(_c)
                 _ys.append(_y)
 
-            _gs = dgl.batch(_gs)
-            _cs = torch.tensor(_cs)
-            _ys = torch.tensor(_ys)
+            _gs = dgl.batch(_gs).to(device)
+            _cs = torch.tensor(_cs).to(device)
+            _ys = torch.tensor(_ys).to(device)
 
             return _gs, _cs, _ys
 
@@ -608,13 +620,17 @@ class MixedSingleAndMultipleDataset(Dataset):
         if collate_fn == 'fixed_size_batch':
             _ds = [self.all_available_pairs(self.ds)]
             self._number_of_measurements = _ds[0][1].shape[0]
-            return self._rebatch(_ds, *args, **kwargs)
+            return self._rebatch(_ds, device=self.device, *args, **kwargs)
 
         if collate_fn == "all_graphs":
             kwargs["batch_size"] = len(self)  # ensure all the graph
 
         if isinstance(collate_fn, str):
             collate_fn = getattr(self, collate_fn)
+
+        from functools import partial
+        
+        collate_fn = partial(collate_fn, device=self.device)
 
         return torch.utils.data.DataLoader(
             dataset=self, collate_fn=collate_fn, *args, **kwargs,
