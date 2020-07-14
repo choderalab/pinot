@@ -2,6 +2,7 @@
 # IMPORTS
 # =============================================================================
 import torch
+from pinot.metrics import _independent
 
 # =============================================================================
 # MODULE FUNCTIONS [SEQUENTIAL]
@@ -200,6 +201,9 @@ def _get_utility(net, unseen_data, acq_func, y_best=0.0):
     # obtain predictive posterior
     gs, ys = unseen_data
     distribution = net.condition(gs)
+
+    # workup distribution
+    distribution = _independent(distribution)
 
     # obtain utility from vanilla acquisition func
     utility = acq_func(distribution, y_best=y_best)
@@ -497,7 +501,7 @@ def greedy_ei_monte_carlo(net, unseen_data, q=5, y_best=0.0):
     pending_pts : torch.LongTensor
         The indices corresponding to pending points.
     """
-    pending_pts = greedy(
+    pending_pts = _greedy(
         net,
         unseen_data,
         expected_improvement_monte_carlo,
@@ -557,7 +561,7 @@ def batch_random(net, unseen_data, q=5, y_best=0.0):
     pending_pts : torch.LongTensor
         The indices corresponding to pending points.
     """
-    pending_pts = greedy(
+    pending_pts = _greedy(
         net,
         unseen_data,
         random,
@@ -588,7 +592,7 @@ def batch_temporal(net, unseen_data, q=5, y_best=0.0):
     pending_pts : torch.LongTensor
         The indices corresponding to pending points.
     """
-    pending_pts = greedy(
+    pending_pts = _greedy(
         net,
         unseen_data,
         temporal,
