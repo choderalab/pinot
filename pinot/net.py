@@ -203,12 +203,8 @@ class Net(BaseNet):
         return distribution
 
     def condition_delta_g(self, g, *args, **kwargs):
-        h = self.representation(g)
-        (
-            distribution_measurement,
-            f_sample,
-            distribution_delta_g,
-        ) = self._condition(h, *args, **kwargs)
+        h = self.representation(g)  
+        f_sample, distribution_delta_g = self.output_regressor.condition_deltaG(h, *args, **kwargs)
         return distribution_delta_g
 
     def condition(self, g, sampler=None, n_samples=64, *args, **kwargs):
