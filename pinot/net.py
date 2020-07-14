@@ -27,12 +27,13 @@ class BaseNet(torch.nn.Module, abc.ABC):
     condition :
     """
 
-    def __init__(self, representation, output_regressor, *args, **kwargs):
+    def __init__(
+        self, representation, output_regressor_class, *args, **kwargs
+    ):
         super(BaseNet, self).__init__()
 
         # bookkeeping
         self.representation = representation
-        self.output_regressor_cls = output_regressor
 
     @abc.abstractmethod
     def condition(self, g, sampler=None, *args, **kwargs):
@@ -55,7 +56,7 @@ class BaseNet(torch.nn.Module, abc.ABC):
         """
         raise NotImplementedError
 
-    def loss(self, g, y):
+    def loss(self, g, y, *args, **kwargs):
         """Negative log likelihood loss.
 
         Parameters
@@ -72,9 +73,9 @@ class BaseNet(torch.nn.Module, abc.ABC):
         # g -> h
         h = self.representation(g)
 
-        return self._loss(h, y)
+        return self._loss(h, y, *args, **kwargs)
 
-    def _loss(self, h, y):
+    def _loss(self, h, y, *args, **kwargs):
         """
 
         Parameters
@@ -90,9 +91,9 @@ class BaseNet(torch.nn.Module, abc.ABC):
         """
         # use loss function from output_regressor, if already implemented
         if hasattr(self.output_regressor, "loss"):
-            return self.output_regressor.loss(h, y)
+            return self.output_regressor.loss(h, y, *args, **kwargs)
 
-        distribution = self._condition(h)
+        distribution = self._condition(h, *args, **kwargs)
         nll = -distribution.log_prob(y).sum()
         return nll
 
@@ -121,11 +122,17 @@ class Net(BaseNet):
     """
 
     def __init__(
-        self, representation, output_regressor=NeuralNetworkRegressor, **kwargs
+        self,
+        representation,
+        output_regressor_class=NeuralNetworkRegressor,
+        output_likelihood_class=None,
+        **kwargs
     ):
 
         super(Net, self).__init__(
-            representation=representation, output_regressor=output_regressor
+            representation=representation,
+            output_regressor_class=output_regressor_class,
+            output_likelihood_class=output_likelihood_class,
         )
 
         # read the representation hidden units here
@@ -136,24 +143,27 @@ class Net(BaseNet):
             if hasattr(layer, "out_features")
         ][-1].out_features
 
-        self.output_regressor_cls = output_regressor
-
         # if nothing is specified for head,
         # use the MLE with heteroschedastic model
-        output_regressor = output_regressor(
+        output_regressor = output_regressor_class(
             in_features=self.representation_out_features, **kwargs
         )
 
-        self.representation = representation
-        self.output_regressor = output_regressor
-
         # determine if the output regressor is an `ExactGaussianProcess`
         self.has_exact_gp = False
-        if isinstance(self.output_regressor, ExactGaussianProcessRegressor):
-
+        if isinstance(output_regressor, ExactGaussianProcessRegressor):
             self.has_exact_gp = True
 
-    def loss(self, g, y):
+        self.representation = representation
+
+        if output_likelihood_class is not None:
+            self.output_regressor = output_likelihood_class(
+                base_regressor=output_regressor
+            )
+        else:
+            self.output_regressor = output_regressor
+
+    def loss(self, g, y, *args, **kwargs):
         """ Negative log likelihood loss.
 
         Parameters
@@ -178,17 +188,26 @@ class Net(BaseNet):
             self.g_last = g
             self.y_last = y
 
-        return self._loss(h, y)
+        return self._loss(h, y, *args, **kwargs)
 
-    def _condition(self, h, **kwargs):
+    def _condition(self, h, *args, **kwargs):
         """ Compute the output distribution from latent without sampling. """
 
         # h -> distribution
-        distribution = self.output_regressor.condition(h, **kwargs)
+        distribution = self.output_regressor.condition(h, *args, **kwargs)
 
         return distribution
 
-    def condition(self, g, sampler=None, n_samples=64):
+    def condition_delta_g(self, g, *args, **kwargs):
+        h = self.representation(g)
+        (
+            distribution_measurement,
+            f_sample,
+            distribution_delta_g,
+        ) = self._condition(h, *args, **kwargs)
+        return distribution_delta_g
+
+    def condition(self, g, sampler=None, n_samples=64, *args, **kwargs):
         """ Compute the output distribution with sampled weights.
 
         Parameters
@@ -217,20 +236,20 @@ class Net(BaseNet):
 
         if self.has_exact_gp is True:
             h_last = self.representation(self.g_last)
-            kwargs = {"x_tr": h_last, "y_tr": self.y_last}
+            kwargs = {**{"x_tr": h_last, "y_tr": self.y_last}, **kwargs}
 
         if sampler is None:
-            return self._condition(h, **kwargs)
+            return self._condition(h, *args, **kwargs)
 
         if not hasattr(sampler, "sample_params"):
-            return self._condition(h, **kwargs)
+            return self._condition(h, *args, **kwargs)
 
         # initialize a list of distributions
         distributions = []
 
         for _ in range(n_samples):
             sampler.sample_params()
-            distributions.append(self._condition(g))
+            distributions.append(self._condition(g, *args, **kwargs))
 
         # get the parameter of these distributions
         # NOTE: this is not necessarily the most efficienct solution

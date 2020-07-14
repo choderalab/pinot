@@ -29,7 +29,8 @@ class DecoderNetwork(nn.Module):
         predictions $\hat{x}$
     """
 
-    def __init__(self, 
+    def __init__(
+        self,
         embedding_dim=128,
         num_atom_types=100,
         Dx1=64,
@@ -180,7 +181,9 @@ class EdgeDecoder(nn.Module):
         neural networks that map from latent encoding of node $z_x$ to
         edge tensor prediction $E_tilde$
     """
-    def __init__(self, 
+
+    def __init__(
+        self,
         embedding_dim=128,
         num_atom_types=100,
         num_bond_types=22,
@@ -224,13 +227,12 @@ class EdgeDecoder(nn.Module):
 
         self.hidden_dim_e = hidden_dim_e
         self.e_tensor_to_E_tilde = nn.Sequential(
-            nn.Linear(self.Dx2*2, self.hidden_dim_e),
+            nn.Linear(self.Dx2 * 2, self.hidden_dim_e),
             nn.ReLU(),
             nn.Linear(self.hidden_dim_e, self.num_bond_types),
             nn.ReLU(),
         )
 
-    
     def edge_tensor_from_g(self, g):
         """ Construct a E tensor of shape (num_nodes, num_nodes, num_bond_types)
         from g.
@@ -249,7 +251,7 @@ class EdgeDecoder(nn.Module):
 
         """
         n = g.number_of_nodes()
-        
+
         one_hot_no_bond = torch.zeros(self.num_bond_types)
         one_hot_no_bond[-1] = 1
 
@@ -259,7 +261,7 @@ class EdgeDecoder(nn.Module):
         # Get the indices of the edges
         indices = g.adjacency_matrix().coalesce().indices()
         # Get the bond types
-        etypes  = g.edata["type"]
+        etypes = g.edata["type"]
 
         for e_idx in range(indices.shape[1]):
             e = torch.tensor([etypes[e_idx]])
@@ -267,8 +269,8 @@ class EdgeDecoder(nn.Module):
             # Get the corresponding entry of the E_tensor
             one_hot = torch.cat((indices[:, e_idx], e.long()))
 
-            # Flip the bit associated with the bond type            
-            E[list(one_hot)] = 1.
+            # Flip the bit associated with the bond type
+            E[list(one_hot)] = 1.0
             E[list(torch.cat((indices[:, e_idx], torch.tensor([-1]))))]
         return E
 
@@ -289,12 +291,12 @@ class EdgeDecoder(nn.Module):
             loss: Float
                 The reconstruction loss, it corresponds to the
                     negative expected likelihood term in the ELBO
-        """    
+        """
         decoded_subgraphs = self.forward(g, z_sample)
         gs_unbatched = dgl.unbatch(g)
         assert len(decoded_subgraphs) == len(gs_unbatched)
 
-        loss = torch.tensor([0.])
+        loss = torch.tensor([0.0])
         if z_sample.is_cuda:
             loss.cuda()
 
@@ -308,7 +310,9 @@ class EdgeDecoder(nn.Module):
             E_true = self.edge_tensor_from_g(subgraph)
             if z_sample.is_cuda:
                 edge_nll = torch.sum(
-                    F.binary_cross_entropy_with_logits(E_tilde.cuda(), E_true.cuda())
+                    F.binary_cross_entropy_with_logits(
+                        E_tilde.cuda(), E_true.cuda()
+                    )
                 )
             else:
                 edge_nll = torch.sum(
@@ -322,7 +326,6 @@ class EdgeDecoder(nn.Module):
 
             loss += node_nll + edge_nll
         return loss
-
 
     def decode(self, z):
         """ Decode a specific z_sample from a subgraph
@@ -362,20 +365,24 @@ class EdgeDecoder(nn.Module):
         x_tilde = self.zx_to_x(zx)
 
         (n, h) = zx.shape
-        assert(h == self.Dx2)
+        assert h == self.Dx2
         # zx, Atilde -> E_tilde
-        temp1 = zx.repeat(1,n).view(n*n,h) # Shape should be (n, n, Dx2)
-        temp2 = z.repeat(n,1) # Shape is also (n, n, Dx2)
-        temp = torch.cat((temp1, temp2), 1) # This creates a (n, n, 2 * Dx2) tensor
+        temp1 = zx.repeat(1, n).view(n * n, h)  # Shape should be (n, n, Dx2)
+        temp2 = z.repeat(n, 1)  # Shape is also (n, n, Dx2)
+        temp = torch.cat(
+            (temp1, temp2), 1
+        )  # This creates a (n, n, 2 * Dx2) tensor
         # where temp[i, j, :] is the concatenation of zx[i,:] and zx[j, :]
 
         # This has shape (n, n, 2*self.Dx2)
-        e_tensor = temp.view(n,n,2*h)
+        e_tensor = temp.view(n, n, 2 * h)
 
         # e_tensor -> E_tilde
-        E_tilde = self.e_tensor_to_E_tilde(e_tensor.view(n*n, 2*h))
-        E_tilde = E_tilde.reshape(n, n, self.num_bond_types) # Shape should be (n, n, num_bond_types)
-        
+        E_tilde = self.e_tensor_to_E_tilde(e_tensor.view(n * n, 2 * h))
+        E_tilde = E_tilde.reshape(
+            n, n, self.num_bond_types
+        )  # Shape should be (n, n, num_bond_types)
+
         return E_tilde, x_tilde
 
     def forward(self, g, z_sample):

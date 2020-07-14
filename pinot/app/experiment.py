@@ -57,8 +57,15 @@ class Train:
 
     """
 
-    def __init__(self, net, data, optimizer, n_epochs=100, record_interval=1,
-            lr_scheduler=None):
+    def __init__(
+        self,
+        net,
+        data,
+        optimizer,
+        n_epochs=100,
+        record_interval=1,
+        lr_scheduler=None,
+    ):
 
         self.data = data
         self.optimizer = optimizer
@@ -70,12 +77,12 @@ class Train:
 
     def train_once(self):
         """Train the model for one batch."""
-        for g, y in self.data:
+        for x in self.data:
 
             def l():
                 """ """
                 self.optimizer.zero_grad()
-                loss = torch.sum(self.net.loss(g, y))
+                loss = torch.sum(self.net.loss(*x))
                 loss.backward()
                 return loss
 
@@ -162,25 +169,38 @@ class Test:
 
             # concat y and y_hat in test set
 
-            y = []
-            g = []
-            for g_, y_ in self.data:
-                y.append(y_)
-                if isinstance(g_, dgl.DGLGraph):
-                    g.append(g_)
+            # y = []
+            # g = []
+            # for g_, y_ in self.data:
+            #     y.append(y_)
+            #     if isinstance(g_, dgl.DGLGraph):
+            #         g.append(g_)
+            #     else:
+            #         g += dgl.unbatch(g_)
+            #
+            # if y[0].dim() == 0:
+            #     y = torch.stack(y)
+            # else:
+            #     y = torch.cat(y)
+            #
+            # g = dgl.batch(g)
+            def _batch(x):
+                if isinstance(x[0], dgl.DGLGraph):
+                    return dgl.batch(x)
+
                 else:
-                    g += dgl.unbatch(g_)
+                    if x[0].dim() == 0:
+                        return torch.stack(x)
 
-            if y[0].dim() == 0:
-                y = torch.stack(y)
-            else:
-                y = torch.cat(y)
+                    else:
+                        return torch.cat(x)
 
-            g = dgl.batch(g)
+            xs = list(zip(*self.data))
+            xs = [_batch(x) for x in xs]
 
             for metric in self.metrics:  # loop through the metrics
                 results[metric.__name__][state_name] = (
-                    metric(self.net, g, y, sampler=self.sampler)
+                    metric(self.net, *xs, sampler=self.sampler)
                     .detach()
                     .cpu()
                     .numpy()
@@ -220,7 +240,7 @@ class TrainAndTest:
     train_cls: `Train`
         (Default value = Train)
         Train class to use
-    
+
     lr_scheduler: `torch.optim.lr_scheduler`
         (Default value = None)
         Learning rate scheduler, will apply after every training epoch
@@ -281,7 +301,7 @@ class TrainAndTest:
             data=self.data_tr,
             optimizer=self.optimizer,
             n_epochs=self.n_epochs,
-            lr_scheduler=self.lr_scheduler
+            lr_scheduler=self.lr_scheduler,
         )
 
         train.train()

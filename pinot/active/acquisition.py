@@ -2,9 +2,10 @@
 # IMPORTS
 # =============================================================================
 import torch
+from pinot.metrics import _independent
 
 # =============================================================================
-# MODULE FUNCTIONS
+# MODULE FUNCTIONS [SEQUENTIAL]
 # =============================================================================
 def temporal(distribution, y_best=0.0):
     r"""Picks the first in sequence.
@@ -191,226 +192,412 @@ def random(distribution, y_best=0.0, seed=2666):
 
 
 # =============================================================================
-# MODULE CLASSES
+# BATCH Utilities
 # =============================================================================
 
+def _get_utility(net, unseen_data, acq_func, y_best=0.0):
+    """ Obtain distribution and utility from acquisition func.
+    """
+    # obtain predictive posterior
+    gs, ys = unseen_data
+    distribution = net.condition(gs)
 
-class MCAcquire:
-    """Implements Monte Carlo acquisition."""
+    # workup distribution
+    distribution = _independent(distribution)
 
-    def __init__(
-        self,
-        sequential_acq,
-        batch_size,
-        q=10,
-        num_samples=1000,
-        marginalize_batch=False,
-    ):
-        """
-        Runs Monte Carlo acquisition over provided `sequential_fn`
+    # obtain utility from vanilla acquisition func
+    utility = acq_func(distribution, y_best=y_best)
+    return utility
 
-        Parameters
-        ----------
-        sequential_acq : Python function
-            Sequential acquisition function applied to Monte Carlo samples.
-        batch_size : int
-            Batch size (i.e., gs.batch_size).
-        q : int
-            Size of the batch samples to be acquired.
-        num_samples : int
-            Number of times to sample from posterior.
-        sampler_fn : BoTorch Sampler
-            The sampler used to draw base samples. Defaults to SobolQMCNormalSampler.
-        objective : BoTorch MCAquisitionObjective
-            Monte Carlo objective under which the samples are evaluated.
-            Default is IdentityMCObjective.
-        """
-        super(MCAcquire, self).__init__()
+def _exponential_weighted_sampling(net, unseen_data, acq_func, q=5, y_best=0.0):
+    """ Exponential weighted expected improvement
+    """
+    utility = _get_utility(
+        net,
+        unseen_data,
+        acq_func,
+        y_best=y_best
+    )
 
-        self.sequential_acq = sequential_acq
-        self.q = q
-        self.num_samples = num_samples
-        self.marginalize_batch = marginalize_batch
+    # generate probability distribution
+    weights = torch.exp(-utility)
 
-    def __call__(self, posterior, batch_size, y_best):
-        """
-        Parameters
-        ----------
-        posterior : GPyTorchPosterior
-            Output of running net.posterior(gs).
-        Returns
-        -------
-        indices : Torch Tensor of int
-            The Tensor containing the indices of each sampled batch.
-        y_best : float
-            The best y output that's been seen so far.
-        q_samples : Torch Tensor of float
-            The values associated with the `sequential_acq` from the Monte Carlo samples.
-        """
-        # sample from posterior
-        seq_samples = posterior.sample(
-            torch.Size([self.q, self.num_samples])
-        ).squeeze(-1)
+    # normalize weights to make distribution
+    weights_norm = weights/weights.sum()
 
-        # shuffle within outer dimension of qth row to obtain random baches
-        indices = torch.randint(batch_size, (self.q, batch_size))
-        q_samples = torch.stack(
-            [
-                row[:, indices[idx]]
-                for idx, row in enumerate(torch.unbind(seq_samples))
-            ]
-        )
+    # perform multinomial sampling from exp-transformed acq score
+    pending_pts = _multinomial_sampling(weights_norm)
+    
+    return pending_pts
 
-        if self.marginalize_batch:
-            # collapse individuals within each batch
-            q_samples = q_samples.reshape(
-                q_samples.shape[0] * q_samples.shape[1], q_samples.shape[2]
-            )
-            # apply sequential acquisition function on joint distribution over batch
-            scores = self.sequential_acq(q_samples, axis=0)
+def _multinomial_sampling(weights, q=5):
+    """
+    """    
+    # perform multinomial sampling
+    pending_pts = torch.utils.data.WeightedRandomSampler(
+        weights=weights,
+        num_samples=q,
+        replacement=False)
+    
+    # convert to tensor
+    pending_pts = torch.LongTensor(list(pending_pts))
 
-        else:
-            # apply sequential acquisition function on in parallel over batch
-            scores = self.sequential_acq(q_samples, axis=1)
-            # find max expectation of acquisition function within batch
-            scores = scores.max(axis=0).values
+    return pending_pts
 
-        return indices, scores
+def _greedy(net, unseen_data, acq_func, q=5, y_best=0.0):
+    """ Greedy batch acquisition
+    """
+    utility = _get_utility(
+        net,
+        unseen_data,
+        acq_func,
+        y_best=y_best
+    )
+    
+    # fill batch greedily
+    pending_pts = torch.topk(utility, q).indices
+    
+    return pending_pts
+
+# =============================================================================
+# MODULE FUNCTIONS [BATCH]
+# =============================================================================
+
+def thompson_sampling(net, unseen_data, q=5, y_best=0.0):
+    """ Generates m Thompson samples and maximizes them.
+    
+    Parameters
+    ----------
+    net : pinot Net object
+        Trained net.
+    unseen_data : tuple
+        Dataset from which pending points are selected.
+    q : int
+        Number of Thompson samples to obtain.
+    y_best : float
+        The best target value seen so far.
+
+    Returns
+    -------
+    pending_pts : torch.LongTensor
+        The indices corresponding to pending points.
+    """
+    # obtain predictive posterior
+    gs, ys = unseen_data
+    distribution = net.condition(gs)
+    
+    # obtain samples from posterior
+    thetas = distribution.sample((q,))
+    
+    # enforce no duplicates in batch
+    pending_pts = torch.unique(torch.argmax(thetas, axis=1)).tolist()
+    
+    while len(pending_pts) < q:
+        theta = distribution.sample()
+        pending_pts.append(torch.argmax(theta).item())
+    
+    # convert to tensor
+    pending_pts = torch.LongTensor(pending_pts)
+    
+    return pending_pts
 
 
-class SeqAcquire:
-    """Wraps sequential to keep track of hyperparameters."""
+def exponential_weighted_ei_analytical(net, unseen_data, q=5, y_best=0.0):
+    """ Exponential weighted expected improvement with analytical evaluation.
 
-    def __init__(self, acq_fn, **kwargs):
-        """
-        Parameters
-        ----------
-        acq_fn : str or function
-            If string, must be one of 'ei', 'ucb', 'pi', 'random'.
-            If a function, it will be used directly as acq function.
-        **kwargs
-            Any state parameters to pass to acq_fn.
-        """
-        if isinstance(acq_fn, str):
-            if acq_fn == "ei":
-                self.acq_fn = self.EI
-            elif acq_fn == "pi":
-                self.acq_fn = self.PI
-            elif acq_fn == "ucb":
-                self.acq_fn = self.UCB
-            elif acq_fn == "uncertainty":
-                self.acq_fn = self.VAR
-            elif acq_fn == "random":
-                self.acq_fn = self.RAND
-            else:
-                raise ValueError(
-                    f"""{acq_fn} is not an available function.
-                    Only available functions are 'ei', 'pi', 'ucb', 'uncertainty', or 'random'."""
-                )
-        else:
-            self.acq_fn = acq_fn
+    Parameters
+    ----------
+    net : pinot Net object
+        Trained net.
+    unseen_data : tuple
+        Dataset from which pending points are selected.
+    q : int
+        Number of Thompson samples to obtain.
+    y_best : float
+        The best target value seen so far.
 
-        self.kwargs = kwargs
+    Returns
+    -------
+    pending_pts : torch.LongTensor
+        The indices corresponding to pending points.
+    """
+    pending_pts = _exponential_weighted_sampling(
+        net,
+        unseen_data,
+        expected_improvement_analytical,
+        q=q,
+        y_best=y_best,
+    )
+    
+    return pending_pts
 
-    def __call__(self, samples, axis, y_best=0.0):
-        return self.acq_fn(
-            samples=samples, axis=axis, y_best=y_best, **self.kwargs
-        )
 
-    def PI(self, samples, axis=0, y_best=0.0):
-        """
+def exponential_weighted_ei_monte_carlo(net, unseen_data, q=5, y_best=0.0):
+    """ Exponential weighted expected improvement with monte carlo sampling.
+    
+    Parameters
+    ----------
+    net : pinot Net object
+        Trained net.
+    unseen_data : tuple
+        Dataset from which pending points are selected.
+    q : int
+        Number of Thompson samples to obtain.
+    y_best : float
+        The best target value seen so far.
 
-        Parameters
-        ----------
-        samples :
+    Returns
+    -------
+    pending_pts : torch.LongTensor
+        The indices corresponding to pending points.
+    """
+    pending_pts = _exponential_weighted_sampling(
+        net,
+        unseen_data,
+        expected_improvement_monte_carlo,
+        q=q,
+        y_best=y_best,
+    )
+    
+    return pending_pts
 
-        axis :
-             (Default value = 0)
-        y_best :
-             (Default value = 0.0)
 
-        Returns
-        -------
+def exponential_weighted_pi(net, unseen_data, q=5, y_best=0.0):
+    """ Exponential weighted probability of improvement.
 
-        """
-        return (samples > y_best).float().mean(axis=axis)
+    Parameters
+    ----------
+    net : pinot Net object
+        Trained net.
+    unseen_data : tuple
+        Dataset from which pending points are selected.
+    q : int
+        Number of Thompson samples to obtain.
+    y_best : float
+        The best target value seen so far.
 
-    def EI(self, samples, axis=0, y_best=0.0):
-        """
+    Returns
+    -------
+    pending_pts : torch.LongTensor
+        The indices corresponding to pending points.
+    """
+    pending_pts = _exponential_weighted_sampling(
+        net,
+        unseen_data,
+        probability_of_improvement,
+        q=q,
+        y_best=y_best,
+    )
+    
+    return pending_pts
 
-        Parameters
-        ----------
-        samples :
 
-        axis :
-             (Default value = 0)
-        y_best :
-             (Default value = 0.0)
+def exponential_weighted_ucb(net, unseen_data, q=5, y_best=0.0):
+    """ Exponential weighted expected improvement
 
-        Returns
-        -------
+    Parameters
+    ----------
+    net : pinot Net object
+        Trained net.
+    unseen_data : tuple
+        Dataset from which pending points are selected.
+    q : int
+        Number of Thompson samples to obtain.
+    y_best : float
+        The best target value seen so far.
 
-        """
-        return (samples - y_best).mean(axis=axis)
+    Returns
+    -------
+    pending_pts : torch.LongTensor
+        The indices corresponding to pending points.
+    """
+    pending_pts = _exponential_weighted_sampling(
+        net,
+        unseen_data,
+        upper_confidence_bound,
+        q=q,
+        y_best=y_best,
+    )
+    
+    return pending_pts
 
-    def VAR(self, samples, axis=0, y_best=0.0):
-        """
 
-        Parameters
-        ----------
-        samples :
+def greedy_ucb(net, unseen_data, q=5, y_best=0.0):
+    """ Greedy upper confidence bound
 
-        axis :
-             (Default value = 0)
-        y_best :
-             (Default value = 0.0)
+    Parameters
+    ----------
+    net : pinot Net object
+        Trained net.
+    unseen_data : tuple
+        Dataset from which pending points are selected.
+    q : int
+        Number of Thompson samples to obtain.
+    y_best : float
+        The best target value seen so far.
 
-        Returns
-        -------
+    Returns
+    -------
+    pending_pts : torch.LongTensor
+        The indices corresponding to pending points.    
+    """
+    pending_pts = _greedy(
+        net,
+        unseen_data,
+        upper_confidence_bound,
+        q=q,
+        y_best=y_best,
+    )
+    
+    return pending_pts
 
-        """
-        return samples.var(axis=axis)
 
-    def RAND(self, samples, axis=0, y_best=0.0):
-        """
+def greedy_ei_analytical(net, unseen_data, q=5, y_best=0.0):
+    """ Greedy expected improvement, evaluated analytically.
 
-        Parameters
-        ----------
-        samples :
+    Parameters
+    ----------
+    net : pinot Net object
+        Trained net.
+    unseen_data : tuple
+        Dataset from which pending points are selected.
+    q : int
+        Number of Thompson samples to obtain.
+    y_best : float
+        The best target value seen so far.
 
-        axis :
-             (Default value = 0)
-        y_best :
-             (Default value = 0.0)
+    Returns
+    -------
+    pending_pts : torch.LongTensor
+        The indices corresponding to pending points.
+    """
+    pending_pts = _greedy(
+        net,
+        unseen_data,
+        expected_improvement_analytical,
+        q=q,
+        y_best=y_best,
+    )
+    
+    return pending_pts
 
-        Returns
-        -------
 
-        """
-        return torch.rand(samples.shape[1])
+def greedy_ei_monte_carlo(net, unseen_data, q=5, y_best=0.0):
+    """ Greedy expected improvement, evaluated using MC sampling.
+    
+    Parameters
+    ----------
+    net : pinot Net object
+        Trained net.
+    unseen_data : tuple
+        Dataset from which pending points are selected.
+    q : int
+        Number of Thompson samples to obtain.
+    y_best : float
+        The best target value seen so far.
 
-    def UCB(self, samples, beta, axis=0, y_best=0.0):
-        """
+    Returns
+    -------
+    pending_pts : torch.LongTensor
+        The indices corresponding to pending points.
+    """
+    pending_pts = _greedy(
+        net,
+        unseen_data,
+        expected_improvement_monte_carlo,
+        q=q,
+        y_best=y_best,
+    )
+    
+    return pending_pts
 
-        Parameters
-        ----------
-        samples :
 
-        beta :
+def greedy_pi(net, unseen_data, q=5, y_best=0.0):
+    """ Greedy probability of improvement.
 
-        axis :
-             (Default value = 0)
-        y_best :
-             (Default value = 0.0)
+    Parameters
+    ----------
+    net : pinot Net object
+        Trained net.
+    unseen_data : tuple
+        Dataset from which pending points are selected.
+    q : int
+        Number of Thompson samples to obtain.
+    y_best : float
+        The best target value seen so far.
 
-        Returns
-        -------
+    Returns
+    -------
+    pending_pts : torch.LongTensor
+        The indices corresponding to pending points.
+    """
+    pending_pts = _greedy(
+        net,
+        unseen_data,
+        probability_of_improvement,
+        q=q,
+        y_best=y_best,
+    )
+    
+    return pending_pts
 
-        """
-        samples_sorted, idxs = torch.sort(samples, dim=0)
-        high_idx = int(len(samples) * (1 - (1 - beta) / 2))
-        if axis == 0:
-            high = samples_sorted[high_idx, :]
-        else:
-            high = samples_sorted[:, high_idx, :]
-        return high
+
+def batch_random(net, unseen_data, q=5, y_best=0.0):
+    """ Fill batch randomly.
+
+    Parameters
+    ----------
+    net : pinot Net object
+        Trained net.
+    unseen_data : tuple
+        Dataset from which pending points are selected.
+    q : int
+        Number of Thompson samples to obtain.
+    y_best : float
+        The best target value seen so far.
+
+    Returns
+    -------
+    pending_pts : torch.LongTensor
+        The indices corresponding to pending points.
+    """
+    pending_pts = _greedy(
+        net,
+        unseen_data,
+        random,
+        q=q,
+        y_best=y_best,
+    )
+
+    return pending_pts
+
+
+def batch_temporal(net, unseen_data, q=5, y_best=0.0):
+    r"""Picks the first q points in sequence.
+    Designed to be used with temporal datasets to compare with baselines.
+
+    Parameters
+    ----------
+    net : pinot Net object
+        Trained net.
+    unseen_data : tuple
+        Dataset from which pending points are selected.
+    q : int
+        Number of Thompson samples to obtain.
+    y_best : float
+        The best target value seen so far.
+
+    Returns
+    -------
+    pending_pts : torch.LongTensor
+        The indices corresponding to pending points.
+    """
+    pending_pts = _greedy(
+        net,
+        unseen_data,
+        temporal,
+        q=q,
+        y_best=y_best,
+    )
+
+    return pending_pts

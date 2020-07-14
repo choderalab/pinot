@@ -17,7 +17,7 @@ from pinot.regressors.neural_network_regressor import NeuralNetworkRegressor
 class SemiSupervisedNet(pinot.Net):
     """ SemiSupervisedNet that could work seemlessly with both
     labeled and unlabeled data
-    
+
     Parameters
     ----------
         representation: Object
@@ -30,7 +30,7 @@ class SemiSupervisedNet(pinot.Net):
             `Class` of the decoder to be initialized
 
         unsup_scale: Float
-        
+
         embedding_dim: Int
             Embedding dim of the variational auto-encoder
 
@@ -42,7 +42,7 @@ class SemiSupervisedNet(pinot.Net):
     Attributes
     ----------
     representation: nn.Module
-        Graph neural network that maps from input graph onto 
+        Graph neural network that maps from input graph onto
         latent representations
 
     output_regressor_generative: nn.Module
@@ -51,7 +51,7 @@ class SemiSupervisedNet(pinot.Net):
         (Variational Auto Encoder)
 
     decoder: nn.Module
-        Neural network that maps from z variables sampled from the 
+        Neural network that maps from z variables sampled from the
         approximate posterior to reconstruct the original graphs
 
     output_regressor: nn.Module
@@ -63,15 +63,16 @@ class SemiSupervisedNet(pinot.Net):
     def __init__(
         self,
         representation,
-        output_regressor=NeuralNetworkRegressor,
-        decoder=EdgeDecoder,
+        output_regressor_class=NeuralNetworkRegressor,
+        decoder_class=EdgeDecoder,
         unsup_scale=1.0,
         embedding_dim=64,
         generative_hidden_dim=64,
     ):
 
         super(SemiSupervisedNet, self).__init__(
-            representation=representation, output_regressor=output_regressor
+            representation=representation,
+            output_regressor_class=output_regressor_class,
         )
 
         # Recommended class: pinot.representation.sequential.Sequential
@@ -85,14 +86,16 @@ class SemiSupervisedNet(pinot.Net):
         self.representation_dim = self.representation_out_features
 
         # pass in decoder as class
-        self.decoder_cls = decoder
+        self.decoder_cls = decoder_class
         # Recommended class: pinot.generative.decoder.DecoderNetwork
         # Decoder needs to satisfy:
         # decoder.loss(g, z_sample) -> compute reconstruction loss
         # Embedding_dim is the dimension of the z_sample vector, or the
         # input of the decoder
         self.embedding_dim = embedding_dim
-        self.decoder = decoder(embedding_dim=embedding_dim, num_atom_types=100)
+        self.decoder = decoder_class(
+            embedding_dim=embedding_dim, num_atom_types=100
+        )
 
         # Output_regressor_generative:
         assert hasattr(self.decoder, "forward")
@@ -132,8 +135,8 @@ class SemiSupervisedNet(pinot.Net):
         Parameters
         ----------
         g : DGLGraph
-            The batched graph 
-            
+            The batched graph
+
         y : FloatTensor
             of shape (number of subgraphs,)
             The measurements associated with the subgraphs
@@ -182,7 +185,7 @@ class SemiSupervisedNet(pinot.Net):
         h : FloatTensor
             Of shape (num_subgraphs, latent_dim)
             The latent representation of the subgraphs
-            
+
         y : FloatTensor
             Of shape (num_subgraphs,)
             The measurements associated with the subgraphs
@@ -201,11 +204,11 @@ class SemiSupervisedNet(pinot.Net):
         Parameters
         ----------
         g : DGLGraph
-            The batched graph 
-                        
+            The batched graph
+
         h : FloatTensor
             Of shape (num_subgraphs, latent_dim)
-            The latent representation of the subgraphs            
+            The latent representation of the subgraphs
 
         Returns
         -------

@@ -58,7 +58,11 @@ def curve(results_dict):
 
             # get all the recorded indices
             idxs = list(
-                [key for key in results[metric].keys() if isinstance(key, int)]
+                [
+                    key
+                    for key in results[metric].keys()
+                    if isinstance(key, int)
+                ]
             )
 
             curve_dict[(metric, ds_name)] = np.array(
@@ -118,7 +122,11 @@ def visual(results_dict):
 
             # get all the recorded indices
             idxs = list(
-                [key for key in results[metric].keys() if isinstance(key, int)]
+                [
+                    key
+                    for key in results[metric].keys()
+                    if isinstance(key, int)
+                ]
             )
 
             # sort it ascending
@@ -336,7 +344,10 @@ def html_multiple_train_and_test_2d_grid(results):
     # populate this table
     for idx_col, param_col in enumerate(param_col_values):
         for idx_row, param_row in enumerate(param_row_values):
-            param_dict = {param_col_name: param_col, param_row_name: param_row}
+            param_dict = {
+                param_col_name: param_col,
+                param_row_name: param_row,
+            }
 
             # TODO:
             # make this less ugly

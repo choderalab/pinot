@@ -52,7 +52,11 @@ class Matern52(BaseKernel):
         # (batch_size, batch_size)
         k = (
             torch.exp(self.variance)
-            * (1.0 + torch.sqrt(5.0 * distance_sq) + (5.0 / 3.0) * distance_sq)
+            * (
+                1.0
+                + torch.sqrt(5.0 * distance_sq)
+                + (5.0 / 3.0) * distance_sq
+            )
             * torch.exp(-torch.sqrt(5.0 * distance_sq))
         )
 

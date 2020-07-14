@@ -108,24 +108,25 @@ class Sequential(torch.nn.Module):
 # pooling
 layer_param_type = {
     # Graph convolution layers
-    "GraphConv": {"out_feats":int,},
-    "GINConv":  {"out_feats":int,},
+    "GraphConv": {"out_feats": int,},
+    "GINConv": {"out_feats": int,},
     # "SAGEConv": {"out_feats":int,},
-    "EdgeConv": {"out_feats":int,},
-    "SAGEConv": {"out_feats":int,},
-    "GATConv":  {"out_feats":int, "num_heads":int},
-    "RelGraphConv": {"out_feats":int, "num_rel":int,},
-    "TAGConv": {"out_feats":int, "k":int,},
-    "SGConv": {"out_feats":int, "k":int,},
+    "EdgeConv": {"out_feats": int,},
+    "SAGEConv": {"out_feats": int,},
+    "GATConv": {"out_feats": int, "num_heads": int},
+    "RelGraphConv": {"out_feats": int, "num_rel": int,},
+    "TAGConv": {"out_feats": int, "k": int,},
+    "SGConv": {"out_feats": int, "k": int,},
     "GatedGraphConv": {"out_feats": int, "n_steps": int, "n_etypes": int,},
-    "ChebConv": {"out_feats":int, "k":int,},
+    "ChebConv": {"out_feats": int, "k": int,},
     # Activation
-    "activation": {"type":str},
+    "activation": {"type": str},
     # Dropout
-    "dropout": {"p":float},
+    "dropout": {"p": float},
     # Attention pooling
-    "attention_pool": {"type":str}
+    "attention_pool": {"type": str},
 }
+
 
 def get_parameter(layer_config):
     """ Get the parameters needed to initialize a layer
@@ -146,7 +147,7 @@ def get_parameter(layer_config):
     # Get the layer type
     layer_type = layer_config[0]
     # Get the config (exclude the layer type)
-    config     = layer_config[1:]
+    config = layer_config[1:]
     all_parameters = layer_param_type[layer_type]
     param_list = list(all_parameters.keys())
     parameters = {}
@@ -164,6 +165,7 @@ def get_parameter(layer_config):
         # Set the parameters to the right type
         parameters[param] = all_parameters[param](config[i])
     return parameters
+
 
 def initialize_layer(layer_config, in_feats):
     """ Initialize a layer given the layer configuration and the
@@ -194,27 +196,34 @@ def initialize_layer(layer_config, in_feats):
             appropriate data type
     """
     layer_type = layer_config[0]
-    assert(layer_type in layer_param_type)
+    assert layer_type in layer_param_type
     # Get the parameters needed to initialize the layer
     parameters = get_parameter(layer_config)
 
     # If this is a Graph Convolution Layer
     if "out_feats" in parameters:
-        out_feats  = parameters["out_feats"]
-        extra_args = dict([(key, val) for (key,val) in parameters.items() if key != "out_feats"])
+        out_feats = parameters["out_feats"]
+        extra_args = dict(
+            [
+                (key, val)
+                for (key, val) in parameters.items()
+                if key != "out_feats"
+            ]
+        )
         layer_init = getattr(dgl.nn.pytorch.conv, layer_type)
-        layer      = layer_init(in_feats, out_feats, **extra_args)
+        layer = layer_init(in_feats, out_feats, **extra_args)
 
-    else: # Activation or pooling or dropout
+    else:  # Activation or pooling or dropout
         if layer_type == "activation":
             layer = getattr(torch, parameters["type"])
         elif layer_type == "dropout":
             layer = torch.nn.Dropout(parameters["p"])
-        else: # If "attention_pool"
-            assert (parameters["type"] in ["concat", "mean", "sum"])
+        else:  # If "attention_pool"
+            assert parameters["type"] in ["concat", "mean", "sum"]
             layer = parameters["type"]
 
     return layer_type, layer, parameters
+
 
 def get_config_layers(config):
     """ Parse the config from a list of strings into component layers configs,
@@ -235,7 +244,7 @@ def get_config_layers(config):
     current_layer = []
     while i < len(config):
         # If config[i] specifies the layer type
-        if (type(config[i])==str) and (config[i] in layer_param_type):
+        if (type(config[i]) == str) and (config[i] in layer_param_type):
             layers.append(current_layer)
             current_layer = []
         current_layer.append(config[i])
@@ -248,6 +257,7 @@ def get_config_layers(config):
 class SequentialMix(torch.nn.Module):
     """ Module to allow for mixing of different convolution layer types
     """
+
     def __init__(
         self,
         config,
@@ -273,11 +283,13 @@ class SequentialMix(torch.nn.Module):
         # Extract the invidual layers
         layers = get_config_layers(config)
 
-        prev_layer_type   = None
-        prev_layer_param  = None
+        prev_layer_type = None
+        prev_layer_param = None
 
         for idx, layer_config in enumerate(layers):
-            layer_type, initialized_layer, layer_params = initialize_layer(layer_config, last_out_dim)
+            layer_type, initialized_layer, layer_params = initialize_layer(
+                layer_config, last_out_dim
+            )
 
             if "out_feats" in layer_params:
                 last_out_dim = layer_params["out_feats"]
@@ -290,17 +302,21 @@ class SequentialMix(torch.nn.Module):
                 elif layer_type == "dropout":
                     setattr(self, "drop" + str(idx), initialized_layer)
                     self.exes.append("drop" + str(idx))
-                else: # Attention pooling layer
+                else:  # Attention pooling layer
                     # We can only have attention pool after an attention layer
-                    assert(prev_layer_type == "GATConv")
-                    assert(type(initialized_layer) == str)
+                    assert prev_layer_type == "GATConv"
+                    assert type(initialized_layer) == str
                     self.exes.append("attn_" + initialized_layer)
 
                     # If we're concatenating the attention heads, the output dimension gets
                     # multiplied by the number of heads, otherwise, it is the same as the
                     # output dimension per head
-                    last_out_dim = prev_layer_param["out_feats"] * prev_layer_param["num_heads"]\
-                        if layer_params["type"] == "concat" else last_out_dim
+                    last_out_dim = (
+                        prev_layer_param["out_feats"]
+                        * prev_layer_param["num_heads"]
+                        if layer_params["type"] == "concat"
+                        else last_out_dim
+                    )
 
             # If it's a graph convolution layer
             else:
@@ -316,7 +332,6 @@ class SequentialMix(torch.nn.Module):
         # regression with the correct dimension
         self.dummy_output = torch.nn.Linear(1, last_out_dim)
 
-
     def forward(self, g, h=None, pool=lambda g: dgl.sum_nodes(g, "h")):
         if h is None:
             h = g.ndata["h"]
@@ -329,7 +344,7 @@ class SequentialMix(torch.nn.Module):
                     h = getattr(self, exe)(g, h)
                 # If attention pooling layer
                 elif exe.startswith("attn_"):
-                    assert(h.ndim == 3)
+                    assert h.ndim == 3
                     if exe[5:] == "concat":
                         h = h.view(h.shape[0], -1)
                     elif exe[5:] == "mean":

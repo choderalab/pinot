@@ -5,6 +5,7 @@ from torch.utils.data import WeightedRandomSampler
 class MultitaskBayesOptExperiment(BayesOptExperiment):
     """ Implements active learning experiment with multiple task target.
     """
+
     def __init__(self, *args, **kwargs):
 
         super(MultitaskBayesOptExperiment, self).__init__(*args, **kwargs)
@@ -27,23 +28,25 @@ class MultitaskBayesOptExperiment(BayesOptExperiment):
 
                 # get the predictive distribution
                 distribution = self.net.condition(gs, task)
-                
+
                 # workup
                 distribution = self.workup(distribution)
 
                 # get score
-                score = self.acquisition(distribution, y_best=self.y_best[task])
-                epsilon = 1e-4*torch.rand(score.shape)
-                
+                score = self.acquisition(
+                    distribution, y_best=self.y_best[task]
+                )
+                epsilon = 1e-4 * torch.rand(score.shape)
+
                 if torch.cuda.is_available:
                     epsilon = epsilon.cuda()
 
                 scores.append(score + epsilon)
-        
+
         # harmonize the scores
         # TODO: AVERAGE SCORES
         # first, scale the scores
-        scaled_scores = [(s - s.mean())/s.std() for s in scores]
+        scaled_scores = [(s - s.mean()) / s.std() for s in scores]
         # next: stack the scores
         scaled_scores = torch.stack(scaled_scores)
         # next: average the scores
@@ -55,11 +58,10 @@ class MultitaskBayesOptExperiment(BayesOptExperiment):
         else:
             # generate probability distribution
             weights = torch.exp(-score)
-            weights = weights/weights.sum()
+            weights = weights / weights.sum()
             best = WeightedRandomSampler(
-                weights=weights,
-                num_samples=self.q,
-                replacement=False)
+                weights=weights, num_samples=self.q, replacement=False
+            )
             best = torch.IntTensor(list(best))
 
         # pop from the back so you don't disrupt the order

@@ -64,15 +64,15 @@ def test_import(
     Parameters
     ----------
     neural_network_regressor :
-        
+
     variational_gaussian_process_regressor :
-        
+
     exact_gaussian_process_regressor :
-        
+
     vanilla_net :
-        
+
     semisupervised_net :
-        
+
 
     Returns
     -------
@@ -102,17 +102,17 @@ def test_init(net, regressor, representation):
     Parameters
     ----------
     net :
-        
+
     regressor :
-        
+
     representation :
-        
+
 
     Returns
     -------
 
     """
-    net(output_regressor=regressor, representation=representation)
+    net(output_regressor_class=regressor, representation=representation)
 
 
 @pytest.mark.parametrize("net", [pinot.Net,])
@@ -130,19 +130,19 @@ def test_forward(net, regressor, representation, ds):
     Parameters
     ----------
     net :
-        
+
     regressor :
-        
+
     representation :
-        
+
     ds :
-        
+
 
     Returns
     -------
 
     """
-    net = net(output_regressor=regressor, representation=representation)
+    net = net(output_regressor_class=regressor, representation=representation)
 
     g, y = ds[0]
     loss = net.loss(g, y)
