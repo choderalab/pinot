@@ -26,7 +26,6 @@ def _slice_fn_tensor(x, idxs):
     -------
     x : `torch.Tensor`, `shape=(n_data_chosen, )`
         Output tensor.
-
     """
     return x[idxs]
 
@@ -46,7 +45,6 @@ def _slice_fn_tensor_pair(x, idxs):
     -------
     x : `torch.Tensor`, `shape=(n_data_chosen, )`
         Output tensor.
-
     """
     return x[0][idxs], x[1][idxs]
 
@@ -59,12 +57,10 @@ def _collate_fn_tensor(x):
     x : `List` of `torch.Tensor`
         Tensors to be stacked.
 
-
     Returns
     -------
     x : `torch.Tensor`
         Output tensor.
-
     """
     return torch.stack(x)
 
@@ -77,11 +73,9 @@ def _collate_fn_graph(x):
     x : `List` of `dgl.DGLGraph`
         Input list of graphs to be batched.
 
-
     Returns
     -------
     x : `dgl.DGLGraph`
-
     """
     return dgl.batch(x)
 
@@ -97,12 +91,10 @@ def _slice_fn_graph(x, idxs):
     idxs : `List` of `int`
         Indices of the chosen graphs.
 
-
     Returns
     -------
     x : `dgl.DGLGraph`
         Sliced graph.
-
     """
     if x.batch_size > 1:
         x = dgl.unbatch(x)
@@ -128,9 +120,8 @@ def _slice_fn_tuple(x, idxs):
     `graph_slices` : `dgl.DGLGraph`
         Sliced and batched graph.
 
-    `tensor_clies` : `torch.Tensor`
+    `tensor_slices` : `torch.Tensor`
         Sliced and stacked tensor.
-
     """
     gs, ys = x
     graph_slices = _slice_fn_graph(gs, idxs)
@@ -221,7 +212,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
         data,
         acquisition,
         optimizer,
-        n_epochs=100,
+        num_epochs=100,
         strategy="sequential",
         q=1,
         num_samples=1000,
