@@ -1,2 +1,39 @@
 Using backend: pytorch
 Using backend: pytorch
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/plotting_active.py", line 322, in <module>
+    best_df = plot.generate()
+  File "scripts/active/plotting_active.py", line 71, in generate
+    final_results = self.run_trials(ds)
+  File "scripts/active/plotting_active.py", line 159, in run_trials
+    x = self.bo.run(num_rounds=self.num_rounds)
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 427, in run
+    self.update_data()
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 392, in update_data
+    self.new_data = self.slice_fn(self.data, self.new)
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 134, in _slice_fn_tuple
+    graph_slices = _slice_fn_graph(gs, idxs)
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 110, in _slice_fn_graph
+    return dgl.batch([x[idx] for idx in idxs])
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/graph.py", line 4181, in batch
+    batched_index = graph_index.disjoint_union([g._graph for g in graph_list])
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/graph_index.py", line 1201, in disjoint_union
+    return _CAPI_DGLDisjointUnion(list(graphs))
+  File "dgl/_ffi/_cython/./function.pxi", line 287, in dgl._ffi._cy3.core.FunctionBase.__call__
+  File "dgl/_ffi/_cython/./function.pxi", line 222, in dgl._ffi._cy3.core.FuncCall
+  File "dgl/_ffi/_cython/./function.pxi", line 211, in dgl._ffi._cy3.core.FuncCall3
+  File "dgl/_ffi/_cython/./base.pxi", line 155, in dgl._ffi._cy3.core.CALL
+dgl._ffi.base.DGLError: [15:48:36] /opt/dgl/src/graph/graph_op.cc:78: Check failed: graphs.size() > 0 (0 vs. 0) : Input graph list is empty
+Stack trace:
+  [bt] (0) /home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/libdgl.so(dmlc::LogMessageFatal::~LogMessageFatal()+0x22) [0x2aeeac16fe12]
+  [bt] (1) /home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/libdgl.so(dgl::GraphOp::DisjointUnion(std::vector<std::shared_ptr<dgl::GraphInterface>, std::allocator<std::shared_ptr<dgl::GraphInterface> > >)+0x7ab) [0x2aeeac7cf2db]
+  [bt] (2) /home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/libdgl.so(+0xd109dd) [0x2aeeac7cf9dd]
+  [bt] (3) /home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/libdgl.so(DGLFuncCall+0x52) [0x2aeeac777d72]
+  [bt] (4) /home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/_ffi/_cy3/core.cpython-38-x86_64-linux-gnu.so(+0x1b122) [0x2aeebc7ae122]
+  [bt] (5) /home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/_ffi/_cy3/core.cpython-38-x86_64-linux-gnu.so(+0x1b65e) [0x2aeebc7ae65e]
+  [bt] (6) /home/nguyenm5/anaconda3/envs/pinot/bin/python(_PyObject_MakeTpCall+0x22f) [0x55f701ac950f]
+  [bt] (7) /home/nguyenm5/anaconda3/envs/pinot/bin/python(_PyEval_EvalFrameDefault+0x485) [0x55f701b4dbb5]
+  [bt] (8) /home/nguyenm5/anaconda3/envs/pinot/bin/python(_PyFunction_Vectorcall+0x10b) [0x55f701b1756b]
+
+
