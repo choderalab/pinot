@@ -34,69 +34,69 @@ def _independent(distribution):
 # =============================================================================
 # MODULE FUNCTIONS
 # =============================================================================
-
-
-def _mse(y, y_hat):
-    """ Mean squarred error. """
-    return torch.nn.functional.mse_loss(y, y_hat)
-
-
-def mse(net, g, y, sampler=None):
-    """ Mean squarred error. """
-
-    y_hat = net.condition(g, sampler=sampler).mean.cpu()
-    y = y.cpu()
-
-    # gp
-    if y_hat.dim() == 1:
-        y_hat = y_hat.unsqueeze(1)
-
-    return _mse(y, y_hat)
-
-
 def _rmse(y, y_hat):
-    """ Rooted mean squarred error. """
-    assert y.numel() == y_hat.numel()
-    return torch.sqrt(
-        torch.nn.functional.mse_loss(y.flatten(), y_hat.flatten())
-    )
-
-
-def rmse(net, g, y, sampler=None):
-    """ Rooted mean squarred error. """
-    y_hat = net.condition(g, sampler=sampler).mean.cpu()
-    y = y.cpu()
-
-    # gp
+    """RMSE"""
     if y_hat.dim() == 1:
         y_hat = y_hat.unsqueeze(1)
+    assert y.shape == y_hat.shape
+    assert y.dim() == 2
+    assert y.shape[-1] == 1
+    return torch.nn.functional.mse_loss(y, y_hat).pow(0.5)
 
-    return _rmse(y, y_hat)
+def rmse(net, g, y, *args, n_samples=64, **kwargs):
+    """ Rooted mean squarred error. """
+
+    y = y.cpu()
+
+    results = []
+    for _ in range(n_samples):
+        y_hat = _independent(
+                net.condition(g, *args, **kwargs)
+            ).sample().cpu()
+
+        results.append(
+            _rmse(y, y_hat))
+
+    return torch.tensor(results).mean()
+
 
 
 def _r2(y, y_hat):
-    """ R2 """
-    ss_tot = (y - y.mean()).pow(2).sum()
-    ss_res = (y_hat - y).pow(2).sum()
-    return 1 - torch.div(ss_res, ss_tot)
-
-
-def r2(net, g, y, sampler=None):
-    """ R2 """
-    y_hat = net.condition(g, sampler=sampler).mean.cpu()
-    y = y.cpu()
-
     if y_hat.dim() == 1:
         y_hat = y_hat.unsqueeze(1)
+    assert y.shape == y_hat.shape
+    assert y.dim() == 2
+    assert y.shape[-1] == 1
 
-    return _r2(y, y_hat)
+    ss_tot = (y - y.mean()).pow(2).sum()
+    ss_res = (y_hat - y).pow(2).sum()
+
+    return 1 - torch.div(ss_res, ss_tot)
+
+def r2(net, g, y, *args, n_samples=64, **kwargs):
+    """ R2 """
+
+    y = y.cpu()
+
+    results = []
+    for _ in range(n_samples):
+        y_hat = _independent(
+                net.condition(g, *args, **kwargs)
+            ).sample().cpu()
+
+        results.append(
+            _r2(y, y_hat))
+
+    return torch.tensor(results).mean()
 
 
-def pearsonr(net, g, y, sampler=None):
+def pearsonr(net, g, y, *args, **kwargs):
     """ Pearson R """
+    # NOTE: not adapted to sampling methods yet
     from scipy.stats import pearsonr as pr
 
-    y_hat = net.condition(g, sampler=sampler).mean.detach().cpu()
+    y_hat = net.condition(g, *args, **kwargs
+        ).mean.detach().cpu()
     y = y.detach().cpu()
 
     result = pr(y.flatten().numpy(), y_hat.flatten().numpy())
@@ -104,12 +104,8 @@ def pearsonr(net, g, y, sampler=None):
     return torch.Tensor([correlation])[0]
 
 
-def log_sigma(net, g, y, sampler=None):
-    """ Log sigma. """
-    return net.log_sigma
 
-
-def avg_nll(net, g, y, sampler=None):
+def avg_nll(net, g, y, *args, **kwargs):
     """ Average negative log likelihood. """
 
     # TODO:
@@ -119,7 +115,7 @@ def avg_nll(net, g, y, sampler=None):
     assert (y.dim() == 2 and y.shape[-1] == 1) or (y.dim() == 1)
 
     # make the predictive distribution
-    distribution = net.condition(g, sampler=sampler)
+    distribution = net.condition(g, *args, **kwargs)
 
     # make independent
     distribution = _independent(distribution)

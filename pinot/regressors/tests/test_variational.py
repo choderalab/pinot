@@ -85,17 +85,9 @@ def test_train_and_test_cuda():
     ).to(torch.device("cuda:0"))
 
     lr = 1e-4
-    optimizer = torch.optim.Adam(
-        [
-            {"params": net.representation.parameters(), "weight_decay": lr},
-            {
-                "params": net.output_regressor.hyperparameters(),
-                "lr": lr * 0.01,
-            },
-            {"params": net.output_regressor.variational_parameters()},
-            {"params": net.output_regressor.likelihood.parameters()},
-        ]
-    )
+
+
+    optimizer = torch.optim.Adam(net.parameters(), 1e-3)
 
     train_and_test = pinot.TrainAndTest(
         net=net,

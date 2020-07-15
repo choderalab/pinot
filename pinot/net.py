@@ -202,7 +202,7 @@ class Net(BaseNet):
 
         return distribution
 
-    def condition(self, g, sampler=None, n_samples=64, *args, **kwargs):
+    def condition(self, g, *args, **kwargs):
         """ Compute the output distribution with sampled weights.
 
         Parameters
@@ -228,6 +228,17 @@ class Net(BaseNet):
         # g -> h
         h = self.representation(g)
         # kwargs = {}
+
+        # workout kwargs
+        # for sampling
+        sampler = None
+        n_samples = 64
+
+        if 'sampler' in kwargs:
+            sampler = kwargs.pop('sampler')
+
+        if 'n_samples' in kwargs:
+            n_samples = kwargs.pop('n_samples')
 
         if self.has_exact_gp is True:
             h_last = self.representation(self.g_last)
