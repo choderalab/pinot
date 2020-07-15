@@ -51,11 +51,17 @@ def _sample_and_marginalize_delta_G(
     for d in range(dG_samples):
         
         # obtain predictive posterior
-        samples = _independent(net.condition(gs, concentration)).sample((n_samples,))
+        samples = _independent(
+            net.condition(gs, concentration)
+        ).sample((n_samples,)).detach()
+
         assay_preds.append(samples)
 
+    print('Check shape of assay_preds following cat')
+    import pdb; pdb.set_trace()
     assay_preds = torch.cat(assay_preds)
     return assay_preds
+
 
 # =============================================================================
 # MODULE FUNCTIONS

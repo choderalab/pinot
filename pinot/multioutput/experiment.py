@@ -4,7 +4,7 @@ import copy
 import dgl
 
 
-class MultitaskTrain(Train):
+class MultiOutputTrain(Train):
     """ Training experiment when heads need to be masked for each task.
     Attributes
     ----------
@@ -21,7 +21,7 @@ class MultitaskTrain(Train):
     """
 
     def __init__(self, net, data, optimizer, n_epochs=100, record_interval=1):
-        super(MultitaskTrain, self).__init__(
+        super(MultiOutputTrain, self).__init__(
             net=net,
             data=data,
             optimizer=optimizer,
@@ -76,7 +76,7 @@ class MultitaskTrain(Train):
             self.optimizer.add_param_group(p)
 
 
-class MultitaskTrainAndTest(TrainAndTest):
+class MultiOutputTrainAndTest(TrainAndTest):
     """ Training experiment when heads need to be masked for each task.
     Attributes
     ----------

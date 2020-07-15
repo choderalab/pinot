@@ -17,29 +17,26 @@ from pinot.active.biophysical_acquisition import (biophysical_thompson_sampling,
 ######################
 # Utilities
 
-
-def _get_thompson_values(net, unseen_data, y_best=0.0, q=1, unique=True):
+def _get_thompson_values(net, data, q=1):
     """ Gets the value associated with the Thompson Samples.
     """
     # obtain predictive posterior
-    gs, ys = unseen_data
+    gs, ys = data
     distribution = _independent(net.condition(gs))
     
     # obtain samples from posterior
-    thetas = distribution.sample((q,))
+    thetas = distribution.sample((q,)).detach()
     thompson_values = torch.max(thetas, axis=1).values
     return thompson_values
 
 
 def _get_biophysical_thompson_values(
     net,
-    unseen_data,
+    data,
     acq_func,
     q=1,
-    y_best=0.0,
     concentration=20,
-    dG_samples=10,
-    unique=True):
+    dG_samples=10):
     """ Generates m Thompson samples and maximizes them.
     """        
     # fill batch
@@ -48,10 +45,9 @@ def _get_biophysical_thompson_values(
 
         # for each thompson sample,
         # get max, marginalizing across all distributions
-        # (and unraveling the index [find the column of max])
         thompson_value = _sample_and_marginalize_delta_G(
             net,
-            unseen_data,
+            data,
             concentration=concentration,
             dG_samples=dG_samples,
             n_samples=1
@@ -61,7 +57,6 @@ def _get_biophysical_thompson_values(
     # convert to tensor
     thompson_values = torch.Tensor(thompson_values)
     return thompson_values
-
 
 
 ######################
@@ -79,6 +74,7 @@ class TSBayesOptExperiment(pinot.active.experiment.BayesOptExperiment):
 
         super(TSBayesOptExperiment, self).__init__(*args, **kwargs)
 
+        self.early_stopping=False
         self.num_thompson_samples = num_thompson_samples
 
 
@@ -122,15 +118,13 @@ class TSBayesOptExperiment(pinot.active.experiment.BayesOptExperiment):
         """ Perform retrospective and prospective Thompson Sampling
             to check model beliefs about y_max.
         """
-        def _ts(key, idx, num_samples=1):
+        def _ts(key, idx, data, num_samples=1):
             """Get Thompson samples.
             """
             if isinstance(self.net.output_regressor, pinot.regressors.BiophysicalRegressor):
-                # thompson sampling on ALL data
-                self.thompson_samples[key][idx] = _get_biophysical_thompson_values(self.net, self.data, q=num_samples)
+                self.thompson_samples[key][idx] = _get_biophysical_thompson_values(self.net, data, q=num_samples)
             else:
-                # thompson sampling on UNSEEN data
-                self.thompson_samples[key][idx] = _get_thompson_values(self.net, self.unseen_data, q=num_samples)
+                self.thompson_samples[key][idx] = _get_thompson_values(self.net, data, q=num_samples)
 
         # set net to eval
         self.net.eval()
@@ -140,7 +134,9 @@ class TSBayesOptExperiment(pinot.active.experiment.BayesOptExperiment):
                                      'retrospective': torch.Tensor(num_rounds, num_samples)}
         
         for key in self.thompson_samples:
-            _ts(key, idx, num_samples=num_samples)
+            # thompson sampling on UNSEEN data if prospective
+            data = self.unseen_data if key == 'prospective' else self.data
+            _ts(key, idx, data, num_samples=num_samples)
 
 
 class TSActivePlot():
