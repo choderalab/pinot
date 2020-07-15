@@ -1,1 +1,139 @@
 Using backend: pytorch
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/plotting_active.py", line 322, in <module>
+    best_df = plot.generate()
+  File "scripts/active/plotting_active.py", line 71, in generate
+    final_results = self.run_trials(ds)
+  File "scripts/active/plotting_active.py", line 159, in run_trials
+    x = self.bo.run(num_rounds=self.num_rounds)
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 414, in run
+    self.train()
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 468, in train
+    self.net = pinot.app.experiment.Train(
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 98, in train
+    self.train_once()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 82, in train_once
+    self.optimizer.step(l)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/autograd/grad_mode.py", line 15, in decorate_context
+    return func(*args, **kwargs)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/optim/adam.py", line 62, in step
+    loss = closure()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 78, in l
+    loss = torch.sum(self.net.loss(g, y))
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 150, in loss
+    total_loss = self.loss_unsupervised(g, h) * self.unsup_scale
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 228, in loss_unsupervised
+    recon_loss = self.decoder.decode_and_compute_recon_error(g, z_sample)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/decoder.py", line 306, in decode_and_compute_recon_error
+    E_true = self.edge_tensor_from_g(subgraph)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/decoder.py", line 271, in edge_tensor_from_g
+    E[list(one_hot)] = 1.
+KeyboardInterrupt
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/plotting_active.py", line 322, in <module>
+    best_df = plot.generate()
+  File "scripts/active/plotting_active.py", line 71, in generate
+    final_results = self.run_trials(ds)
+  File "scripts/active/plotting_active.py", line 159, in run_trials
+    x = self.bo.run(num_rounds=self.num_rounds)
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 414, in run
+    self.train()
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 468, in train
+    self.net = pinot.app.experiment.Train(
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 98, in train
+    self.train_once()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 82, in train_once
+    self.optimizer.step(l)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/autograd/grad_mode.py", line 15, in decorate_context
+    return func(*args, **kwargs)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/optim/adam.py", line 62, in step
+    loss = closure()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 78, in l
+    loss = torch.sum(self.net.loss(g, y))
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 150, in loss
+    total_loss = self.loss_unsupervised(g, h) * self.unsup_scale
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 228, in loss_unsupervised
+    recon_loss = self.decoder.decode_and_compute_recon_error(g, z_sample)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/decoder.py", line 306, in decode_and_compute_recon_error
+    E_true = self.edge_tensor_from_g(subgraph)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/decoder.py", line 272, in edge_tensor_from_g
+    E[list(torch.cat((indices[:, e_idx], torch.tensor([-1]))))]
+KeyboardInterrupt
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/plotting_active.py", line 322, in <module>
+    best_df = plot.generate()
+  File "scripts/active/plotting_active.py", line 71, in generate
+    final_results = self.run_trials(ds)
+  File "scripts/active/plotting_active.py", line 159, in run_trials
+    x = self.bo.run(num_rounds=self.num_rounds)
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 414, in run
+    self.train()
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 468, in train
+    self.net = pinot.app.experiment.Train(
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 98, in train
+    self.train_once()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 82, in train_once
+    self.optimizer.step(l)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/autograd/grad_mode.py", line 15, in decorate_context
+    return func(*args, **kwargs)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/optim/adam.py", line 62, in step
+    loss = closure()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 78, in l
+    loss = torch.sum(self.net.loss(g, y))
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 150, in loss
+    total_loss = self.loss_unsupervised(g, h) * self.unsup_scale
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 228, in loss_unsupervised
+    recon_loss = self.decoder.decode_and_compute_recon_error(g, z_sample)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/decoder.py", line 293, in decode_and_compute_recon_error
+    decoded_subgraphs = self.forward(g, z_sample)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/decoder.py", line 403, in forward
+    decoded_subgraphs = [
+  File "/home/nguyenm5/coding/pinot/pinot/generative/decoder.py", line 404, in <listcomp>
+    self.decode(g_sample.ndata["h"]) for g_sample in gs_unbatched
+  File "/home/nguyenm5/coding/pinot/pinot/generative/decoder.py", line 348, in decode
+    za = self.z_to_za(z)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/nn/modules/module.py", line 550, in __call__
+    result = self.forward(*input, **kwargs)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/nn/modules/container.py", line 100, in forward
+    input = module(input)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/nn/modules/module.py", line 550, in __call__
+    result = self.forward(*input, **kwargs)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/nn/modules/linear.py", line 87, in forward
+    return F.linear(input, self.weight, self.bias)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/nn/functional.py", line 1610, in linear
+    ret = torch.addmm(bias, input, weight.t())
+KeyboardInterrupt
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/plotting_active.py", line 322, in <module>
+    best_df = plot.generate()
+  File "scripts/active/plotting_active.py", line 71, in generate
+    final_results = self.run_trials(ds)
+  File "scripts/active/plotting_active.py", line 159, in run_trials
+    x = self.bo.run(num_rounds=self.num_rounds)
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 414, in run
+    self.train()
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 468, in train
+    self.net = pinot.app.experiment.Train(
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 98, in train
+    self.train_once()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 82, in train_once
+    self.optimizer.step(l)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/autograd/grad_mode.py", line 15, in decorate_context
+    return func(*args, **kwargs)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/optim/adam.py", line 62, in step
+    loss = closure()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 78, in l
+    loss = torch.sum(self.net.loss(g, y))
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 150, in loss
+    total_loss = self.loss_unsupervised(g, h) * self.unsup_scale
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 228, in loss_unsupervised
+    recon_loss = self.decoder.decode_and_compute_recon_error(g, z_sample)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/decoder.py", line 306, in decode_and_compute_recon_error
+    E_true = self.edge_tensor_from_g(subgraph)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/decoder.py", line 265, in edge_tensor_from_g
+    e = torch.tensor([etypes[e_idx]])
+KeyboardInterrupt
