@@ -461,7 +461,9 @@ class MixedSingleAndMultipleDataset(Dataset):
         single_concentrations=[20, 50],
         single_col_names=["f_inhibition_at_20_uM", "f_inhibition_at_50_uM",],
         # scaling
-        concentration_unit_scaling=0.001,
+        concentration_unit_scaling=1e-6, # \mu M
+        # shuffling
+        shuffle=True,
     ):
         def _from_csv():
             # read single and multiple data
@@ -527,6 +529,11 @@ class MixedSingleAndMultipleDataset(Dataset):
             df = df.apply(flatten_single, axis=1)
 
             self.ds = df.to_dict(orient="records")
+            
+            # shuffle
+            if shuffle is True:
+                import random
+                random.shuffle(self.ds)
 
             for record in self.ds:
                 record["g"] = pinot.graph.from_rdkit_mol(
