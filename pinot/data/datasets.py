@@ -590,7 +590,7 @@ class MixedSingleAndMultipleDataset(Dataset):
             filter_concentration=None,
             *args, **kwargs):
         assert len(xs) == 1
-        g, c, y = xs[0]
+        g, y, c = xs[0]
         gs = dgl.unbatch(g)
         cs = c.numpy().tolist()
         ys = y.numpy().tolist()
@@ -598,6 +598,7 @@ class MixedSingleAndMultipleDataset(Dataset):
         _ds = list(zip(gs, ys, cs))
 
         if filter_concentration is not None:
+
             _ds = [(g, y, c) for g, y, c in _ds 
                     if float(c[0]) == filter_concentration]
 
