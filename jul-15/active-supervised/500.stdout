@@ -1,0 +1,960 @@
+Sender: LSF System <lsfadmin@ls09>
+Subject: Job 15339271: <active-sup> in cluster <lila> Done
+
+Job <active-sup> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:51 2020
+Job was executed on host(s) <12*ls09>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:51 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Wed Jul 15 00:58:51 2020
+Terminated at Wed Jul 15 00:59:19 2020
+Results reported at Wed Jul 15 00:59:19 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/plotting_active.py --net ExactGaussianProcessRegressor --num_rounds 4 --num_trials 1 --num_epochs 500 --data moonshot --q 96 --acquisition ExpectedImprovement --output_folder /home/nguyenm5/coding/pinot/jul-15/active-supervised --index 2
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   41.83 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.69 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                20
+    Run time :                                   29 sec.
+    Turnaround time :                            28 sec.
+
+The output (if any) follows:
+
+0
+Max probability of improvement:
+[array(0.48642796, dtype=float32), array(0.4499703, dtype=float32), array(0.44193906, dtype=float32), array(0.43554437, dtype=float32)]
+Max UCB:
+[array(1.9171463, dtype=float32), array(1.7256012, dtype=float32), array(1.5533124, dtype=float32), array(1.350177, dtype=float32)]
+Max UCB - ybest
+[1.77148, 1.5799348, 1.4076461, 1.2045107]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-15/active-supervised/500.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls16>
+Subject: Job 15339289: <active-sup> in cluster <lila> Done
+
+Job <active-sup> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:52 2020
+Job was executed on host(s) <12*ls16>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:52 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Wed Jul 15 00:58:52 2020
+Terminated at Wed Jul 15 00:59:20 2020
+Results reported at Wed Jul 15 00:59:20 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/plotting_active.py --net ExactGaussianProcessRegressor --num_rounds 4 --num_trials 1 --num_epochs 500 --data moonshot --q 96 --acquisition Human --output_folder /home/nguyenm5/coding/pinot/jul-15/active-supervised --index 5
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   41.12 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.69 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                20
+    Run time :                                   28 sec.
+    Turnaround time :                            28 sec.
+
+The output (if any) follows:
+
+0
+Max probability of improvement:
+[array(0.4948545, dtype=float32), array(0.47656196, dtype=float32), array(0.32298064, dtype=float32), array(0.15313971, dtype=float32)]
+Max UCB:
+[array(1.9126358, dtype=float32), array(1.8432733, dtype=float32), array(1.530859, dtype=float32), array(1.4452676, dtype=float32)]
+Max UCB - ybest
+[1.857407, 1.7880445, 1.1651657, 0.62308854]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-15/active-supervised/500.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls14>
+Subject: Job 15339277: <active-sup> in cluster <lila> Done
+
+Job <active-sup> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:51 2020
+Job was executed on host(s) <12*ls14>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:52 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Wed Jul 15 00:58:52 2020
+Terminated at Wed Jul 15 00:59:21 2020
+Results reported at Wed Jul 15 00:59:21 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/plotting_active.py --net ExactGaussianProcessRegressor --num_rounds 4 --num_trials 1 --num_epochs 500 --data moonshot --q 96 --acquisition UpperConfidenceBound --output_folder /home/nguyenm5/coding/pinot/jul-15/active-supervised --index 3
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   41.92 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.69 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                20
+    Run time :                                   30 sec.
+    Turnaround time :                            30 sec.
+
+The output (if any) follows:
+
+0
+Max probability of improvement:
+[array(0.38869953, dtype=float32), array(0.40725744, dtype=float32), array(0.18441796, dtype=float32), array(0.37727964, dtype=float32)]
+Max UCB:
+[array(1.9122019, dtype=float32), array(1.7867696, dtype=float32), array(1.6584104, dtype=float32), array(1.7812641, dtype=float32)]
+Max UCB - ybest
+[1.6341931, 1.5087608, 0.87289685, 0.9957505]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-15/active-supervised/500.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls03>
+Subject: Job 15339273: <active-sup> in cluster <lila> Done
+
+Job <active-sup> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:51 2020
+Job was executed on host(s) <12*ls03>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:51 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Wed Jul 15 00:58:51 2020
+Terminated at Wed Jul 15 00:59:21 2020
+Results reported at Wed Jul 15 00:59:21 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/plotting_active.py --net ExactGaussianProcessRegressor --num_rounds 4 --num_trials 1 --num_epochs 500 --data moonshot --q 96 --acquisition ExpectedImprovement --output_folder /home/nguyenm5/coding/pinot/jul-15/active-supervised --index 4
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   42.93 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.71 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                20
+    Run time :                                   31 sec.
+    Turnaround time :                            30 sec.
+
+The output (if any) follows:
+
+0
+Max probability of improvement:
+[array(0.4885605, dtype=float32), array(0.4556489, dtype=float32), array(0.44954288, dtype=float32), array(0.444677, dtype=float32)]
+Max UCB:
+[array(1.9156202, dtype=float32), array(1.8363271, dtype=float32), array(1.6631346, dtype=float32), array(1.5142026, dtype=float32)]
+Max UCB - ybest
+[1.7928406, 1.7135475, 1.540355, 1.391423]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-15/active-supervised/500.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls15>
+Subject: Job 15339280: <active-sup> in cluster <lila> Done
+
+Job <active-sup> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:51 2020
+Job was executed on host(s) <12*ls15>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:52 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Wed Jul 15 00:58:52 2020
+Terminated at Wed Jul 15 00:59:21 2020
+Results reported at Wed Jul 15 00:59:21 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/plotting_active.py --net ExactGaussianProcessRegressor --num_rounds 4 --num_trials 1 --num_epochs 500 --data moonshot --q 96 --acquisition ProbabilityOfImprovement --output_folder /home/nguyenm5/coding/pinot/jul-15/active-supervised --index 1
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   40.91 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.69 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                20
+    Run time :                                   29 sec.
+    Turnaround time :                            30 sec.
+
+The output (if any) follows:
+
+0
+Max probability of improvement:
+[array(0.40363264, dtype=float32), array(0.41956007, dtype=float32), array(0.41600215, dtype=float32), array(0.4217971, dtype=float32)]
+Max UCB:
+[array(1.9122263, dtype=float32), array(1.8711531, dtype=float32), array(1.6472555, dtype=float32), array(1.2288349, dtype=float32)]
+Max UCB - ybest
+[1.6714766, 1.6304034, 1.4065058, 0.98808515]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-15/active-supervised/500.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls01>
+Subject: Job 15339274: <active-sup> in cluster <lila> Done
+
+Job <active-sup> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:51 2020
+Job was executed on host(s) <12*ls01>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:51 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Wed Jul 15 00:58:51 2020
+Terminated at Wed Jul 15 00:59:21 2020
+Results reported at Wed Jul 15 00:59:21 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/plotting_active.py --net ExactGaussianProcessRegressor --num_rounds 4 --num_trials 1 --num_epochs 500 --data moonshot --q 96 --acquisition ExpectedImprovement --output_folder /home/nguyenm5/coding/pinot/jul-15/active-supervised --index 5
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   40.71 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.65 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                20
+    Run time :                                   31 sec.
+    Turnaround time :                            30 sec.
+
+The output (if any) follows:
+
+0
+Max probability of improvement:
+[array(0.49054945, dtype=float32), array(0.48771423, dtype=float32), array(0.08378041, dtype=float32), array(0.39885324, dtype=float32)]
+Max UCB:
+[array(1.9118731, dtype=float32), array(1.6108444, dtype=float32), array(1.4124267, dtype=float32), array(1.8450001, dtype=float32)]
+Max UCB - ybest
+[1.8887676, 1.5877389, 0.4194697, 0.85204315]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-15/active-supervised/500.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls08>
+Subject: Job 15339279: <active-sup> in cluster <lila> Done
+
+Job <active-sup> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:51 2020
+Job was executed on host(s) <12*ls08>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:52 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Wed Jul 15 00:58:52 2020
+Terminated at Wed Jul 15 00:59:22 2020
+Results reported at Wed Jul 15 00:59:22 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/plotting_active.py --net ExactGaussianProcessRegressor --num_rounds 4 --num_trials 1 --num_epochs 500 --data moonshot --q 96 --acquisition UpperConfidenceBound --output_folder /home/nguyenm5/coding/pinot/jul-15/active-supervised --index 5
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   42.70 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.71 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                20
+    Run time :                                   32 sec.
+    Turnaround time :                            31 sec.
+
+The output (if any) follows:
+
+0
+Max probability of improvement:
+[array(0.482131, dtype=float32), array(0.48623037, dtype=float32), array(0.42656165, dtype=float32), array(0.43386906, dtype=float32)]
+Max UCB:
+[array(1.9120053, dtype=float32), array(1.7242552, dtype=float32), array(1.4932394, dtype=float32), array(1.5181988, dtype=float32)]
+Max UCB - ybest
+[1.8628708, 1.6751207, 1.3362415, 1.3612009]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-15/active-supervised/500.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls05>
+Subject: Job 15339284: <active-sup> in cluster <lila> Done
+
+Job <active-sup> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:52 2020
+Job was executed on host(s) <12*ls05>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:52 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Wed Jul 15 00:58:52 2020
+Terminated at Wed Jul 15 00:59:22 2020
+Results reported at Wed Jul 15 00:59:22 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/plotting_active.py --net ExactGaussianProcessRegressor --num_rounds 4 --num_trials 1 --num_epochs 500 --data moonshot --q 96 --acquisition ProbabilityOfImprovement --output_folder /home/nguyenm5/coding/pinot/jul-15/active-supervised --index 5
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   41.08 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.71 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                20
+    Run time :                                   30 sec.
+    Turnaround time :                            30 sec.
+
+The output (if any) follows:
+
+0
+Max probability of improvement:
+[array(0.4905513, dtype=float32), array(0.4809019, dtype=float32), array(0.47425961, dtype=float32), array(0.47124028, dtype=float32)]
+Max UCB:
+[array(1.9118797, dtype=float32), array(1.3513618, dtype=float32), array(1.0866508, dtype=float32), array(1.034417, dtype=float32)]
+Max UCB - ybest
+[1.8887742, 1.3282562, 1.0635453, 1.0113115]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-15/active-supervised/500.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls07>
+Subject: Job 15339283: <active-sup> in cluster <lila> Done
+
+Job <active-sup> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:52 2020
+Job was executed on host(s) <12*ls07>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:52 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Wed Jul 15 00:58:52 2020
+Terminated at Wed Jul 15 00:59:22 2020
+Results reported at Wed Jul 15 00:59:22 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/plotting_active.py --net ExactGaussianProcessRegressor --num_rounds 4 --num_trials 1 --num_epochs 500 --data moonshot --q 96 --acquisition ProbabilityOfImprovement --output_folder /home/nguyenm5/coding/pinot/jul-15/active-supervised --index 4
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   42.21 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.71 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                20
+    Run time :                                   30 sec.
+    Turnaround time :                            30 sec.
+
+The output (if any) follows:
+
+0
+Max probability of improvement:
+[array(0.4990086, dtype=float32), array(0.4903108, dtype=float32), array(0.4699685, dtype=float32), array(0.4682362, dtype=float32)]
+Max UCB:
+[array(1.9119052, dtype=float32), array(1.8650135, dtype=float32), array(1.7968692, dtype=float32), array(1.3527734, dtype=float32)]
+Max UCB - ybest
+[1.901264, 1.841908, 1.7246931, 1.2805973]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-15/active-supervised/500.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls09>
+Subject: Job 15339270: <active-sup> in cluster <lila> Done
+
+Job <active-sup> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:51 2020
+Job was executed on host(s) <12*ls09>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:51 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Wed Jul 15 00:58:51 2020
+Terminated at Wed Jul 15 00:59:22 2020
+Results reported at Wed Jul 15 00:59:22 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/plotting_active.py --net ExactGaussianProcessRegressor --num_rounds 4 --num_trials 1 --num_epochs 500 --data moonshot --q 96 --acquisition ExpectedImprovement --output_folder /home/nguyenm5/coding/pinot/jul-15/active-supervised --index 1
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   44.55 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.71 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                20
+    Run time :                                   31 sec.
+    Turnaround time :                            31 sec.
+
+The output (if any) follows:
+
+0
+Max probability of improvement:
+[array(0.4640023, dtype=float32), array(0.47072434, dtype=float32), array(0.46183854, dtype=float32), array(0.45471668, dtype=float32)]
+Max UCB:
+[array(1.9118963, dtype=float32), array(1.7575278, dtype=float32), array(1.6160959, dtype=float32), array(1.3622528, dtype=float32)]
+Max UCB - ybest
+[1.8233551, 1.6689866, 1.5275546, 1.2737116]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-15/active-supervised/500.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls15>
+Subject: Job 15339281: <active-sup> in cluster <lila> Done
+
+Job <active-sup> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:51 2020
+Job was executed on host(s) <12*ls15>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:52 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Wed Jul 15 00:58:52 2020
+Terminated at Wed Jul 15 00:59:22 2020
+Results reported at Wed Jul 15 00:59:22 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/plotting_active.py --net ExactGaussianProcessRegressor --num_rounds 4 --num_trials 1 --num_epochs 500 --data moonshot --q 96 --acquisition ProbabilityOfImprovement --output_folder /home/nguyenm5/coding/pinot/jul-15/active-supervised --index 2
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   42.75 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.71 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                20
+    Run time :                                   30 sec.
+    Turnaround time :                            31 sec.
+
+The output (if any) follows:
+
+0
+Max probability of improvement:
+[array(0.49685973, dtype=float32), array(0.47926813, dtype=float32), array(0.4722926, dtype=float32), array(0.30077863, dtype=float32)]
+Max UCB:
+[array(1.9121597, dtype=float32), array(1.8051032, dtype=float32), array(1.2474482, dtype=float32), array(0.8762879, dtype=float32)]
+Max UCB - ybest
+[1.8784536, 1.7713971, 1.2137421, 0.66727567]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-15/active-supervised/500.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls05>
+Subject: Job 15339285: <active-sup> in cluster <lila> Done
+
+Job <active-sup> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:52 2020
+Job was executed on host(s) <12*ls05>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:52 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Wed Jul 15 00:58:52 2020
+Terminated at Wed Jul 15 00:59:22 2020
+Results reported at Wed Jul 15 00:59:22 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/plotting_active.py --net ExactGaussianProcessRegressor --num_rounds 4 --num_trials 1 --num_epochs 500 --data moonshot --q 96 --acquisition Human --output_folder /home/nguyenm5/coding/pinot/jul-15/active-supervised --index 1
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   41.25 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.47 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                20
+    Run time :                                   30 sec.
+    Turnaround time :                            30 sec.
+
+The output (if any) follows:
+
+0
+Max probability of improvement:
+[array(0.4636547, dtype=float32), array(0.39409155, dtype=float32), array(0.37454408, dtype=float32), array(0.16197014, dtype=float32)]
+Max UCB:
+[array(1.9493793, dtype=float32), array(1.8802032, dtype=float32), array(1.6290779, dtype=float32), array(1.4228474, dtype=float32)]
+Max UCB - ybest
+[1.5591718, 1.4899957, 1.2388704, 0.6006684]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-15/active-supervised/500.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls14>
+Subject: Job 15339276: <active-sup> in cluster <lila> Done
+
+Job <active-sup> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:51 2020
+Job was executed on host(s) <12*ls14>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:52 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Wed Jul 15 00:58:52 2020
+Terminated at Wed Jul 15 00:59:22 2020
+Results reported at Wed Jul 15 00:59:22 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/plotting_active.py --net ExactGaussianProcessRegressor --num_rounds 4 --num_trials 1 --num_epochs 500 --data moonshot --q 96 --acquisition UpperConfidenceBound --output_folder /home/nguyenm5/coding/pinot/jul-15/active-supervised --index 2
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   42.46 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.71 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                20
+    Run time :                                   31 sec.
+    Turnaround time :                            31 sec.
+
+The output (if any) follows:
+
+0
+Max probability of improvement:
+[array(0.49342275, dtype=float32), array(0.4868616, dtype=float32), array(0.14941919, dtype=float32), array(0.39880168, dtype=float32)]
+Max UCB:
+[array(1.9131161, dtype=float32), array(1.816716, dtype=float32), array(1.4502695, dtype=float32), array(1.5806565, dtype=float32)]
+Max UCB - ybest
+[1.8425207, 1.7461206, 0.6647559, 0.79514295]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-15/active-supervised/500.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls08>
+Subject: Job 15339278: <active-sup> in cluster <lila> Done
+
+Job <active-sup> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:51 2020
+Job was executed on host(s) <12*ls08>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:52 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Wed Jul 15 00:58:52 2020
+Terminated at Wed Jul 15 00:59:22 2020
+Results reported at Wed Jul 15 00:59:22 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/plotting_active.py --net ExactGaussianProcessRegressor --num_rounds 4 --num_trials 1 --num_epochs 500 --data moonshot --q 96 --acquisition UpperConfidenceBound --output_folder /home/nguyenm5/coding/pinot/jul-15/active-supervised --index 4
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   43.96 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.71 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                20
+    Run time :                                   32 sec.
+    Turnaround time :                            31 sec.
+
+The output (if any) follows:
+
+0
+Max probability of improvement:
+[array(0.45281744, dtype=float32), array(0.37107223, dtype=float32), array(0.3897527, dtype=float32), array(0.39333385, dtype=float32)]
+Max UCB:
+[array(1.9747678, dtype=float32), array(1.8367059, dtype=float32), array(1.658608, dtype=float32), array(1.3332932, dtype=float32)]
+Max UCB - ybest
+[1.4678738, 1.329812, 1.1517141, 0.82639927]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-15/active-supervised/500.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls02>
+Subject: Job 15339286: <active-sup> in cluster <lila> Done
+
+Job <active-sup> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:52 2020
+Job was executed on host(s) <12*ls02>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:52 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Wed Jul 15 00:58:52 2020
+Terminated at Wed Jul 15 00:59:23 2020
+Results reported at Wed Jul 15 00:59:23 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/plotting_active.py --net ExactGaussianProcessRegressor --num_rounds 4 --num_trials 1 --num_epochs 500 --data moonshot --q 96 --acquisition Human --output_folder /home/nguyenm5/coding/pinot/jul-15/active-supervised --index 2
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   44.53 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.39 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                20
+    Run time :                                   31 sec.
+    Turnaround time :                            31 sec.
+
+The output (if any) follows:
+
+0
+Max probability of improvement:
+[array(0.45446426, dtype=float32), array(0.38629997, dtype=float32), array(0.39776844, dtype=float32), array(0.15227264, dtype=float32)]
+Max UCB:
+[array(1.9704938, dtype=float32), array(1.8943592, dtype=float32), array(1.5967224, dtype=float32), array(1.2729313, dtype=float32)]
+Max UCB - ybest
+[1.4813538, 1.4052192, 1.1075823, 0.45075232]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-15/active-supervised/500.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls07>
+Subject: Job 15339282: <active-sup> in cluster <lila> Done
+
+Job <active-sup> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:51 2020
+Job was executed on host(s) <12*ls07>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:52 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Wed Jul 15 00:58:52 2020
+Terminated at Wed Jul 15 00:59:23 2020
+Results reported at Wed Jul 15 00:59:23 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/plotting_active.py --net ExactGaussianProcessRegressor --num_rounds 4 --num_trials 1 --num_epochs 500 --data moonshot --q 96 --acquisition ProbabilityOfImprovement --output_folder /home/nguyenm5/coding/pinot/jul-15/active-supervised --index 3
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   43.62 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.71 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                20
+    Run time :                                   30 sec.
+    Turnaround time :                            32 sec.
+
+The output (if any) follows:
+
+0
+Max probability of improvement:
+[array(0.41368246, dtype=float32), array(0.43356562, dtype=float32), array(0.40948802, dtype=float32), array(0.41025233, dtype=float32)]
+Max UCB:
+[array(1.919272, dtype=float32), array(1.8783638, dtype=float32), array(1.8261865, dtype=float32), array(1.7739996, dtype=float32)]
+Max UCB - ybest
+[1.6481484, 1.6072403, 1.555063, 1.502876]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-15/active-supervised/500.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls16>
+Subject: Job 15339288: <active-sup> in cluster <lila> Done
+
+Job <active-sup> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:52 2020
+Job was executed on host(s) <12*ls16>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:52 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Wed Jul 15 00:58:52 2020
+Terminated at Wed Jul 15 00:59:23 2020
+Results reported at Wed Jul 15 00:59:23 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/plotting_active.py --net ExactGaussianProcessRegressor --num_rounds 4 --num_trials 1 --num_epochs 500 --data moonshot --q 96 --acquisition Human --output_folder /home/nguyenm5/coding/pinot/jul-15/active-supervised --index 4
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   43.25 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.71 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                20
+    Run time :                                   31 sec.
+    Turnaround time :                            31 sec.
+
+The output (if any) follows:
+
+0
+Max probability of improvement:
+[array(0.4965098, dtype=float32), array(0.48264664, dtype=float32), array(0.3407753, dtype=float32), array(0.18599021, dtype=float32)]
+Max UCB:
+[array(1.9122264, dtype=float32), array(1.8424927, dtype=float32), array(1.7403213, dtype=float32), array(1.6164532, dtype=float32)]
+Max UCB - ybest
+[1.8747641, 1.8029987, 1.3746278, 0.79427415]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-15/active-supervised/500.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls01>
+Subject: Job 15339275: <active-sup> in cluster <lila> Done
+
+Job <active-sup> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:51 2020
+Job was executed on host(s) <12*ls01>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:52 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Wed Jul 15 00:58:52 2020
+Terminated at Wed Jul 15 00:59:23 2020
+Results reported at Wed Jul 15 00:59:23 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/plotting_active.py --net ExactGaussianProcessRegressor --num_rounds 4 --num_trials 1 --num_epochs 500 --data moonshot --q 96 --acquisition UpperConfidenceBound --output_folder /home/nguyenm5/coding/pinot/jul-15/active-supervised --index 1
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   41.91 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.41 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                20
+    Run time :                                   33 sec.
+    Turnaround time :                            32 sec.
+
+The output (if any) follows:
+
+0
+Max probability of improvement:
+[array(0.4088794, dtype=float32), array(0.39984232, dtype=float32), array(0.39364207, dtype=float32), array(0.3932268, dtype=float32)]
+Max UCB:
+[array(2.1510823, dtype=float32), array(2.0751836, dtype=float32), array(1.9982259, dtype=float32), array(1.9845542, dtype=float32)]
+Max UCB - ybest
+[1.1574582, 1.0815595, 1.0046018, 0.9909301]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-15/active-supervised/500.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls03>
+Subject: Job 15339272: <active-sup> in cluster <lila> Done
+
+Job <active-sup> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:51 2020
+Job was executed on host(s) <12*ls03>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:51 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Wed Jul 15 00:58:51 2020
+Terminated at Wed Jul 15 00:59:23 2020
+Results reported at Wed Jul 15 00:59:23 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/plotting_active.py --net ExactGaussianProcessRegressor --num_rounds 4 --num_trials 1 --num_epochs 500 --data moonshot --q 96 --acquisition ExpectedImprovement --output_folder /home/nguyenm5/coding/pinot/jul-15/active-supervised --index 3
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   44.65 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.71 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                20
+    Run time :                                   33 sec.
+    Turnaround time :                            32 sec.
+
+The output (if any) follows:
+
+0
+Max probability of improvement:
+[array(0.49050444, dtype=float32), array(0.4546805, dtype=float32), array(0.4217757, dtype=float32), array(0.42137676, dtype=float32)]
+Max UCB:
+[array(1.9117908, dtype=float32), array(1.3566386, dtype=float32), array(0.85142815, dtype=float32), array(0.73101324, dtype=float32)]
+Max UCB - ybest
+[1.8886853, 1.333533, 0.8283227, 0.7079078]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-15/active-supervised/500.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls02>
+Subject: Job 15339287: <active-sup> in cluster <lila> Done
+
+Job <active-sup> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:52 2020
+Job was executed on host(s) <12*ls02>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Wed Jul 15 00:58:52 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Wed Jul 15 00:58:52 2020
+Terminated at Wed Jul 15 00:59:25 2020
+Results reported at Wed Jul 15 00:59:25 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/plotting_active.py --net ExactGaussianProcessRegressor --num_rounds 4 --num_trials 1 --num_epochs 500 --data moonshot --q 96 --acquisition Human --output_folder /home/nguyenm5/coding/pinot/jul-15/active-supervised --index 3
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   45.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.39 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                20
+    Run time :                                   33 sec.
+    Turnaround time :                            33 sec.
+
+The output (if any) follows:
+
+0
+Max probability of improvement:
+[array(0.46160865, dtype=float32), array(0.40725607, dtype=float32), array(0.39454895, dtype=float32), array(0.15286338, dtype=float32)]
+Max UCB:
+[array(1.9536842, dtype=float32), array(1.8884462, dtype=float32), array(1.6849389, dtype=float32), array(1.3986315, dtype=float32)]
+Max UCB - ybest
+[1.541471, 1.476233, 1.2727257, 0.57645243]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-15/active-supervised/500.stderr> for stderr output of this job.
+
