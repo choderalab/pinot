@@ -173,7 +173,7 @@ class ActivePlot():
             'Uncertainty': pinot.active.acquisition.uncertainty,
             'Human': pinot.active.acquisition.temporal,
             'Random': pinot.active.acquisition.random,
-            'ThompsonSampling': pinot.active.batch_acquisition.thompson_sampling,
+            'ThompsonSampling': pinot.active.acquisition.thompson_sampling,
         }
 
         return acquisitions[self.acquisition]
