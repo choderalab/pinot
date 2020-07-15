@@ -13,6 +13,25 @@ from pinot.generative import SemiSupervisedNet
 
 
 ######################
+# Utilities
+
+def _get_dataframe(value_dict):
+    """ Creates pandas dataframe to play nice with seaborn
+    """
+    best_df = pd.DataFrame.from_records(
+        [
+            (acq_fn, trial, step, value)
+            for acq_fn, trial_dict in dict(value_dict).items()
+            for trial, value_history in trial_dict.items()
+            for step, value in enumerate(value_history)
+        ],
+        columns = ['Acquisition Function', 'Trial',
+                   'Datapoints Acquired', 'Best Solubility']
+    )
+    return best_df
+
+
+######################
 # Function definitions
 
 class ActivePlot():
@@ -66,17 +85,10 @@ class ActivePlot():
         final_results = self.run_trials(ds)
 
         # create pandas dataframe to play nice with seaborn
-        best_df = pd.DataFrame.from_records(
-            [
-                (acq_fn, trial, step, best)
-                for acq_fn, trial_dict in dict(final_results).items()
-                for trial, best_history in trial_dict.items()
-                for step, best in enumerate(best_history)
-            ],
-            columns=['Acquisition Function', 'Trial', 'Datapoints Acquired', 'Best Solubility']
-        )
-
+        best_df = _get_dataframe(final_results)
+        
         return best_df
+
 
     def run_trials(self, ds):
         """
@@ -98,7 +110,7 @@ class ActivePlot():
         """
         # get the real solution
         ds = self.generate_data()
-        acq_fn = self.get_acquisition(gs)
+        acq_fn = self.get_acquisition()
 
         # acquistion functions to be tested
         for i in range(self.num_trials):
@@ -128,10 +140,11 @@ class ActivePlot():
             )
 
             # run experiment
-            x, self.thompson_samples = self.bo.run(num_rounds=self.num_rounds)
+            x = self.bo.run(num_rounds=self.num_rounds)
             self.results = self.process_results(x, ds, i)
 
-        return self.results, self.thompson_samples
+        return self.results
+
 
     def process_results(self, x, ds, i):
         """ Processes the output of BayesOptExperiment.
@@ -182,7 +195,7 @@ class ActivePlot():
         ds = [tuple([i.to(self.device) for i in ds[0]])]
         return ds
 
-    def get_acquisition(self, gs):
+    def get_acquisition(self):
         """ Retrieve acquisition function and prepare for BO Experiment
         """
         acquisitions = {

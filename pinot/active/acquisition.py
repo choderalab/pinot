@@ -29,7 +29,7 @@ def _greedy(utility, q=1):
 # =============================================================================
 # MODULE FUNCTIONS
 # =============================================================================
-def thompson_sampling(net, unseen_data, y_best=0.0, q=1):
+def thompson_sampling(net, unseen_data, y_best=0.0, q=1, unique=True):
     """ Generates m Thompson samples and maximizes them.
     
     Parameters
@@ -46,6 +46,9 @@ def thompson_sampling(net, unseen_data, y_best=0.0, q=1):
     q : int
         Number of Thompson samples to obtain.
 
+    unique : bool
+        Enforce no duplicates in batch if True.
+
     Returns
     -------
     pending_pts : torch.LongTensor
@@ -57,13 +60,16 @@ def thompson_sampling(net, unseen_data, y_best=0.0, q=1):
     
     # obtain samples from posterior
     thetas = distribution.sample((q,))
+    pending_pts = torch.argmax(thetas, axis=1)
     
-    # enforce no duplicates in batch
-    pending_pts = torch.unique(torch.argmax(thetas, axis=1)).tolist()
-    
-    while len(pending_pts) < q:
-        theta = distribution.sample()
-        pending_pts.append(torch.argmax(theta).item())
+    if unique:
+
+        # enforce no duplicates in batch
+        pending_pts = torch.unique(pending_pts).tolist()
+        
+        while len(pending_pts) < q:
+            theta = distribution.sample()
+            pending_pts.append(torch.argmax(theta).item())
     
     # convert to tensor
     pending_pts = torch.LongTensor(pending_pts)

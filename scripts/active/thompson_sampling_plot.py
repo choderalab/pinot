@@ -10,13 +10,82 @@ import pinot
 from pinot.generative import SemiSupervisedNet
 from pinot.metrics import _independent
 from pinot.active.acquisition import thompson_sampling
-from pinot.active.biophysical_acquisition import biophysical_thompson_sampling
+from pinot.active.biophysical_acquisition import (biophysical_thompson_sampling,
+                                                  _sample_and_marginalize_delta_G)
+
+
+######################
+# Utilities
+
+def _get_dataframe(value_dict):
+    """ Creates pandas dataframe to play nice with seaborn
+    """
+    best_df = pd.DataFrame.from_records(
+        [
+            (acq_fn, trial, step, value)
+            for acq_fn, trial_dict in dict(value_dict).items()
+            for trial, value_history in trial_dict.items()
+            for step, value in enumerate(value_history)
+        ],
+        columns = ['Acquisition Function', 'Trial',
+                   'Datapoints Acquired', 'Value']
+    )
+    return best_df
+
+
+def _get_thompson_values(net, unseen_data, y_best=0.0, q=1, unique=True):
+    """ Gets the value associated with the Thompson Samples.
+    """
+    # obtain predictive posterior
+    gs, ys = unseen_data
+    distribution = _independent(net.condition(gs))
+    
+    # obtain samples from posterior
+    thetas = distribution.sample((q,))
+    thompson_values = torch.max(thetas, axis=1)
+    
+    # convert to tensor
+    thompson_values = torch.Tensor(thompson_values)
+    return thompson_values
+
+
+def _get_biophysical_thompson_values(
+    net,
+    unseen_data,
+    acq_func,
+    q=1,
+    y_best=0.0,
+    concentration=20,
+    dG_samples=10,
+    unique=True):
+    """ Generates m Thompson samples and maximizes them.
+    """        
+    # fill batch
+    thompson_values = []
+    for _ in range(q):
+
+        # for each thompson sample,
+        # get max, marginalizing across all distributions
+        # (and unraveling the index [find the column of max])
+        thompson_value = _sample_and_marginalize_delta_G(
+            net,
+            unseen_data,
+            concentration=concentration,
+            dG_samples=dG_samples,
+            n_samples=1
+        ).max().item()
+        thompson_values.append(thompson_value)
+
+    # convert to tensor
+    thompson_values = torch.Tensor(thompson_values)
+    return thompson_values
+
 
 
 ######################
 # Function definitions
 
-class TSBayesOpt(pinot.active.experiment.BayesOptExperiment):
+class TSBayesOptExperiment(pinot.active.experiment.BayesOptExperiment):
     """ Performs Thompson Sampling each loop.
     """
     def __init__(
@@ -26,7 +95,7 @@ class TSBayesOpt(pinot.active.experiment.BayesOptExperiment):
         **kwargs
         ):
 
-        super(TSBayesOpt, self).__init__(*args, **kwargs)
+        super(TSBayesOptExperiment, self).__init__(*args, **kwargs)
 
         self.num_thompson_samples = num_thompson_samples
 
@@ -92,7 +161,7 @@ class TSBayesOpt(pinot.active.experiment.BayesOptExperiment):
             _ts(key, idx, num_samples=num_samples)
 
 
-class ActivePlot():
+class TSActivePlot():
 
     def __init__(self, net, config,
                  lr, optimizer_type,
@@ -121,9 +190,6 @@ class ActivePlot():
         self.num_rounds = num_rounds
         self.num_epochs = num_epochs
 
-        # instantiate results dictionary
-        self.results = defaultdict(dict)
-
 
     def generate(self):
         """
@@ -132,20 +198,15 @@ class ActivePlot():
         ds = self.generate_data()
 
         # get results for each trial
-        final_results, thompson_samples = self.run_trials(ds)
+        final_results, prospective_ts, retrospective_ts = self.run_trials(ds)
 
         # create pandas dataframe to play nice with seaborn
-        best_df = pd.DataFrame.from_records(
-            [
-                (acq_fn, trial, step, best)
-                for acq_fn, trial_dict in dict(final_results).items()
-                for trial, best_history in trial_dict.items()
-                for step, best in enumerate(best_history)
-            ],
-            columns=['Acquisition Function', 'Trial', 'Datapoints Acquired', 'Best Solubility']
-        )
+        best_df = pd.DataFrame(final_results)
+        pro_ts_df = pd.DataFrame(prospective_ts)
+        retro_ts_df = pd.DataFrame(retrospective_ts)
 
-        return best_df, thompson_samples
+        return best_df, pro_ts_df, retro_ts_df
+
 
     def run_trials(self, ds):
         """
@@ -167,7 +228,7 @@ class ActivePlot():
         """
         # get the real solution
         ds = self.generate_data()
-        acq_fn = self.get_acquisition(gs)
+        acq_fn = self.get_acquisition()
 
         # acquistion functions to be tested
         for i in range(self.num_trials):
@@ -184,7 +245,7 @@ class ActivePlot():
                 )
 
             # instantiate experiment
-            self.bo = TSBayesOpt(
+            self.bo = TSBayesOptExperiment(
                 net=net,
                 data=ds[0],
                 optimizer=optimizer,
@@ -198,10 +259,50 @@ class ActivePlot():
             )
 
             # run experiment
-            x, self.thompson_samples = self.bo.run(num_rounds=self.num_rounds)
+            x, self.ts = self.bo.run(num_rounds=self.num_rounds)
             self.results = self.process_results(x, ds, i)
+            
+            for key in self.ts:
+                self.prospective_ts = self.process_thompson_samples(key, self.ts, i)
+                self.retrospective_ts = self.process_thompson_samples(key, self.ts, i)
 
-        return self.results, self.thompson_samples
+        return self.results, self.prospective_ts, self.retrospective_ts
+
+
+    def process_thompson_samples(self, key, thompson_samples, i):
+        """ Processes the output of BayesOptExperiment.
+
+        Parameters
+        ----------
+        thompson_samples : dict
+            Output of `TSBayesOptExperiment` object.
+            Keys are 'prospective' and 'retrospective'.
+            Values are torch.Tensors of indices, corresponding to Thompson samples.
+        ds : tuple
+            Dataset object
+        i : int
+            Index of loop
+
+        Returns
+        -------
+        self.thompson_samples : dict
+            Processed data
+        """
+        # record results
+        thompson_samples = []
+        for step, round_indices in enumerate(thompson_samples):
+            
+            output = ys[round_indices].flatten().tolist()
+            
+            for ts_index, ts in enumerate(thompson_samples):
+                
+                thompson_samples.append({'Acquisition Function': self.acquisition,
+                                         'Trial': i,
+                                         'Round': step,
+                                         'TS Index': ts_index,
+                                         'Value': ts})
+        return thompson_samples
+
 
     def process_results(self, x, ds, i):
         """ Processes the output of BayesOptExperiment.
@@ -238,8 +339,11 @@ class ActivePlot():
         results_data[:len(x)] = np.maximum.accumulate(output.cpu().squeeze())
 
         # record results
-        self.results[self.acquisition][i] = results_data
-        return self.results
+        results = []
+        for step, result in enumerate(results_data):
+            results.append({'Acquisition Function': self.acquisition,
+                            'Trial': i, 'Step': step, 'Value': result})
+        return results
 
 
     def generate_data(self):
@@ -252,7 +356,7 @@ class ActivePlot():
         ds = [tuple([i.to(self.device) for i in ds[0]])]
         return ds
 
-    def get_acquisition(self, gs):
+    def get_acquisition(self):
         """ Retrieve acquisition function and prepare for BO Experiment
         """
         acquisitions = {
@@ -336,7 +440,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    plot = ActivePlot(
+    plot = TSActivePlot(
         # net config
         net=args.net,
         config=args.config,

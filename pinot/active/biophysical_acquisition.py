@@ -68,19 +68,26 @@ def biophysical_thompson_sampling(
     q=1,
     y_best=0.0,
     concentration=20,
-    dG_samples=10):
+    dG_samples=10,
+    unique=True):
     """ Generates m Thompson samples and maximizes them.
     
     Parameters
     ----------
     net : pinot Net object
         Trained net.
+
     unseen_data : tuple
         Dataset from which pending points are selected.
+
     q : int
         Number of Thompson samples to obtain.
+
     y_best : float
         The best target value seen so far.
+
+    unique : bool
+        Enforce no duplicates in batch if True.
 
     Returns
     -------
@@ -107,16 +114,25 @@ def biophysical_thompson_sampling(
         pending_pt = thetas.argmax() % thetas.shape[1]
         return pending_pt.item()
 
-    # enforce no duplicates in batch
-    pending_pts = set()
+    # fill batch
+    pending_pts = []
     while len(pending_pts) < q:
+
+        # do thompson sampling
         pending_pt = _get_thompson_sample(
             net,
             unseen_data,
             concentration=concentration,
             dG_samples=dG_samples
         )
-        pending_pts.add(pending_pt)
+
+        if unique:
+            # enforce no duplicates in batch
+            pending_pts = set(pending_pts)
+            pending_pts.add(pending_pt)
+        
+        else:
+            pending_pts.append(pending_pt)
 
     # convert to tensor
     pending_pts = torch.LongTensor(list(pending_pts))
