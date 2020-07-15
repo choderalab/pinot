@@ -360,15 +360,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
 
             # get utility score
             utility = self.acquisition(distribution, y_best=self.y_best)
-            pending_pts = torch.argmax(utility)
-
-            # Compute the max probability of improvement needed for later plots
-            # Note that this probability of improvement is computed for all graphs
-            prob_improvement = pinot.active.acquisition.probability_of_improvement(
-                    pinot.metrics._independent(self.net.condition(self.g_all)),
-                                y_best=self.y_best)
-            print("Max probability of improvement:")
-            print(prob_improvement.max().detach())
+            pending_pts = [torch.argmax(utility)]
 
         # print(len(self.new), best)
         self.seen.extend([self.unseen.pop(p) for p in pending_pts])

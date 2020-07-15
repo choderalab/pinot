@@ -178,15 +178,15 @@ class ActivePlot():
         }
 
         batch_acquisitions = {
-            'ThompsonSampling': pinot.active.acquisition.thompson_sampling,
-            'WeightedSamplingExpectedImprovement': pinot.active.acquisition.exponential_weighted_ei_analytical,
-            'WeightedSamplingProbabilityOfImprovement': pinot.active.acquisition.exponential_weighted_pi,
-            'WeightedSamplingUpperConfidenceBound': pinot.active.acquisition.exponential_weighted_ucb,
-            'GreedyExpectedImprovement': pinot.active.acquisition.greedy_ei_analytical,
-            'GreedyProbabilityOfImprovement': pinot.active.acquisition.greedy_pi,
-            'GreedyUpperConfidenceBound': pinot.active.acquisition.greedy_ucb,
-            'BatchRandom': pinot.active.acquisition.batch_random,
-            'BatchTemporal': pinot.active.acquisition.batch_temporal
+            'ThompsonSampling': pinot.active.batch_acquisition.thompson_sampling,
+            'WeightedSamplingExpectedImprovement': pinot.active.batch_acquisition.exponential_weighted_ei_analytical,
+            'WeightedSamplingProbabilityOfImprovement': pinot.active.batch_acquisition.exponential_weighted_pi,
+            'WeightedSamplingUpperConfidenceBound': pinot.active.batch_acquisition.exponential_weighted_ucb,
+            'GreedyExpectedImprovement': pinot.active.batch_acquisition.greedy_ei_analytical,
+            'GreedyProbabilityOfImprovement': pinot.active.batch_acquisition.greedy_pi,
+            'GreedyUpperConfidenceBound': pinot.active.batch_acquisition.greedy_ucb,
+            'BatchRandom': pinot.active.batch_acquisition.batch_random,
+            'BatchTemporal': pinot.active.batch_acquisition.batch_temporal
         }
 
         if self.acquisition in sequential_acquisitions:
