@@ -17,21 +17,6 @@ from pinot.active.biophysical_acquisition import (biophysical_thompson_sampling,
 ######################
 # Utilities
 
-def _get_dataframe(value_dict):
-    """ Creates pandas dataframe to play nice with seaborn
-    """
-    best_df = pd.DataFrame.from_records(
-        [
-            (acq_fn, trial, step, value)
-            for acq_fn, trial_dict in dict(value_dict).items()
-            for trial, value_history in trial_dict.items()
-            for step, value in enumerate(value_history)
-        ],
-        columns = ['Acquisition Function', 'Trial',
-                   'Datapoints Acquired', 'Value']
-    )
-    return best_df
-
 
 def _get_thompson_values(net, unseen_data, y_best=0.0, q=1, unique=True):
     """ Gets the value associated with the Thompson Samples.
@@ -42,10 +27,7 @@ def _get_thompson_values(net, unseen_data, y_best=0.0, q=1, unique=True):
     
     # obtain samples from posterior
     thetas = distribution.sample((q,))
-    thompson_values = torch.max(thetas, axis=1)
-    
-    # convert to tensor
-    thompson_values = torch.Tensor(thompson_values)
+    thompson_values = torch.max(thetas, axis=1).values
     return thompson_values
 
 
@@ -145,10 +127,10 @@ class TSBayesOptExperiment(pinot.active.experiment.BayesOptExperiment):
             """
             if isinstance(self.net.output_regressor, pinot.regressors.BiophysicalRegressor):
                 # thompson sampling on ALL data
-                self.thompson_samples[key][idx] = biophysical_thompson_sampling(self.net, self.data, q=num_samples)
+                self.thompson_samples[key][idx] = _get_biophysical_thompson_values(self.net, self.data, q=num_samples)
             else:
                 # thompson sampling on UNSEEN data
-                self.thompson_samples[key][idx] = thompson_sampling(self.net, self.unseen_data, q=num_samples)
+                self.thompson_samples[key][idx] = _get_thompson_values(self.net, self.unseen_data, q=num_samples)
 
         # set net to eval
         self.net.eval()
@@ -189,6 +171,11 @@ class TSActivePlot():
         self.num_trials = num_trials
         self.num_rounds = num_rounds
         self.num_epochs = num_epochs
+
+        # recording data
+        self.results = []
+        self.prospective_ts = []
+        self.retrospective_ts = []
 
 
     def generate(self):
@@ -232,6 +219,7 @@ class TSActivePlot():
 
         # acquistion functions to be tested
         for i in range(self.num_trials):
+
             print(i)
 
             # make fresh net and optimizer
@@ -260,16 +248,30 @@ class TSActivePlot():
 
             # run experiment
             x, self.ts = self.bo.run(num_rounds=self.num_rounds)
-            self.results = self.process_results(x, ds, i)
             
-            for key in self.ts:
-                self.prospective_ts = self.process_thompson_samples(key, self.ts, i)
-                self.retrospective_ts = self.process_thompson_samples(key, self.ts, i)
+            # record results
+            self.results = self.process_results(
+                x[1:], # ignore first random pick
+                ds,
+                i
+            )
+
+            self.prospective_ts = self.process_thompson_samples(
+                self.prospective_ts,
+                self.ts['prospective'],
+                i
+            )
+
+            self.retrospective_ts = self.process_thompson_samples(
+                self.retrospective_ts,
+                self.ts['retrospective'],
+                i
+            )
 
         return self.results, self.prospective_ts, self.retrospective_ts
 
 
-    def process_thompson_samples(self, key, thompson_samples, i):
+    def process_thompson_samples(self, ts_list, ts, i):
         """ Processes the output of BayesOptExperiment.
 
         Parameters
@@ -278,8 +280,8 @@ class TSActivePlot():
             Output of `TSBayesOptExperiment` object.
             Keys are 'prospective' and 'retrospective'.
             Values are torch.Tensors of indices, corresponding to Thompson samples.
-        ds : tuple
-            Dataset object
+        ts : tuple
+            Thompson sampling values
         i : int
             Index of loop
 
@@ -289,19 +291,16 @@ class TSActivePlot():
             Processed data
         """
         # record results
-        thompson_samples = []
-        for step, round_indices in enumerate(thompson_samples):
+        for step, step_ts in enumerate(ts):
             
-            output = ys[round_indices].flatten().tolist()
-            
-            for ts_index, ts in enumerate(thompson_samples):
+            for ts_index, t in enumerate(step_ts):
                 
-                thompson_samples.append({'Acquisition Function': self.acquisition,
-                                         'Trial': i,
-                                         'Round': step,
-                                         'TS Index': ts_index,
-                                         'Value': ts})
-        return thompson_samples
+                ts_list.append({'Acquisition Function': self.acquisition,
+                                'Trial': i,
+                                'Round': step,
+                                'TS Index': ts_index,
+                                'Value': t.item()})
+        return ts_list
 
 
     def process_results(self, x, ds, i):
@@ -326,7 +325,7 @@ class TSActivePlot():
 
         # pad if experiment stopped early
         # candidates_acquired = limit + 1 because we begin with a blind pick
-        results_size = self.num_rounds * self.q + 1
+        results_size = self.num_rounds * self.q # (actually no +1)
 
         if self.net == 'multitask':
             results_data = actual_sol*np.ones((results_size, ys.size(1)))
@@ -339,11 +338,11 @@ class TSActivePlot():
         results_data[:len(x)] = np.maximum.accumulate(output.cpu().squeeze())
 
         # record results
-        results = []
         for step, result in enumerate(results_data):
-            results.append({'Acquisition Function': self.acquisition,
-                            'Trial': i, 'Step': step, 'Value': result})
-        return results
+            self.results.append({'Acquisition Function': self.acquisition,
+                                 'Trial': i, 'Datapoint Acquired': step,
+                                 'Round': step // self.q, 'Value': result})
+        return self.results
 
 
     def generate_data(self):
@@ -428,6 +427,7 @@ if __name__ == '__main__':
     parser.add_argument('--data', type=str, default='esol')
     parser.add_argument('--acquisition', type=str, default='ExpectedImprovement')
     parser.add_argument('--num_samples', type=int, default=1000)
+    parser.add_argument('--num_thompson_samples', type=int, default=1000)
     parser.add_argument('--q', type=int, default=1)
 
     parser.add_argument('--device', type=str, default='cuda:0')
