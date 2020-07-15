@@ -8,44 +8,34 @@ def test_import():
     """ """
     import pinot.metrics
 
+@pytest.fixture
+def net():
+    class Net(torch.nn.Module):
+        def __init__(self):
+            super(Net, self).__init__()
 
-def test_mse_and_rmse():
-    """ """
+        def condition(self, *args, **kwargs):
+            return torch.distributions.normal.Normal(10, 1)
+
+
+    return Net()
+
+
+def test_r2(net):
     import pinot
-
-    # we only test here that:
-    #  * the implementation is consistent with numpy
-    #  * rmse is root of mse
-    for _ in range(5):
-        x = np.random.normal(size=(10,))
-        y = np.random.normal(size=(10,))
-
-        npt.assert_almost_equal(
-            np.mean((x - y) ** 2),
-            pinot.metrics._mse(torch.tensor(x), torch.tensor(y))
-            .detach()
-            .numpy(),
-        )
-
-        npt.assert_almost_equal(
-            pinot.metrics._mse(torch.tensor(x), torch.tensor(y))
-            .pow(0.5)
-            .detach()
-            .numpy(),
-            pinot.metrics._rmse(torch.tensor(x), torch.tensor(y))
-            .detach()
-            .numpy(),
-        )
+    g = None
+    y = torch.distributions.normal.Normal(
+            torch.zeros(10, 1),
+            torch.ones(10, 1),
+            ).sample()
+    r2 = pinot.metrics.r2(net, g, y)
 
 
-def test_r2():
-    """ """
+def test_rmse(net):
     import pinot
-
-    x = np.random.normal(size=(10,))
-    y = x
-
-    npt.assert_almost_equal(
-        pinot.metrics._r2(torch.tensor(x), torch.tensor(y)).detach().numpy(),
-        1.0,
-    )
+    g = None
+    y = torch.distributions.normal.Normal(
+            torch.zeros(10, 1),
+            torch.ones(10, 1),
+            ).sample()
+    rmse = pinot.metrics.rmse(net, g, y)
