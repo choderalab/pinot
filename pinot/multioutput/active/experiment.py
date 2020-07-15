@@ -2,13 +2,13 @@ from pinot.active.experiment import BayesOptExperiment
 from torch.utils.data import WeightedRandomSampler
 
 
-class MultitaskBayesOptExperiment(BayesOptExperiment):
+class MultiOutputBayesOptExperiment(BayesOptExperiment):
     """ Implements active learning experiment with multiple task target.
     """
 
     def __init__(self, *args, **kwargs):
 
-        super(MultitaskBayesOptExperiment, self).__init__(*args, **kwargs)
+        super(MultiOutputBayesOptExperiment, self).__init__(*args, **kwargs)
 
     def acquire(self):
         """ Acquire new training data.

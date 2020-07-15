@@ -320,7 +320,10 @@ class BayesOptExperiment(ActiveLearningExperiment):
         # split input target
         gs, ys = self.unseen_data
 
-        # batch acquisition
+        # make sure we only 'acquire' fewer points than are remaining
+        self.q = min(self.q, len(self.unseen))
+
+        # acquire pending points
         pending_pts = self.acquisition(
             self.net, self.unseen_data, q=self.q, y_best=self.y_best
         )

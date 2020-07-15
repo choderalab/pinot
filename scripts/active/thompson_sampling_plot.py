@@ -101,6 +101,7 @@ class TSBayesOptExperiment(pinot.active.experiment.BayesOptExperiment):
         self.update_data()
 
         while idx < num_rounds and len(self.unseen) > 0:
+            
             self.train()
             self.thompson_sample(idx, num_rounds, num_samples=self.num_thompson_samples)
             self.acquire()
