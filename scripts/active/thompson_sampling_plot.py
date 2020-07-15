@@ -5,10 +5,12 @@ from collections import defaultdict
 
 import numpy as np
 import pandas as pd
-
 import torch
 import pinot
 from pinot.generative import SemiSupervisedNet
+from pinot.metrics import _independent
+from pinot.active.acquisition import thompson_sampling
+from pinot.active.biophysical_acquisition import biophysical_thompson_sampling
 
 
 ######################
@@ -19,25 +21,12 @@ class TSBayesOpt(pinot.active.experiment.BayesOptExperiment):
     """
     def __init__(
         self,
-        net,
-        data,
-        acquisition,
-        optimizer,
-        num_epochs=100,
-        strategy='sequential',
-        q=1,
-        num_ts_samples=1000,
-        num_samples=1000,
-        weighted_acquire=False,
-        early_stopping=True,
-        workup=_independent,
-        slice_fn=_slice_fn_tensor,
-        collate_fn=_collate_fn_tensor,
-        net_state_dict=None,
-        train_class=pinot.app.experiment.Train,
+        num_thompson_samples=1000,
+        *args,
+        **kwargs
         ):
 
-        super(TSBayesOpt, self).__init__()
+        super(TSBayesOpt, self).__init__(*args, **kwargs)
 
         self.num_thompson_samples = num_thompson_samples
 
@@ -66,7 +55,7 @@ class TSBayesOpt(pinot.active.experiment.BayesOptExperiment):
 
         while idx < num_rounds and len(self.unseen) > 0:
             self.train()
-            self.thompson_sample(idx, q=self.num_thompson_samples)
+            self.thompson_sample(idx, num_rounds, num_samples=self.num_thompson_samples)
             self.acquire()
             self.update_data()
 
@@ -78,14 +67,14 @@ class TSBayesOpt(pinot.active.experiment.BayesOptExperiment):
         return self.seen, self.thompson_samples
 
 
-    def thompson_sample(self, idx, num_samples=1):
+    def thompson_sample(self, idx, num_rounds, num_samples=1):
         """ Perform retrospective and prospective Thompson Sampling
             to check model beliefs about y_max.
         """
-        def _ts(self, key, idx, num_samples=1):
+        def _ts(key, idx, num_samples=1):
             """Get Thompson samples.
             """
-            if isinstance(self.net, BiophysicalNet):
+            if isinstance(self.net.output_regressor, pinot.regressors.BiophysicalRegressor):
                 # thompson sampling on ALL data
                 self.thompson_samples[key][idx] = biophysical_thompson_sampling(self.net, self.data, q=num_samples)
             else:
@@ -95,12 +84,12 @@ class TSBayesOpt(pinot.active.experiment.BayesOptExperiment):
         # set net to eval
         self.net.eval()
 
-        if not hasattr(self, 'ts_samples'):
+        if not hasattr(self, 'thompson_samples'):
             self.thompson_samples = {'prospective': torch.Tensor(num_rounds, num_samples),
                                      'retrospective': torch.Tensor(num_rounds, num_samples)}
         
         for key in self.thompson_samples:
-            self._ts(idx, key, num_samples=num_samples)
+            _ts(key, idx, num_samples=num_samples)
 
 
 class ActivePlot():
@@ -143,7 +132,7 @@ class ActivePlot():
         ds = self.generate_data()
 
         # get results for each trial
-        final_results = self.run_trials(ds)
+        final_results, thompson_samples = self.run_trials(ds)
 
         # create pandas dataframe to play nice with seaborn
         best_df = pd.DataFrame.from_records(
@@ -156,7 +145,7 @@ class ActivePlot():
             columns=['Acquisition Function', 'Trial', 'Datapoints Acquired', 'Best Solubility']
         )
 
-        return best_df
+        return best_df, thompson_samples
 
     def run_trials(self, ds):
         """
@@ -178,10 +167,6 @@ class ActivePlot():
         """
         # get the real solution
         ds = self.generate_data()
-        gs, ys = ds[0]
-        self.feat_dim = gs.ndata['h'].shape[1]
-        actual_sol = torch.max(ys).item()
-
         acq_fn = self.get_acquisition(gs)
 
         # acquistion functions to be tested
@@ -207,32 +192,55 @@ class ActivePlot():
                 num_epochs=self.num_epochs,
                 num_thompson_samples=self.num_thompson_samples,
                 q=self.q,
-                slice_fn=experiment._slice_fn_tuple, # pinot.active.
-                collate_fn=experiment._collate_fn_graph, # pinot.active.
+                slice_fn=pinot.active.experiment._slice_fn_tuple, # pinot.active.
+                collate_fn=pinot.active.experiment._collate_fn_graph, # pinot.active.
                 train_class=self.train
             )
 
             # run experiment
-            x = self.bo.run(num_rounds=self.num_rounds)
+            x, self.thompson_samples = self.bo.run(num_rounds=self.num_rounds)
+            self.results = self.process_results(x, ds, i)
 
-            # pad if experiment stopped early
-            # candidates_acquired = limit + 1 because we begin with a blind pick
-            results_size = self.num_rounds * self.q + 1
+        return self.results, self.thompson_samples
 
-            if self.net == 'multitask':
-                results_data = actual_sol*np.ones((results_size, ys.size(1)))
-                output = ys[x]
-                output[torch.isnan(output)] = -np.inf
-            else:
-                results_data = actual_sol*np.ones(results_size)
-                output = ys[x]
+    def process_results(self, x, ds, i):
+        """ Processes the output of BayesOptExperiment.
 
-            results_data[:len(x)] = np.maximum.accumulate(output.cpu().squeeze())
+        Parameters
+        ----------
+        x : list of int
+            Items chosen by BayesOptExperiment object
+        ds : tuple
+            Dataset object
+        i : int
+            Index of loop
 
-            # record results
-            self.results[self.acquisition][i] = results_data
+        Returns
+        -------
+        self.results : defaultdict
+            Processed data
+        """
+        gs, ys = ds[0]
+        actual_sol = torch.max(ys).item()
 
+        # pad if experiment stopped early
+        # candidates_acquired = limit + 1 because we begin with a blind pick
+        results_size = self.num_rounds * self.q + 1
+
+        if self.net == 'multitask':
+            results_data = actual_sol*np.ones((results_size, ys.size(1)))
+            output = ys[x]
+            output[torch.isnan(output)] = -np.inf
+        else:
+            results_data = actual_sol*np.ones(results_size)
+            output = ys[x]
+
+        results_data[:len(x)] = np.maximum.accumulate(output.cpu().squeeze())
+
+        # record results
+        self.results[self.acquisition][i] = results_data
         return self.results
+
 
     def generate_data(self):
         """

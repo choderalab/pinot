@@ -6,7 +6,6 @@ import abc
 import dgl
 import pinot
 from pinot.metrics import _independent
-from torch.utils.data import WeightedRandomSampler
 
 # =============================================================================
 # HELPER FUNCTIONS

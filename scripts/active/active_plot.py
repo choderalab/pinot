@@ -98,10 +98,6 @@ class ActivePlot():
         """
         # get the real solution
         ds = self.generate_data()
-        gs, ys = ds[0]
-        self.feat_dim = gs.ndata['h'].shape[1]
-        actual_sol = torch.max(ys).item()
-
         acq_fn = self.get_acquisition(gs)
 
         # acquistion functions to be tested
@@ -132,26 +128,49 @@ class ActivePlot():
             )
 
             # run experiment
-            x = self.bo.run(num_rounds=self.num_rounds)
+            x, self.thompson_samples = self.bo.run(num_rounds=self.num_rounds)
+            self.results = self.process_results(x, ds, i)
 
-            # pad if experiment stopped early
-            # candidates_acquired = limit + 1 because we begin with a blind pick
-            results_size = self.num_rounds * self.q + 1
+        return self.results, self.thompson_samples
 
-            if self.net == 'multitask':
-                results_data = actual_sol*np.ones((results_size, ys.size(1)))
-                output = ys[x]
-                output[torch.isnan(output)] = -np.inf
-            else:
-                results_data = actual_sol*np.ones(results_size)
-                output = ys[x]
+    def process_results(self, x, ds, i):
+        """ Processes the output of BayesOptExperiment.
 
-            results_data[:len(x)] = np.maximum.accumulate(output.cpu().squeeze())
+        Parameters
+        ----------
+        x : list of int
+            Items chosen by BayesOptExperiment object
+        ds : tuple
+            Dataset object
+        i : int
+            Index of loop
 
-            # record results
-            self.results[self.acquisition][i] = results_data
+        Returns
+        -------
+        self.results : defaultdict
+            Processed data
+        """
+        gs, ys = ds[0]
+        actual_sol = torch.max(ys).item()
 
+        # pad if experiment stopped early
+        # candidates_acquired = limit + 1 because we begin with a blind pick
+        results_size = self.num_rounds * self.q + 1
+
+        if self.net == 'multitask':
+            results_data = actual_sol*np.ones((results_size, ys.size(1)))
+            output = ys[x]
+            output[torch.isnan(output)] = -np.inf
+        else:
+            results_data = actual_sol*np.ones(results_size)
+            output = ys[x]
+
+        results_data[:len(x)] = np.maximum.accumulate(output.cpu().squeeze())
+
+        # record results
+        self.results[self.acquisition][i] = results_data
         return self.results
+
 
     def generate_data(self):
         """
