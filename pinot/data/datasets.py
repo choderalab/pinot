@@ -446,6 +446,7 @@ class MixedSingleAndMultipleDataset(Dataset):
 
     def to(self, device):
         self.device = device
+        return self
 
     def from_csv(
         self,
@@ -532,8 +533,6 @@ class MixedSingleAndMultipleDataset(Dataset):
                 record["g"] = pinot.graph.from_rdkit_mol(
                     Chem.MolFromSmiles(record["SMILES"])
                 )
-
-            # print(self.ds)
 
             return self
 
