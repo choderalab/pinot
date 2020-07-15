@@ -657,7 +657,7 @@ class BiophysicalVariationalGaussianProcessRegressor(
 
 
     def loss(
-        self, x_te, y_te, test_ligand_concentration=None, *args, **kwargs
+        self, x_te, y_te, test_ligand_concentration=None, nr_samples=1, *args, **kwargs
     ):
         """ Loss function.
 
@@ -683,11 +683,7 @@ class BiophysicalVariationalGaussianProcessRegressor(
         prior_tril = prior_tril.to(device=x_te.device)
         prior_mean = prior_mean.to(device=x_te.device)
 
-        distribution_measurement = self.condition(
-            x_te=x_te, test_ligand_concentration=test_ligand_concentration
-        )
-
-        nll = -distribution_measurement.log_prob(y_te.flatten()).mean()
+        
 
         log_p_u = self.exp_log_full_gaussian(
             self.y_tr_mu, self._y_tr_sigma(), prior_mean, prior_tril
@@ -696,6 +692,16 @@ class BiophysicalVariationalGaussianProcessRegressor(
         log_q_u = -self.entropy_full_gaussian(
             self.y_tr_mu, self._y_tr_sigma()
         )
+
+        nll = 0
+        for iis in range(nr_samples):
+            distribution_measurement = self.condition(
+                x_te=x_te, test_ligand_concentration=test_ligand_concentration
+            )
+
+            nll += -distribution_measurement.log_prob(y_te.flatten()).mean()
+
+        nll = nll/nr_samples
 
         loss = nll + self.kl_loss_scaling * (log_q_u - log_p_u)
 
