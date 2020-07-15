@@ -1,8 +1,34 @@
 from pinot.metrics import _independent
+from pinot.active.acquisition import _greedy
 
 # =============================================================================
 # UTILITIES
 # =============================================================================
+
+def _get_utility(
+    net,
+    unseen_data,
+    acq_func,
+    y_best=0.0,
+    concentration=20,
+    dG_samples=10,
+    n_samples=100):
+    """ Obtain distribution and utility from acquisition function.
+    """
+    # marginalize over distribution of possible delta Gs
+    assay_preds = _sample_and_marginalize_delta_G(
+        net,
+        unseen_data,
+        concentration=concentration,
+        dG_samples=dG_samples,
+        n_samples=m
+    )
+
+    # obtain utility from vanilla acquisition func
+    utility = acq_func(assay_preds, y_best=y_best)
+    return utility
+
+
 def _sample_and_marginalize_delta_G(
     net,
     unseen_data,
@@ -31,51 +57,6 @@ def _sample_and_marginalize_delta_G(
     assay_preds = torch.cat(assay_preds)
     return assay_preds
 
-
-def _get_utility(
-    net,
-    unseen_data,
-    acq_func,
-    y_best=0.0,
-    concentration=20,
-    dG_samples=10,
-    n_samples=100):
-    """ Obtain distribution and utility from acquisition function.
-    """
-    # marginalize over distribution of possible delta Gs
-    assay_preds = _sample_and_marginalize_delta_G(
-        net,
-        unseen_data,
-        concentration=concentration,
-        dG_samples=dG_samples,
-        n_samples=m
-    )
-
-    # obtain utility from vanilla acquisition func
-    utility = acq_func(assay_preds, y_best=y_best)
-    return utility
-
-def _biophysical_ei(assay_preds, y_best=0.0):
-    r"""Expected Improvement (EI).
-    """
-    improvement = torch.nn.functional.relu(assay_preds - y_best)
-    return improvement.mean(axis=0)
-
-def _biophysical_pi(assay_preds, y_best=0.0):
-    r""" Probability of Improvement (PI).
-    """
-    return (assay_preds > y_best).mean(axis=0)
-
-def _biophysical_ucb(assay_preds, y_best=0.0, kappa=0.95):
-    r""" Upper Confidence Bound (UCB).
-    """
-    kappa = 0.95
-    n_samples = len(assay_preds)
-    k = n_samples - int(kappa*n_samples)
-    high = torch.topk(assay_preds, k, axis=0).values[-1]
-    return high
-
-
 # =============================================================================
 # MODULE FUNCTIONS
 # =============================================================================
@@ -84,7 +65,7 @@ def biophysical_thompson_sampling(
     net,
     unseen_data,
     acq_func,
-    q=5,
+    q=1,
     y_best=0.0,
     concentration=20,
     dG_samples=10):
@@ -148,11 +129,16 @@ def biophysical_expected_improvement(
     net,
     unseen_data,
     y_best=0.0,
+    q=1,
     concentration=20,
     dG_samples=10,
     n_samples=100):
     """ Expected Improvement
     """
+    def _biophysical_ei(assay_preds, y_best=0.0):
+        improvement = torch.nn.functional.relu(assay_preds - y_best)
+        return improvement.mean(axis=0)
+
     utility = _get_utility(
         net,
         unseen_data,
@@ -162,7 +148,13 @@ def biophysical_expected_improvement(
         dG_samples=dG_samples,
         n_samples=n_samples,
     )
-    return utility
+
+    pending_pts = _greedy(
+        utility,
+        q=q,
+    )    
+
+    return pending_pts
 
 
 
@@ -170,11 +162,15 @@ def biophysical_probability_of_improvement(
     net,
     unseen_data,
     y_best=0.0,
+    q=1,
     concentration=20,
     dG_samples=10,
     n_samples=100):
-    """ Expected Improvement
+    """ Probability of Improvement
     """
+    def _biophysical_pi(assay_preds, y_best=0.0):
+        return (assay_preds > y_best).mean(axis=0)
+
     utility = _get_utility(
         net,
         unseen_data,
@@ -184,19 +180,32 @@ def biophysical_probability_of_improvement(
         dG_samples=dG_samples,
         n_samples=n_samples,
     )
-    return utility
+
+    pending_pts = _greedy(
+        utility,
+        q=q,
+    )    
+
+    return pending_pts
 
 
-
-def biophysical_probability_of_improvement(
+def biophysical_upper_confidence_bound(
     net,
     unseen_data,
     y_best=0.0,
+    q=1,
     concentration=20,
     dG_samples=10,
     n_samples=100):
-    """ Expected Improvement
+    """ Upper Confidence Bound Improvement
     """
+    def _biophysical_ucb(assay_preds, y_best=0.0, kappa=0.95):
+        kappa = 0.95
+        n_samples = len(assay_preds)
+        k = n_samples - int(kappa*n_samples)
+        high = torch.topk(assay_preds, k, axis=0).values[-1]
+        return high
+
     utility = _get_utility(
         net,
         unseen_data,
@@ -206,4 +215,10 @@ def biophysical_probability_of_improvement(
         dG_samples=dG_samples,
         n_samples=n_samples,
     )
-    return utility
+    
+    pending_pts = _greedy(
+        utility,
+        q=q,
+    )    
+
+    return pending_pts

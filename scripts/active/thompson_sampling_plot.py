@@ -14,7 +14,7 @@ from pinot.generative import SemiSupervisedNet
 ######################
 # Function definitions
 
-class TSBayesOpt(experiment.BayesOptExperiment):
+class TSBayesOpt(pinot.active.experiment.BayesOptExperiment):
     """ Performs Thompson Sampling each loop.
     """
     def __init__(
@@ -208,8 +208,8 @@ class ActivePlot():
                 num_epochs=self.num_epochs,
                 num_thompson_samples=self.num_thompson_samples,
                 q=self.q,
-                slice_fn=pinot.active.experiment._slice_fn_tuple, # pinot.active.
-                collate_fn=pinot.active.experiment._collate_fn_graph, # pinot.active.
+                slice_fn=experiment._slice_fn_tuple, # pinot.active.
+                collate_fn=experiment._collate_fn_graph, # pinot.active.
                 train_class=self.train
             )
 
@@ -235,7 +235,6 @@ class ActivePlot():
 
         return self.results
 
-
     def generate_data(self):
         """
         Generate data, put on GPU if possible.
@@ -245,7 +244,6 @@ class ActivePlot():
         ds = pinot.data.utils.batch(ds, len(ds), seed=None)
         ds = [tuple([i.to(self.device) for i in ds[0]])]
         return ds
-
 
     def get_acquisition(self, gs):
         """ Retrieve acquisition function and prepare for BO Experiment
@@ -257,6 +255,7 @@ class ActivePlot():
             'Uncertainty': pinot.active.acquisition.uncertainty,
             'Human': pinot.active.acquisition.temporal,
             'Random': pinot.active.acquisition.random,
+            
         }
 
         batch_acquisitions = {

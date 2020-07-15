@@ -172,9 +172,6 @@ class BayesOptExperiment(ActiveLearningExperiment):
     n_epochs : `int`
         Number of epochs.
 
-    strategy : `str`, either `sequential` or `batch`
-        Acquisition strategy.
-
     q : `int`
         Number of acquired candidates in each round.
 
@@ -213,7 +210,6 @@ class BayesOptExperiment(ActiveLearningExperiment):
         acquisition,
         optimizer,
         num_epochs=100,
-        strategy="sequential",
         q=1,
         num_samples=1000,
         weighted_acquire=False,
@@ -230,7 +226,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
         # model
         self.net = net
         self.optimizer = optimizer
-        self.n_epochs = n_epochs
+        self.num_epochs = num_epochs
 
         # data
         self.data = data
@@ -249,12 +245,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
 
         # acquisition
         self.acquisition = acquisition
-        self.strategy = strategy
-
-        # batch acquisition stuff
         self.q = q
-        self.num_samples = num_samples
-        self.weighted_acquire = weighted_acquire
 
         # early stopping
         self.early_stopping = early_stopping
@@ -299,7 +290,6 @@ class BayesOptExperiment(ActiveLearningExperiment):
 
         """
         import random
-
         random.seed(seed)
         best = random.choice(self.unseen)
         self.seen.append(self.unseen.pop(best))
@@ -316,11 +306,12 @@ class BayesOptExperiment(ActiveLearningExperiment):
         # train the model
         self.net = self.train_class(
             data=[self.seen_data],
-            optimizer=self.optimizer,
-            n_epochs=self.n_epochs,
+            optimizer=self.optimizer(self.net),
+            n_epochs=self.num_epochs,
             net=self.net,
             record_interval=999999,
         ).train()
+
 
     def acquire(self):
         """Acquire new training data."""
@@ -330,28 +321,13 @@ class BayesOptExperiment(ActiveLearningExperiment):
         # split input target
         gs, ys = self.unseen_data
 
-        # get the predictive distribution
-        # TODO:
-        # write API for sampler
-        distribution = self.net.condition(gs)
+        # batch acquisition
+        pending_pts = self.acquisition(
+            self.net, self.unseen_data, q=self.q, y_best=self.y_best
+        )
 
-        if self.strategy == "batch":
-
-            # batch acquisition
-            pending_pts = self.acquisition(
-                self.net, self.unseen_data, q=5, y_best=0.0
-            )
-
-            # pop from the back so you don't disrupt the order
-            pending_pts = pending_pts.sort(descending=True).values
-
-        else:
-            # workup
-            distribution = self.workup(distribution)
-
-            # get utility score
-            utility = self.acquisition(distribution, y_best=self.y_best)
-            pending_pts = [torch.argmax(utility)]
+        # pop from the back so you don't disrupt the order
+        pending_pts = pending_pts.sort(descending=True).values
 
         # print(len(self.new), best)
         self.seen.extend([self.unseen.pop(p) for p in pending_pts])
@@ -369,6 +345,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
         gs, ys = self.seen_data
 
         self.y_best = torch.max(ys)
+
 
     def run(self, num_rounds=999999, seed=None):
         """Run the model and conduct rounds of acquisition and training.
