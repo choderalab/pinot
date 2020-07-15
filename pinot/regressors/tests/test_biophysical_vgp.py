@@ -33,9 +33,13 @@ def test_forward(net):
             'c1ccccc1'
         )
     )
+
+    import dgl
+    g = dgl.batch([g, g])
+
     distribution = net.condition(g, test_ligand_concentration=0.001)
 
-    assert distribution.mean.shape == torch.Size([1, 1])
+    assert distribution.mean.shape == torch.Size([2, 1])
 
 def test_loss(net):
     import pinot
@@ -47,6 +51,9 @@ def test_loss(net):
             'c1ccccc1'
         )
     )
+
+    import dgl
+    g = dgl.batch([g, g])
 
     net.loss(g, torch.zeros(1, 1), 0.001)
 
@@ -63,6 +70,8 @@ def test_train(net):
     )
     train.train()
 
+
+'''
 def test_train_and_test(net):
     import pinot
     import torch
@@ -77,3 +86,4 @@ def test_train_and_test(net):
     )
 
     experiment.run()
+'''

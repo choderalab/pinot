@@ -45,3 +45,15 @@ def test_rebatch():
 
     for g, c, y in view:
         assert g.batch_size == 32
+
+
+def test_filter():
+    import pinot
+    from pinot.data import utils
+    import os
+    ds = pinot.data.moonshot_mixed()
+
+    view = ds.view('fixed_size_batch_filter_20')
+
+    for g, y, c in view:
+        assert float(c) == float(20)

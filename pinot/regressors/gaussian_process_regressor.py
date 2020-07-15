@@ -516,7 +516,7 @@ class BiophysicalVariationalGaussianProcessRegressor(
         in_features,
         kernel=None,
         log_sigma=-3.0,
-        n_inducing_points=100,
+        n_inducing_points=50,
         mu_initializer_std=0.1,
         sigma_initializer_value=-2.0,
         kl_loss_scaling=1e-2,
@@ -610,6 +610,7 @@ class BiophysicalVariationalGaussianProcessRegressor(
 
         elif output == 'measurement':
             f_sample = self._sample_f(distribution_delta_g)
+
             distribution_measurement = self._condition_measurement(
                 f_sample,
                 test_ligand_concentration=test_ligand_concentration

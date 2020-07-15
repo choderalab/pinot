@@ -34,24 +34,60 @@ def _independent(distribution):
 # =============================================================================
 # MODULE FUNCTIONS
 # =============================================================================
+def _rmse(y, y_hat):
+    """RMSE"""
+    if y_hat.dim() == 1:
+        y_hat = y_hat.unsqueeze(1)
+    assert y.shape == y_hat.shape
+    assert y.dim() == 2
+    assert y.shape[-1] == 1
+    return torch.nn.functional.mse_loss(y, y_hat).pow(0.5)
 
 def rmse(net, g, y, *args, n_samples=64, **kwargs):
     """ Rooted mean squarred error. """
 
-    y_hat = net.condition(g, *args, **kwargs).sample([n_samples]).cpu()
     y = y.cpu()
-    
-    return ((y_hat - y) ** 2).mean(dim=1).pow(0.5).mean()
+
+    results = []
+    for _ in range(n_samples):
+        y_hat = _independent(
+                net.condition(g, *args, **kwargs)
+            ).sample().cpu()
+
+        results.append(
+            _rmse(y, y_hat))
+
+    return torch.tensor(results).mean()
+
+
+
+def _r2(y, y_hat):
+    if y_hat.dim() == 1:
+        y_hat = y_hat.unsqueeze(1)
+    assert y.shape == y_hat.shape
+    assert y.dim() == 2
+    assert y.shape[-1] == 1
+
+    ss_tot = (y - y.mean()).pow(2).sum()
+    ss_res = (y_hat - y).pow(2).sum()
+
+    return 1 - torch.div(ss_res, ss_tot)
 
 def r2(net, g, y, *args, n_samples=64, **kwargs):
     """ R2 """
-    y_hat = net.condition(g, *args, **kwargs).sample([n_samples]).cpu()
+
     y = y.cpu()
 
-    ss_tot = (y - y.mean()).pow(2).sum()
-    ss_res = (y_hat - y).pow(2).sum(dim=1)
+    results = []
+    for _ in range(n_samples):
+        y_hat = _independent(
+                net.condition(g, *args, **kwargs)
+            ).sample().cpu()
 
-    return (1 - torch.div(ss_res, ss_tot)).mean()
+        results.append(
+            _r2(y, y_hat))
+
+    return torch.tensor(results).mean()
 
 
 def pearsonr(net, g, y, *args, **kwargs):
