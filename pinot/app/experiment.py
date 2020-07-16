@@ -186,7 +186,10 @@ class Test:
             # g = dgl.batch(g)
             def _batch(x):
                 if isinstance(x[0], dgl.DGLGraph):
-                    return dgl.batch(x)
+                    _x = []
+                    for _g in x:
+                        _x += dgl.unbatch(_g)
+                    return dgl.batch(_x)
 
                 else:
                     if x[0].dim() == 0:
@@ -198,13 +201,27 @@ class Test:
             xs = list(zip(*self.data))
             xs = [_batch(x) for x in xs]
 
+            # get input and auxiliary arguments
+            g = xs[0]
+            y = xs[1]
+            _args = xs[2:]
+
+            # print('here')
+
             for metric in self.metrics:  # loop through the metrics
                 results[metric.__name__][state_name] = (
-                    metric(self.net, *xs, sampler=self.sampler)
+                    metric(
+                        self.net,
+                        g,
+                        y,
+                        *_args,
+                        sampler=self.sampler,
+                    )
                     .detach()
                     .cpu()
                     .numpy()
                 )
+
 
         self.results = results
         return dict(results)
@@ -304,10 +321,13 @@ class TrainAndTest:
             lr_scheduler=self.lr_scheduler,
         )
 
+        print('training now')
+
         train.train()
 
         self.states = train.states
 
+        print('testing now')
         test = Test(
             net=self.net,
             data=self.data_te,

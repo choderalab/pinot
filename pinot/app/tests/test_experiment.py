@@ -51,7 +51,7 @@ def test_test():
     test = pinot.Test(
         net=net,
         data=pinot.data.utils.batch(pinot.data.esol()[:10], 5),
-        metrics=[pinot.mse, pinot.rmse, pinot.r2],
+        metrics=[pinot.rmse, pinot.r2],
         states=train.states,
     )
 

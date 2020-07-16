@@ -446,6 +446,7 @@ class MixedSingleAndMultipleDataset(Dataset):
 
     def to(self, device):
         self.device = device
+        return self
 
     def from_csv(
         self,
@@ -461,8 +462,8 @@ class MixedSingleAndMultipleDataset(Dataset):
         single_concentrations=[20, 50],
         single_col_names=["f_inhibition_at_20_uM", "f_inhibition_at_50_uM",],
         # scaling
-        concentration_unit_scaling=1e-6, # \mu M
-        # shuffling
+        measurement_scaling=0.01,
+        concentration_unit_scaling=0.001,
         shuffle=True,
     ):
         def _from_csv():
@@ -506,6 +507,7 @@ class MixedSingleAndMultipleDataset(Dataset):
 
                     # scaling
                     cs = [c * concentration_unit_scaling for c in cs]
+                    ys = [y * measurement_scaling for y in ys]
 
                     record["cs_multiple"] = cs
                     record["ys_multiple"] = ys
@@ -520,6 +522,7 @@ class MixedSingleAndMultipleDataset(Dataset):
 
                 # scaling
                 cs = [c * concentration_unit_scaling for c in cs]
+                ys = [y * measurement_scaling for y in ys]
 
                 record["cs_single"] = cs
                 record["ys_single"] = ys
@@ -539,8 +542,6 @@ class MixedSingleAndMultipleDataset(Dataset):
                 record["g"] = pinot.graph.from_rdkit_mol(
                     Chem.MolFromSmiles(record["SMILES"])
                 )
-
-            # print(self.ds)
 
             return self
 
@@ -584,6 +585,7 @@ class MixedSingleAndMultipleDataset(Dataset):
 
         # batch
         g = dgl.batch(gs).to(device)
+        g.ndata['h'] = g.ndata['h'].to(device)
         c = torch.tensor(cs)[:, None].to(device)
         y = torch.tensor(ys)[:, None].to(device)
 
@@ -594,14 +596,21 @@ class MixedSingleAndMultipleDataset(Dataset):
         return dgl.batch([x["g"] for x in xs]).to(device)
 
     @staticmethod
-    def _rebatch(xs, device=torch.device("cpu"), *args, **kwargs):
+    def _rebatch(xs, device=torch.device("cpu"), 
+            filter_concentration=None,
+            *args, **kwargs):
         assert len(xs) == 1
-        g, c, y = xs[0]
+        g, y, c = xs[0]
         gs = dgl.unbatch(g)
         cs = c.numpy().tolist()
         ys = y.numpy().tolist()
 
         _ds = list(zip(gs, ys, cs))
+
+        if filter_concentration is not None:
+
+            _ds = [(g, y, c) for g, y, c in _ds 
+                    if abs(float(c[0]) - filter_concentration) < 0.001]
 
         def _collate_fn(_xs):
             _gs = []
@@ -614,6 +623,7 @@ class MixedSingleAndMultipleDataset(Dataset):
                 _ys.append(_y)
 
             _gs = dgl.batch(_gs).to(device)
+            _gs.ndata['h'] = _gs.ndata['h'].to(device)
             _cs = torch.tensor(_cs).to(device)
             _ys = torch.tensor(_ys).to(device)
 
@@ -629,6 +639,17 @@ class MixedSingleAndMultipleDataset(Dataset):
             _ds = [self.all_available_pairs(self.ds)]
             self._number_of_measurements = _ds[0][1].shape[0]
             return self._rebatch(_ds, device=self.device, *args, **kwargs)
+
+        if isinstance(collate_fn, str) and collate_fn.startswith(
+                'fixed_size_batch_filter_'):
+            c_ref = float(collate_fn.split('_')[-1])
+            _ds = [self.all_available_pairs(self.ds)]
+            self._number_of_measurements = _ds[0][1].shape[0]
+            return self._rebatch(
+                    _ds, 
+                    device=self.device,
+                    filter_concentration=c_ref,
+                    *args, **kwargs)
 
         if collate_fn == "all_graphs":
             kwargs["batch_size"] = len(self)  # ensure all the graph
