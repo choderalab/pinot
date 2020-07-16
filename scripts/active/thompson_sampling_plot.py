@@ -469,7 +469,7 @@ if __name__ == '__main__':
 
     # write to disk
     if args.index_provided:
-        filename = f'{args.net}_{args.optimizer}_{args.data}_{args.acquisition}_q{args.q}_{args.index}.csv'
+        filename = f'{args.net}_{args.optimizer}_{args.data}_num_epochs{args.num_epochs}_{args.acquisition}_q{args.q}_{args.index}.csv'
     
     best_df.to_csv(f'best_{filename}')
     pro_ts_df.to_csv(f'pro_{filename}')
