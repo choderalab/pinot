@@ -255,7 +255,7 @@ class TSActivePlot():
             
             # record results
             self.results = self.process_results(
-                x[1:], # ignore first random pick
+                x, # ignore first random pick
                 ds,
                 i
             )
