@@ -6,7 +6,7 @@ do
 		do
 			for num_epochs in 400 800 1200
 			do
-				python thompson_sampling_plot.py --num_epochs $num_epochs --acquisition $acquisition --q $q --index $index
+				python thompson_sampling_plot.py --num_epochs $num_epochs --acquisition $acquisition --q $q --index $index --data moonshot
 			done
 		done
 	done
