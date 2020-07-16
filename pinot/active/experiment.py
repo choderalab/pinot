@@ -361,14 +361,8 @@ class BayesOptExperiment(ActiveLearningExperiment):
             # get utility score
             utility = self.acquisition(distribution, y_best=self.y_best)
             pending_pts = torch.argmax(utility)
-
-            # Compute the max probability of improvement needed for later plots
-            # Note that this probability of improvement is computed for all graphs
-            prob_improvement = pinot.active.acquisition.probability_of_improvement(
-                    pinot.metrics._independent(self.net.condition(self.g_all)),
-                                y_best=self.y_best)
-            print("Max probability of improvement:")
-            print(prob_improvement.max().detach())
+            if pending_pts.ndim == 0:
+                pending_pts = [pending_pts]
 
         # print(len(self.new), best)
         self.seen.extend([self.unseen.pop(p) for p in pending_pts])
@@ -409,15 +403,41 @@ class BayesOptExperiment(ActiveLearningExperiment):
         self.blind_pick(seed=seed)
         self.update_data()
 
-        while idx < num_rounds and len(self.unseen) > 0:
+        
+        max_prob_arr = []
+        max_ucb_arr = []
+        max_ucb_minus_ybest = []
+
+
+        while idx < num_rounds: # and len(self.unseen) > 0:
             self.train()
             self.acquire()
             self.update_data()
 
-            if self.early_stopping and self.y_best == self.best_possible:
-                break
+            max_prob = pinot.active.acquisition.probability_of_improvement(
+                    pinot.metrics._independent(self.net.condition(self.g_all)),
+                                y_best=self.y_best).max().detach().cpu().numpy()
+
+            max_ucb = pinot.active.acquisition.upper_confidence_bound(
+                    pinot.metrics._independent(self.net.condition(self.g_all)),
+                                y_best=self.y_best).max().detach().cpu().numpy()
+
+
+            max_prob_arr.append(max_prob)
+            max_ucb_arr.append(max_ucb)
+            max_ucb_minus_ybest.append(max_ucb - self.y_best.cpu().numpy())
+            
+            #if self.early_stopping and self.y_best == self.best_possible:
+            #    break
 
             idx += 1
+
+        print("Max probability of improvement:")
+        print(max_prob_arr)
+        print("Max UCB:")
+        print(max_ucb_arr)
+        print("Max UCB - ybest")
+        print(max_ucb_minus_ybest)
 
         return self.seen
 
@@ -456,9 +476,9 @@ class SemiSupervisedBayesOptExperiment(BayesOptExperiment):
         # Compute the unsupervised scaling constant and reset it
         # as the number of labeled data points change after every epoch
         if self.unlabeled_data:
-            unsup_scale = float(len(self.old_data))/(len(self.new_data) + len(self.unlabeled_data))
+            unsup_scale = float(len(self.seen_data))/(len(self.unseen_data) + len(self.unlabeled_data))
         else:
-            unsup_scale = float(len(self.old_data))/len(self.new_data)
+            unsup_scale = float(len(self.seen_data))/len(self.unseen_data)
         
         # Update the unsupervised scale constant of SemiSupervisedNet
         self.net.unsup_scale = unsup_scale

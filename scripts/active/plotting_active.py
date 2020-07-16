@@ -5,7 +5,7 @@ from collections import defaultdict
 
 import numpy as np
 import pandas as pd
-
+import os
 import torch
 import pinot
 import pinot.active.experiment as experiment
@@ -218,7 +218,7 @@ class ActivePlot():
             output_regressor = pinot.regressors.NeuralNetworkRegressor
             net = SemiSupervisedNet(
                 representation=representation,
-                output_regressor=output_regressor
+                output_regressor_class=output_regressor
             )
 
         elif self.net == 'semi_gp':
@@ -226,14 +226,14 @@ class ActivePlot():
 
             net = SemiSupervisedNet(
                 representation=representation,
-                output_regressor=output_regressor,
+                output_regressor_class=output_regressor,
             )
 
         elif self.net == 'multitask':
             output_regressor = pinot.regressors.ExactGaussianProcessRegressor
             net = pinot.multitask.MultitaskNet(
                 representation=representation,
-                output_regressor=output_regressor,
+                output_regressor_class=output_regressor,
             )
 
         return net
@@ -262,10 +262,11 @@ if __name__ == '__main__':
     parser.add_argument('--device', type=str, default='cuda:0')
     parser.add_argument('--num_trials', type=int, default=1)
     parser.add_argument('--num_rounds', type=int, default=50)
-    parser.add_argument('--num_epochs', type=int, default=10)
+    parser.add_argument('--num_epochs', type=int, default=20)
 
     parser.add_argument('--index_provided', type=bool, default=True)
     parser.add_argument('--index', type=int, default=0)
+    parser.add_argument('--output_folder', type=str, default="plotting_active")
 
     args = parser.parse_args()
 
@@ -296,5 +297,5 @@ if __name__ == '__main__':
 
     # save to disk
     if args.index_provided:
-        filename = f'{args.net}_{representation}_{args.optimizer}_{args.data}_{args.acquisition}_q{args.q}_{args.index}.csv'
-    best_df.to_csv(filename)
+        filename = f'{args.net}_{representation}_{args.optimizer}_{args.data}_{args.acquisition}_q{args.q}_{args.index}_{args.num_epochs}.csv'
+    best_df.to_csv(os.path.join(args.output_folder, filename))
