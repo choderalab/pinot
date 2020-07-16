@@ -428,7 +428,7 @@ if __name__ == '__main__':
     parser.add_argument('--data', type=str, default='esol')
     parser.add_argument('--acquisition', type=str, default='ExpectedImprovement')
     parser.add_argument('--num_samples', type=int, default=1000)
-    parser.add_argument('--num_thompson_samples', type=int, default=10000)
+    parser.add_argument('--num_thompson_samples', type=int, default=1000)
     parser.add_argument('--q', type=int, default=1)
 
     parser.add_argument('--device', type=str, default='cuda:0')
