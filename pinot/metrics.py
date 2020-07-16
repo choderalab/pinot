@@ -43,16 +43,16 @@ def _rmse(y, y_hat):
     assert y.shape[-1] == 1
     return torch.nn.functional.mse_loss(y, y_hat).pow(0.5)
 
-def rmse(net, g, y, *args, n_samples=64, **kwargs):
+def rmse(net, g, y, *args, n_samples=16, **kwargs):
     """ Rooted mean squarred error. """
 
-    y = y.cpu()
+    y = y.detach().cpu()
 
     results = []
     for _ in range(n_samples):
         y_hat = _independent(
                 net.condition(g, *args, **kwargs)
-            ).sample().cpu()
+            ).sample().detach().cpu()
 
         results.append(
             _rmse(y, y_hat))
@@ -73,21 +73,16 @@ def _r2(y, y_hat):
 
     return 1 - torch.div(ss_res, ss_tot)
 
-def r2(net, g, y, *args, n_samples=64, **kwargs):
+def r2(net, g, y, *args, n_samples=16, **kwargs):
     """ R2 """
 
-    y = y.cpu()
+    y = y.detach().cpu()
 
-    results = []
-    for _ in range(n_samples):
-        y_hat = _independent(
+    y_hat = _independent(
                 net.condition(g, *args, **kwargs)
-            ).sample().cpu()
+            ).mean.detach().cpu()
 
-        results.append(
-            _r2(y, y_hat))
-
-    return torch.tensor(results).mean()
+    return _r2(y, y_hat)
 
 
 def pearsonr(net, g, y, *args, **kwargs):

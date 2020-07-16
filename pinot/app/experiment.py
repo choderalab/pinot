@@ -222,7 +222,6 @@ class Test:
                     .numpy()
                 )
 
-                print(results[metric.__name__][state_name])
 
         self.results = results
         return dict(results)
@@ -322,10 +321,13 @@ class TrainAndTest:
             lr_scheduler=self.lr_scheduler,
         )
 
+        print('training now')
+
         train.train()
 
         self.states = train.states
 
+        print('testing now')
         test = Test(
             net=self.net,
             data=self.data_te,

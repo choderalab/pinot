@@ -21,7 +21,7 @@ do
                                 do
 
                                     name="_"$output_regressor"_"$lr"_"$log_sigma"_"$mu_initializer_std"_"$sigma_initializer_value"_"$n_inducing_points"_"$n_epochs
-                                    bsub -q gpuqueue -J $name -m "ld-gpu ls-gpu lt-gpu lg-gpu lu-gpu" -n 4 -gpu "num=1:j_exclusive=yes" -R "rusage[mem=4] span[hosts=1]" -W 1:00 -o %J.stdout -eo %J.stderr python tune_gp.py --layer $layer --optimizer $opt --lr $lr --out $name --n_epochs $n_epochs --config 32 tanh 32 tanh 32 tanh --output_regressor $output_regressor --log_sigma $log_sigma --mu_initializer_std $mu_initializer_std --sigma_initializer_value $sigma_initializer_value --n_inducing_points $n_inducing_points --data moonshot 
+                                    bsub -q gpuqueue -J $name -m "ld-gpu ls-gpu lt-gpu lg-gpu lu-gpu" -n 4 -gpu "num=1:j_exclusive=yes" -R "rusage[mem=4] span[hosts=1]" -W 1:00 -o %J.stdout -eo %J.stderr python tune_gp.py --layer $layer --optimizer $opt --lr $lr --out $name --n_epochs $n_epochs --config 32 tanh 32 tanh 32 tanh --output_regressor $output_regressor --log_sigma $log_sigma --mu_initializer_std $mu_initializer_std --sigma_initializer_value $sigma_initializer_value --n_inducing_points $n_inducing_points --data esol 
 
 done
 done

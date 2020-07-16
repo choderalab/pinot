@@ -462,7 +462,8 @@ class MixedSingleAndMultipleDataset(Dataset):
         single_concentrations=[20, 50],
         single_col_names=["f_inhibition_at_20_uM", "f_inhibition_at_50_uM",],
         # scaling
-        concentration_unit_scaling=1.0,
+        measurement_scaling=0.01,
+        concentration_unit_scaling=0.001,
     ):
         def _from_csv():
             # read single and multiple data
@@ -505,6 +506,7 @@ class MixedSingleAndMultipleDataset(Dataset):
 
                     # scaling
                     cs = [c * concentration_unit_scaling for c in cs]
+                    ys = [y * measurement_scaling for y in ys]
 
                     record["cs_multiple"] = cs
                     record["ys_multiple"] = ys
@@ -519,6 +521,7 @@ class MixedSingleAndMultipleDataset(Dataset):
 
                 # scaling
                 cs = [c * concentration_unit_scaling for c in cs]
+                ys = [y * measurement_scaling for y in ys]
 
                 record["cs_single"] = cs
                 record["ys_single"] = ys
@@ -576,6 +579,7 @@ class MixedSingleAndMultipleDataset(Dataset):
 
         # batch
         g = dgl.batch(gs).to(device)
+        g.ndata['h'] = g.ndata['h'].to(device)
         c = torch.tensor(cs)[:, None].to(device)
         y = torch.tensor(ys)[:, None].to(device)
 
@@ -598,9 +602,10 @@ class MixedSingleAndMultipleDataset(Dataset):
         _ds = list(zip(gs, ys, cs))
 
         if filter_concentration is not None:
+            print(filter_concentration)
 
             _ds = [(g, y, c) for g, y, c in _ds 
-                    if float(c[0]) == filter_concentration]
+                    if abs(float(c[0]) - filter_concentration) < 0.001]
 
         def _collate_fn(_xs):
             _gs = []
@@ -613,6 +618,7 @@ class MixedSingleAndMultipleDataset(Dataset):
                 _ys.append(_y)
 
             _gs = dgl.batch(_gs).to(device)
+            _gs.ndata['h'] = _gs.ndata['h'].to(device)
             _cs = torch.tensor(_cs).to(device)
             _ys = torch.tensor(_ys).to(device)
 

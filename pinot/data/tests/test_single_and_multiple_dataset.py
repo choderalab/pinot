@@ -53,7 +53,11 @@ def test_filter():
     import os
     ds = pinot.data.moonshot_mixed()
 
-    view = ds.view('fixed_size_batch_filter_20')
+    view = ds.view('fixed_size_batch_filter_0.02')
 
     for g, y, c in view:
+        print(c)
         assert float(c) == float(20)
+
+
+    print(len(view))

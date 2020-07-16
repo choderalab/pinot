@@ -121,7 +121,7 @@ class ExactGaussianProcessRegressor(GaussianProcessRegressor):
 
         return k_tr_tr, k_te_te, k_te_tr, k_tr_te, l_low, alpha
 
-    def loss(self, x_tr, y_tr):
+    def loss(self, x_tr, y_tr, *args, **kwargs):
         r""" Compute the loss.
 
         Note
@@ -167,7 +167,7 @@ class ExactGaussianProcessRegressor(GaussianProcessRegressor):
 
         return nll
 
-    def condition(self, x_te, x_tr=None, y_tr=None, sampler=None):
+    def condition(self, x_te, *args, x_tr=None, y_tr=None, **kwargs):
         r""" Calculate the predictive distribution given `x_te`.
 
         Note
@@ -421,7 +421,7 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
 
         return predictive_mean, predictive_cov
 
-    def condition(self, x_te, sampler=None):
+    def condition(self, x_te, *args, **kwargs):
         """
 
         Parameters
@@ -435,6 +435,8 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
         -------
 
         """
+        
+
         predictive_mean, predictive_cov = self.forward(x_te)
 
         distribution = torch.distributions.multivariate_normal.MultivariateNormal(
@@ -443,7 +445,7 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
 
         return distribution
 
-    def loss(self, x_te, y_te):
+    def loss(self, x_te, y_te, *args, **kwargs):
         """ Loss function.
 
         Parameters
@@ -516,7 +518,7 @@ class BiophysicalVariationalGaussianProcessRegressor(
         in_features,
         kernel=None,
         log_sigma=-3.0,
-        n_inducing_points=50,
+        n_inducing_points=100,
         mu_initializer_std=0.1,
         sigma_initializer_value=-2.0,
         kl_loss_scaling=1e-2,
