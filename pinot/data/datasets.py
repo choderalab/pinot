@@ -464,6 +464,7 @@ class MixedSingleAndMultipleDataset(Dataset):
         # scaling
         measurement_scaling=0.01,
         concentration_unit_scaling=0.001,
+        shuffle=True,
     ):
         def _from_csv():
             # read single and multiple data
@@ -531,6 +532,11 @@ class MixedSingleAndMultipleDataset(Dataset):
             df = df.apply(flatten_single, axis=1)
 
             self.ds = df.to_dict(orient="records")
+            
+            # shuffle
+            if shuffle is True:
+                import random
+                random.shuffle(self.ds)
 
             for record in self.ds:
                 record["g"] = pinot.graph.from_rdkit_mol(
@@ -658,6 +664,16 @@ class MixedSingleAndMultipleDataset(Dataset):
         return torch.utils.data.DataLoader(
             dataset=self, collate_fn=collate_fn, *args, **kwargs,
         )
+
+
+class UnlabeledDataset(Dataset):
+    def __init__(self, ds=None):
+        super(UnlabeledDataset, self).__init__(ds)
+    
+    def from_txt(self, *args, **kwargs):
+        """ Read from txt file """
+        self.ds = pinot.data.utils.load_unlabeled_data(*args, **kwargs)()
+        return self
 
 
 # =============================================================================
