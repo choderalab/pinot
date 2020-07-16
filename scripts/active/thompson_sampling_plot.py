@@ -436,7 +436,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--device', type=str, default='cuda:0')
     parser.add_argument('--num_trials', type=int, default=1)
-    parser.add_argument('--num_rounds', type=int, default=50)
+    parser.add_argument('--num_rounds', type=int, default=100)
     parser.add_argument('--num_epochs', type=int, default=10)
 
     parser.add_argument('--index_provided', type=bool, default=True)
