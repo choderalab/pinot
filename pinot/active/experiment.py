@@ -374,12 +374,16 @@ class BayesOptExperiment(ActiveLearningExperiment):
         self.blind_pick(seed=seed)
         self.update_data()
 
-        while idx < num_rounds and len(self.unseen) > 0:
+        while idx < num_rounds:
             
             if self.early_stopping and self.y_best == self.best_possible:
                 break
 
             self.train()
+
+            if not self.unseen:
+                break
+
             self.acquire()
             self.update_data()
 
