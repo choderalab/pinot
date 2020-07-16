@@ -109,10 +109,8 @@ class TSBayesOptExperiment(pinot.active.experiment.BayesOptExperiment):
 
             self.acquire()
             self.update_data()
-            
-            if self.early_stopping and self.y_best == self.best_possible:
-                break
 
+            print(len(self.unseen))
             idx += 1
 
         return self.seen, self.thompson_samples
