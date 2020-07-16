@@ -602,7 +602,6 @@ class MixedSingleAndMultipleDataset(Dataset):
         _ds = list(zip(gs, ys, cs))
 
         if filter_concentration is not None:
-            print(filter_concentration)
 
             _ds = [(g, y, c) for g, y, c in _ds 
                     if abs(float(c[0]) - filter_concentration) < 0.001]

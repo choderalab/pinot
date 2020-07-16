@@ -56,8 +56,6 @@ def test_filter():
     view = ds.view('fixed_size_batch_filter_0.02')
 
     for g, y, c in view:
-        print(c)
-        assert float(c) == float(20)
+        assert abs(c - 0.02) < 0.01
 
 
-    print(len(view))
