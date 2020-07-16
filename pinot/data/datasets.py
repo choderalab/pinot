@@ -446,7 +446,6 @@ class MixedSingleAndMultipleDataset(Dataset):
 
     def to(self, device):
         self.device = device
-        return self
 
     def from_csv(
         self,
@@ -462,7 +461,9 @@ class MixedSingleAndMultipleDataset(Dataset):
         single_concentrations=[20, 50],
         single_col_names=["f_inhibition_at_20_uM", "f_inhibition_at_50_uM",],
         # scaling
-        concentration_unit_scaling=1.0,
+        concentration_unit_scaling=1e-6, # \mu M
+        # shuffling
+        shuffle=True,
     ):
         def _from_csv():
             # read single and multiple data
@@ -528,11 +529,18 @@ class MixedSingleAndMultipleDataset(Dataset):
             df = df.apply(flatten_single, axis=1)
 
             self.ds = df.to_dict(orient="records")
+            
+            # shuffle
+            if shuffle is True:
+                import random
+                random.shuffle(self.ds)
 
             for record in self.ds:
                 record["g"] = pinot.graph.from_rdkit_mol(
                     Chem.MolFromSmiles(record["SMILES"])
                 )
+
+            # print(self.ds)
 
             return self
 
@@ -586,9 +594,7 @@ class MixedSingleAndMultipleDataset(Dataset):
         return dgl.batch([x["g"] for x in xs]).to(device)
 
     @staticmethod
-    def _rebatch(xs, device=torch.device("cpu"), 
-            filter_concentration=None,
-            *args, **kwargs):
+    def _rebatch(xs, device=torch.device("cpu"), *args, **kwargs):
         assert len(xs) == 1
         g, c, y = xs[0]
         gs = dgl.unbatch(g)
@@ -596,10 +602,6 @@ class MixedSingleAndMultipleDataset(Dataset):
         ys = y.numpy().tolist()
 
         _ds = list(zip(gs, ys, cs))
-
-        if filter_concentration is not None:
-            _ds = [(g, y, c) for g, y, c in _ds 
-                    if float(c[0]) == filter_concentration]
 
         def _collate_fn(_xs):
             _gs = []
@@ -627,17 +629,6 @@ class MixedSingleAndMultipleDataset(Dataset):
             _ds = [self.all_available_pairs(self.ds)]
             self._number_of_measurements = _ds[0][1].shape[0]
             return self._rebatch(_ds, device=self.device, *args, **kwargs)
-
-        if isinstance(collate_fn, str) and collate_fn.startswith(
-                'fixed_size_batch_filter_'):
-            c_ref = float(collate_fn.split('_')[-1])
-            _ds = [self.all_available_pairs(self.ds)]
-            self._number_of_measurements = _ds[0][1].shape[0]
-            return self._rebatch(
-                    _ds, 
-                    device=self.device,
-                    filter_concentration=c_ref,
-                    *args, **kwargs)
 
         if collate_fn == "all_graphs":
             kwargs["batch_size"] = len(self)  # ensure all the graph
