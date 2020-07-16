@@ -74,7 +74,7 @@ class TSBayesOptExperiment(pinot.active.experiment.BayesOptExperiment):
 
         super(TSBayesOptExperiment, self).__init__(*args, **kwargs)
 
-        self.early_stopping=False
+        self.early_stopping = False
         self.num_thompson_samples = num_thompson_samples
 
 
@@ -100,13 +100,17 @@ class TSBayesOptExperiment(pinot.active.experiment.BayesOptExperiment):
         self.blind_pick(seed=seed)
         self.update_data()
 
-        while idx < num_rounds and len(self.unseen) > 0:
-            
+        while idx < num_rounds:
+
             self.train()
-            self.thompson_sample(idx, num_rounds, num_samples=self.num_thompson_samples)
+            self.thompson_sample(num_samples=self.num_thompson_samples)
+            
+            if not self.unseen:
+                break
+
             self.acquire()
             self.update_data()
-
+            
             if self.early_stopping and self.y_best == self.best_possible:
                 break
 
@@ -115,29 +119,32 @@ class TSBayesOptExperiment(pinot.active.experiment.BayesOptExperiment):
         return self.seen, self.thompson_samples
 
 
-    def thompson_sample(self, idx, num_rounds, num_samples=1):
+    def thompson_sample(self, num_samples=1):
         """ Perform retrospective and prospective Thompson Sampling
             to check model beliefs about y_max.
         """
-        def _ts(key, idx, data, num_samples=1):
+        def _ts(key, data, num_samples=1):
             """Get Thompson samples.
             """
             if isinstance(self.net.output_regressor, pinot.regressors.BiophysicalRegressor):
-                self.thompson_samples[key][idx] = _get_biophysical_thompson_values(self.net, data, q=num_samples)
+                ts_values = _get_biophysical_thompson_values(self.net, data, q=num_samples)
             else:
-                self.thompson_samples[key][idx] = _get_thompson_values(self.net, data, q=num_samples)
+                ts_values = _get_thompson_values(self.net, data, q=num_samples)
+            self.thompson_samples[key].append(ts_values)
 
         # set net to eval
         self.net.eval()
 
+        # instantiate thompson samples dict if necessary
         if not hasattr(self, 'thompson_samples'):
-            self.thompson_samples = {'prospective': torch.Tensor(num_rounds, num_samples),
-                                     'retrospective': torch.Tensor(num_rounds, num_samples)}
+            self.thompson_samples = {'prospective': [],
+                                     'retrospective': []}
         
         for key in self.thompson_samples:
             # thompson sampling on UNSEEN data if prospective
             data = self.unseen_data if key == 'prospective' else self.data
-            _ts(key, idx, data, num_samples=num_samples)
+            if len(data):
+                _ts(key, data, num_samples=num_samples)
 
 
 class TSActivePlot():
@@ -322,7 +329,7 @@ class TSActivePlot():
 
         # pad if experiment stopped early
         # candidates_acquired = limit + 1 because we begin with a blind pick
-        results_size = self.num_rounds * self.q # (actually no +1)
+        results_size = len(ys) + 1
 
         if self.net == 'multitask':
             results_data = actual_sol*np.ones((results_size, ys.size(1)))
@@ -415,8 +422,8 @@ if __name__ == '__main__':
     parser.add_argument('--net', type=str, default='ExactGaussianProcessRegressor')
     parser.add_argument('--config', nargs="+", type=str,
         default=["GraphConv", "32", "activation", "tanh",
-        "GraphConv", "32", "activation", "tanh",
-        "GraphConv", "32", "activation", "tanh"])
+                 "GraphConv", "32", "activation", "tanh",
+                 "GraphConv", "32", "activation", "tanh"])
 
     parser.add_argument('--lr', type=float, default=1e-4)
     parser.add_argument('--optimizer', type=str, default='Adam')
@@ -424,7 +431,7 @@ if __name__ == '__main__':
     parser.add_argument('--data', type=str, default='esol')
     parser.add_argument('--acquisition', type=str, default='ExpectedImprovement')
     parser.add_argument('--num_samples', type=int, default=1000)
-    parser.add_argument('--num_thompson_samples', type=int, default=1000)
+    parser.add_argument('--num_thompson_samples', type=int, default=10000)
     parser.add_argument('--q', type=int, default=1)
 
     parser.add_argument('--device', type=str, default='cuda:0')
@@ -460,10 +467,13 @@ if __name__ == '__main__':
         num_epochs=args.num_epochs,
     )
 
-    best_df = plot.generate()
-    representation = args.config[0]
+    # run experiment
+    best_df, pro_ts_df, retro_ts_df = plot.generate()
 
-    # save to disk
+    # write to disk
     if args.index_provided:
         filename = f'{args.net}_{representation}_{args.optimizer}_{args.data}_{args.acquisition}_q{args.q}_{args.index}.csv'
-    best_df.to_csv(filename)
+    
+    best_df.to_csv(f'best_{filename}')
+    pro_ts_df.to_csv(f'pro_{filename}')
+    retro_ts_df.to_csv(f'retro_{filename}')

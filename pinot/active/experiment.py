@@ -337,8 +337,11 @@ class BayesOptExperiment(ActiveLearningExperiment):
 
     def update_data(self):
         """Update the internal data using old and new."""
-        # grab new data
-        self.unseen_data = self.slice_fn(self.data, self.unseen)
+        if len(self.unseen):
+            # grab new data
+            self.unseen_data = self.slice_fn(self.data, self.unseen)
+        else:
+            self.unseen_data = tuple()
 
         # grab old data
         self.seen_data = self.slice_fn(self.data, self.seen)
@@ -372,12 +375,13 @@ class BayesOptExperiment(ActiveLearningExperiment):
         self.update_data()
 
         while idx < num_rounds and len(self.unseen) > 0:
+            
+            if self.early_stopping and self.y_best == self.best_possible:
+                break
+
             self.train()
             self.acquire()
             self.update_data()
-
-            if self.early_stopping and self.y_best == self.best_possible:
-                break
 
             idx += 1
 
