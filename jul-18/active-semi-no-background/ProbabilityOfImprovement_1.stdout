@@ -1,0 +1,51 @@
+Sender: LSF System <lsfadmin@ls08>
+Subject: Job 15925269: <no-background> in cluster <lila> Done
+
+Job <no-background> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Sun Jul 19 13:30:52 2020
+Job was executed on host(s) <12*ls08>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Sun Jul 19 13:30:56 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Sun Jul 19 13:30:56 2020
+Terminated at Sun Jul 19 13:31:36 2020
+Results reported at Sun Jul 19 13:31:36 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/plotting_active.py --net semi_gp --num_rounds 4 --num_trials 1 --num_epochs 1 --data moonshot --q 96 --acquisition ProbabilityOfImprovement --output_folder /home/nguyenm5/coding/pinot/jul-18/active-semi-no-background --index 1
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   355.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.18 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   41 sec.
+    Turnaround time :                            44 sec.
+
+The output (if any) follows:
+
+0
+MPI, UCB, UCB-ybest, Expected Improv
+[array(0.4760636, dtype=float32), array(0.4068061, dtype=float32), array(0.39747345, dtype=float32), array(0.3965233, dtype=float32)]
+[array(1.3595834, dtype=float32), array(1.3589394, dtype=float32), array(1.3583994, dtype=float32), array(1.3577539, dtype=float32)]
+[array(0.40808982, dtype=float32), array(0.37114614, dtype=float32), array(0.36590767, dtype=float32), array(0.36526215, dtype=float32)]
+[array(0.07908847, dtype=float32), array(0.06287512, dtype=float32), array(0.06077953, dtype=float32), array(0.06054968, dtype=float32)]
+[array(0.47606272, dtype=float32), array(0.40680408, dtype=float32), array(0.38943326, dtype=float32), array(0.3735881, dtype=float32)]
+[array(1.3595988, dtype=float32), array(1.3590137, dtype=float32), array(1.3533242, dtype=float32), array(1.3363159, dtype=float32)]
+[array(0.4081052, dtype=float32), array(0.3712204, dtype=float32), array(0.36083245, dtype=float32), array(0.34382415, dtype=float32)]
+[array(0.07909671, dtype=float32), array(0.06288747, dtype=float32), array(0.05891547, dtype=float32), array(0.05267648, dtype=float32)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-18/active-semi-no-background/ProbabilityOfImprovement_1.stderr> for stderr output of this job.
+

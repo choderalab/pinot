@@ -1,0 +1,51 @@
+Sender: LSF System <lsfadmin@lt04>
+Subject: Job 15925267: <no-background> in cluster <lila> Done
+
+Job <no-background> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Sun Jul 19 13:30:52 2020
+Job was executed on host(s) <12*lt04>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Sun Jul 19 13:30:56 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Sun Jul 19 13:30:56 2020
+Terminated at Sun Jul 19 13:31:43 2020
+Results reported at Sun Jul 19 13:31:43 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/plotting_active.py --net semi_gp --num_rounds 4 --num_trials 1 --num_epochs 1 --data moonshot --q 96 --acquisition UpperConfidenceBound --output_folder /home/nguyenm5/coding/pinot/jul-18/active-semi-no-background --index 1
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   392.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.20 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   49 sec.
+    Turnaround time :                            51 sec.
+
+The output (if any) follows:
+
+0
+MPI, UCB, UCB-ybest, Expected Improv
+[array(0.9998459, dtype=float32), array(0.4025213, dtype=float32), array(0.40225548, dtype=float32), array(0.40195292, dtype=float32)]
+[array(1.3620408, dtype=float32), array(1.3618435, dtype=float32), array(1.3616276, dtype=float32), array(1.3613904, dtype=float32)]
+[array(1.1107123, dtype=float32), array(0.36935174, dtype=float32), array(0.36913586, dtype=float32), array(0.36889863, dtype=float32)]
+[array(0.68850243, dtype=float32), array(0.06201125, dtype=float32), array(0.06193974, dtype=float32), array(0.06185997, dtype=float32)]
+[array(0.999846, dtype=float32), array(0.3918054, dtype=float32), array(0.3898092, dtype=float32), array(0.3890589, dtype=float32)]
+[array(1.3620558, dtype=float32), array(1.3553997, dtype=float32), array(1.3477324, dtype=float32), array(1.3366618, dtype=float32)]
+[array(1.1107273, dtype=float32), array(0.362908, dtype=float32), array(0.3552407, dtype=float32), array(0.3441701, dtype=float32)]
+[array(0.68850106, dtype=float32), array(0.05955789, dtype=float32), array(0.05689744, dtype=float32), array(0.0527762, dtype=float32)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-18/active-semi-no-background/UpperConfidenceBound_1.stderr> for stderr output of this job.
+
