@@ -41,12 +41,12 @@ class BiophysicalRegressor(BaseRegressor):
     def _condition_delta_g(self, x_te, *args, **kwargs):
         return self.base_regressor.condition(x_te, *args, **kwargs)
 
-    def _condition_measurement(self, concentration=1e-3, _delta_g_sample=None):
-        if _delta_g_sample is None:
-            _delta_g_sample = self._condition_delta_g()
+    def _condition_measurement(self, x_te, concentration=1e-3, delta_g_sample=None):
+        if delta_g_sample is None:
+            delta_g_sample = self._condition_delta_g(x_te).rsample()
 
         distribution_measurement = torch.distributions.normal.Normal(
-            loc=self._get_measurement(delta_g, concentration=concentration),
+            loc=self._get_measurement(delta_g_sample, concentration=concentration),
             scale=self.log_sigma_measurement.exp()
         )
 
@@ -54,15 +54,15 @@ class BiophysicalRegressor(BaseRegressor):
         self, 
         *args,
         output="measurement", 
-        **kwargs.
+        **kwargs,
     ):
         if output == "measurement":
-            return self._condition_measurement(self, *args, **kwargs)
+            return self._condition_measurement(*args, **kwargs)
 
         elif output == "delta_g":
-            return self._condition_delta_g(self, *args, **kwargs)
+            return self._condition_delta_g(*args, **kwargs)
 
         else:
-            raise RuntimeError('We only support condition measurement and delta g")
+            raise RuntimeError('We only support condition measurement and delta g')
 
         

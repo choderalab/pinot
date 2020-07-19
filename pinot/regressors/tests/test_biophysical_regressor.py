@@ -14,7 +14,8 @@ def test_init():
 def net():
     import pinot
     regressor = pinot.regressors.biophysical_regressor.BiophysicalRegressor(
-        base_regressor=pinot.regressors.NeuralNetworkRegressor(32),
+        base_regressor_class=pinot.regressors.NeuralNetworkRegressor,
+        in_features=32,    
     )
 
     representation = pinot.representation.Sequential(
