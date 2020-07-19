@@ -94,8 +94,9 @@ class BiophysicalRegressor(BaseRegressor):
             scale=self.log_sigma_measurement.exp(),
         )
 
-        # (number_of_concentrations, 1)
+        # (number_of_graphs, number_of_concentrations)
         measurement_sample = distribution_measurement.rsample()
+        measurement_sample_sorted = measurement_sample.sort(dimension=1)
 
 
 
