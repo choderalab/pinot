@@ -1,0 +1,255 @@
+Sender: LSF System <lsfadmin@ls12>
+Subject: Job 15968208: <no-background> in cluster <lila> Done
+
+Job <no-background> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Sun Jul 19 22:49:54 2020
+Job was executed on host(s) <12*ls12>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Sun Jul 19 22:49:56 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Sun Jul 19 22:49:56 2020
+Terminated at Mon Jul 20 04:39:32 2020
+Results reported at Mon Jul 20 04:39:32 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/plotting_active.py --net semi_gp --num_rounds 4 --num_trials 1 --num_epochs 1000 --data moonshot --q 96 --acquisition ExpectedImprovement --output_folder /home/nguyenm5/coding/pinot/jul-18/active-semi-no-background --index 5
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   367708.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   20976 sec.
+    Turnaround time :                            20978 sec.
+
+The output (if any) follows:
+
+0
+MPI, UCB, UCB-ybest, Expected Improv
+[array(0.86500347, dtype=float32), array(0.44342637, dtype=float32), array(0.42636728, dtype=float32), array(0.44560945, dtype=float32)]
+[array(1.2653795, dtype=float32), array(1.2569158, dtype=float32), array(1.257339, dtype=float32), array(1.256692, dtype=float32)]
+[array(0.48029828, dtype=float32), array(0.28053826, dtype=float32), array(0.26954573, dtype=float32), array(0.2688988, dtype=float32)]
+[array(0.18152057, dtype=float32), array(0.05121408, dtype=float32), array(0.04754538, dtype=float32), array(0.0492999, dtype=float32)]
+[array(0.86505985, dtype=float32), array(0.44342887, dtype=float32), array(0.41094685, dtype=float32), array(0.41404617, dtype=float32)]
+[array(1.2653815, dtype=float32), array(1.2569149, dtype=float32), array(1.2337532, dtype=float32), array(1.231753, dtype=float32)]
+[array(0.4803002, dtype=float32), array(0.2805373, dtype=float32), array(0.24595994, dtype=float32), array(0.24395972, dtype=float32)]
+[array(0.18151811, dtype=float32), array(0.05121167, dtype=float32), array(0.04049952, dtype=float32), array(0.04037019, dtype=float32)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-18/active-semi-no-background/ExpectedImprovement_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls14>
+Subject: Job 15968202: <no-background> in cluster <lila> Done
+
+Job <no-background> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Sun Jul 19 22:49:50 2020
+Job was executed on host(s) <12*ls14>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Sun Jul 19 22:49:52 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Sun Jul 19 22:49:52 2020
+Terminated at Mon Jul 20 04:40:19 2020
+Results reported at Mon Jul 20 04:40:19 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/plotting_active.py --net semi_gp --num_rounds 4 --num_trials 1 --num_epochs 1000 --data moonshot --q 96 --acquisition ExpectedImprovement --output_folder /home/nguyenm5/coding/pinot/jul-18/active-semi-no-background --index 2
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   363842.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   21027 sec.
+    Turnaround time :                            21029 sec.
+
+The output (if any) follows:
+
+0
+MPI, UCB, UCB-ybest, Expected Improv
+[array(1., dtype=float32), array(0.37560558, dtype=float32), array(0.42793375, dtype=float32), array(0.43601084, dtype=float32)]
+[array(1.2347053, dtype=float32), array(1.2449961, dtype=float32), array(1.2504196, dtype=float32), array(1.2640188, dtype=float32)]
+[array(1.1175175, dtype=float32), array(0.25203907, dtype=float32), array(0.25746262, dtype=float32), array(0.27106178, dtype=float32)]
+[array(0.8294159, dtype=float32), array(0.03957773, dtype=float32), array(0.04556043, dtype=float32), array(0.0487555, dtype=float32)]
+[array(1., dtype=float32), array(0.37156844, dtype=float32), array(0.3578487, dtype=float32), array(0.3572448, dtype=float32)]
+[array(1.2347001, dtype=float32), array(1.2450002, dtype=float32), array(1.2161316, dtype=float32), array(1.223493, dtype=float32)]
+[array(1.1175122, dtype=float32), array(0.25204325, dtype=float32), array(0.22317457, dtype=float32), array(0.23053598, dtype=float32)]
+[array(0.8294121, dtype=float32), array(0.03958015, dtype=float32), array(0.03306724, dtype=float32), array(0.03505809, dtype=float32)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-18/active-semi-no-background/ExpectedImprovement_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls14>
+Subject: Job 15968204: <no-background> in cluster <lila> Done
+
+Job <no-background> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Sun Jul 19 22:49:50 2020
+Job was executed on host(s) <12*ls14>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Sun Jul 19 22:49:52 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Sun Jul 19 22:49:52 2020
+Terminated at Mon Jul 20 04:41:57 2020
+Results reported at Mon Jul 20 04:41:57 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/plotting_active.py --net semi_gp --num_rounds 4 --num_trials 1 --num_epochs 1000 --data moonshot --q 96 --acquisition ExpectedImprovement --output_folder /home/nguyenm5/coding/pinot/jul-18/active-semi-no-background --index 3
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   369981.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   21124 sec.
+    Turnaround time :                            21127 sec.
+
+The output (if any) follows:
+
+0
+MPI, UCB, UCB-ybest, Expected Improv
+[array(1., dtype=float32), array(0.4037177, dtype=float32), array(0.44362086, dtype=float32), array(0.47724402, dtype=float32)]
+[array(1.2594107, dtype=float32), array(1.258447, dtype=float32), array(1.27249, dtype=float32), array(1.2841918, dtype=float32)]
+[array(1.2199167, dtype=float32), array(0.26549006, dtype=float32), array(0.27953303, dtype=float32), array(0.29123485, dtype=float32)]
+[array(0.9151172, dtype=float32), array(0.04257412, dtype=float32), array(0.05100643, dtype=float32), array(0.05678962, dtype=float32)]
+[array(1., dtype=float32), array(0.40367913, dtype=float32), array(0.44366753, dtype=float32), array(0.37540728, dtype=float32)]
+[array(1.2593888, dtype=float32), array(1.2584674, dtype=float32), array(1.2578878, dtype=float32), array(1.2395126, dtype=float32)]
+[array(1.2198948, dtype=float32), array(0.26551044, dtype=float32), array(0.26493084, dtype=float32), array(0.24655557, dtype=float32)]
+[array(0.9151705, dtype=float32), array(0.04258262, dtype=float32), array(0.0483898, dtype=float32), array(0.03904837, dtype=float32)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-18/active-semi-no-background/ExpectedImprovement_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls12>
+Subject: Job 15968206: <no-background> in cluster <lila> Done
+
+Job <no-background> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Sun Jul 19 22:49:51 2020
+Job was executed on host(s) <12*ls12>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Sun Jul 19 22:49:54 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Sun Jul 19 22:49:54 2020
+Terminated at Mon Jul 20 04:44:57 2020
+Results reported at Mon Jul 20 04:44:57 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/plotting_active.py --net semi_gp --num_rounds 4 --num_trials 1 --num_epochs 1000 --data moonshot --q 96 --acquisition ExpectedImprovement --output_folder /home/nguyenm5/coding/pinot/jul-18/active-semi-no-background --index 4
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   370204.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   21302 sec.
+    Turnaround time :                            21306 sec.
+
+The output (if any) follows:
+
+0
+MPI, UCB, UCB-ybest, Expected Improv
+[array(1., dtype=float32), array(0.44746816, dtype=float32), array(0.41178536, dtype=float32), array(0.44861412, dtype=float32)]
+[array(1.291358, dtype=float32), array(1.2736244, dtype=float32), array(1.2530136, dtype=float32), array(1.2512376, dtype=float32)]
+[array(1.2301877, dtype=float32), array(0.29724687, dtype=float32), array(0.26522034, dtype=float32), array(0.25828063, dtype=float32)]
+[array(0.8997216, dtype=float32), array(0.05470094, dtype=float32), array(0.04539748, dtype=float32), array(0.04763868, dtype=float32)]
+[array(1., dtype=float32), array(0.44746876, dtype=float32), array(0.39148355, dtype=float32), array(0.37625855, dtype=float32)]
+[array(1.2913506, dtype=float32), array(1.2736216, dtype=float32), array(1.2499094, dtype=float32), array(1.241462, dtype=float32)]
+[array(1.2301803, dtype=float32), array(0.297244, dtype=float32), array(0.26211613, dtype=float32), array(0.248505, dtype=float32)]
+[array(0.89971757, dtype=float32), array(0.0547023, dtype=float32), array(0.04108186, dtype=float32), array(0.03942927, dtype=float32)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-18/active-semi-no-background/ExpectedImprovement_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls03>
+Subject: Job 15968200: <no-background> in cluster <lila> Done
+
+Job <no-background> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Sun Jul 19 22:49:49 2020
+Job was executed on host(s) <12*ls03>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Sun Jul 19 22:49:52 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Sun Jul 19 22:49:52 2020
+Terminated at Mon Jul 20 04:47:42 2020
+Results reported at Mon Jul 20 04:47:42 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/plotting_active.py --net semi_gp --num_rounds 4 --num_trials 1 --num_epochs 1000 --data moonshot --q 96 --acquisition ExpectedImprovement --output_folder /home/nguyenm5/coding/pinot/jul-18/active-semi-no-background --index 1
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   367956.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   21471 sec.
+    Turnaround time :                            21473 sec.
+
+The output (if any) follows:
+
+0
+MPI, UCB, UCB-ybest, Expected Improv
+[array(1., dtype=float32), array(0.47492993, dtype=float32), array(0.45572984, dtype=float32), array(0.4756741, dtype=float32)]
+[array(1.2538168, dtype=float32), array(1.2604169, dtype=float32), array(1.2886678, dtype=float32), array(1.2803829, dtype=float32)]
+[array(1.2126153, dtype=float32), array(0.28403932, dtype=float32), array(0.30207318, dtype=float32), array(0.2925896, dtype=float32)]
+[array(0.90800387, dtype=float32), array(0.05506505, dtype=float32), array(0.05650145, dtype=float32), array(0.05688228, dtype=float32)]
+[array(1., dtype=float32), array(0.47494555, dtype=float32), array(0.45571423, dtype=float32), array(0.40384394, dtype=float32)]
+[array(1.253813, dtype=float32), array(1.2543888, dtype=float32), array(1.2886659, dtype=float32), array(1.2483004, dtype=float32)]
+[array(1.2126114, dtype=float32), array(0.27801126, dtype=float32), array(0.30207127, dtype=float32), array(0.26050717, dtype=float32)]
+[array(0.908001, dtype=float32), array(0.05397417, dtype=float32), array(0.05649906, dtype=float32), array(0.04385854, dtype=float32)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-18/active-semi-no-background/ExpectedImprovement_1000.stderr> for stderr output of this job.
+

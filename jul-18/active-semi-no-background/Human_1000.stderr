@@ -1,0 +1,62 @@
+THCudaCheck FAIL file=/opt/conda/conda-bld/pytorch_1591914743399/work/aten/src/THC/THCGeneral.cpp line=47 error=30 : unknown error
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/plotting_active.py", line 296, in <module>
+    best_df = plot.generate()
+  File "scripts/active/plotting_active.py", line 63, in generate
+    ds = self.generate_data()
+  File "scripts/active/plotting_active.py", line 164, in generate_data
+    ds = [tuple([i.to(self.device) for i in ds[0]])]
+  File "scripts/active/plotting_active.py", line 164, in <listcomp>
+    ds = [tuple([i.to(self.device) for i in ds[0]])]
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/graph.py", line 3858, in to
+    self.ndata[k] = F.copy_to(self.ndata[k], ctx)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/backend/pytorch/tensor.py", line 94, in copy_to
+    th.cuda.set_device(ctx.index)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/cuda/__init__.py", line 245, in set_device
+    torch._C._cuda_setDevice(device)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/cuda/__init__.py", line 153, in _lazy_init
+    torch._C._cuda_init()
+RuntimeError: cuda runtime error (30) : unknown error at /opt/conda/conda-bld/pytorch_1591914743399/work/aten/src/THC/THCGeneral.cpp:47
+THCudaCheck FAIL file=/opt/conda/conda-bld/pytorch_1591914743399/work/aten/src/THC/THCGeneral.cpp line=47 error=30 : unknown error
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/plotting_active.py", line 296, in <module>
+    best_df = plot.generate()
+  File "scripts/active/plotting_active.py", line 63, in generate
+    ds = self.generate_data()
+  File "scripts/active/plotting_active.py", line 164, in generate_data
+    ds = [tuple([i.to(self.device) for i in ds[0]])]
+  File "scripts/active/plotting_active.py", line 164, in <listcomp>
+    ds = [tuple([i.to(self.device) for i in ds[0]])]
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/graph.py", line 3858, in to
+    self.ndata[k] = F.copy_to(self.ndata[k], ctx)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/backend/pytorch/tensor.py", line 94, in copy_to
+    th.cuda.set_device(ctx.index)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/cuda/__init__.py", line 245, in set_device
+    torch._C._cuda_setDevice(device)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/cuda/__init__.py", line 153, in _lazy_init
+    torch._C._cuda_init()
+RuntimeError: cuda runtime error (30) : unknown error at /opt/conda/conda-bld/pytorch_1591914743399/work/aten/src/THC/THCGeneral.cpp:47
+THCudaCheck FAIL file=/opt/conda/conda-bld/pytorch_1591914743399/work/aten/src/THC/THCGeneral.cpp line=47 error=30 : unknown error
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/plotting_active.py", line 296, in <module>
+    best_df = plot.generate()
+  File "scripts/active/plotting_active.py", line 63, in generate
+    ds = self.generate_data()
+  File "scripts/active/plotting_active.py", line 164, in generate_data
+    ds = [tuple([i.to(self.device) for i in ds[0]])]
+  File "scripts/active/plotting_active.py", line 164, in <listcomp>
+    ds = [tuple([i.to(self.device) for i in ds[0]])]
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/graph.py", line 3858, in to
+    self.ndata[k] = F.copy_to(self.ndata[k], ctx)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/backend/pytorch/tensor.py", line 94, in copy_to
+    th.cuda.set_device(ctx.index)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/cuda/__init__.py", line 245, in set_device
+    torch._C._cuda_setDevice(device)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/cuda/__init__.py", line 153, in _lazy_init
+    torch._C._cuda_init()
+RuntimeError: cuda runtime error (30) : unknown error at /opt/conda/conda-bld/pytorch_1591914743399/work/aten/src/THC/THCGeneral.cpp:47
+Using backend: pytorch
+Using backend: pytorch
