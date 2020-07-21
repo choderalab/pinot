@@ -110,7 +110,6 @@ class TSBayesOptExperiment(pinot.active.experiment.BayesOptExperiment):
             self.acquire()
             self.update_data()
 
-            print(len(self.unseen))
             idx += 1
 
         return self.seen, self.thompson_samples
