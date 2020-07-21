@@ -30,7 +30,7 @@ def run(args):
 
     net = pinot.Net(
         net_representation,
-        output_regressor=getattr(pinot.regressors, args.output_regressor),
+        output_regressor_class=getattr(pinot.regressors, args.output_regressor),
     )
 
     # get the entire dataset
@@ -52,11 +52,17 @@ def run(args):
         ds_tr = pinot.data.utils.batch(ds_tr, len(ds_tr))
         ds_te = pinot.data.utils.batch(ds_te, len(ds_te))
 
+    elif 'mixed' in args.data:
+        ds = ds.to(torch.device('cuda:0'))
+        ds_tr, ds_te = ds.split(partition)
+        ds_tr = ds_tr.view('fixed_size_batch', batch_size=args.batch_size)
+        ds_te = ds_te.view('fixed_size_batch', batch_size=len(ds_te))
+
     else:
         ds = pinot.data.utils.batch(ds, batch_size)
         ds_tr, ds_te = pinot.data.utils.split(ds, partition)
 
-    if torch.cuda.is_available():
+    if torch.cuda.is_available() and 'mixed' not in args.data:
         ds_tr = [
             (g.to(torch.device("cuda:0")), y.to(torch.device("cuda:0")))
             for g, y in ds_tr

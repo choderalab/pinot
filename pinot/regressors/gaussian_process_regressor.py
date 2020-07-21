@@ -121,7 +121,7 @@ class ExactGaussianProcessRegressor(GaussianProcessRegressor):
 
         return k_tr_tr, k_te_te, k_te_tr, k_tr_te, l_low, alpha
 
-    def loss(self, x_tr, y_tr):
+    def loss(self, x_tr, y_tr, *args, **kwargs):
         r""" Compute the loss.
 
         Note
@@ -167,7 +167,7 @@ class ExactGaussianProcessRegressor(GaussianProcessRegressor):
 
         return nll
 
-    def condition(self, x_te, x_tr=None, y_tr=None, sampler=None):
+    def condition(self, x_te, *args, x_tr=None, y_tr=None, **kwargs):
         r""" Calculate the predictive distribution given `x_te`.
 
         Note
@@ -421,7 +421,7 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
 
         return predictive_mean, predictive_cov
 
-    def condition(self, x_te, sampler=None):
+    def condition(self, x_te, *args, **kwargs):
         """
 
         Parameters
@@ -435,6 +435,8 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
         -------
 
         """
+        
+
         predictive_mean, predictive_cov = self.forward(x_te)
 
         distribution = torch.distributions.multivariate_normal.MultivariateNormal(
@@ -443,7 +445,7 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
 
         return distribution
 
-    def loss(self, x_te, y_te):
+    def loss(self, x_te, y_te, *args, **kwargs):
         """ Loss function.
 
         Parameters
@@ -610,6 +612,7 @@ class BiophysicalVariationalGaussianProcessRegressor(
 
         elif output == 'measurement':
             f_sample = self._sample_f(distribution_delta_g)
+
             distribution_measurement = self._condition_measurement(
                 f_sample,
                 test_ligand_concentration=test_ligand_concentration
@@ -657,7 +660,7 @@ class BiophysicalVariationalGaussianProcessRegressor(
 
 
     def loss(
-        self, x_te, y_te, test_ligand_concentration=None, *args, **kwargs
+        self, x_te, y_te, test_ligand_concentration=None, nr_samples=1, *args, **kwargs
     ):
         """ Loss function.
 
@@ -683,11 +686,7 @@ class BiophysicalVariationalGaussianProcessRegressor(
         prior_tril = prior_tril.to(device=x_te.device)
         prior_mean = prior_mean.to(device=x_te.device)
 
-        distribution_measurement = self.condition(
-            x_te=x_te, test_ligand_concentration=test_ligand_concentration
-        )
-
-        nll = -distribution_measurement.log_prob(y_te.flatten()).mean()
+        
 
         log_p_u = self.exp_log_full_gaussian(
             self.y_tr_mu, self._y_tr_sigma(), prior_mean, prior_tril
@@ -696,6 +695,16 @@ class BiophysicalVariationalGaussianProcessRegressor(
         log_q_u = -self.entropy_full_gaussian(
             self.y_tr_mu, self._y_tr_sigma()
         )
+
+        nll = 0
+        for iis in range(nr_samples):
+            distribution_measurement = self.condition(
+                x_te=x_te, test_ligand_concentration=test_ligand_concentration
+            )
+
+            nll += -distribution_measurement.log_prob(y_te.flatten()).mean()
+
+        nll = nll/nr_samples
 
         loss = nll + self.kl_loss_scaling * (log_q_u - log_p_u)
 
