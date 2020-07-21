@@ -237,49 +237,13 @@ class Net(BaseNet):
         if 'sampler' in kwargs:
             sampler = kwargs.pop('sampler')
 
-        if 'n_samples' in kwargs:
-            n_samples = kwargs.pop('n_samples')
-
         if self.has_exact_gp is True:
             h_last = self.representation(self.g_last)
             kwargs = {**{"x_tr": h_last, "y_tr": self.y_last}, **kwargs}
 
-        if sampler is None:
-            return self._condition(h, *args, **kwargs)
 
-        if not hasattr(sampler, "sample_params"):
-            return self._condition(h, *args, **kwargs)
-
-        # initialize a list of distributions
-        distributions = []
-
-        for _ in range(n_samples):
+        if sampler is not None and hasattr(sampler, 'sample_params'):
             sampler.sample_params()
-            distributions.append(self._condition(g, *args, **kwargs))
+        
+        return self._condition(h, *args, **kwargs)
 
-        # get the parameter of these distributions
-        # NOTE: this is not necessarily the most efficienct solution
-        # since we don't know the memory footprint of
-        # torch.distributions
-        mus, sigmas = zip(
-            *[
-                (distribution.loc, distribution.scale)
-                for distribution in distributions
-            ]
-        )
-
-        # concat parameters together
-        # (n_samples, batch_size, measurement_dimension)
-        mu = torch.stack(mus).cpu()  # distribution no cuda
-        sigma = torch.stack(sigmas).cpu()
-
-        # construct the distribution
-        distribution = torch.distributions.normal.Normal(loc=mu, scale=sigma)
-
-        # make it mixture
-        distribution = torch.distributions.mixture_same_family.MixtureSameFamily(
-            torch.distributions.Categorical(torch.ones(mu.shape[0],)),
-            torch.distributions.Independent(distribution, 2),
-        )
-
-        return distribution
