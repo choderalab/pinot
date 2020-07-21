@@ -6,7 +6,6 @@ import abc
 import dgl
 import pinot
 from pinot.metrics import _independent
-from torch.utils.data import WeightedRandomSampler
 
 # =============================================================================
 # HELPER FUNCTIONS
@@ -26,7 +25,6 @@ def _slice_fn_tensor(x, idxs):
     -------
     x : `torch.Tensor`, `shape=(n_data_chosen, )`
         Output tensor.
-
     """
     return x[idxs]
 
@@ -46,7 +44,6 @@ def _slice_fn_tensor_pair(x, idxs):
     -------
     x : `torch.Tensor`, `shape=(n_data_chosen, )`
         Output tensor.
-
     """
     return x[0][idxs], x[1][idxs]
 
@@ -59,12 +56,10 @@ def _collate_fn_tensor(x):
     x : `List` of `torch.Tensor`
         Tensors to be stacked.
 
-
     Returns
     -------
     x : `torch.Tensor`
         Output tensor.
-
     """
     return torch.stack(x)
 
@@ -77,11 +72,9 @@ def _collate_fn_graph(x):
     x : `List` of `dgl.DGLGraph`
         Input list of graphs to be batched.
 
-
     Returns
     -------
     x : `dgl.DGLGraph`
-
     """
     return dgl.batch(x)
 
@@ -97,12 +90,10 @@ def _slice_fn_graph(x, idxs):
     idxs : `List` of `int`
         Indices of the chosen graphs.
 
-
     Returns
     -------
     x : `dgl.DGLGraph`
         Sliced graph.
-
     """
     if x.batch_size > 1:
         x = dgl.unbatch(x)
@@ -128,9 +119,8 @@ def _slice_fn_tuple(x, idxs):
     `graph_slices` : `dgl.DGLGraph`
         Sliced and batched graph.
 
-    `tensor_clies` : `torch.Tensor`
+    `tensor_slices` : `torch.Tensor`
         Sliced and stacked tensor.
-
     """
     gs, ys = x
     graph_slices = _slice_fn_graph(gs, idxs)
@@ -181,9 +171,6 @@ class BayesOptExperiment(ActiveLearningExperiment):
     n_epochs : `int`
         Number of epochs.
 
-    strategy : `str`, either `sequential` or `batch`
-        Acquisition strategy.
-
     q : `int`
         Number of acquired candidates in each round.
 
@@ -221,8 +208,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
         data,
         acquisition,
         optimizer,
-        n_epochs=100,
-        strategy="sequential",
+        num_epochs=100,
         q=1,
         num_samples=1000,
         weighted_acquire=False,
@@ -239,7 +225,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
         # model
         self.net = net
         self.optimizer = optimizer
-        self.n_epochs = n_epochs
+        self.num_epochs = num_epochs
 
         # data
         self.data = data
@@ -258,12 +244,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
 
         # acquisition
         self.acquisition = acquisition
-        self.strategy = strategy
-
-        # batch acquisition stuff
         self.q = q
-        self.num_samples = num_samples
-        self.weighted_acquire = weighted_acquire
 
         # early stopping
         self.early_stopping = early_stopping
@@ -308,7 +289,6 @@ class BayesOptExperiment(ActiveLearningExperiment):
 
         """
         import random
-
         random.seed(seed)
         best = random.choice(self.unseen)
         self.seen.append(self.unseen.pop(best))
@@ -325,11 +305,12 @@ class BayesOptExperiment(ActiveLearningExperiment):
         # train the model
         self.net = self.train_class(
             data=[self.seen_data],
-            optimizer=self.optimizer,
-            n_epochs=self.n_epochs,
+            optimizer=self.optimizer(self.net),
+            n_epochs=self.num_epochs,
             net=self.net,
             record_interval=999999,
         ).train()
+
 
     def acquire(self):
         """Acquire new training data."""
@@ -339,36 +320,16 @@ class BayesOptExperiment(ActiveLearningExperiment):
         # split input target
         gs, ys = self.unseen_data
 
-        # get the predictive distribution
-        # TODO:
-        # write API for sampler
-        distribution = self.net.condition(gs)
+        # make sure we only 'acquire' fewer points than are remaining
+        self.q = min(self.q, len(self.unseen))
 
-        if self.strategy == "batch":
+        # acquire pending points
+        pending_pts = self.acquisition(
+            self.net, self.unseen_data, q=self.q, y_best=self.y_best
+        )
 
-            # batch acquisition
-            pending_pts = self.acquisition(
-                self.net, self.unseen_data, q=5, y_best=0.0
-            )
-
-            # pop from the back so you don't disrupt the order
-            pending_pts = pending_pts.sort(descending=True).values
-
-        else:
-            # workup
-            distribution = self.workup(distribution)
-
-            # get utility score
-            utility = self.acquisition(distribution, y_best=self.y_best)
-            pending_pts = torch.argmax(utility)
-
-            # Compute the max probability of improvement needed for later plots
-            # Note that this probability of improvement is computed for all graphs
-            prob_improvement = pinot.active.acquisition.probability_of_improvement(
-                    pinot.metrics._independent(self.net.condition(self.g_all)),
-                                y_best=self.y_best)
-            print("Max probability of improvement:")
-            print(prob_improvement.max().detach())
+        # pop from the back so you don't disrupt the order
+        pending_pts = pending_pts.sort(descending=True).values
 
         # print(len(self.new), best)
         self.seen.extend([self.unseen.pop(p) for p in pending_pts])
@@ -376,8 +337,11 @@ class BayesOptExperiment(ActiveLearningExperiment):
 
     def update_data(self):
         """Update the internal data using old and new."""
-        # grab new data
-        self.unseen_data = self.slice_fn(self.data, self.unseen)
+        if len(self.unseen):
+            # grab new data
+            self.unseen_data = self.slice_fn(self.data, self.unseen)
+        else:
+            self.unseen_data = tuple()
 
         # grab old data
         self.seen_data = self.slice_fn(self.data, self.seen)
@@ -386,6 +350,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
         gs, ys = self.seen_data
 
         self.y_best = torch.max(ys)
+
 
     def run(self, num_rounds=999999, seed=None):
         """Run the model and conduct rounds of acquisition and training.
@@ -409,13 +374,18 @@ class BayesOptExperiment(ActiveLearningExperiment):
         self.blind_pick(seed=seed)
         self.update_data()
 
-        while idx < num_rounds and len(self.unseen) > 0:
-            self.train()
-            self.acquire()
-            self.update_data()
-
+        while idx < num_rounds:
+            
             if self.early_stopping and self.y_best == self.best_possible:
                 break
+
+            self.train()
+
+            if not self.unseen:
+                break
+
+            self.acquire()
+            self.update_data()
 
             idx += 1
 

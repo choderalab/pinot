@@ -26,4 +26,4 @@ from pinot.samplers.adlala import AdLaLa
 from pinot.samplers.bbb import BBB
 
 from pinot.generative import *
-import pinot.multitask
+import pinot.multioutput

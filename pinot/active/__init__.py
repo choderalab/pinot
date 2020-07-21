@@ -1,1 +1,1 @@
-from pinot.active import acquisition, experiment
+from pinot.active import acquisition, batch_acquisition, biophysical_acquisition, experiment

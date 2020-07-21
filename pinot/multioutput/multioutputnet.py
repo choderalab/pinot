@@ -6,7 +6,7 @@ from pinot.regressors import (
 )
 
 
-class MultitaskNet(Net):
+class MultiOutputNet(Net):
     """ An object that combines the representation and parameter
     learning, puts into a predicted distribution and calculates the
     corresponding divergence.
@@ -22,7 +22,7 @@ class MultitaskNet(Net):
         output_regressor=NeuralNetworkRegressor,
         **kwargs
     ):
-        super(MultitaskNet, self).__init__(
+        super(MultiOutputNet, self).__init__(
             representation, output_regressor, **kwargs
         )
 
