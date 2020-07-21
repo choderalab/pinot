@@ -22,7 +22,7 @@ def _greedy(utility, q=1):
     """ Greedy batch acquisition
     """
     # fill batch greedily
-    pending_pts = torch.topk(utility, q).indices
+    pending_pts = torch.topk(utility, min(q, len(utility))).indices
     
     return pending_pts
 
