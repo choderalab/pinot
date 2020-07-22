@@ -463,7 +463,7 @@ class MixedSingleAndMultipleDataset(Dataset):
         single_col_names=["f_inhibition_at_20_uM", "f_inhibition_at_50_uM",],
         # scaling
         measurement_scaling=0.01,
-        concentration_unit_scaling=1.0,
+        concentration_unit_scaling=1e-6,
         shuffle=True,
     ):
         def _from_csv():
