@@ -321,17 +321,21 @@ class BayesOptExperiment(ActiveLearningExperiment):
         gs, ys = self.unseen_data
 
         # make sure we only 'acquire' fewer points than are remaining
-        self.q = min(self.q, len(self.unseen))
+        if self.q <= len(self.unseen):
 
-        # acquire pending points
-        pending_pts = self.acquisition(
-            self.net, gs, q=self.q, y_best=self.y_best
-        )
+            # acquire pending points
+            pending_pts = self.acquisition(
+                self.net, gs, q=self.q, y_best=self.y_best
+            )
+    
+            # pop from the back so you don't disrupt the order
+            pending_pts = pending_pts.sort(descending=True).values
 
-        # pop from the back so you don't disrupt the order
-        pending_pts = pending_pts.sort(descending=True).values
+        else:
 
-        # print(len(self.new), best)
+            # set pending points to all remaining data
+            pending_pts = torch.range(len(self.unseen)-1, 0, step=-1).long()
+
         self.seen.extend([self.unseen.pop(p) for p in pending_pts])
 
 

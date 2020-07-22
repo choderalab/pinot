@@ -63,11 +63,13 @@ def thompson_sampling(net, gs, y_best=0.0, q=1, unique=True):
     if unique:
 
         # enforce no duplicates in batch
-        pending_pts = torch.unique(pending_pts).tolist()
+        pending_pts = set(torch.unique(pending_pts).tolist())
         
         while len(pending_pts) < q:
             theta = distribution.sample()
-            pending_pts.append(torch.argmax(theta).item())
+            pending_pts.add(torch.argmax(theta).item())
+        
+        pending_pts = list(pending_pts)
     
     # convert to tensor
     pending_pts = torch.LongTensor(pending_pts)
