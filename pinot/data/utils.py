@@ -294,7 +294,10 @@ def prepare_semi_supervised_data(unlabelled_data, labelled_data, seed=2666):
     semi_supervised_data = []
 
     for (g, y) in unlabelled_data:
-        semi_supervised_data.append((g, y))
+        if y.is_cuda:
+            semi_supervised_data.append((g, torch.tensor([np.nan]).cuda()))
+        else:
+            semi_supervised_data.append((g, torch.tensor([np.nan]))) 
     for (g, y) in labelled_data:
         semi_supervised_data.append((g, y))
 
