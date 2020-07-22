@@ -325,7 +325,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
 
         # acquire pending points
         pending_pts = self.acquisition(
-            self.net, self.unseen_data, q=self.q, y_best=self.y_best
+            self.net, gs, q=self.q, y_best=self.y_best
         )
 
         # pop from the back so you don't disrupt the order
