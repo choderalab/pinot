@@ -426,9 +426,9 @@ class SemiSupervisedBayesOptExperiment(BayesOptExperiment):
         # Compute the unsupervised scaling constant and reset it
         # as the number of labeled data points change after every epoch
         if self.unlabeled_data:
-            unsup_scale = float(len(self.old_data))/(len(self.new_data) + len(self.unlabeled_data))
+            unsup_scale = float(len(self.seen_data))/(len(self.unseen_data) + len(self.unlabeled_data))
         else:
-            unsup_scale = float(len(self.old_data))/len(self.new_data)
+            unsup_scale = float(len(self.seen_data))/len(self.unseen_data)
         
         # Update the unsupervised scale constant of SemiSupervisedNet
         self.net.unsup_scale = unsup_scale
