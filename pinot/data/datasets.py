@@ -463,7 +463,7 @@ class MixedSingleAndMultipleDataset(Dataset):
         single_col_names=["f_inhibition_at_20_uM", "f_inhibition_at_50_uM",],
         # scaling
         measurement_scaling=0.01,
-        concentration_unit_scaling=0.001,
+        concentration_unit_scaling=1.0,
         shuffle=True,
     ):
         def _from_csv():
@@ -531,8 +531,18 @@ class MixedSingleAndMultipleDataset(Dataset):
 
             df = df.apply(flatten_single, axis=1)
 
+            is_null = np.all(
+                [
+                    *[df[x].isnull().values for x in single_col_names],
+                    df['ys_multiple'].isnull().values
+                ],
+                axis=0,
+            )
+
+            df = df[~is_null]
+
             self.ds = df.to_dict(orient="records")
-            
+
             # shuffle
             if shuffle is True:
                 import random
@@ -596,7 +606,7 @@ class MixedSingleAndMultipleDataset(Dataset):
         return dgl.batch([x["g"] for x in xs]).to(device)
 
     @staticmethod
-    def _rebatch(xs, device=torch.device("cpu"), 
+    def _rebatch(xs, device=torch.device("cpu"),
             filter_concentration=None,
             *args, **kwargs):
         assert len(xs) == 1
@@ -609,7 +619,7 @@ class MixedSingleAndMultipleDataset(Dataset):
 
         if filter_concentration is not None:
 
-            _ds = [(g, y, c) for g, y, c in _ds 
+            _ds = [(g, y, c) for g, y, c in _ds
                     if abs(float(c[0]) - filter_concentration) < 0.001]
 
         def _collate_fn(_xs):
@@ -646,7 +656,7 @@ class MixedSingleAndMultipleDataset(Dataset):
             _ds = [self.all_available_pairs(self.ds)]
             self._number_of_measurements = _ds[0][1].shape[0]
             return self._rebatch(
-                    _ds, 
+                    _ds,
                     device=self.device,
                     filter_concentration=c_ref,
                     *args, **kwargs)
@@ -669,7 +679,7 @@ class MixedSingleAndMultipleDataset(Dataset):
 class UnlabeledDataset(Dataset):
     def __init__(self, ds=None):
         super(UnlabeledDataset, self).__init__(ds)
-    
+
     def from_txt(self, *args, **kwargs):
         """ Read from txt file """
         self.ds = pinot.data.utils.load_unlabeled_data(*args, **kwargs)()
