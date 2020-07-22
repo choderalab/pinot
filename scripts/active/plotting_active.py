@@ -5,30 +5,11 @@ from collections import defaultdict
 
 import numpy as np
 import pandas as pd
-
+import os
 import torch
 import pinot
 import pinot.active.experiment as experiment
 from pinot.generative import SemiSupervisedNet
-import os
-
-######################
-# Utilities
-
-def _get_dataframe(value_dict):
-    """ Creates pandas dataframe to play nice with seaborn
-    """
-    best_df = pd.DataFrame.from_records(
-        [
-            (acq_fn, trial, step, value)
-            for acq_fn, trial_dict in dict(value_dict).items()
-            for trial, value_history in trial_dict.items()
-            for step, value in enumerate(value_history)
-        ],
-        columns = ['Acquisition Function', 'Trial',
-                   'Datapoints Acquired', 'Best Solubility']
-    )
-    return best_df
 
 
 ######################
@@ -85,10 +66,17 @@ class ActivePlot():
         final_results = self.run_trials(ds)
 
         # create pandas dataframe to play nice with seaborn
-        best_df = _get_dataframe(final_results)
-        
-        return best_df
+        best_df = pd.DataFrame.from_records(
+            [
+                (acq_fn, trial, step, best)
+                for acq_fn, trial_dict in dict(final_results).items()
+                for trial, best_history in trial_dict.items()
+                for step, best in enumerate(best_history)
+            ],
+            columns=['Acquisition Function', 'Trial', 'Datapoints Acquired', 'Best Solubility']
+        )
 
+        return best_df
 
     def run_trials(self, ds):
         """
@@ -110,10 +98,15 @@ class ActivePlot():
         """
         # get the real solution
         ds = self.generate_data()
-        acq_fn = self.get_acquisition()
+        gs, ys = ds[0]
+        self.feat_dim = gs.ndata['h'].shape[1]
+        actual_sol = torch.max(ys).item()
+
+        acq_fn = self.get_acquisition(gs)
 
         # acquistion functions to be tested
         for i in range(self.num_trials):
+            print(i)
 
             # make fresh net and optimizer
             net = self.get_net().to(self.device)
@@ -129,9 +122,10 @@ class ActivePlot():
             self.bo = self.bo_cls(
                 net=net,
                 data=ds[0],
-                optimizer=optimizer,
+                optimizer=optimizer(net),
+                strategy=self.strategy,
                 acquisition=acq_fn,
-                num_epochs=self.num_epochs,
+                n_epochs=self.num_epochs,
                 q=self.q,
                 slice_fn=experiment._slice_fn_tuple, # pinot.active.
                 collate_fn=experiment._collate_fn_graph, # pinot.active.
@@ -140,49 +134,25 @@ class ActivePlot():
 
             # run experiment
             x = self.bo.run(num_rounds=self.num_rounds)
-            self.results = self.process_results(x, ds, i)
+
+            # pad if experiment stopped early
+            # candidates_acquired = limit + 1 because we begin with a blind pick
+            results_size = self.num_rounds * self.q + 1
+
+            if self.net == 'multitask':
+                results_data = actual_sol*np.ones((results_size, ys.size(1)))
+                output = ys[x]
+                output[torch.isnan(output)] = -np.inf
+            else:
+                results_data = actual_sol*np.ones(results_size)
+                output = ys[x]
+
+            results_data[:len(x)] = np.maximum.accumulate(output.cpu().squeeze())
+
+            # record results
+            self.results[self.acquisition][i] = results_data
 
         return self.results
-
-
-    def process_results(self, x, ds, i):
-        """ Processes the output of BayesOptExperiment.
-
-        Parameters
-        ----------
-        x : list of int
-            Items chosen by BayesOptExperiment object
-        ds : tuple
-            Dataset object
-        i : int
-            Index of loop
-
-        Returns
-        -------
-        self.results : defaultdict
-            Processed data
-        """
-        gs, ys = ds[0]
-        actual_sol = torch.max(ys).item()
-
-        # pad if experiment stopped early
-        # candidates_acquired = limit + 1 because we begin with a blind pick
-        results_size = self.num_rounds * self.q + 1
-
-        if self.net == 'multitask':
-            results_data = actual_sol*np.ones((results_size, ys.size(1)))
-            output = ys[x]
-            output[torch.isnan(output)] = -np.inf
-        else:
-            results_data = actual_sol*np.ones(results_size)
-            output = ys[x]
-
-        results_data[:len(x)] = np.maximum.accumulate(output.cpu().squeeze())
-
-        # record results
-        self.results[self.acquisition][i] = results_data
-        return self.results
-
 
     def generate_data(self):
         """
@@ -196,27 +166,48 @@ class ActivePlot():
         ds = [tuple([i.to(self.device) for i in ds[0]])]
         return ds
 
-    def get_acquisition(self):
+    def get_acquisition(self, gs):
         """ Retrieve acquisition function and prepare for BO Experiment
         """
-        acquisitions = {
+        sequential_acquisitions = {
             'ExpectedImprovement': pinot.active.acquisition.expected_improvement_analytical,
             'ProbabilityOfImprovement': pinot.active.acquisition.probability_of_improvement,
             'UpperConfidenceBound': pinot.active.acquisition.upper_confidence_bound,
             'Uncertainty': pinot.active.acquisition.uncertainty,
             'Human': pinot.active.acquisition.temporal,
             'Random': pinot.active.acquisition.random,
-            'ThompsonSampling': pinot.active.acquisition.thompson_sampling,
+            
         }
 
-        return acquisitions[self.acquisition]
+        batch_acquisitions = {
+            'ThompsonSampling': pinot.active.acquisition.thompson_sampling,
+            'WeightedSamplingExpectedImprovement': pinot.active.acquisition.exponential_weighted_ei_analytical,
+            'WeightedSamplingProbabilityOfImprovement': pinot.active.acquisition.exponential_weighted_pi,
+            'WeightedSamplingUpperConfidenceBound': pinot.active.acquisition.exponential_weighted_ucb,
+            'GreedyExpectedImprovement': pinot.active.acquisition.greedy_ei_analytical,
+            'GreedyProbabilityOfImprovement': pinot.active.acquisition.greedy_pi,
+            'GreedyUpperConfidenceBound': pinot.active.acquisition.greedy_ucb,
+            'BatchRandom': pinot.active.acquisition.batch_random,
+            'BatchTemporal': pinot.active.acquisition.batch_temporal
+        }
+
+        if self.acquisition in sequential_acquisitions:
+            self.strategy = 'sequential'
+            acq_fn = sequential_acquisitions[self.acquisition]
+        
+        elif self.acquisition in batch_acquisitions:
+            self.strategy = 'batch'
+            acq_fn = batch_acquisitions[self.acquisition]
+
+        return acq_fn
 
 
     def get_net(self):
         """
         Retrive GP using representation provided in args.
         """
-        representation = pinot.representation.SequentialMix(config=self.config)
+        representation = pinot.representation.SequentialMix(
+            config=self.config)
 
         if hasattr(pinot.regressors, self.net):
             output_regressor = getattr(pinot.regressors, self.net)
@@ -258,9 +249,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--net', type=str, default='ExactGaussianProcessRegressor')
     parser.add_argument('--config', nargs="+", type=str,
-        default=["GraphConv", "32", "activation", "tanh",
-        "GraphConv", "32", "activation", "tanh",
-        "GraphConv", "32", "activation", "tanh"])
+        default=["GraphConv", "64", "activation", "tanh",
+        "GraphConv", "64", "activation", "tanh",
+        "GraphConv", "64", "activation", "tanh",
+        "GraphConv", "64", "activation", "tanh"])
 
     parser.add_argument('--lr', type=float, default=1e-4)
     parser.add_argument('--optimizer', type=str, default='Adam')
@@ -272,17 +264,14 @@ if __name__ == '__main__':
 
     parser.add_argument('--device', type=str, default='cuda:0')
     parser.add_argument('--num_trials', type=int, default=1)
-    parser.add_argument('--num_rounds', type=int, default=100)
-    parser.add_argument('--num_epochs', type=int, default=200)
+    parser.add_argument('--num_rounds', type=int, default=50)
+    parser.add_argument('--num_epochs', type=int, default=20)
 
     parser.add_argument('--index_provided', type=bool, default=True)
     parser.add_argument('--index', type=int, default=0)
     parser.add_argument('--output_folder', type=str, default="plotting_active")
-    parser.add_argument('--seed', type=int, default=2666, help="Seed for weight initialization")
 
     args = parser.parse_args()
-    
-    torch.manual_seed(args.seed) # Pick a seed
 
     plot = ActivePlot(
         # net config
@@ -308,13 +297,12 @@ if __name__ == '__main__':
 
     best_df = plot.generate()
     representation = args.config[0]
-
+   
     # If the output folder doesn't exist, create one
     if not os.path.isdir(args.output_folder):
         os.mkdir(args.output_folder)
 
     # save to disk
     if args.index_provided:
-        filename =\
-        f'{args.net}_{representation}_{args.optimizer}_{args.data}_{args.acquisition}_q{args.q}_{args.index}_{args.num_epochs}_{args.seed}.csv'
+        filename = f'{args.net}_{representation}_{args.optimizer}_{args.data}_{args.acquisition}_q{args.q}_{args.index}_{args.num_epochs}.csv'
     best_df.to_csv(os.path.join(args.output_folder, filename))
