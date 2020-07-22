@@ -32,6 +32,15 @@ def test_mix_default():
         c
 
 
+def test_mix_one_graph():
+    import pinot
+    from pinot.data import utils
+    import os
+
+    ds = pinot.data.moonshot_mixed()
+    view = ds.view("all_available_pairs", batch_size=1)
+    list(view)
+
 def test_rebatch():
     import pinot
     from pinot.data import utils
@@ -57,5 +66,3 @@ def test_filter():
 
     for g, y, c in view:
         assert abs(c - 0.02) < 0.01
-
-

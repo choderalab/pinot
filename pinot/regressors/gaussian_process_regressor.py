@@ -578,9 +578,13 @@ class BiophysicalVariationalGaussianProcessRegressor(
 
         self.log_sigma_measurement = torch.nn.Parameter(torch.zeros(1))
 
-    def g(self, func_value=None, test_ligand_concentration=None):
-        # normally test_ligand_concentration=1e-3
-        return 1 / (1 + torch.exp(-func_value) / test_ligand_concentration)
+    def fractional_saturation(self, func_value=None, test_ligand_concentration=None):
+        """
+        we pass units in molar
+        test_ligand_concentration : tensor(1) float32 in 1M units
+        returns: fractional saturation between 0 and 1
+        """
+        return 1.0 / (1.0 + torch.exp(func_value) / test_ligand_concentration)
 
     def condition(
         self, x_te, test_ligand_concentration=None, output='measurement',
@@ -630,15 +634,24 @@ class BiophysicalVariationalGaussianProcessRegressor(
         return f_sample, distribution_delta_g
 
 
-    def _condition_measurement(self, f_sample, test_ligand_concentration):
-        mu_m = self.g(
+    def _condition_measurement(self, f_sample, test_ligand_concentration, noise_model='robust'):
+        """
+        noise_model: robust -> StudentT, normal->Normal
+        """
+        mu_m = self.fractional_saturation(
             func_value=f_sample[:, None],
             test_ligand_concentration=test_ligand_concentration,
         )
         sigma_m = torch.exp(self.log_sigma_measurement)
-        distribution_measurement = torch.distributions.normal.Normal(
-            loc=mu_m, scale=sigma_m
-        )
+        
+        if noise_model=='normal':
+            distribution_measurement = torch.distributions.normal.Normal(
+                loc=mu_m, scale=sigma_m
+            )
+        elif noise_model=='robust':
+            distribution_measurement = torch.distributions.studentT.StudentT(
+                df=1,loc=mu_m, scale=sigma_m
+            )
         return distribution_measurement
 
     def _condition_delta_g(self, x_te):
