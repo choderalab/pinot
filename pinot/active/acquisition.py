@@ -7,11 +7,10 @@ from pinot.metrics import _independent
 # =============================================================================
 # UTILITIES
 # =============================================================================
-def _get_utility(net, unseen_data, acq_func, y_best=0.0):
+def _get_utility(net, gs, acq_func, y_best=0.0):
     """ Obtain distribution and utility from acquisition func.
     """
     # obtain predictive posterior
-    gs, ys = unseen_data
     distribution = _independent(net.condition(gs))
 
     # obtain utility from vanilla acquisition func
@@ -29,7 +28,7 @@ def _greedy(utility, q=1):
 # =============================================================================
 # MODULE FUNCTIONS
 # =============================================================================
-def thompson_sampling(net, unseen_data, y_best=0.0, q=1, unique=True):
+def thompson_sampling(net, gs, y_best=0.0, q=1, unique=True):
     """ Generates m Thompson samples and maximizes them.
     
     Parameters
@@ -55,7 +54,6 @@ def thompson_sampling(net, unseen_data, y_best=0.0, q=1, unique=True):
         The indices corresponding to pending points.
     """
     # obtain predictive posterior
-    gs, ys = unseen_data
     distribution = _independent(net.condition(gs))
     
     # obtain samples from posterior
@@ -65,11 +63,13 @@ def thompson_sampling(net, unseen_data, y_best=0.0, q=1, unique=True):
     if unique:
 
         # enforce no duplicates in batch
-        pending_pts = torch.unique(pending_pts).tolist()
+        pending_pts = set(torch.unique(pending_pts).tolist())
         
         while len(pending_pts) < q:
             theta = distribution.sample()
-            pending_pts.append(torch.argmax(theta).item())
+            pending_pts.add(torch.argmax(theta).item())
+        
+        pending_pts = list(pending_pts)
     
     # convert to tensor
     pending_pts = torch.LongTensor(pending_pts)
@@ -77,7 +77,7 @@ def thompson_sampling(net, unseen_data, y_best=0.0, q=1, unique=True):
     return pending_pts
 
 
-def temporal(net, unseen_data, y_best=0.0, q=1):
+def temporal(net, gs, y_best=0.0, q=1):
     r"""Picks the first in sequence.
     Designed to be used with temporal datasets to compare with baselines.
 
@@ -115,7 +115,7 @@ def temporal(net, unseen_data, y_best=0.0, q=1):
 
     utility = _get_utility(
         net,
-        unseen_data,
+        gs,
         _temporal,
         y_best=y_best
     )
@@ -129,7 +129,7 @@ def temporal(net, unseen_data, y_best=0.0, q=1):
     return pending_pts
 
 
-def probability_of_improvement(net, unseen_data, y_best=0.0, q=1):
+def probability_of_improvement(net, gs, y_best=0.0, q=1):
     r""" Probability of Improvement (PI).
 
     Parameters
@@ -158,7 +158,7 @@ def probability_of_improvement(net, unseen_data, y_best=0.0, q=1):
 
     utility = _get_utility(
         net,
-        unseen_data,
+        gs,
         _pi,
         y_best=y_best
     )
@@ -172,7 +172,7 @@ def probability_of_improvement(net, unseen_data, y_best=0.0, q=1):
     return pending_pts
 
 
-def uncertainty(net, unseen_data, y_best=0.0, q=1):
+def uncertainty(net, gs, y_best=0.0, q=1):
     r""" Uncertainty.
 
     Parameters
@@ -201,7 +201,7 @@ def uncertainty(net, unseen_data, y_best=0.0, q=1):
 
     utility = _get_utility(
         net,
-        unseen_data,
+        gs,
         _uncertainty,
         y_best=y_best
     )
@@ -215,7 +215,7 @@ def uncertainty(net, unseen_data, y_best=0.0, q=1):
     return pending_pts
 
 
-def expected_improvement_analytical(net, unseen_data, y_best=0.0, q=1):
+def expected_improvement_analytical(net, gs, y_best=0.0, q=1):
     r""" Analytical Expected Improvement (EI).
 
     Closed-form derivation assumes predictive posterior is a multivariate normal distribution.
@@ -263,7 +263,7 @@ def expected_improvement_analytical(net, unseen_data, y_best=0.0, q=1):
 
     utility = _get_utility(
         net,
-        unseen_data,
+        gs,
         _ei_analytical,
         y_best=y_best
     )
@@ -277,7 +277,7 @@ def expected_improvement_analytical(net, unseen_data, y_best=0.0, q=1):
     return pending_pts
 
 
-def expected_improvement_monte_carlo(net, unseen_data, y_best=0.0, q=1, n_samples=1000):
+def expected_improvement_monte_carlo(net, gs, y_best=0.0, q=1, n_samples=1000):
     r""" Monte Carlo Expected Improvement (EI).
 
     Parameters
@@ -311,7 +311,7 @@ def expected_improvement_monte_carlo(net, unseen_data, y_best=0.0, q=1, n_sample
 
     utility = _get_utility(
         net,
-        unseen_data,
+        gs,
         _ei_monte_carlo,
         y_best=y_best
     )
@@ -325,7 +325,7 @@ def expected_improvement_monte_carlo(net, unseen_data, y_best=0.0, q=1, n_sample
     return pending_pts
 
 
-def upper_confidence_bound(net, unseen_data, y_best=0.0, q=1, kappa=0.95):
+def upper_confidence_bound(net, gs, y_best=0.0, q=1, kappa=0.95):
     r""" Upper Confidence Bound (UCB).
 
     Parameters
@@ -355,7 +355,7 @@ def upper_confidence_bound(net, unseen_data, y_best=0.0, q=1, kappa=0.95):
 
     utility = _get_utility(
         net,
-        unseen_data,
+        gs,
         _ucb,
         y_best=y_best
     )
@@ -369,7 +369,7 @@ def upper_confidence_bound(net, unseen_data, y_best=0.0, q=1, kappa=0.95):
     return pending_pts
 
 
-def random(net, unseen_data, y_best=0.0, q=1, seed=2666):
+def random(net, gs, y_best=0.0, q=1, seed=2666):
     """ Random assignment of scores under normal distribution.
 
     Parameters
@@ -404,7 +404,7 @@ def random(net, unseen_data, y_best=0.0, q=1, seed=2666):
     # torch.manual_seed(seed)
     utility = _get_utility(
         net,
-        unseen_data,
+        gs,
         _random,
         y_best=y_best
     )

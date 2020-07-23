@@ -37,7 +37,7 @@ def _get_biophysical_thompson_values(
     concentration=20,
     dG_samples=10):
     """ Generates m Thompson samples and maximizes them.
-    """        
+    """
     # fill batch
     thompson_values = []
     for _ in range(q):
