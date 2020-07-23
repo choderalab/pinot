@@ -43,15 +43,15 @@ moonshot_meta = utils.from_csv(
 moonshot_with_date = lambda: datasets.TemporalDataset().from_csv(
     os.path.dirname(utils.__file__) + "/moonshot_with_date.csv",
     smiles_col=1,
-    y_cols=[5, 6, 7, 8, 9, 10],
-    time_col=-4,
+    y_cols=[11, 12, 13, 14, 15, 16],
+    time_col=-2,
     scale=0.01,
 )
 
 moonshot_sorted = utils.from_csv(
     os.path.dirname(utils.__file__) + "/moonshot_with_date.csv",
     smiles_col=1,
-    y_cols=[14],
+    y_cols=[14], # f inhibition at 20 uM
     scale=0.01,
     shuffle=False,
     dropna=True,

@@ -142,6 +142,33 @@ class TSBayesOptExperiment(pinot.active.experiment.BayesOptExperiment):
             if len(data):
                 _ts(key, data, num_samples=num_samples)
 
+    def ucb(self, num_samples=1):
+        """ Perform retrospective and prospective Thompson Sampling
+            to check model beliefs about y_max.
+        """
+        def _ts(key, data, num_samples=1):
+            """Get Thompson samples.
+            """
+            if isinstance(self.net.output_regressor, pinot.regressors.BiophysicalRegressor):
+                ts_values = _get_biophysical_thompson_values(self.net, data, q=num_samples)
+            else:
+                ts_values = _get_thompson_values(self.net, data, q=num_samples)
+            self.thompson_samples[key].append(ts_values)
+
+        # set net to eval
+        self.net.eval()
+
+        # instantiate thompson samples dict if necessary
+        if not hasattr(self, 'thompson_samples'):
+            self.thompson_samples = {'prospective': [],
+                                     'retrospective': []}
+        
+        for key in self.thompson_samples:
+            # thompson sampling on UNSEEN data if prospective
+            data = self.unseen_data if key == 'prospective' else self.data
+            if len(data):
+                _ts(key, data, num_samples=num_samples)
+
 
 class TSActivePlot():
 
