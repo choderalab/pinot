@@ -42,7 +42,7 @@ def bo():
         data=torch.cat([x, y], dim=1),
         optimizer=torch.optim.Adam(net.parameters(), 1e-3),
         acquisition=pinot.active.acquisition.probability_of_improvement,
-        n_epochs=10,
+        num_epochs=10,
     )
 
 

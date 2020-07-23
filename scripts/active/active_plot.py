@@ -10,7 +10,7 @@ import torch
 import pinot
 import pinot.active.experiment as experiment
 from pinot.generative import SemiSupervisedNet
-
+import os
 
 ######################
 # Utilities
@@ -38,7 +38,7 @@ class ActivePlot():
 
     def __init__(self, net, config,
                  lr, optimizer_type,
-                 data, acquisition, num_samples, q,
+                 data, unlabeled_data, acquisition, num_samples, q,
                  device, num_trials, num_rounds, num_epochs):
 
         # net config
@@ -51,6 +51,7 @@ class ActivePlot():
 
         # experiment config
         self.data = data
+        self.unlabeled_data = unlabeled_data
         self.acquisition = acquisition
         self.num_samples = num_samples
         self.q = q
@@ -112,9 +113,11 @@ class ActivePlot():
         ds = self.generate_data()
         acq_fn = self.get_acquisition()
 
+        if self.unlabeled_data:
+            unlabeled_data = getattr(pinot.data, self.unlabeled_data) 
+
         # acquistion functions to be tested
         for i in range(self.num_trials):
-            print(i)
 
             # make fresh net and optimizer
             net = self.get_net().to(self.device)
@@ -124,7 +127,7 @@ class ActivePlot():
                 lr=self.lr,
                 weight_decay=0.01,
                 kl_loss_scaling=1.0/float(len(ds[0][1]))
-                )
+                )(net)
 
             # instantiate experiment
             self.bo = self.bo_cls(
@@ -138,6 +141,9 @@ class ActivePlot():
                 collate_fn=experiment._collate_fn_graph, # pinot.active.
                 train_class=self.train
             )
+
+            if self.unlabeled_data:
+                self.bo.unlabeled_data = unlabeled_data
 
             # run experiment
             x = self.bo.run(num_rounds=self.num_rounds)
@@ -191,6 +197,8 @@ class ActivePlot():
         """
         # Load and batch data
         ds = getattr(pinot.data, self.data)()
+        if len(ds[0]) > 2: # Temporal Dataset might have 3 fields per tuple
+            ds = [(d[0],d[1]) for d in ds]
         ds = pinot.data.utils.batch(ds, len(ds), seed=None)
         ds = [tuple([i.to(self.device) for i in ds[0]])]
         return ds
@@ -228,7 +236,7 @@ class ActivePlot():
             output_regressor = pinot.regressors.NeuralNetworkRegressor
             net = SemiSupervisedNet(
                 representation=representation,
-                output_regressor=output_regressor
+                output_regressor_class=output_regressor
             )
 
         elif self.net == 'semi_gp':
@@ -236,14 +244,14 @@ class ActivePlot():
 
             net = SemiSupervisedNet(
                 representation=representation,
-                output_regressor=output_regressor,
+                output_regressor_class=output_regressor,
             )
 
         elif self.net == 'multitask':
             output_regressor = pinot.regressors.ExactGaussianProcessRegressor
             net = pinot.multitask.MultitaskNet(
                 representation=representation,
-                output_regressor=output_regressor,
+                output_regressor_class=output_regressor,
             )
 
         return net
@@ -265,6 +273,7 @@ if __name__ == '__main__':
     parser.add_argument('--optimizer', type=str, default='Adam')
 
     parser.add_argument('--data', type=str, default='esol')
+    parser.add_argument('--unlabeled_data', type=str, default="")
     parser.add_argument('--acquisition', type=str, default='ExpectedImprovement')
     parser.add_argument('--num_samples', type=int, default=1000)
     parser.add_argument('--q', type=int, default=1)
@@ -276,8 +285,12 @@ if __name__ == '__main__':
 
     parser.add_argument('--index_provided', type=bool, default=True)
     parser.add_argument('--index', type=int, default=0)
-
+    parser.add_argument('--output_folder', type=str, default="plotting_active")
+    parser.add_argument('--seed', type=int, default=2666, help="Seed for weight initialization")
+    
     args = parser.parse_args()
+    
+    torch.manual_seed(args.seed) # Pick a seed
 
     plot = ActivePlot(
         # net config
@@ -290,6 +303,7 @@ if __name__ == '__main__':
 
         # experiment config
         data=args.data,
+        unlabeled_data=args.unlabeled_data,
         acquisition=args.acquisition,
         num_samples=args.num_samples,
         q=args.q,
@@ -304,7 +318,12 @@ if __name__ == '__main__':
     best_df = plot.generate()
     representation = args.config[0]
 
+    # If the output folder doesn't exist, create one
+    if not os.path.isdir(args.output_folder):
+        os.mkdir(args.output_folder)
+
     # save to disk
     if args.index_provided:
-        filename = f'{args.net}_{representation}_{args.optimizer}_{args.data}_{args.acquisition}_q{args.q}_{args.index}.csv'
-    best_df.to_csv(filename)
+        filename =\
+        f'{args.net}_{representation}_{args.optimizer}_{args.data}_{args.acquisition}_q{args.q}_{args.index}_{args.num_epochs}_{args.seed}.csv'
+    best_df.to_csv(os.path.join(args.output_folder, filename))
