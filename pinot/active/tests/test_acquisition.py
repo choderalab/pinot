@@ -56,7 +56,7 @@ def setup():
         )
     )
 
-    unseen_data = tuple([x, y])
+    unseen_data = x
 
     return net, unseen_data
 
