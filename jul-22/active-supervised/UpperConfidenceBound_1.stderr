@@ -1,0 +1,26 @@
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/active_plot.py", line 318, in <module>
+    best_df = plot.generate()
+  File "scripts/active/active_plot.py", line 86, in generate
+    final_results = self.run_trials(ds)
+  File "scripts/active/active_plot.py", line 149, in run_trials
+    x = self.bo.run(num_rounds=self.num_rounds)
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 393, in run
+    self.train()
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 309, in train
+    optimizer=self.optimizer(self.net),
+TypeError: 'Adam' object is not callable
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/active_plot.py", line 318, in <module>
+    best_df = plot.generate()
+  File "scripts/active/active_plot.py", line 86, in generate
+    final_results = self.run_trials(ds)
+  File "scripts/active/active_plot.py", line 149, in run_trials
+    x = self.bo.run(num_rounds=self.num_rounds)
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 393, in run
+    self.train()
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 309, in train
+    optimizer=self.optimizer(self.net),
+TypeError: 'Adam' object is not callable

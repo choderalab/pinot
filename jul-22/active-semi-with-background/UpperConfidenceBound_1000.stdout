@@ -1,0 +1,100 @@
+Sender: LSF System <lsfadmin@ls06>
+Subject: Job 16131970: <yes-data> in cluster <lila> Done
+
+Job <yes-data> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Thu Jul 23 10:48:38 2020
+Job was executed on host(s) <12*ls06>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Thu Jul 23 10:50:35 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Thu Jul 23 10:50:35 2020
+Terminated at Fri Jul 24 09:24:41 2020
+Results reported at Fri Jul 24 09:24:41 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/active_plot.py --net semi_gp --num_rounds 6 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition UpperConfidenceBound --output_folder /home/nguyenm5/coding/pinot/jul-22/active-semi-with-background --index 4 --unlabeled_data moonshot_unlabeled_small --device cuda:0 --seed 2666
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   1395739.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   81246 sec.
+    Turnaround time :                            81363 sec.
+
+The output (if any) follows:
+
+MPI, UCB, UCB-ybest, Expected Improv
+[array(521)]
+[array(521)]
+[array(520.06104797)]
+[array(521)]
+[array(520)]
+[array(520)]
+[array(519.06104797)]
+[array(520)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-22/active-semi-with-background/UpperConfidenceBound_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls15>
+Subject: Job 16131967: <yes-data> in cluster <lila> Done
+
+Job <yes-data> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Thu Jul 23 10:48:38 2020
+Job was executed on host(s) <12*ls15>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Thu Jul 23 10:48:59 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Thu Jul 23 10:48:59 2020
+Terminated at Fri Jul 24 10:11:59 2020
+Results reported at Fri Jul 24 10:11:59 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/active_plot.py --net semi_gp --num_rounds 6 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition UpperConfidenceBound --output_folder /home/nguyenm5/coding/pinot/jul-22/active-semi-with-background --index 1 --unlabeled_data moonshot_unlabeled_small --device cuda:0 --seed 2666
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   1456430.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   84181 sec.
+    Turnaround time :                            84201 sec.
+
+The output (if any) follows:
+
+MPI, UCB, UCB-ybest, Expected Improv
+[array(520)]
+[array(521)]
+[array(520.8139489)]
+[array(519)]
+[array(519)]
+[array(520)]
+[array(519.8139489)]
+[array(518)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-22/active-semi-with-background/UpperConfidenceBound_1000.stderr> for stderr output of this job.
+

@@ -1,0 +1,82 @@
+Sender: LSF System <lsfadmin@lu02>
+Subject: Job 16130324: <supervised> in cluster <lila> Exited
+
+Job <supervised> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Wed Jul 22 15:58:44 2020
+Job was executed on host(s) <12*lu02>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Wed Jul 22 16:08:11 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Wed Jul 22 16:08:11 2020
+Terminated at Wed Jul 22 16:08:42 2020
+Results reported at Wed Jul 22 16:08:42 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/active_plot.py --net ExactGaussianProcessRegressor --num_rounds 6 --num_trials 1 --num_epochs 1 --data moonshot_sorted --q 96 --acquisition UpperConfidenceBound --output_folder /home/nguyenm5/coding/pinot/jul-22/active-supervised --index 1 --device cuda:0 --seed 2666
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   11.00 sec.
+    Max Memory :                                 1 GB
+    Average Memory :                             0.06 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               191.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                8
+    Run time :                                   33 sec.
+    Turnaround time :                            598 sec.
+
+The output (if any) follows:
+
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-22/active-supervised/UpperConfidenceBound_1.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls08>
+Subject: Job 16130324: <supervised> in cluster <lila> Exited
+
+Job <supervised> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Wed Jul 22 15:58:44 2020
+Job was executed on host(s) <12*ls08>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Wed Jul 22 16:10:38 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Wed Jul 22 16:10:38 2020
+Terminated at Wed Jul 22 16:10:56 2020
+Results reported at Wed Jul 22 16:10:56 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/active_plot.py --net ExactGaussianProcessRegressor --num_rounds 6 --num_trials 1 --num_epochs 1 --data moonshot_sorted --q 96 --acquisition UpperConfidenceBound --output_folder /home/nguyenm5/coding/pinot/jul-22/active-supervised --index 1 --device cuda:0 --seed 2666
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   8.00 sec.
+    Max Memory :                                 1 GB
+    Average Memory :                             0.36 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               191.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                8
+    Run time :                                   19 sec.
+    Turnaround time :                            732 sec.
+
+The output (if any) follows:
+
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-22/active-supervised/UpperConfidenceBound_1.stderr> for stderr output of this job.
+

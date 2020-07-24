@@ -1,0 +1,50 @@
+THCudaCheck FAIL file=/opt/conda/conda-bld/pytorch_1591914743399/work/aten/src/THC/generic/THCTensorMath.cu line=29 error=59 : device-side assert triggered
+Using backend: pytorch
+/opt/conda/conda-bld/pytorch_1591914743399/work/aten/src/THCUNN/ClassNLLCriterion.cu:187: cunn_ClassNLLCriterion_updateGradInput_kernel: block: [0,0,0], thread: [2,0,0] Assertion `t >= 0 && t < n_classes` failed.
+/opt/conda/conda-bld/pytorch_1591914743399/work/aten/src/THCUNN/ClassNLLCriterion.cu:187: cunn_ClassNLLCriterion_updateGradInput_kernel: block: [0,0,0], thread: [3,0,0] Assertion `t >= 0 && t < n_classes` failed.
+/opt/conda/conda-bld/pytorch_1591914743399/work/aten/src/THCUNN/ClassNLLCriterion.cu:187: cunn_ClassNLLCriterion_updateGradInput_kernel: block: [0,0,0], thread: [10,0,0] Assertion `t >= 0 && t < n_classes` failed.
+/opt/conda/conda-bld/pytorch_1591914743399/work/aten/src/THCUNN/ClassNLLCriterion.cu:187: cunn_ClassNLLCriterion_updateGradInput_kernel: block: [0,0,0], thread: [11,0,0] Assertion `t >= 0 && t < n_classes` failed.
+/opt/conda/conda-bld/pytorch_1591914743399/work/aten/src/THCUNN/ClassNLLCriterion.cu:187: cunn_ClassNLLCriterion_updateGradInput_kernel: block: [0,0,0], thread: [22,0,0] Assertion `t >= 0 && t < n_classes` failed.
+/opt/conda/conda-bld/pytorch_1591914743399/work/aten/src/THCUNN/ClassNLLCriterion.cu:187: cunn_ClassNLLCriterion_updateGradInput_kernel: block: [0,0,0], thread: [23,0,0] Assertion `t >= 0 && t < n_classes` failed.
+Traceback (most recent call last):
+  File "scripts/active/active_plot.py", line 319, in <module>
+    best_df = plot.generate()
+  File "scripts/active/active_plot.py", line 86, in generate
+    final_results = self.run_trials(ds)
+  File "scripts/active/active_plot.py", line 150, in run_trials
+    x = self.bo.run(num_rounds=self.num_rounds)
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 393, in run
+    self.train()
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 503, in train
+    self.net = pinot.app.experiment.Train(
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 105, in train
+    self.train_once()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 89, in train_once
+    self.optimizer.step(l)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/autograd/grad_mode.py", line 15, in decorate_context
+    return func(*args, **kwargs)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/optim/adam.py", line 62, in step
+    loss = closure()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 86, in l
+    loss.backward()
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/tensor.py", line 198, in backward
+    torch.autograd.backward(self, gradient, retain_graph, create_graph)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/autograd/__init__.py", line 98, in backward
+    Variable._execution_engine.run_backward(
+RuntimeError: cuda runtime error (59) : device-side assert triggered at /opt/conda/conda-bld/pytorch_1591914743399/work/aten/src/THC/generic/THCTensorMath.cu:29
+terminate called after throwing an instance of 'dmlc::Error'
+  what():  [10:55:49] /opt/dgl/src/runtime/cuda/cuda_device_api.cc:103: Check failed: e == cudaSuccess || e == cudaErrorCudartUnloading: CUDA: device-side assert triggered
+Stack trace:
+  [bt] (0) /home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/libdgl.so(dgl::runtime::CUDADeviceAPI::FreeDataSpace(DLContext, void*)+0x65d) [0x2b3805c1517d]
+  [bt] (1) /home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/libdgl.so(dgl::runtime::NDArray::Internal::DefaultDeleter(dgl::runtime::NDArray::Container*)+0x195) [0x2b3805b0a6b5]
+  [bt] (2) /home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/libdgl.so(dgl::CSR::~CSR()+0x35) [0x2b3805b729e5]
+  [bt] (3) /home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/libdgl.so(std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_release()+0x39) [0x2b38054e4929]
+  [bt] (4) /home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/libdgl.so(dgl::ImmutableGraph::~ImmutableGraph()+0x59) [0x2b3805b73a49]
+  [bt] (5) /home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/libdgl.so(DGLObjectFree+0x52) [0x2b3805adc292]
+  [bt] (6) /home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/_ffi/_cy3/core.cpython-38-x86_64-linux-gnu.so(+0x104ff) [0x2b3815b134ff]
+  [bt] (7) /home/nguyenm5/anaconda3/envs/pinot/bin/python(+0x1c0eb9) [0x562da3ae2eb9]
+  [bt] (8) /home/nguyenm5/anaconda3/envs/pinot/bin/python(+0x1286f6) [0x562da3a4a6f6]
+
+
+/scratch/lsftmp/1595515722.16131984: line 8: 58508 Aborted                 (core dumped) /home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/active_plot.py --net semi_gp --num_rounds 6 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition ProbabilityOfImprovement --output_folder /home/nguyenm5/coding/pinot/jul-22/active-semi-with-background --index 3 --unlabeled_data moonshot_unlabeled_small --device cuda:0 --seed 2666
+Using backend: pytorch

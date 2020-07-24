@@ -1,0 +1,82 @@
+Sender: LSF System <lsfadmin@lu02>
+Subject: Job 16130327: <supervised> in cluster <lila> Exited
+
+Job <supervised> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Wed Jul 22 15:58:46 2020
+Job was executed on host(s) <12*lu02>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Wed Jul 22 16:08:43 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Wed Jul 22 16:08:43 2020
+Terminated at Wed Jul 22 16:08:51 2020
+Results reported at Wed Jul 22 16:08:51 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/active_plot.py --net ExactGaussianProcessRegressor --num_rounds 6 --num_trials 1 --num_epochs 1 --data moonshot_sorted --q 96 --acquisition ProbabilityOfImprovement --output_folder /home/nguyenm5/coding/pinot/jul-22/active-supervised --index 1 --device cuda:0 --seed 2666
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   7.00 sec.
+    Max Memory :                                 1 GB
+    Average Memory :                             0.67 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               191.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                8
+    Run time :                                   9 sec.
+    Turnaround time :                            605 sec.
+
+The output (if any) follows:
+
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-22/active-supervised/ProbabilityOfImprovement_1.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls09>
+Subject: Job 16130327: <supervised> in cluster <lila> Exited
+
+Job <supervised> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Wed Jul 22 15:58:46 2020
+Job was executed on host(s) <12*ls09>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Wed Jul 22 16:10:40 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Wed Jul 22 16:10:40 2020
+Terminated at Wed Jul 22 16:10:59 2020
+Results reported at Wed Jul 22 16:10:59 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/active_plot.py --net ExactGaussianProcessRegressor --num_rounds 6 --num_trials 1 --num_epochs 1 --data moonshot_sorted --q 96 --acquisition ProbabilityOfImprovement --output_folder /home/nguyenm5/coding/pinot/jul-22/active-supervised --index 1 --device cuda:0 --seed 2666
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   8.00 sec.
+    Max Memory :                                 1 GB
+    Average Memory :                             0.27 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               191.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                8
+    Run time :                                   21 sec.
+    Turnaround time :                            733 sec.
+
+The output (if any) follows:
+
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-22/active-supervised/ProbabilityOfImprovement_1.stderr> for stderr output of this job.
+
