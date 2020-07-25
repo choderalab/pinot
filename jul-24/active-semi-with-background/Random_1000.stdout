@@ -1,0 +1,150 @@
+Sender: LSF System <lsfadmin@lt19>
+Subject: Job 16136453: <semi-active> in cluster <lila> Done
+
+Job <semi-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Fri Jul 24 20:32:08 2020
+Job was executed on host(s) <12*lt19>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Fri Jul 24 20:33:04 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Fri Jul 24 20:33:04 2020
+Terminated at Sat Jul 25 02:41:25 2020
+Results reported at Sat Jul 25 02:41:25 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/active_plot.py --net semi_gp --num_rounds 6 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition Random --output_folder /home/nguyenm5/coding/pinot/jul-24/active-semi-with-background --index 1 --unlabeled_data moonshot_unlabeled_small --device cuda:0 --seed 2666 --unlabeled_volume 0.0
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   365615.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   22101 sec.
+    Turnaround time :                            22157 sec.
+
+The output (if any) follows:
+
+MPI, UCB, UCB-ybest, Expected Improv
+[array(520), array(513), array(520)]
+[array(521), array(513), array(520)]
+[array(520.93181994), array(511.96037245), array(518.96037245)]
+[array(520), array(513), array(520)]
+[array(519), array(418), array(328)]
+[array(520), array(418), array(329)]
+[array(519.93181994), array(416.96037245), array(327.96037245)]
+[array(519), array(418), array(328)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-24/active-semi-with-background/Random_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls06>
+Subject: Job 16136455: <semi-active> in cluster <lila> Done
+
+Job <semi-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Fri Jul 24 20:32:09 2020
+Job was executed on host(s) <12*ls06>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Fri Jul 24 20:33:23 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Fri Jul 24 20:33:23 2020
+Terminated at Sat Jul 25 08:08:17 2020
+Results reported at Sat Jul 25 08:08:17 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/active_plot.py --net semi_gp --num_rounds 6 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition Random --output_folder /home/nguyenm5/coding/pinot/jul-24/active-semi-with-background --index 1 --unlabeled_data moonshot_unlabeled_small --device cuda:0 --seed 8888 --unlabeled_volume 0.0
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   718468.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   41695 sec.
+    Turnaround time :                            41768 sec.
+
+The output (if any) follows:
+
+MPI, UCB, UCB-ybest, Expected Improv
+[array(524), array(521), array(523), array(520), array(520), array(522)]
+[array(524), array(521), array(523), array(520), array(520), array(522)]
+[array(523.84630156), array(519.96453345), array(521.96453345), array(518.96037245), array(518.96037245), array(520.96037245)]
+[array(524), array(521), array(523), array(520), array(520), array(522)]
+[array(523), array(424), array(330), array(233), array(138), array(43)]
+[array(523), array(424), array(330), array(233), array(139), array(43)]
+[array(522.84630156), array(422.96453345), array(328.96453345), array(231.96037245), array(137.96037245), array(41.96037245)]
+[array(523), array(424), array(330), array(233), array(138), array(43)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-24/active-semi-with-background/Random_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lt10>
+Subject: Job 16136454: <semi-active> in cluster <lila> Done
+
+Job <semi-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Fri Jul 24 20:32:09 2020
+Job was executed on host(s) <12*lt10>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Fri Jul 24 20:33:06 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Fri Jul 24 20:33:06 2020
+Terminated at Sat Jul 25 08:24:14 2020
+Results reported at Sat Jul 25 08:24:14 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/active_plot.py --net semi_gp --num_rounds 6 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition Random --output_folder /home/nguyenm5/coding/pinot/jul-24/active-semi-with-background --index 1 --unlabeled_data moonshot_unlabeled_small --device cuda:0 --seed 417 --unlabeled_volume 0.0
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   690879.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   42670 sec.
+    Turnaround time :                            42725 sec.
+
+The output (if any) follows:
+
+MPI, UCB, UCB-ybest, Expected Improv
+[array(524), array(519), array(519), array(513), array(513)]
+[array(524), array(519), array(522), array(522), array(522)]
+[array(523.87025569), array(518.00562525), array(521.0013569), array(520.96453345), array(520.96453345)]
+[array(524), array(519), array(519), array(513), array(513)]
+[array(523), array(424), array(328), array(232), array(138)]
+[array(523), array(424), array(330), array(232), array(138)]
+[array(522.87025569), array(423.00562525), array(329.0013569), array(230.96453345), array(136.96453345)]
+[array(523), array(424), array(328), array(232), array(138)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-24/active-semi-with-background/Random_1000.stderr> for stderr output of this job.
+

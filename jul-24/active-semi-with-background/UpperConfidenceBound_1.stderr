@@ -1,0 +1,16 @@
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/active_plot.py", line 300, in <module>
+    plot = ActivePlot(
+TypeError: __init__() missing 1 required positional argument: 'unlabeled_volume'
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/active_plot.py", line 9, in <module>
+    import torch
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/__init__.py", line 135, in <module>
+    _load_global_deps()
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/__init__.py", line 93, in _load_global_deps
+    ctypes.CDLL(lib_path, mode=ctypes.RTLD_GLOBAL)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/ctypes/__init__.py", line 373, in __init__
+    self._handle = _dlopen(self._name, mode)
+KeyboardInterrupt
