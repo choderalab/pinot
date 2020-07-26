@@ -1,0 +1,41 @@
+Sender: LSF System <lsfadmin@ls15>
+Subject: Job 16135699: <semi-supervised> in cluster <lila> Done
+
+Job <semi-supervised> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Fri Jul 24 10:48:38 2020
+Job was executed on host(s) <12*ls15>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Fri Jul 24 10:49:26 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Fri Jul 24 10:49:26 2020
+Terminated at Sat Jul 25 08:50:18 2020
+Results reported at Sat Jul 25 08:50:18 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/semi_supervised/learning_curve_semi.py --n_epochs 2000 --cuda --regressor_type VariationalGaussianProcessRegressor --output /home/nguyenm5/coding/pinot/jul-23/semi/arch-search --labeled_data moonshot --unlabeled_data moonshot_unlabeled_small --architecture GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh --volume 0.4
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   1605389.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   79254 sec.
+    Turnaround time :                            79300 sec.
+
+The output (if any) follows:
+
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-23/semi/error/VariationalGaussianProcessRegressor_GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh_0.4.stderr> for stderr output of this job.
+

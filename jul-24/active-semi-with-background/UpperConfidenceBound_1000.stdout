@@ -248,3 +248,53 @@ PS:
 
 Read file </home/nguyenm5/coding/pinot/jul-24/active-semi-with-background/UpperConfidenceBound_1000.stderr> for stderr output of this job.
 
+Sender: LSF System <lsfadmin@ls08>
+Subject: Job 16136464: <semi-active> in cluster <lila> Done
+
+Job <semi-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Fri Jul 24 20:32:11 2020
+Job was executed on host(s) <12*ls08>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Fri Jul 24 21:38:35 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Fri Jul 24 21:38:35 2020
+Terminated at Sun Jul 26 00:40:37 2020
+Results reported at Sun Jul 26 00:40:37 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/active_plot.py --net semi_gp --num_rounds 6 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition UpperConfidenceBound --output_folder /home/nguyenm5/coding/pinot/jul-24/active-semi-with-background --index 1 --unlabeled_data moonshot_unlabeled_small --device cuda:0 --seed 8888 --unlabeled_volume 0.2
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   1652368.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   97323 sec.
+    Turnaround time :                            101306 sec.
+
+The output (if any) follows:
+
+MPI, UCB, UCB-ybest, Expected Improv
+[array(513), array(511), array(524), array(522)]
+[array(513), array(521), array(524), array(522)]
+[array(512.23622513), array(520.0013569), array(523.0013569), array(521.0013569)]
+[array(513), array(521), array(524), array(522)]
+[array(512), array(415), array(331), array(235)]
+[array(512), array(424), array(331), array(235)]
+[array(511.23622513), array(423.0013569), array(330.0013569), array(234.0013569)]
+[array(512), array(424), array(331), array(235)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-24/active-semi-with-background/UpperConfidenceBound_1000.stderr> for stderr output of this job.
+

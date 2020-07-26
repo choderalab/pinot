@@ -248,3 +248,53 @@ PS:
 
 Read file </home/nguyenm5/coding/pinot/jul-24/active-semi-with-background/ProbabilityOfImprovement_1000.stderr> for stderr output of this job.
 
+Sender: LSF System <lsfadmin@lt18>
+Subject: Job 16136472: <semi-active> in cluster <lila> Done
+
+Job <semi-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Fri Jul 24 20:32:12 2020
+Job was executed on host(s) <12*lt18>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Fri Jul 24 21:39:47 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Fri Jul 24 21:39:47 2020
+Terminated at Sat Jul 25 16:39:31 2020
+Results reported at Sat Jul 25 16:39:31 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/active_plot.py --net semi_gp --num_rounds 6 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition ProbabilityOfImprovement --output_folder /home/nguyenm5/coding/pinot/jul-24/active-semi-with-background --index 1 --unlabeled_data moonshot_unlabeled_small --device cuda:0 --seed 417 --unlabeled_volume 0.2
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   1151934.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   68383 sec.
+    Turnaround time :                            72439 sec.
+
+The output (if any) follows:
+
+MPI, UCB, UCB-ybest, Expected Improv
+[array(497), array(513), array(524)]
+[array(522), array(507), array(524)]
+[array(521.97365863), array(505.96037245), array(522.96037245)]
+[array(521), array(507), array(524)]
+[array(496), array(416), array(331)]
+[array(521), array(416), array(331)]
+[array(520.97365863), array(414.96037245), array(329.96037245)]
+[array(520), array(427), array(331)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-24/active-semi-with-background/ProbabilityOfImprovement_1000.stderr> for stderr output of this job.
+
