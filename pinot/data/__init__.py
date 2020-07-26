@@ -53,6 +53,6 @@ moonshot_sorted = lambda: datasets.TemporalDataset().from_csv(
     smiles_col=1,
     y_cols=[14], # f inhibition at 20 uM
     scale=0.01,
-    time_col=-4,
+    time_col=-2,
     dropna=True,
 )

@@ -198,7 +198,7 @@ class ActivePlot():
         # Load and batch data
         ds = getattr(pinot.data, self.data)()
         if len(ds[0]) > 2: # Temporal Dataset might have 3 fields per tuple
-            ds = [(d[0],d[1]) for d in ds]
+            ds = [(d[0], d[1]) for d in ds]
         ds = pinot.data.utils.batch(ds, len(ds), seed=None)
         ds = [tuple([i.to(self.device) for i in ds[0]])]
         return ds
