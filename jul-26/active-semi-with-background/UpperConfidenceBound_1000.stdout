@@ -1,0 +1,255 @@
+Sender: LSF System <lsfadmin@ls01>
+Subject: Job 16146492: <semi-active> in cluster <lila> Done
+
+Job <semi-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Sun Jul 26 16:12:00 2020
+Job was executed on host(s) <12*ls01>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Sun Jul 26 16:16:57 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Sun Jul 26 16:16:57 2020
+Terminated at Mon Jul 27 04:01:12 2020
+Results reported at Mon Jul 27 04:01:12 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/active_plot.py --net semi_gp --num_rounds 6 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition UpperConfidenceBound --output_folder /home/nguyenm5/coding/pinot/jul-26/active-semi-with-background --index 1 --unlabeled_data moonshot_unlabeled_small --device cuda:0 --seed 417 --unlabeled_volume 0.0
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   742514.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   42257 sec.
+    Turnaround time :                            42552 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='UpperConfidenceBound', config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1000, num_rounds=6, num_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/jul-26/active-semi-with-background', q=96, seed=417, unlabeled_data='moonshot_unlabeled_small', unlabeled_volume=0.0)
+MPI, UCB, UCB-ybest, Expected Improv
+[array(521), array(517), array(519), array(522), array(524), array(512)]
+[array(521), array(520), array(523), array(504), array(524), array(513)]
+[array(520.7842283), array(519.01426601), array(521.917575), array(502.917575), array(522.917575), array(511.917575)]
+[array(521), array(520), array(523), array(504), array(524), array(512)]
+[array(520), array(424), array(330), array(234), array(139), array(43)]
+[array(520), array(424), array(330), array(232), array(139), array(43)]
+[array(519.7842283), array(423.01426601), array(328.917575), array(230.917575), array(137.917575), array(41.917575)]
+[array(520), array(424), array(330), array(232), array(139), array(43)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-26/active-semi-with-background/UpperConfidenceBound_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls15>
+Subject: Job 16146491: <semi-active> in cluster <lila> Done
+
+Job <semi-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Sun Jul 26 16:11:59 2020
+Job was executed on host(s) <12*ls15>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Sun Jul 26 16:16:49 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Sun Jul 26 16:16:49 2020
+Terminated at Mon Jul 27 04:08:27 2020
+Results reported at Mon Jul 27 04:08:27 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/active_plot.py --net semi_gp --num_rounds 6 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition UpperConfidenceBound --output_folder /home/nguyenm5/coding/pinot/jul-26/active-semi-with-background --index 1 --unlabeled_data moonshot_unlabeled_small --device cuda:0 --seed 2666 --unlabeled_volume 0.0
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   746077.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   42700 sec.
+    Turnaround time :                            42988 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='UpperConfidenceBound', config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1000, num_rounds=6, num_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/jul-26/active-semi-with-background', q=96, seed=2666, unlabeled_data='moonshot_unlabeled_small', unlabeled_volume=0.0)
+MPI, UCB, UCB-ybest, Expected Improv
+[array(521), array(515), array(522), array(520), array(523), array(513)]
+[array(521), array(515), array(522), array(519), array(523), array(522)]
+[array(520.8910426), array(513.917575), array(520.917575), array(517.917575), array(521.917575), array(520.917575)]
+[array(521), array(515), array(522), array(512), array(523), array(512)]
+[array(520), array(419), array(329), array(233), array(139), array(43)]
+[array(520), array(419), array(329), array(232), array(139), array(43)]
+[array(519.8910426), array(417.917575), array(327.917575), array(230.917575), array(137.917575), array(41.917575)]
+[array(520), array(419), array(329), array(232), array(139), array(43)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-26/active-semi-with-background/UpperConfidenceBound_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls18>
+Subject: Job 16146493: <semi-active> in cluster <lila> Done
+
+Job <semi-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Sun Jul 26 16:12:01 2020
+Job was executed on host(s) <12*ls18>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Sun Jul 26 16:16:58 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Sun Jul 26 16:16:58 2020
+Terminated at Mon Jul 27 04:23:29 2020
+Results reported at Mon Jul 27 04:23:29 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/active_plot.py --net semi_gp --num_rounds 6 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition UpperConfidenceBound --output_folder /home/nguyenm5/coding/pinot/jul-26/active-semi-with-background --index 1 --unlabeled_data moonshot_unlabeled_small --device cuda:0 --seed 8888 --unlabeled_volume 0.0
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   747822.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   43591 sec.
+    Turnaround time :                            43888 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='UpperConfidenceBound', config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1000, num_rounds=6, num_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/jul-26/active-semi-with-background', q=96, seed=8888, unlabeled_data='moonshot_unlabeled_small', unlabeled_volume=0.0)
+MPI, UCB, UCB-ybest, Expected Improv
+[array(522), array(521), array(523), array(524), array(520), array(512)]
+[array(522), array(521), array(523), array(524), array(520), array(513)]
+[array(521.8807212), array(519.918962), array(521.917575), array(522.917575), array(518.917575), array(511.917575)]
+[array(522), array(521), array(523), array(524), array(520), array(512)]
+[array(521), array(425), array(330), array(235), array(139), array(43)]
+[array(521), array(425), array(330), array(235), array(139), array(43)]
+[array(520.8807212), array(423.918962), array(328.917575), array(233.917575), array(137.917575), array(41.917575)]
+[array(521), array(425), array(330), array(235), array(139), array(43)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-26/active-semi-with-background/UpperConfidenceBound_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls04>
+Subject: Job 16146501: <semi-active> in cluster <lila> Done
+
+Job <semi-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Sun Jul 26 16:12:02 2020
+Job was executed on host(s) <12*ls04>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Sun Jul 26 16:26:26 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Sun Jul 26 16:26:26 2020
+Terminated at Tue Jul 28 05:39:53 2020
+Results reported at Tue Jul 28 05:39:53 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/active_plot.py --net semi_gp --num_rounds 6 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition UpperConfidenceBound --output_folder /home/nguyenm5/coding/pinot/jul-26/active-semi-with-background --index 1 --unlabeled_data moonshot_unlabeled_small --device cuda:0 --seed 417 --unlabeled_volume 0.2
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   2295324.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   134006 sec.
+    Turnaround time :                            134871 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='UpperConfidenceBound', config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1000, num_rounds=6, num_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/jul-26/active-semi-with-background', q=96, seed=417, unlabeled_data='moonshot_unlabeled_small', unlabeled_volume=0.2)
+MPI, UCB, UCB-ybest, Expected Improv
+[array(232), array(520), array(513), array(522), array(515), array(522)]
+[array(510), array(520), array(524), array(522), array(522), array(522)]
+[array(510.08282147), array(518.917575), array(522.917575), array(520.917575), array(520.917575), array(520.917575)]
+[array(517), array(520), array(513), array(522), array(515), array(521)]
+[array(231), array(424), array(331), array(228), array(139), array(43)]
+[array(515), array(424), array(331), array(229), array(138), array(43)]
+[array(515.08282147), array(422.917575), array(329.917575), array(227.917575), array(136.917575), array(41.917575)]
+[array(522), array(424), array(331), array(228), array(139), array(43)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-26/active-semi-with-background/UpperConfidenceBound_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls06>
+Subject: Job 16146500: <semi-active> in cluster <lila> Done
+
+Job <semi-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Sun Jul 26 16:12:02 2020
+Job was executed on host(s) <12*ls06>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Sun Jul 26 16:17:43 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Sun Jul 26 16:17:43 2020
+Terminated at Tue Jul 28 07:11:39 2020
+Results reported at Tue Jul 28 07:11:39 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/active_plot.py --net semi_gp --num_rounds 6 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition UpperConfidenceBound --output_folder /home/nguyenm5/coding/pinot/jul-26/active-semi-with-background --index 1 --unlabeled_data moonshot_unlabeled_small --device cuda:0 --seed 2666 --unlabeled_volume 0.2
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   2381523.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   140037 sec.
+    Turnaround time :                            140377 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='UpperConfidenceBound', config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1000, num_rounds=6, num_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/jul-26/active-semi-with-background', q=96, seed=2666, unlabeled_data='moonshot_unlabeled_small', unlabeled_volume=0.2)
+MPI, UCB, UCB-ybest, Expected Improv
+[array(513), array(523), array(515), array(524), array(521), array(522)]
+[array(513), array(523), array(513), array(513), array(513), array(522)]
+[array(512.00520539), array(522.00520539), array(511.917575), array(511.917575), array(511.917575), array(520.917575)]
+[array(513), array(523), array(515), array(524), array(521), array(522)]
+[array(512), array(426), array(326), array(235), array(139), array(43)]
+[array(512), array(426), array(325), array(235), array(138), array(43)]
+[array(511.00520539), array(425.00520539), array(323.917575), array(233.917575), array(136.917575), array(41.917575)]
+[array(512), array(426), array(326), array(235), array(139), array(43)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-26/active-semi-with-background/UpperConfidenceBound_1000.stderr> for stderr output of this job.
+

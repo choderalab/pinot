@@ -1,0 +1,204 @@
+Sender: LSF System <lsfadmin@ls06>
+Subject: Job 16146498: <semi-active> in cluster <lila> Done
+
+Job <semi-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Sun Jul 26 16:12:02 2020
+Job was executed on host(s) <12*ls06>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Sun Jul 26 16:17:14 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Sun Jul 26 16:17:14 2020
+Terminated at Mon Jul 27 03:43:35 2020
+Results reported at Mon Jul 27 03:43:35 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/active_plot.py --net semi_gp --num_rounds 6 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition ProbabilityOfImprovement --output_folder /home/nguyenm5/coding/pinot/jul-26/active-semi-with-background --index 1 --unlabeled_data moonshot_unlabeled_small --device cuda:0 --seed 417 --unlabeled_volume 0.0
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   697409.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   41182 sec.
+    Turnaround time :                            41493 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ProbabilityOfImprovement', config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1000, num_rounds=6, num_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/jul-26/active-semi-with-background', q=96, seed=417, unlabeled_data='moonshot_unlabeled_small', unlabeled_volume=0.0)
+MPI, UCB, UCB-ybest, Expected Improv
+[array(518), array(522), array(517), array(523), array(524), array(521)]
+[array(518), array(522), array(517), array(523), array(524), array(521)]
+[array(517.92778534), array(521.00520539), array(515.918962), array(521.917575), array(522.917575), array(519.917575)]
+[array(518), array(522), array(517), array(523), array(524), array(521)]
+[array(517), array(425), array(326), array(234), array(139), array(43)]
+[array(517), array(425), array(326), array(234), array(139), array(43)]
+[array(516.92778534), array(424.00520539), array(324.918962), array(232.917575), array(137.917575), array(41.917575)]
+[array(517), array(425), array(326), array(234), array(139), array(43)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-26/active-semi-with-background/ProbabilityOfImprovement_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls15>
+Subject: Job 16146497: <semi-active> in cluster <lila> Done
+
+Job <semi-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Sun Jul 26 16:12:02 2020
+Job was executed on host(s) <12*ls15>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Sun Jul 26 16:17:11 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Sun Jul 26 16:17:11 2020
+Terminated at Mon Jul 27 04:03:26 2020
+Results reported at Mon Jul 27 04:03:26 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/active_plot.py --net semi_gp --num_rounds 6 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition ProbabilityOfImprovement --output_folder /home/nguyenm5/coding/pinot/jul-26/active-semi-with-background --index 1 --unlabeled_data moonshot_unlabeled_small --device cuda:0 --seed 2666 --unlabeled_volume 0.0
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   743339.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   42375 sec.
+    Turnaround time :                            42684 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ProbabilityOfImprovement', config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1000, num_rounds=6, num_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/jul-26/active-semi-with-background', q=96, seed=2666, unlabeled_data='moonshot_unlabeled_small', unlabeled_volume=0.0)
+MPI, UCB, UCB-ybest, Expected Improv
+[array(504), array(524), array(521), array(517), array(523), array(513)]
+[array(504), array(524), array(521), array(520), array(523), array(522)]
+[array(503.87894455), array(523.07123393), array(519.918962), array(518.918962), array(521.917575), array(520.917575)]
+[array(504), array(524), array(521), array(517), array(523), array(513)]
+[array(503), array(427), array(330), array(232), array(139), array(43)]
+[array(503), array(427), array(330), array(234), array(139), array(43)]
+[array(502.87894455), array(426.07123393), array(328.918962), array(232.918962), array(137.917575), array(41.917575)]
+[array(503), array(427), array(330), array(234), array(139), array(43)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-26/active-semi-with-background/ProbabilityOfImprovement_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls17>
+Subject: Job 16146499: <semi-active> in cluster <lila> Done
+
+Job <semi-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Sun Jul 26 16:12:02 2020
+Job was executed on host(s) <12*ls17>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Sun Jul 26 16:17:21 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Sun Jul 26 16:17:21 2020
+Terminated at Mon Jul 27 04:11:43 2020
+Results reported at Mon Jul 27 04:11:43 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/active_plot.py --net semi_gp --num_rounds 6 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition ProbabilityOfImprovement --output_folder /home/nguyenm5/coding/pinot/jul-26/active-semi-with-background --index 1 --unlabeled_data moonshot_unlabeled_small --device cuda:0 --seed 8888 --unlabeled_volume 0.0
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   730637.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   42862 sec.
+    Turnaround time :                            43181 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ProbabilityOfImprovement', config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1000, num_rounds=6, num_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/jul-26/active-semi-with-background', q=96, seed=8888, unlabeled_data='moonshot_unlabeled_small', unlabeled_volume=0.0)
+MPI, UCB, UCB-ybest, Expected Improv
+[array(515), array(511), array(523), array(524), array(522), array(517)]
+[array(515), array(510), array(523), array(524), array(522), array(513)]
+[array(514.84250745), array(509.00520539), array(521.917575), array(522.917575), array(520.917575), array(511.917575)]
+[array(515), array(510), array(523), array(524), array(522), array(521)]
+[array(514), array(416), array(330), array(235), array(139), array(43)]
+[array(514), array(416), array(330), array(235), array(139), array(43)]
+[array(513.84250745), array(415.00520539), array(328.917575), array(233.917575), array(137.917575), array(41.917575)]
+[array(514), array(416), array(330), array(235), array(139), array(43)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-26/active-semi-with-background/ProbabilityOfImprovement_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls14>
+Subject: Job 16146507: <semi-active> in cluster <lila> Done
+
+Job <semi-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Sun Jul 26 16:12:03 2020
+Job was executed on host(s) <12*ls14>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Jul 27 01:42:53 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Jul 27 01:42:53 2020
+Terminated at Tue Jul 28 14:50:06 2020
+Results reported at Tue Jul 28 14:50:06 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/active_plot.py --net semi_gp --num_rounds 6 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition ProbabilityOfImprovement --output_folder /home/nguyenm5/coding/pinot/jul-26/active-semi-with-background --index 1 --unlabeled_data moonshot_unlabeled_small --device cuda:0 --seed 417 --unlabeled_volume 0.2
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   2242745.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   133634 sec.
+    Turnaround time :                            167883 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ProbabilityOfImprovement', config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1000, num_rounds=6, num_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/jul-26/active-semi-with-background', q=96, seed=417, unlabeled_data='moonshot_unlabeled_small', unlabeled_volume=0.2)
+MPI, UCB, UCB-ybest, Expected Improv
+[array(521), array(468), array(523), array(524), array(522), array(522)]
+[array(511), array(519), array(523), array(513), array(522), array(522)]
+[array(510.99561476), array(518.00520539), array(522.00520539), array(511.918962), array(520.917575), array(520.917575)]
+[array(513), array(519), array(523), array(524), array(522), array(522)]
+[array(520), array(382), array(330), array(235), array(139), array(43)]
+[array(511), array(423), array(330), array(235), array(139), array(43)]
+[array(510.99561476), array(422.00520539), array(329.00520539), array(233.918962), array(137.917575), array(41.917575)]
+[array(513), array(423), array(330), array(235), array(139), array(43)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-26/active-semi-with-background/ProbabilityOfImprovement_1000.stderr> for stderr output of this job.
+
