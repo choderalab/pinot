@@ -38,7 +38,7 @@ class ActivePlot():
 
     def __init__(self, net, config,
                  lr, optimizer_type,
-                 data, unlabeled_data, acquisition, num_samples, q,
+                 data, unlabeled_data, unlabeled_volume, acquisition, num_samples, q,
                  device, num_trials, num_rounds, num_epochs):
 
         # net config
@@ -52,6 +52,7 @@ class ActivePlot():
         # experiment config
         self.data = data
         self.unlabeled_data = unlabeled_data
+        self.unlabeled_volume = unlabeled_volume
         self.acquisition = acquisition
         self.num_samples = num_samples
         self.q = q
@@ -114,7 +115,10 @@ class ActivePlot():
         acq_fn = self.get_acquisition()
 
         if self.unlabeled_data:
-            unlabeled_data = getattr(pinot.data, self.unlabeled_data) 
+            unlabeled_data = getattr(pinot.data, self.unlabeled_data)()
+            # Use a portion of the unlabeled data
+            unlabeled_data, _ = pinot.data.utils.split(unlabeled_data, [self.unlabeled_volume, 1-self.unlabeled_volume])
+            unlabeled_data = [(g.to(self.device),y.to(self.device)) for (g,y) in unlabeled_data]
 
         # acquistion functions to be tested
         for i in range(self.num_trials):
@@ -265,9 +269,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--net', type=str, default='ExactGaussianProcessRegressor')
     parser.add_argument('--config', nargs="+", type=str,
-        default=["GraphConv", "32", "activation", "tanh",
-        "GraphConv", "32", "activation", "tanh",
-        "GraphConv", "32", "activation", "tanh"])
+        default=["GraphConv", "64", "activation", "tanh",
+        "GraphConv", "64", "activation", "tanh",
+        "GraphConv", "64", "activation", "tanh",
+        "GraphConv", "64", "activation", "tanh"])
 
     parser.add_argument('--lr', type=float, default=1e-4)
     parser.add_argument('--optimizer', type=str, default='Adam')
@@ -287,8 +292,10 @@ if __name__ == '__main__':
     parser.add_argument('--index', type=int, default=0)
     parser.add_argument('--output_folder', type=str, default="plotting_active")
     parser.add_argument('--seed', type=int, default=2666, help="Seed for weight initialization")
+    parser.add_argument('--unlabeled_volume', type=float, default=0.2, help="volume of unlabeled data to use")
     
     args = parser.parse_args()
+    print(args)
     
     torch.manual_seed(args.seed) # Pick a seed
 
@@ -304,6 +311,7 @@ if __name__ == '__main__':
         # experiment config
         data=args.data,
         unlabeled_data=args.unlabeled_data,
+        unlabeled_volume=args.unlabeled_volume,
         acquisition=args.acquisition,
         num_samples=args.num_samples,
         q=args.q,
@@ -325,5 +333,5 @@ if __name__ == '__main__':
     # save to disk
     if args.index_provided:
         filename =\
-        f'{args.net}_{representation}_{args.optimizer}_{args.data}_{args.acquisition}_q{args.q}_{args.index}_{args.num_epochs}_{args.seed}.csv'
+        f'{args.net}_{args.data}_{args.acquisition}_q{args.q}_{args.index}_{args.num_epochs}_{args.seed}_{args.unlabeled_volume}.csv'
     best_df.to_csv(os.path.join(args.output_folder, filename))

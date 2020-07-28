@@ -6,6 +6,7 @@ import abc
 import dgl
 import pinot
 from pinot.metrics import _independent
+import numpy as np
 
 # =============================================================================
 # HELPER FUNCTIONS
@@ -168,7 +169,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
     optimizer : `torch.optim.Optimizer` or `pinot.Sampler`
         Optimizer for training.
 
-    n_epochs : `int`
+    num_epochs : `int`
         Number of epochs.
 
     q : `int`
@@ -306,7 +307,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
         self.net = self.train_class(
             data=[self.seen_data],
             optimizer=self.optimizer(self.net),
-            n_epochs=self.num_epochs,
+            num_epochs=self.num_epochs,
             net=self.net,
             record_interval=999999,
         ).train()
@@ -374,13 +375,62 @@ class BayesOptExperiment(ActiveLearningExperiment):
         self.blind_pick(seed=seed)
         self.update_data()
 
+        max_prob_arr = []
+        max_ucb_arr = []
+        max_ucb_minus_ybest = []
+        max_exp_improv_arr = []
+
+        max_prob_arr_forward = []
+        max_ucb_arr_forward = []
+        max_ucb_minus_ybest_forward = []
+        max_exp_improv_arr_forward = []
+
         while idx < num_rounds:
             
-            if self.early_stopping and self.y_best == self.best_possible:
-                break
+            #if self.early_stopping and self.y_best == self.best_possible:
+            #    break
 
             self.train()
 
+            max_prob = pinot.active.acquisition.probability_of_improvement(
+                        net=self.net, unseen_data=(self.g_all,None),
+                        y_best=self.y_best, q=self.q).max().detach().cpu().numpy()
+
+            max_ucb = pinot.active.acquisition.upper_confidence_bound(
+                        net=self.net, unseen_data=(self.g_all,None),
+                        y_best=self.y_best, q=self.q).max().detach().cpu().numpy()
+
+            exp_improv = pinot.active.acquisition.expected_improvement_analytical(
+                        net=self.net, unseen_data=(self.g_all,None),
+                        y_best=self.y_best, q=self.q).max().detach().cpu().numpy()
+            
+            # Prospective
+            max_prob_forward = pinot.active.acquisition.probability_of_improvement(
+                        net=self.net, unseen_data=(self.unseen_data[0],None),
+                        y_best=self.y_best, q=self.q).max().detach().cpu().numpy()
+
+            max_ucb_forward = pinot.active.acquisition.upper_confidence_bound(
+                        net=self.net, unseen_data=(self.unseen_data[0],None),
+                        y_best=self.y_best, q=self.q).max().detach().cpu().numpy()
+            
+            exp_improv_forward = pinot.active.acquisition.expected_improvement_analytical(
+                        net=self.net, unseen_data=(self.unseen_data[0],None),
+                        y_best=self.y_best, q=self.q).max().detach().cpu().numpy()
+            
+
+
+            # Retrospective
+            max_prob_arr.append(max_prob)
+            max_ucb_arr.append(max_ucb)
+            max_ucb_minus_ybest.append(np.array(max_ucb - self.y_best.cpu().numpy()))
+            max_exp_improv_arr.append(exp_improv)
+    
+            # Prospective
+            max_prob_arr_forward.append(max_prob_forward)
+            max_ucb_arr_forward.append(max_ucb_forward)
+            max_ucb_minus_ybest_forward.append(np.array(max_ucb_forward - self.y_best.cpu().numpy()))
+            max_exp_improv_arr_forward.append(exp_improv_forward)
+            
             if not self.unseen:
                 break
 
@@ -388,6 +438,19 @@ class BayesOptExperiment(ActiveLearningExperiment):
             self.update_data()
 
             idx += 1
+
+
+        print("MPI, UCB, UCB-ybest, Expected Improv")
+        
+        print(max_prob_arr)
+        print(max_ucb_arr)
+        print(max_ucb_minus_ybest)
+        print(max_exp_improv_arr)
+
+        print(max_prob_arr_forward)
+        print(max_ucb_arr_forward)
+        print(max_ucb_minus_ybest_forward)
+        print(max_exp_improv_arr_forward)
 
         return self.seen
 
@@ -426,9 +489,9 @@ class SemiSupervisedBayesOptExperiment(BayesOptExperiment):
         # Compute the unsupervised scaling constant and reset it
         # as the number of labeled data points change after every epoch
         if self.unlabeled_data:
-            unsup_scale = float(len(self.old_data))/(len(self.new_data) + len(self.unlabeled_data))
+            unsup_scale = float(len(self.seen_data))/(len(self.unseen_data) + len(self.unlabeled_data))
         else:
-            unsup_scale = float(len(self.old_data))/len(self.new_data)
+            unsup_scale = float(len(self.seen_data))/len(self.unseen_data)
         
         # Update the unsupervised scale constant of SemiSupervisedNet
         self.net.unsup_scale = unsup_scale
@@ -440,7 +503,7 @@ class SemiSupervisedBayesOptExperiment(BayesOptExperiment):
         self.net = pinot.app.experiment.Train(
             data=batched_semi_supervised_data,
             optimizer=self.optimizer,
-            n_epochs=self.n_epochs,
+            n_epochs=self.num_epochs,
             net=self.net,
             record_interval=999999,
         ).train()
