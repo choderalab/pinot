@@ -27,7 +27,7 @@ class GaussianProcessRegressor(BaseRegressor):
         raise NotImplementedError
 
     def _perturb(self, k):
-        """Add small noise `epsilon` to the diagnol of covariant matrix.
+        """Add small noise `epsilon` to the diagonal of covariant matrix.
 
         Parameters
         ----------
@@ -40,8 +40,7 @@ class GaussianProcessRegressor(BaseRegressor):
             Preturbed covariant matrix.
 
         """
-
-        # introduce noise along the diagnol
+        # introduce noise along the diagonal
         noise = self.epsilon * torch.eye(*k.shape, device=k.device)
 
         return k + noise
@@ -143,7 +142,6 @@ class ExactGaussianProcessRegressor(GaussianProcessRegressor):
             Negative log likelihood.
 
         """
-
         # point data to object
         self._x_tr = x_tr
         self._y_tr = y_tr
@@ -364,7 +362,7 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
         """
 
         # get the kernels
-        (k_tr_tr, k_tr_te, k_te_tr, k_te_te) = (
+        k_tr_tr, k_tr_te, k_te_tr, k_te_te = (
             self._k_tr_tr(),
             self._k_tr_te(x_te),
             self._k_te_tr(x_te),

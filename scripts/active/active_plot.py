@@ -146,8 +146,11 @@ class ActivePlot():
                 self.bo.unlabeled_data = unlabeled_data
 
             # run experiment
-            x = self.bo.run(num_rounds=self.num_rounds)
-            self.results = self.process_results(x, ds, i)
+            acquisitions = self.bo.run(num_rounds=self.num_rounds)
+            
+            # record results
+            seen, _ = acquisitions[-1]
+            self.results = self.process_results(seen, ds, i)
 
         return self.results
 

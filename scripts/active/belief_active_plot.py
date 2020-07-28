@@ -1,11 +1,15 @@
 import warnings
 warnings.filterwarnings("ignore")
 
+import copy
+import math
 from collections import defaultdict
 
+import toolz
+import torch
 import numpy as np
 import pandas as pd
-import torch
+
 import pinot
 from pinot.generative import SemiSupervisedNet
 from pinot.metrics import _independent
@@ -16,15 +20,20 @@ from pinot.active.biophysical_acquisition import (biophysical_thompson_sampling,
 ######################
 # Utilities
 
+
 def _get_thompson_values(net, data, q=1):
     """ Gets the value associated with the Thompson Samples.
     """
-    # obtain predictive posterior
-    gs, ys = data
+    # unpack data
+    gs, _ = data
+
+    # get predictive posterior
     distribution = _independent(net.condition(gs))
     
     # obtain samples from posterior
     thetas = distribution.sample((q,)).detach()
+
+    # find the max of each sample
     thompson_values = torch.max(thetas, axis=1).values
     return thompson_values
 
@@ -58,119 +67,63 @@ def _get_biophysical_thompson_values(
     return thompson_values
 
 
+def thompson_sample(net, data, unseen, num_samples=1):
+    """ Perform retrospective and prospective Thompson Sampling
+        to check model beliefs about y_max.
+    """
+    def _ts(net, data, num_samples=1):
+        """ Get Thompson samples.
+        """
+        if isinstance(net.output_regressor, pinot.regressors.BiophysicalRegressor):
+            ts_values = _get_biophysical_thompson_values(net, data, q=num_samples)
+        else:
+            ts_values = _get_thompson_values(net, data, q=num_samples)
+        return ts_values
+
+    # save log sigma
+    sigma = torch.exp(net.output_regressor.log_sigma)
+
+    # construct measurement error distribution
+    epsilon = torch.distributions.Normal(0., sigma)
+
+    # make predictive posterior noiseless by setting sigma to 0
+    zero = torch.tensor(-10.)
+    if torch.cuda.is_available():
+        zero = zero.cuda()
+    net.output_regressor.log_sigma = torch.nn.Parameter(zero)
+
+    # set net to eval
+    net.eval()
+
+    # initialize thompson sampling dict
+    thompson_samples = {}
+    
+    # get prospective thompson samples
+    if unseen:
+
+        # prospective evaluates only unseen data
+        unseen_data = pinot.active.experiment._slice_fn_tuple(data, unseen)
+        thompson_samples['prospective'] = _ts(
+            net,
+            unseen_data,
+            num_samples=num_samples
+        ) + epsilon.sample((num_samples,))
+
+    # get retrospective thompson samples on all data
+    thompson_samples['retrospective'] = _ts(
+        net,
+        data,
+        num_samples=num_samples
+    ) + epsilon.sample((num_samples, ))
+
+    return thompson_samples
+
+
+
 ######################
 # Function definitions
 
-class TSBayesOptExperiment(pinot.active.experiment.BayesOptExperiment):
-    """ Performs Thompson Sampling each loop.
-    """
-    def __init__(
-        self,
-        num_thompson_samples=1000,
-        *args,
-        **kwargs
-        ):
-
-        super(TSBayesOptExperiment, self).__init__(*args, **kwargs)
-
-        self.early_stopping = False
-        self.num_thompson_samples = num_thompson_samples
-
-
-    def run(self, num_rounds=999999, seed=None):
-        """Run the model and conduct rounds of acquisition and training.
-
-        Parameters
-        ----------
-        num_rounds : `int`
-             (Default value = 999999)
-             Number of rounds.
-
-        seed : `int` or `None`
-             (Default value = None)
-             Random seed.
-
-        Returns
-        -------
-        self.old : Resulting indices of acquired candidates.
-
-        """
-        idx = 0
-        self.blind_pick(seed=seed)
-        self.update_data()
-
-        while idx < num_rounds:
-
-            self.train()
-            self.thompson_sample(num_samples=self.num_thompson_samples)
-            
-            if not self.unseen:
-                break
-
-            self.acquire()
-            self.update_data()
-
-            idx += 1
-
-        return self.seen, self.thompson_samples
-
-
-    def thompson_sample(self, num_samples=1):
-        """ Perform retrospective and prospective Thompson Sampling
-            to check model beliefs about y_max.
-        """
-        def _ts(key, data, num_samples=1):
-            """Get Thompson samples.
-            """
-            if isinstance(self.net.output_regressor, pinot.regressors.BiophysicalRegressor):
-                ts_values = _get_biophysical_thompson_values(self.net, data, q=num_samples)
-            else:
-                ts_values = _get_thompson_values(self.net, data, q=num_samples)
-            self.thompson_samples[key].append(ts_values)
-
-        # set net to eval
-        self.net.eval()
-
-        # instantiate thompson samples dict if necessary
-        if not hasattr(self, 'thompson_samples'):
-            self.thompson_samples = {'prospective': [],
-                                     'retrospective': []}
-        
-        for key in self.thompson_samples:
-            # thompson sampling on UNSEEN data if prospective
-            data = self.unseen_data if key == 'prospective' else self.data
-            if len(data):
-                _ts(key, data, num_samples=num_samples)
-
-    def ucb(self, num_samples=1):
-        """ Perform retrospective and prospective Thompson Sampling
-            to check model beliefs about y_max.
-        """
-        def _ts(key, data, num_samples=1):
-            """Get Thompson samples.
-            """
-            if isinstance(self.net.output_regressor, pinot.regressors.BiophysicalRegressor):
-                ts_values = _get_biophysical_thompson_values(self.net, data, q=num_samples)
-            else:
-                ts_values = _get_thompson_values(self.net, data, q=num_samples)
-            self.thompson_samples[key].append(ts_values)
-
-        # set net to eval
-        self.net.eval()
-
-        # instantiate thompson samples dict if necessary
-        if not hasattr(self, 'thompson_samples'):
-            self.thompson_samples = {'prospective': [],
-                                     'retrospective': []}
-        
-        for key in self.thompson_samples:
-            # thompson sampling on UNSEEN data if prospective
-            data = self.unseen_data if key == 'prospective' else self.data
-            if len(data):
-                _ts(key, data, num_samples=num_samples)
-
-
-class TSActivePlot():
+class BeliefActivePlot():
 
     def __init__(self, net, config,
                  lr, optimizer_type,
@@ -201,8 +154,8 @@ class TSActivePlot():
 
         # recording data
         self.results = []
-        self.prospective_ts = []
-        self.retrospective_ts = []
+        self.prospective_beliefs = []
+        self.retrospective_beliefs = []
 
 
     def generate(self):
@@ -212,14 +165,14 @@ class TSActivePlot():
         ds = self.generate_data()
 
         # get results for each trial
-        final_results, prospective_ts, retrospective_ts = self.run_trials(ds)
+        final_results, prospective_beliefs, retrospective_beliefs = self.run_trials(ds)
 
         # create pandas dataframe to play nice with seaborn
         best_df = pd.DataFrame(final_results)
-        pro_ts_df = pd.DataFrame(prospective_ts)
-        retro_ts_df = pd.DataFrame(retrospective_ts)
+        pro_df = pd.DataFrame(prospective_beliefs)
+        retro_df = pd.DataFrame(retrospective_beliefs)
 
-        return best_df, pro_ts_df, retro_ts_df
+        return best_df, pro_df, retro_df
 
 
     def run_trials(self, ds):
@@ -241,10 +194,9 @@ class TSActivePlot():
         results
         """
         # get the real solution
-        ds = self.generate_data()
+        ds = self.generate_data()[0]
         acq_fn = self.get_acquisition()
 
-        # acquistion functions to be tested
         for i in range(self.num_trials):
 
             print(i)
@@ -256,49 +208,104 @@ class TSActivePlot():
                 opt_string=self.optimizer_type,
                 lr=self.lr,
                 weight_decay=0.01,
-                kl_loss_scaling=1.0/float(len(ds[0][1]))
-                )
+                kl_loss_scaling=1.0/float(len(ds[1]))
+            )
 
             # instantiate experiment
-            self.bo = TSBayesOptExperiment(
+            self.bo = pinot.active.experiment.BayesOptExperiment(
                 net=net,
-                data=ds[0],
+                data=ds,
                 optimizer=optimizer,
                 acquisition=acq_fn,
                 num_epochs=self.num_epochs,
-                num_thompson_samples=self.num_thompson_samples,
+                early_stopping=False,
                 q=self.q,
-                slice_fn=pinot.active.experiment._slice_fn_tuple, # pinot.active.
-                collate_fn=pinot.active.experiment._collate_fn_graph, # pinot.active.
+                slice_fn=pinot.active.experiment._slice_fn_tuple,
+                collate_fn=pinot.active.experiment._collate_fn_graph,
                 train_class=self.train
             )
 
             # run experiment
-            x, self.ts = self.bo.run(num_rounds=self.num_rounds)
+            acquisitions = self.bo.run(num_rounds=self.num_rounds)
             
-            # record results
-            self.results = self.process_results(
-                x, # ignore first random pick
-                ds,
-                i
+            # process acquisitions into pandas-friendly format
+            self.results = self.process_results(acquisitions, ds, i)
+            
+            # get beliefs
+            self.beliefs = self.get_beliefs(net, ds, acquisitions, method='thompson')
+
+            # generate long-form records for pandas
+            self.prospective_beliefs.extend(
+                self.process_beliefs(self.beliefs['prospective'], i)
             )
 
-            self.prospective_ts = self.process_thompson_samples(
-                self.prospective_ts,
-                self.ts['prospective'],
-                i
+            # generate long-form records for pandas
+            self.retrospective_beliefs.extend(
+                self.process_beliefs(self.beliefs['retrospective'], i)
             )
 
-            self.retrospective_ts = self.process_thompson_samples(
-                self.retrospective_ts,
-                self.ts['retrospective'],
-                i
+        return self.results, self.prospective_beliefs, self.retrospective_beliefs
+
+
+    def get_beliefs(self, net, ds, acquisitions, method='thompson'):
+        """ Gets Thompson samples at each round
+
+        Parameters
+        ----------
+        net : pinot.Net
+            The network used for Bayesian optimization
+        
+        ds : pinot.data.Dataset
+            The dataset used
+        
+        acquisitions : list of dict
+            Choice of acquired and unacquired points at each round
+
+        method : str
+            The method used to estimate model beliefs 
+
+        Returns
+        -------
+        beliefs : dict
+            Values are 'prospective' and 'retrospective'
+            Keys are 
+        
+        """
+        if method == 'thompson':
+            belief_func = thompson_sample
+        
+        # loop through rounds
+        round_ts = []
+        for idx, state in self.bo.states.items():
+            
+            seen, unseen = acquisitions[idx]
+
+            # load network states
+            net.load_state_dict(state)
+
+            # set _x_tr and _y_tr if exact GP
+            if isinstance(net.output_regressor, pinot.regressors.ExactGaussianProcessRegressor):
+                seen_gs, seen_ys = pinot.active.experiment._slice_fn_tuple(ds, seen)
+                net.g_last, net.y_last = seen_gs, seen_ys
+
+            # gather pro and retro thompson samples
+            round_ts.append(
+                belief_func(
+                    net, ds, unseen,
+                    num_samples=self.num_thompson_samples
+                )
             )
 
-        return self.results, self.prospective_ts, self.retrospective_ts
+        # convert from list of dicts to dict of lists
+        beliefs = {
+            k: [d[k] for d in round_ts if k in d]
+            for k in ['prospective', 'retrospective']
+        }
+
+        return beliefs
 
 
-    def process_thompson_samples(self, ts_list, ts, i):
+    def process_beliefs(self, ts, i):
         """ Processes the output of BayesOptExperiment.
 
         Parameters
@@ -314,9 +321,11 @@ class TSActivePlot():
 
         Returns
         -------
-        self.thompson_samples : dict
-            Processed data
+        self.ts_list : dict
+            Long-style thompson sample records
         """
+        ts_list = []
+        
         # record results
         for step, step_ts in enumerate(ts):
             
@@ -330,12 +339,12 @@ class TSActivePlot():
         return ts_list
 
 
-    def process_results(self, x, ds, i):
+    def process_results(self, acquisitions, ds, i):
         """ Processes the output of BayesOptExperiment.
 
         Parameters
         ----------
-        x : list of int
+        seen : list of int
             Items chosen by BayesOptExperiment object
         ds : tuple
             Dataset object
@@ -347,7 +356,11 @@ class TSActivePlot():
         self.results : defaultdict
             Processed data
         """
-        gs, ys = ds[0]
+        # get the final acquired points
+        seen, _ = acquisitions[-1]
+        
+        # get max f(x)
+        gs, ys = ds
         actual_sol = torch.max(ys).item()
 
         # pad if experiment stopped early
@@ -356,13 +369,13 @@ class TSActivePlot():
 
         if self.net == 'multitask':
             results_data = actual_sol*np.ones((results_size, ys.size(1)))
-            output = ys[x]
+            output = ys[seen]
             output[torch.isnan(output)] = -np.inf
         else:
             results_data = actual_sol*np.ones(results_size)
-            output = ys[x]
+            output = ys[seen]
 
-        results_data[:len(x)] = np.maximum.accumulate(output.cpu().squeeze())
+        results_data[:len(seen)] = np.maximum.accumulate(output.cpu().squeeze())
 
         # record results
         for step, result in enumerate(results_data):
@@ -373,13 +386,21 @@ class TSActivePlot():
 
 
     def generate_data(self):
+        """ Generate data, put on GPU if possible.
         """
-        Generate data, put on GPU if possible.
-        """
-        # Load and batch data
+        # Load data
         ds = getattr(pinot.data, self.data)()
+        
+        # Limit to first two fields of tuple
+        if len(ds[0]) > 2:
+            ds = [(d[0], d[1]) for d in ds]
+        
+        # Batch data
         ds = pinot.data.utils.batch(ds, len(ds), seed=None)
+        
+        # Move data to GPU
         ds = [tuple([i.to(self.device) for i in ds[0]])]
+        
         return ds
 
     def get_acquisition(self):

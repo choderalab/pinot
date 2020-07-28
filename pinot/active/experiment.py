@@ -4,6 +4,7 @@
 import torch
 import abc
 import dgl
+import copy
 import pinot
 from pinot.metrics import _independent
 
@@ -211,7 +212,6 @@ class BayesOptExperiment(ActiveLearningExperiment):
         num_epochs=100,
         q=1,
         num_samples=1000,
-        weighted_acquire=False,
         early_stopping=True,
         workup=_independent,
         slice_fn=_slice_fn_tensor,
@@ -256,6 +256,8 @@ class BayesOptExperiment(ActiveLearningExperiment):
         self.collate_fn = collate_fn
         self.net_state_dict = net_state_dict
         self.train_class = train_class
+        self.states = {}
+        self.acquisitions = []
 
     def reset_net(self):
         """Reset everything."""
@@ -320,7 +322,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
         # split input target
         gs, ys = self.unseen_data
 
-        # make sure we only 'acquire' fewer points than are remaining
+        # acquire no more points than are remaining
         if self.q <= len(self.unseen):
 
             # acquire pending points
@@ -384,6 +386,11 @@ class BayesOptExperiment(ActiveLearningExperiment):
                 break
 
             self.train()
+            self.states[idx] = copy.deepcopy(self.net.state_dict())
+            # self.states[idx] = copy.deepcopy(self.net)
+            self.acquisitions.append(
+                tuple([self.seen.copy(), self.unseen.copy()])
+            )
 
             if not self.unseen:
                 break
@@ -393,7 +400,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
 
             idx += 1
 
-        return self.seen
+        return self.acquisitions
 
 
 class SemiSupervisedBayesOptExperiment(BayesOptExperiment):
