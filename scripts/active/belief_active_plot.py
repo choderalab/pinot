@@ -145,14 +145,18 @@ def _max_utility(net, data, unseen, utility_func, y_best=0.0):
 
         # prospective evaluates only unseen data
         unseen_data = pinot.active.experiment._slice_fn_tuple(data, unseen)
-        beliefs['prospective'] = utility_func(
-            distribution, y_best=y_best,
-        )
+        beliefs['prospective'] = torch.max(
+            utility_func(
+                distribution, y_best=y_best,
+            )
+        ).unsqueeze(0)
 
     # get retrospective thompson samples on all data
-    beliefs['retrospective'] = utility_func(
-        distribution, y_best=y_best,
-    )
+    beliefs['retrospective'] = torch.max(
+        utility_func(
+            distribution, y_best=y_best,
+        )
+    ).unsqueeze(0)
 
     return beliefs
 
