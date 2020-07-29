@@ -267,7 +267,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--net', type=str, default='ExactGaussianProcessRegressor')
-    parser.add_argument('--config', nargs="+", type=str,
+    parser.add_argument('--config', nargs='+', type=str,
         default=["GraphConv", "32", "activation", "tanh",
         "GraphConv", "32", "activation", "tanh",
         "GraphConv", "32", "activation", "tanh"])

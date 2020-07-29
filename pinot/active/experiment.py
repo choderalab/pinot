@@ -387,7 +387,6 @@ class BayesOptExperiment(ActiveLearningExperiment):
 
             self.train()
             self.states[idx] = copy.deepcopy(self.net.state_dict())
-            # self.states[idx] = copy.deepcopy(self.net)
             self.acquisitions.append(
                 tuple([self.seen.copy(), self.unseen.copy()])
             )

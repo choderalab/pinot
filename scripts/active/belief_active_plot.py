@@ -232,7 +232,7 @@ class BeliefActivePlot():
             self.results = self.process_results(acquisitions, ds, i)
             
             # get beliefs
-            self.beliefs = self.get_beliefs(net, ds, acquisitions, method='thompson')
+            self.beliefs = self.get_beliefs(net, ds, acquisitions, method=['thompson', 'maxpoi'])
 
             # generate long-form records for pandas
             self.prospective_beliefs.extend(
@@ -275,7 +275,7 @@ class BeliefActivePlot():
             belief_func = thompson_sample
         
         # loop through rounds
-        round_ts = []
+        round_beliefs = []
         for idx, state in self.bo.states.items():
             
             seen, unseen = acquisitions[idx]
@@ -289,7 +289,7 @@ class BeliefActivePlot():
                 net.g_last, net.y_last = seen_gs, seen_ys
 
             # gather pro and retro thompson samples
-            round_ts.append(
+            round_beliefs.append(
                 belief_func(
                     net, ds, unseen,
                     num_samples=self.num_thompson_samples
@@ -298,7 +298,7 @@ class BeliefActivePlot():
 
         # convert from list of dicts to dict of lists
         beliefs = {
-            k: [d[k] for d in round_ts if k in d]
+            k: [d[k] for d in round_beliefs if k in d]
             for k in ['prospective', 'retrospective']
         }
 

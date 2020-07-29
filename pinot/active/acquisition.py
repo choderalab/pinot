@@ -15,6 +15,7 @@ def _get_utility(net, gs, acq_func, y_best=0.0):
 
     # obtain utility from vanilla acquisition func
     utility = acq_func(distribution, y_best=y_best)
+    
     return utility
 
 def _greedy(utility, q=1):
@@ -24,6 +25,46 @@ def _greedy(utility, q=1):
     pending_pts = torch.topk(utility, min(q, len(utility))).indices
     
     return pending_pts
+
+def _temporal(distribution, y_best=0.0):
+    utility = torch.range(
+        start=0,
+        end=len(distribution.mean.flatten()) - 1
+        ).flip(0)
+    if torch.cuda.is_available():
+        utility = utility.cuda()
+    return utility
+
+def _pi(distribution, y_best=0.0):
+    return 1.0 - distribution.cdf(y_best)
+
+def _uncertainty(distribution, y_best=0.0):
+    return distribution.variance
+
+def _ei_analytical(distribution, y_best=0.0):
+    assert isinstance(distribution, torch.distributions.Normal)
+    mu = distribution.mean
+    sigma = distribution.stddev
+    Z = (mu - y_best)/sigma
+
+    normal = torch.distributions.Normal(0, 1)
+    cdf = lambda x: normal.cdf(x)
+    pdf = lambda x: torch.exp(normal.log_prob(x))
+    return (mu - y_best) * cdf(Z) + sigma * pdf(Z)
+
+def _ei_monte_carlo(distribution, y_best, n_samples=1000):
+    improvement = torch.nn.functional.relu(
+        distribution.sample((n_samples, )) - y_best
+    )
+    return improvement.mean(axis=0)
+
+def _ucb(distribution, y_best=0.0, kappa=0.95):
+    from pinot.samplers.utils import confidence_interval
+    _, high = confidence_interval(distribution, kappa)
+    return high
+
+def _random(distribution, y_best=0.0, seed=2666):
+    return torch.rand(distribution.batch_shape)
 
 # =============================================================================
 # MODULE FUNCTIONS
@@ -104,15 +145,6 @@ def temporal(net, gs, y_best=0.0, q=1):
     utility : `torch.Tensor`, `shape=(n_candidates, )`
         Utility for candidates under predictive distribution.
     """
-    def _temporal(distribution, y_best=0.0):
-        utility = torch.range(
-            start=0,
-            end=len(distribution.mean.flatten()) - 1
-            ).flip(0)
-        if torch.cuda.is_available():
-            utility = utility.cuda()
-        return utility
-
     utility = _get_utility(
         net,
         gs,
@@ -153,9 +185,6 @@ def probability_of_improvement(net, gs, y_best=0.0, q=1):
     utility : `torch.Tensor`, `shape=(n_candidates, )`
         Utility for candidates under predictive distribution.
     """
-    def _pi(distribution, y_best=0.0):
-        return 1.0 - distribution.cdf(y_best)
-
     utility = _get_utility(
         net,
         gs,
@@ -196,9 +225,6 @@ def uncertainty(net, gs, y_best=0.0, q=1):
     utility : `torch.Tensor`, `shape=(n_candidates, )`
         Utility for candidates under predictive distribution.
     """
-    def _uncertainty(distribution, y_best=0.0):
-        return distribution.variance
-
     utility = _get_utility(
         net,
         gs,
@@ -250,17 +276,6 @@ def expected_improvement_analytical(net, gs, y_best=0.0, q=1):
     utility : `torch.Tensor`, `shape=(n_candidates, )`
         Utility for candidates under predictive distribution.
     """
-    def _ei_analytical(distribution, y_best=0.0):
-        assert isinstance(distribution, torch.distributions.Normal)
-        mu = distribution.mean
-        sigma = distribution.stddev
-        Z = (mu - y_best)/sigma
-
-        normal = torch.distributions.Normal(0, 1)
-        cdf = lambda x: normal.cdf(x)
-        pdf = lambda x: torch.exp(normal.log_prob(x))
-        return (mu - y_best) * cdf(Z) + sigma * pdf(Z)
-
     utility = _get_utility(
         net,
         gs,
@@ -303,12 +318,6 @@ def expected_improvement_monte_carlo(net, gs, y_best=0.0, q=1, n_samples=1000):
     utility : `torch.Tensor`, `shape=(n_candidates, )`
         Utility for candidates under predictive distribution.
     """
-    def _ei_monte_carlo(distribution, y_best, n_samples=1000):
-        improvement = torch.nn.functional.relu(
-            distribution.sample((n_samples, )) - y_best
-        )
-        return improvement.mean(axis=0)
-
     utility = _get_utility(
         net,
         gs,
@@ -348,11 +357,6 @@ def upper_confidence_bound(net, gs, y_best=0.0, q=1, kappa=0.95):
     utility : `torch.Tensor`, `shape=(n_candidates, )`
         Utility for candidates under predictive distribution.
     """
-    def _ucb(distribution, y_best=0.0, kappa=0.95):
-        from pinot.samplers.utils import confidence_interval
-        _, high = confidence_interval(distribution, kappa)
-        return high
-
     utility = _get_utility(
         net,
         gs,
@@ -398,9 +402,6 @@ def random(net, gs, y_best=0.0, q=1, seed=2666):
     human literary history by Roberto Bolano.
     This needs to be set to `None` if parallel experiments were to be performed.
     """
-    def _random(distribution, y_best=0.0, seed=2666):
-        return torch.rand(distribution.batch_shape)
-
     # torch.manual_seed(seed)
     utility = _get_utility(
         net,
