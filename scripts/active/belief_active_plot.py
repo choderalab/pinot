@@ -4,6 +4,7 @@ warnings.filterwarnings("ignore")
 import copy
 import math
 from collections import defaultdict
+from contextlib import suppress
 
 import toolz
 import torch
@@ -13,13 +14,12 @@ import pandas as pd
 import pinot
 from pinot.generative import SemiSupervisedNet
 from pinot.metrics import _independent
-from pinot.active.acquisition import thompson_sampling
+from pinot.active.acquisition import thompson_sampling, _pi, _ei_analytical, _ucb
 from pinot.active.biophysical_acquisition import (biophysical_thompson_sampling,
                                                   _sample_and_marginalize_delta_G)
 
 ######################
 # Utilities
-
 
 def _get_thompson_values(net, data, q=1):
     """ Gets the value associated with the Thompson Samples.
@@ -70,6 +70,12 @@ def _get_biophysical_thompson_values(
 def thompson_sample(net, data, unseen, num_samples=1):
     """ Perform retrospective and prospective Thompson Sampling
         to check model beliefs about y_max.
+
+    Returns
+    -------
+    thompson_samples : dict
+        Dictionary with keys 'prospective' and 'retrospective'
+        Values are tensors.
     """
     def _ts(net, data, num_samples=1):
         """ Get Thompson samples.
@@ -119,6 +125,58 @@ def thompson_sample(net, data, unseen, num_samples=1):
     return thompson_samples
 
 
+def _max_utility(net, data, unseen, utility_func, y_best=0.0):
+    """ Finds max of the beliefs of a network according to some utility function
+    """
+    # unpack data
+    gs, _ = data
+
+    # set net to eval
+    net.eval()
+
+    # get predictive posterior
+    distribution = _independent(net.condition(gs))
+
+    # initialize beliefs dict
+    beliefs = {}
+
+    # get prospective beliefs
+    if unseen:
+
+        # prospective evaluates only unseen data
+        unseen_data = pinot.active.experiment._slice_fn_tuple(data, unseen)
+        beliefs['prospective'] = utility_func(
+            distribution, y_best=y_best,
+        )
+
+    # get retrospective thompson samples on all data
+    beliefs['retrospective'] = utility_func(
+        distribution, y_best=y_best,
+    )
+
+    return beliefs
+
+
+def max_probability_of_improvement(net, data, unseen, y_best=0.0):
+    """ Computes the belief about the max using PI utility function.
+    """
+    beliefs = _max_utility(net, data, unseen, _pi, y_best=y_best)
+    return beliefs
+
+
+def max_upper_confidence_bound(net, data, unseen, y_best=0.0):
+    """ Computes the belief about the max using UCB utility function.
+    """
+    beliefs = _max_utility(net, data, unseen, _ucb, y_best=y_best)
+    return beliefs
+
+
+def max_expected_improvement(net, data, unseen, y_best=0.0):
+    """ Computes the belief about the max using EI utility function.
+    """
+    beliefs = _max_utility(net, data, unseen, _ei_analytical, y_best=y_best)
+    return beliefs
+
 
 ######################
 # Function definitions
@@ -128,6 +186,7 @@ class BeliefActivePlot():
     def __init__(self, net, config,
                  lr, optimizer_type,
                  data, acquisition, num_samples, num_thompson_samples, q,
+                 belief,
                  device, num_trials, num_rounds, num_epochs):
 
         # net config
@@ -145,6 +204,9 @@ class BeliefActivePlot():
         self.num_thompson_samples = num_thompson_samples
         self.q = q
         self.train = pinot.app.experiment.Train
+
+        # beliefs
+        self.belief = belief
 
         # housekeeping
         self.device = torch.device(device)
@@ -232,7 +294,7 @@ class BeliefActivePlot():
             self.results = self.process_results(acquisitions, ds, i)
             
             # get beliefs
-            self.beliefs = self.get_beliefs(net, ds, acquisitions, method=['thompson', 'maxpoi'])
+            self.beliefs = self.get_beliefs(net, ds, acquisitions, method=self.belief_functions)
 
             # generate long-form records for pandas
             self.prospective_beliefs.extend(
@@ -247,7 +309,7 @@ class BeliefActivePlot():
         return self.results, self.prospective_beliefs, self.retrospective_beliefs
 
 
-    def get_beliefs(self, net, ds, acquisitions, method='thompson'):
+    def get_beliefs(self, net, ds, acquisitions, method=['ThompsonSampling']):
         """ Gets Thompson samples at each round
 
         Parameters
@@ -261,7 +323,7 @@ class BeliefActivePlot():
         acquisitions : list of dict
             Choice of acquired and unacquired points at each round
 
-        method : str
+        method : list of str
             The method used to estimate model beliefs 
 
         Returns
@@ -271,8 +333,12 @@ class BeliefActivePlot():
             Keys are 
         
         """
-        if method == 'thompson':
-            belief_func = thompson_sample
+        belief_dict = {
+            'ThompsonSampling': thompson_sample,
+            'MaxProbabilityOfImprovement': max_probability_of_improvement,
+            'MaxUCB': max_upper_confidence_bound,
+            'MaxExpectedImprovement': max_expected_improvement,
+        }
         
         # loop through rounds
         round_beliefs = []
@@ -288,20 +354,23 @@ class BeliefActivePlot():
                 seen_gs, seen_ys = pinot.active.experiment._slice_fn_tuple(ds, seen)
                 net.g_last, net.y_last = seen_gs, seen_ys
 
-            # gather pro and retro thompson samples
-            round_beliefs.append(
-                belief_func(
-                    net, ds, unseen,
-                    num_samples=self.num_thompson_samples
-                )
-            )
+            # gather pro and retro beliefs for each belief function
+            for function_name, belief_function in belief_dict.items():
+                if function_name in method:
+                    round_belief = belief_function(
+                        net, ds, unseen,
+                        num_samples=self.num_thompson_samples
+                    )
+                    round_beliefs.append({function_name: round_belief})
 
         # convert from list of dicts to dict of lists
-        beliefs = {
-            k: [d[k] for d in round_beliefs if k in d]
-            for k in ['prospective', 'retrospective']
-        }
-
+        beliefs = {'prospective': defaultdict(list), 'retrospective': defaultdict(list)}
+        for round_record in round_beliefs:
+            for m in method:
+                for direction in beliefs.keys():
+                    with suppress(IndexError):
+                        belief = round_record[direction]
+                        beliefs[direction][m].append(belief)
         return beliefs
 
 
@@ -464,10 +533,10 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--net', type=str, default='ExactGaussianProcessRegressor')
-    parser.add_argument('--config', nargs="+", type=str,
-        default=["GraphConv", "32", "activation", "tanh",
-                 "GraphConv", "32", "activation", "tanh",
-                 "GraphConv", "32", "activation", "tanh"])
+    parser.add_argument('--config', nargs='+', type=str,
+        default=['GraphConv', '32', 'activation', 'tanh',
+                 'GraphConv', '32', 'activation', 'tanh',
+                 'GraphConv', '32', 'activation', 'tanh'])
 
     parser.add_argument('--lr', type=float, default=1e-4)
     parser.add_argument('--optimizer', type=str, default='Adam')
@@ -475,8 +544,11 @@ if __name__ == '__main__':
     parser.add_argument('--data', type=str, default='esol')
     parser.add_argument('--acquisition', type=str, default='ExpectedImprovement')
     parser.add_argument('--num_samples', type=int, default=1000)
-    parser.add_argument('--num_thompson_samples', type=int, default=350)
     parser.add_argument('--q', type=int, default=1)
+    
+    parser.add_argument('--beliefs', nargs='+', type=str,
+        default=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement']
+    )
 
     parser.add_argument('--device', type=str, default='cuda:0')
     parser.add_argument('--num_trials', type=int, default=1)
@@ -504,6 +576,9 @@ if __name__ == '__main__':
         num_thompson_samples=args.num_thompson_samples,        
         q=args.q,
 
+        # beliefs
+        beliefs=args.beliefs,
+
         # housekeeping
         device=args.device,
         num_trials=args.num_trials,
@@ -516,7 +591,7 @@ if __name__ == '__main__':
 
     # write to disk
     if args.index_provided:
-        filename = f'{args.net}_{args.optimizer}_{args.data}_num_epochs{args.num_epochs}_{args.acquisition}_q{args.q}_{args.index}.csv'
+        filename = f'{args.net}_{args.optimizer}_{args.data}_num_epochs{args.num_epochs}_{args.acquisition}_q{args.q}_beliefs{'_'.join(args.beliefs)}_{args.index}.csv'
     
     best_df.to_csv(f'best_{filename}')
     pro_ts_df.to_csv(f'pro_{filename}')
