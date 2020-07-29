@@ -300,16 +300,16 @@ class BeliefActivePlot():
             self.results = self.process_results(acquisitions, ds, i)
             
             # get beliefs
-            self.beliefs = self.get_beliefs(net, ds, acquisitions, method=self.belief_functions)
+            self.beliefs = self.get_beliefs(net, ds, acquisitions, methods=self.belief_functions)
 
             # generate long-form records for pandas
             self.prospective_beliefs.extend(
-                self.process_beliefs(self.beliefs['prospective'], i)
+                self.process_beliefs(self.beliefs['prospective'], i, methods=self.belief_functions)
             )
 
             # generate long-form records for pandas
             self.retrospective_beliefs.extend(
-                self.process_beliefs(self.beliefs['retrospective'], i)
+                self.process_beliefs(self.beliefs['retrospective'], i, methods=self.belief_functions)
             )
 
         return self.results, self.prospective_beliefs, self.retrospective_beliefs
@@ -365,9 +365,9 @@ class BeliefActivePlot():
         # convert from list of dicts to dict of lists
         beliefs = {'prospective': defaultdict(list), 'retrospective': defaultdict(list)}
         for round_record in round_beliefs:
-            for m in method:
+            for m in methods:
                 for direction in beliefs.keys():
-                    with suppress(IndexError):
+                    with suppress(KeyError):
                         belief = round_record[direction]
                         beliefs[direction][m].append(belief)
         return beliefs
@@ -394,7 +394,7 @@ class BeliefActivePlot():
         belief_list = []
         
         # record results
-        for belief_name, belief_function in self.belief_functions_dict.item():
+        for belief_name, belief_function in self.belief_functions_dict.items():
             
             if belief_name in methods:
             
