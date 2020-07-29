@@ -186,7 +186,7 @@ class BeliefActivePlot():
     def __init__(self, net, config,
                  lr, optimizer_type,
                  data, acquisition, num_samples, num_thompson_samples, q,
-                 belief,
+                 beliefs,
                  device, num_trials, num_rounds, num_epochs):
 
         # net config
@@ -206,7 +206,13 @@ class BeliefActivePlot():
         self.train = pinot.app.experiment.Train
 
         # beliefs
-        self.belief = belief
+        self.belief_functions = beliefs
+        self.belief_functions_dict = {
+            'ThompsonSampling': thompson_sample,
+            'MaxProbabilityOfImprovement': max_probability_of_improvement,
+            'MaxUCB': max_upper_confidence_bound,
+            'MaxExpectedImprovement': max_expected_improvement,
+        }
 
         # housekeeping
         self.device = torch.device(device)
@@ -309,7 +315,7 @@ class BeliefActivePlot():
         return self.results, self.prospective_beliefs, self.retrospective_beliefs
 
 
-    def get_beliefs(self, net, ds, acquisitions, method=['ThompsonSampling']):
+    def get_beliefs(self, net, ds, acquisitions, methods=['ThompsonSampling']):
         """ Gets Thompson samples at each round
 
         Parameters
@@ -323,7 +329,7 @@ class BeliefActivePlot():
         acquisitions : list of dict
             Choice of acquired and unacquired points at each round
 
-        method : list of str
+        methods : list of str
             The method used to estimate model beliefs 
 
         Returns
@@ -332,14 +338,7 @@ class BeliefActivePlot():
             Values are 'prospective' and 'retrospective'
             Keys are 
         
-        """
-        belief_dict = {
-            'ThompsonSampling': thompson_sample,
-            'MaxProbabilityOfImprovement': max_probability_of_improvement,
-            'MaxUCB': max_upper_confidence_bound,
-            'MaxExpectedImprovement': max_expected_improvement,
-        }
-        
+        """        
         # loop through rounds
         round_beliefs = []
         for idx, state in self.bo.states.items():
@@ -355,13 +354,13 @@ class BeliefActivePlot():
                 net.g_last, net.y_last = seen_gs, seen_ys
 
             # gather pro and retro beliefs for each belief function
-            for function_name, belief_function in belief_dict.items():
-                if function_name in method:
+            for belief_name, belief_function in self.belief_functions_dict.items():
+                if belief_name in methods:
                     round_belief = belief_function(
                         net, ds, unseen,
                         num_samples=self.num_thompson_samples
                     )
-                    round_beliefs.append({function_name: round_belief})
+                    round_beliefs.append({belief_name: round_belief})
 
         # convert from list of dicts to dict of lists
         beliefs = {'prospective': defaultdict(list), 'retrospective': defaultdict(list)}
@@ -374,38 +373,45 @@ class BeliefActivePlot():
         return beliefs
 
 
-    def process_beliefs(self, ts, i):
+    def process_beliefs(self, beliefs_dict, i, methods=['ThompsonSampling']):
         """ Processes the output of BayesOptExperiment.
 
         Parameters
         ----------
-        thompson_samples : dict
-            Output of `TSBayesOptExperiment` object.
-            Keys are 'prospective' and 'retrospective'.
-            Values are torch.Tensors of indices, corresponding to Thompson samples.
-        ts : tuple
-            Thompson sampling values
+        beliefs_dict : tuple
+            Dictionary of beliefs
         i : int
             Index of loop
+        methods : list of str
+            The method used to estimate model beliefs
 
         Returns
         -------
-        self.ts_list : dict
-            Long-style thompson sample records
+        ts_list : dict
+            Long-style belief records
         """
-        ts_list = []
+        # instantiate belief list
+        belief_list = []
         
         # record results
-        for step, step_ts in enumerate(ts):
+        for belief_name, belief_function in self.belief_functions_dict.item():
             
-            for ts_index, t in enumerate(step_ts):
-                
-                ts_list.append({'Acquisition Function': self.acquisition,
-                                'Trial': i,
-                                'Round': step,
-                                'TS Index': ts_index,
-                                'Value': t.item()})
-        return ts_list
+            if belief_name in methods:
+            
+                for step, step_beliefs in enumerate(beliefs_dict):
+                    
+                    for belief_index, belief in enumerate(step_beliefs):
+                        
+                        belief_list.append(
+                            {'Acquisition Function': self.acquisition,
+                             'Belief Function': belief_name,
+                             'Trial': i,
+                             'Round': step,
+                             'Index': belief_index,
+                             'Value': belief.item()}
+                         )
+
+        return belief_list
 
 
     def process_results(self, acquisitions, ds, i):
@@ -590,8 +596,8 @@ if __name__ == '__main__':
     best_df, pro_ts_df, retro_ts_df = plot.generate()
 
     # write to disk
-    if args.index_provided:
-        filename = f'{args.net}_{args.optimizer}_{args.data}_num_epochs{args.num_epochs}_{args.acquisition}_q{args.q}_beliefs{'_'.join(args.beliefs)}_{args.index}.csv'
+    beliefs_string = '_'.join(args.beliefs)
+    filename = f'{args.net}_{args.optimizer}_{args.data}_num_epochs{args.num_epochs}_{args.acquisition}_q{args.q}_beliefs{beliefs_string}_{args.index}.csv'
     
     best_df.to_csv(f'best_{filename}')
     pro_ts_df.to_csv(f'pro_{filename}')
