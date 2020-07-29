@@ -133,8 +133,8 @@ def _max_utility(net, data, unseen, utility_func):
 
     # get y_best
     seen = [s for s in range(len(ys)) if s not in unseen]
-    y_best_round = ys[seen].max().detach().item()
-    y_best_global = ys.max().detach().item()
+    y_best_round = ys[seen].max().item()
+    y_best_global = ys.max().item()
 
     # set net to eval
     net.eval()
@@ -154,14 +154,14 @@ def _max_utility(net, data, unseen, utility_func):
             utility_func(
                 distribution, y_best=y_best_round,
             )
-        ).unsqueeze(0)
+        ).detach().unsqueeze(0)
 
     # get retrospective thompson samples on all data
     beliefs['retrospective'] = torch.max(
         utility_func(
             distribution, y_best=y_best_global,
         )
-    ).unsqueeze(0)
+    ).detach().unsqueeze(0)
 
     return beliefs
 
@@ -313,12 +313,12 @@ class BeliefActivePlot():
 
             # generate long-form records for pandas
             self.prospective_beliefs.extend(
-                self.process_beliefs(self.beliefs['prospective'], i, methods=self.belief_functions)
+                self.process_beliefs(self.beliefs['prospective'], i)
             )
 
             # generate long-form records for pandas
             self.retrospective_beliefs.extend(
-                self.process_beliefs(self.beliefs['retrospective'], i, methods=self.belief_functions)
+                self.process_beliefs(self.beliefs['retrospective'], i)
             )
 
         return self.results, self.prospective_beliefs, self.retrospective_beliefs
@@ -378,12 +378,12 @@ class BeliefActivePlot():
             for m in methods:
                 for direction in beliefs.keys():
                     with suppress(KeyError):
-                        belief = round_record[direction]
+                        belief = round_record[m][direction]
                         beliefs[direction][m].append(belief)
         return beliefs
 
 
-    def process_beliefs(self, beliefs_dict, i, methods=['ThompsonSampling']):
+    def process_beliefs(self, beliefs_dict, i):
         """ Processes the output of BayesOptExperiment.
 
         Parameters
@@ -402,24 +402,22 @@ class BeliefActivePlot():
         """
         # instantiate belief list
         belief_list = []
-        
+
         # record results
-        for belief_name, belief_function in self.belief_functions_dict.items():
-            
-            if belief_name in methods:
-            
-                for step, step_beliefs in enumerate(beliefs_dict):
+        for belief_name, step_beliefs in beliefs_dict.items():
+
+            for step, beliefs in enumerate(step_beliefs):
+
+                for belief_index, belief in enumerate(beliefs):
                     
-                    for belief_index, belief in enumerate(step_beliefs):
-                        
-                        belief_list.append(
-                            {'Acquisition Function': self.acquisition,
-                             'Belief Function': belief_name,
-                             'Trial': i,
-                             'Round': step,
-                             'Index': belief_index,
-                             'Value': belief.item()}
-                         )
+                    belief_list.append(
+                        {'Acquisition Function': self.acquisition,
+                         'Belief Function': belief_name,
+                         'Trial': i,
+                         'Round': step,
+                         'Index': belief_index,
+                         'Value': belief.item()}
+                    )
 
         return belief_list
 
