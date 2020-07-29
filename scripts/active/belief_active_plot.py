@@ -67,7 +67,7 @@ def _get_biophysical_thompson_values(
     return thompson_values
 
 
-def thompson_sample(net, data, unseen, num_samples=1):
+def thompson_sample(net, data, unseen, num_samples=1, **kwargs):
     """ Perform retrospective and prospective Thompson Sampling
         to check model beliefs about y_max.
 
@@ -125,11 +125,16 @@ def thompson_sample(net, data, unseen, num_samples=1):
     return thompson_samples
 
 
-def _max_utility(net, data, unseen, utility_func, y_best=0.0):
+def _max_utility(net, data, unseen, utility_func):
     """ Finds max of the beliefs of a network according to some utility function
     """
     # unpack data
-    gs, _ = data
+    gs, ys = data
+
+    # get y_best
+    seen = [s for s in range(len(ys)) if s not in unseen]
+    y_best_round = ys[seen].max().detach().item()
+    y_best_global = ys.max().detach().item()
 
     # set net to eval
     net.eval()
@@ -147,38 +152,38 @@ def _max_utility(net, data, unseen, utility_func, y_best=0.0):
         unseen_data = pinot.active.experiment._slice_fn_tuple(data, unseen)
         beliefs['prospective'] = torch.max(
             utility_func(
-                distribution, y_best=y_best,
+                distribution, y_best=y_best_round,
             )
         ).unsqueeze(0)
 
     # get retrospective thompson samples on all data
     beliefs['retrospective'] = torch.max(
         utility_func(
-            distribution, y_best=y_best,
+            distribution, y_best=y_best_global,
         )
     ).unsqueeze(0)
 
     return beliefs
 
 
-def max_probability_of_improvement(net, data, unseen, y_best=0.0):
+def max_probability_of_improvement(net, data, unseen, **kwargs):
     """ Computes the belief about the max using PI utility function.
     """
-    beliefs = _max_utility(net, data, unseen, _pi, y_best=y_best)
+    beliefs = _max_utility(net, data, unseen, _pi)
     return beliefs
 
 
-def max_upper_confidence_bound(net, data, unseen, y_best=0.0):
+def max_upper_confidence_bound(net, data, unseen, **kwargs):
     """ Computes the belief about the max using UCB utility function.
     """
-    beliefs = _max_utility(net, data, unseen, _ucb, y_best=y_best)
+    beliefs = _max_utility(net, data, unseen, _ucb)
     return beliefs
 
 
-def max_expected_improvement(net, data, unseen, y_best=0.0):
+def max_expected_improvement(net, data, unseen, **kwargs):
     """ Computes the belief about the max using EI utility function.
     """
-    beliefs = _max_utility(net, data, unseen, _ei_analytical, y_best=y_best)
+    beliefs = _max_utility(net, data, unseen, _ei_analytical)
     return beliefs
 
 
@@ -346,7 +351,8 @@ class BeliefActivePlot():
         # loop through rounds
         round_beliefs = []
         for idx, state in self.bo.states.items():
-            
+
+            # unpack acquisitions
             seen, unseen = acquisitions[idx]
 
             # load network states
