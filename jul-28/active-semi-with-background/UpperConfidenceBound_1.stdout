@@ -1,0 +1,43 @@
+Sender: LSF System <lsfadmin@lu01>
+Subject: Job 16161845: <semi-active> in cluster <lila> Done
+
+Job <semi-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Wed Jul 29 16:27:44 2020
+Job was executed on host(s) <12*lu01>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Wed Jul 29 16:36:05 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Wed Jul 29 16:36:05 2020
+Terminated at Wed Jul 29 16:39:05 2020
+Results reported at Wed Jul 29 16:39:05 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_gp --num_rounds 6 --num_trials 1 --num_epochs 1 --data moonshot_sorted --q 96 --acquisition UpperConfidenceBound --output_folder /home/nguyenm5/coding/pinot/jul-28/active-semi-with-background --index 1 --unlabeled_data moonshot_unlabeled_small --device cuda:0 --seed 2666 --unlabeled_volume 0.1
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   628.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.63 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   181 sec.
+    Turnaround time :                            681 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='UpperConfidenceBound', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1, num_rounds=6, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/jul-28/active-semi-with-background', q=96, seed=2666, unlabeled_data='moonshot_unlabeled_small', unlabeled_volume=0.1)
+0
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-28/active-semi-with-background/UpperConfidenceBound_1.stderr> for stderr output of this job.
+

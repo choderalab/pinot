@@ -4,9 +4,9 @@
 import torch
 import abc
 import dgl
+import copy
 import pinot
 from pinot.metrics import _independent
-import numpy as np
 
 # =============================================================================
 # HELPER FUNCTIONS
@@ -169,7 +169,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
     optimizer : `torch.optim.Optimizer` or `pinot.Sampler`
         Optimizer for training.
 
-    num_epochs : `int`
+    n_epochs : `int`
         Number of epochs.
 
     q : `int`
@@ -212,7 +212,6 @@ class BayesOptExperiment(ActiveLearningExperiment):
         num_epochs=100,
         q=1,
         num_samples=1000,
-        weighted_acquire=False,
         early_stopping=True,
         workup=_independent,
         slice_fn=_slice_fn_tensor,
@@ -257,6 +256,8 @@ class BayesOptExperiment(ActiveLearningExperiment):
         self.collate_fn = collate_fn
         self.net_state_dict = net_state_dict
         self.train_class = train_class
+        self.states = {}
+        self.acquisitions = []
 
     def reset_net(self):
         """Reset everything."""
@@ -307,7 +308,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
         self.net = self.train_class(
             data=[self.seen_data],
             optimizer=self.optimizer(self.net),
-            num_epochs=self.num_epochs,
+            n_epochs=self.num_epochs,
             net=self.net,
             record_interval=999999,
         ).train()
@@ -321,18 +322,22 @@ class BayesOptExperiment(ActiveLearningExperiment):
         # split input target
         gs, ys = self.unseen_data
 
-        # make sure we only 'acquire' fewer points than are remaining
-        self.q = min(self.q, len(self.unseen))
+        # acquire no more points than are remaining
+        if self.q <= len(self.unseen):
 
-        # acquire pending points
-        pending_pts = self.acquisition(
-            self.net, self.unseen_data, q=self.q, y_best=self.y_best
-        )
+            # acquire pending points
+            pending_pts = self.acquisition(
+                self.net, gs, q=self.q, y_best=self.y_best
+            )
+    
+            # pop from the back so you don't disrupt the order
+            pending_pts = pending_pts.sort(descending=True).values
 
-        # pop from the back so you don't disrupt the order
-        pending_pts = pending_pts.sort(descending=True).values
+        else:
 
-        # print(len(self.new), best)
+            # set pending points to all remaining data
+            pending_pts = torch.range(len(self.unseen)-1, 0, step=-1).long()
+
         self.seen.extend([self.unseen.pop(p) for p in pending_pts])
 
 
@@ -375,62 +380,17 @@ class BayesOptExperiment(ActiveLearningExperiment):
         self.blind_pick(seed=seed)
         self.update_data()
 
-        max_prob_arr = []
-        max_ucb_arr = []
-        max_ucb_minus_ybest = []
-        max_exp_improv_arr = []
-
-        max_prob_arr_forward = []
-        max_ucb_arr_forward = []
-        max_ucb_minus_ybest_forward = []
-        max_exp_improv_arr_forward = []
-
         while idx < num_rounds:
             
-            #if self.early_stopping and self.y_best == self.best_possible:
-            #    break
+            if self.early_stopping and self.y_best == self.best_possible:
+                break
 
             self.train()
+            self.states[idx] = copy.deepcopy(self.net.state_dict())
+            self.acquisitions.append(
+                tuple([self.seen.copy(), self.unseen.copy()])
+            )
 
-            max_prob = pinot.active.acquisition.probability_of_improvement(
-                        net=self.net, unseen_data=(self.g_all,None),
-                        y_best=self.y_best, q=self.q).max().detach().cpu().numpy()
-
-            max_ucb = pinot.active.acquisition.upper_confidence_bound(
-                        net=self.net, unseen_data=(self.g_all,None),
-                        y_best=self.y_best, q=self.q).max().detach().cpu().numpy()
-
-            exp_improv = pinot.active.acquisition.expected_improvement_analytical(
-                        net=self.net, unseen_data=(self.g_all,None),
-                        y_best=self.y_best, q=self.q).max().detach().cpu().numpy()
-            
-            # Prospective
-            max_prob_forward = pinot.active.acquisition.probability_of_improvement(
-                        net=self.net, unseen_data=(self.unseen_data[0],None),
-                        y_best=self.y_best, q=self.q).max().detach().cpu().numpy()
-
-            max_ucb_forward = pinot.active.acquisition.upper_confidence_bound(
-                        net=self.net, unseen_data=(self.unseen_data[0],None),
-                        y_best=self.y_best, q=self.q).max().detach().cpu().numpy()
-            
-            exp_improv_forward = pinot.active.acquisition.expected_improvement_analytical(
-                        net=self.net, unseen_data=(self.unseen_data[0],None),
-                        y_best=self.y_best, q=self.q).max().detach().cpu().numpy()
-            
-
-
-            # Retrospective
-            max_prob_arr.append(max_prob)
-            max_ucb_arr.append(max_ucb)
-            max_ucb_minus_ybest.append(np.array(max_ucb - self.y_best.cpu().numpy()))
-            max_exp_improv_arr.append(exp_improv)
-    
-            # Prospective
-            max_prob_arr_forward.append(max_prob_forward)
-            max_ucb_arr_forward.append(max_ucb_forward)
-            max_ucb_minus_ybest_forward.append(np.array(max_ucb_forward - self.y_best.cpu().numpy()))
-            max_exp_improv_arr_forward.append(exp_improv_forward)
-            
             if not self.unseen:
                 break
 
@@ -439,20 +399,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
 
             idx += 1
 
-
-        print("MPI, UCB, UCB-ybest, Expected Improv")
-        
-        print(max_prob_arr)
-        print(max_ucb_arr)
-        print(max_ucb_minus_ybest)
-        print(max_exp_improv_arr)
-
-        print(max_prob_arr_forward)
-        print(max_ucb_arr_forward)
-        print(max_ucb_minus_ybest_forward)
-        print(max_exp_improv_arr_forward)
-
-        return self.seen
+        return self.acquisitions
 
 
 class SemiSupervisedBayesOptExperiment(BayesOptExperiment):
@@ -503,7 +450,7 @@ class SemiSupervisedBayesOptExperiment(BayesOptExperiment):
         self.net = pinot.app.experiment.Train(
             data=batched_semi_supervised_data,
             optimizer=self.optimizer,
-            n_epochs=self.num_epochs,
+            n_epochs=self.n_epochs,
             net=self.net,
             record_interval=999999,
         ).train()
