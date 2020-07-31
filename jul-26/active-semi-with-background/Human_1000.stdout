@@ -202,3 +202,105 @@ PS:
 
 Read file </home/nguyenm5/coding/pinot/jul-26/active-semi-with-background/Human_1000.stderr> for stderr output of this job.
 
+Sender: LSF System <lsfadmin@ls17>
+Subject: Job 16146503: <semi-active> in cluster <lila> Done
+
+Job <semi-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Sun Jul 26 16:12:03 2020
+Job was executed on host(s) <12*ls17>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Jul 27 01:38:05 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Jul 27 01:38:05 2020
+Terminated at Tue Jul 28 15:49:17 2020
+Results reported at Tue Jul 28 15:49:17 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/active_plot.py --net semi_gp --num_rounds 6 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition Human --output_folder /home/nguyenm5/coding/pinot/jul-26/active-semi-with-background --index 1 --unlabeled_data moonshot_unlabeled_small --device cuda:0 --seed 2666 --unlabeled_volume 0.2
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   2289998.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   137471 sec.
+    Turnaround time :                            171434 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='Human', config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1000, num_rounds=6, num_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/jul-26/active-semi-with-background', q=96, seed=2666, unlabeled_data='moonshot_unlabeled_small', unlabeled_volume=0.2)
+MPI, UCB, UCB-ybest, Expected Improv
+[array(521), array(520), array(524), array(523), array(524), array(523)]
+[array(521), array(520), array(523), array(523), array(522), array(522)]
+[array(520.7503901), array(518.918962), array(521.917575), array(521.917575), array(520.917575), array(520.917575)]
+[array(521), array(520), array(524), array(523), array(524), array(523)]
+[array(520), array(423), array(331), array(235), array(139), array(43)]
+[array(520), array(423), array(331), array(234), array(139), array(43)]
+[array(519.7503901), array(421.918962), array(329.917575), array(232.917575), array(137.917575), array(41.917575)]
+[array(520), array(424), array(331), array(235), array(139), array(43)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-26/active-semi-with-background/Human_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls01>
+Subject: Job 16146505: <semi-active> in cluster <lila> Done
+
+Job <semi-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Sun Jul 26 16:12:03 2020
+Job was executed on host(s) <12*ls01>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Jul 27 01:42:00 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Jul 27 01:42:00 2020
+Terminated at Tue Jul 28 15:50:31 2020
+Results reported at Tue Jul 28 15:50:31 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/active_plot.py --net semi_gp --num_rounds 6 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition Human --output_folder /home/nguyenm5/coding/pinot/jul-26/active-semi-with-background --index 1 --unlabeled_data moonshot_unlabeled_small --device cuda:0 --seed 8888 --unlabeled_volume 0.2
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   2350224.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   137313 sec.
+    Turnaround time :                            171508 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='Human', config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1000, num_rounds=6, num_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/jul-26/active-semi-with-background', q=96, seed=8888, unlabeled_data='moonshot_unlabeled_small', unlabeled_volume=0.2)
+MPI, UCB, UCB-ybest, Expected Improv
+[array(520), array(521), array(520), array(520), array(524), array(523)]
+[array(520), array(521), array(520), array(520), array(522), array(522)]
+[array(519.98565708), array(519.918962), array(518.917575), array(518.917575), array(520.917575), array(520.917575)]
+[array(520), array(521), array(520), array(520), array(524), array(523)]
+[array(519), array(424), array(327), array(231), array(139), array(43)]
+[array(519), array(424), array(327), array(233), array(139), array(43)]
+[array(518.98565708), array(422.918962), array(325.917575), array(231.917575), array(137.917575), array(41.917575)]
+[array(519), array(424), array(327), array(231), array(139), array(43)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-26/active-semi-with-background/Human_1000.stderr> for stderr output of this job.
+
