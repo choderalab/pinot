@@ -334,3 +334,175 @@ PS:
 
 Read file </home/nguyenm5/coding/pinot/aug-02/active-sup/UpperConfidenceBound_1000.stderr> for stderr output of this job.
 
+Sender: LSF System <lsfadmin@lt08>
+Subject: Job 16224375: <sup-active> in cluster <lila> Done
+
+Job <sup-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Sun Aug  2 16:04:13 2020
+Job was executed on host(s) <12*lt08>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Sun Aug  2 16:04:14 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Sun Aug  2 16:04:14 2020
+Terminated at Sun Aug  2 16:06:43 2020
+Results reported at Sun Aug  2 16:06:43 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net ExactGaussianProcessRegressor --num_rounds 6 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition UpperConfidenceBound --output_folder /home/nguyenm5/coding/pinot/aug-02/active-sup --index 1 --device cuda:0 --seed 417 --unlabeled_volume 0.0
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   318.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.61 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   149 sec.
+    Turnaround time :                            150 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='UpperConfidenceBound', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '32', 'activation', 'tanh', 'GraphConv', '32', 'activation', 'tanh', 'GraphConv', '32', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='ExactGaussianProcessRegressor', num_epochs=1000, num_rounds=6, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-02/active-sup', q=96, seed=417, unlabeled_data='', unlabeled_volume=0.0)
+0
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-02/active-sup/UpperConfidenceBound_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls03>
+Subject: Job 16224377: <sup-active> in cluster <lila> Done
+
+Job <sup-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Sun Aug  2 16:04:13 2020
+Job was executed on host(s) <12*ls03>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Sun Aug  2 16:04:14 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Sun Aug  2 16:04:14 2020
+Terminated at Sun Aug  2 16:07:40 2020
+Results reported at Sun Aug  2 16:07:40 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net ExactGaussianProcessRegressor --num_rounds 6 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition UpperConfidenceBound --output_folder /home/nguyenm5/coding/pinot/aug-02/active-sup --index 1 --device cuda:0 --seed 11 --unlabeled_volume 0.0
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   458.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.77 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   207 sec.
+    Turnaround time :                            207 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='UpperConfidenceBound', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '32', 'activation', 'tanh', 'GraphConv', '32', 'activation', 'tanh', 'GraphConv', '32', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='ExactGaussianProcessRegressor', num_epochs=1000, num_rounds=6, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-02/active-sup', q=96, seed=11, unlabeled_data='', unlabeled_volume=0.0)
+0
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-02/active-sup/UpperConfidenceBound_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls08>
+Subject: Job 16224374: <sup-active> in cluster <lila> Done
+
+Job <sup-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Sun Aug  2 16:04:10 2020
+Job was executed on host(s) <12*ls08>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Sun Aug  2 16:04:13 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Sun Aug  2 16:04:13 2020
+Terminated at Sun Aug  2 16:08:14 2020
+Results reported at Sun Aug  2 16:08:14 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net ExactGaussianProcessRegressor --num_rounds 6 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition UpperConfidenceBound --output_folder /home/nguyenm5/coding/pinot/aug-02/active-sup --index 1 --device cuda:0 --seed 2666 --unlabeled_volume 0.0
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   720.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.79 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   242 sec.
+    Turnaround time :                            244 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='UpperConfidenceBound', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '32', 'activation', 'tanh', 'GraphConv', '32', 'activation', 'tanh', 'GraphConv', '32', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='ExactGaussianProcessRegressor', num_epochs=1000, num_rounds=6, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-02/active-sup', q=96, seed=2666, unlabeled_data='', unlabeled_volume=0.0)
+0
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-02/active-sup/UpperConfidenceBound_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls14>
+Subject: Job 16224376: <sup-active> in cluster <lila> Done
+
+Job <sup-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Sun Aug  2 16:04:13 2020
+Job was executed on host(s) <12*ls14>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Sun Aug  2 16:04:14 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Sun Aug  2 16:04:14 2020
+Terminated at Sun Aug  2 16:08:20 2020
+Results reported at Sun Aug  2 16:08:20 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net ExactGaussianProcessRegressor --num_rounds 6 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition UpperConfidenceBound --output_folder /home/nguyenm5/coding/pinot/aug-02/active-sup --index 1 --device cuda:0 --seed 8888 --unlabeled_volume 0.0
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   664.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.81 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   247 sec.
+    Turnaround time :                            247 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='UpperConfidenceBound', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '32', 'activation', 'tanh', 'GraphConv', '32', 'activation', 'tanh', 'GraphConv', '32', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='ExactGaussianProcessRegressor', num_epochs=1000, num_rounds=6, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-02/active-sup', q=96, seed=8888, unlabeled_data='', unlabeled_volume=0.0)
+0
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-02/active-sup/UpperConfidenceBound_1000.stderr> for stderr output of this job.
+
