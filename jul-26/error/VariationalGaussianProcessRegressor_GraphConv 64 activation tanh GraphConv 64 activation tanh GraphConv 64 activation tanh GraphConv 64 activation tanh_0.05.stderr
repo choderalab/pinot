@@ -1,0 +1,7 @@
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/semi_supervised/learning_curve_semi.py", line 241, in <module>
+    net, optimizer = get_net_and_optimizer(args, args.architecture, unsup_scale, False) # No input transformation
+  File "scripts/semi_supervised/learning_curve_semi.py", line 183, in get_net_and_optimizer
+    if args.starting_epochs: # If we have a pretrained model, load it
+AttributeError: 'Namespace' object has no attribute 'starting_epochs'

@@ -170,3 +170,347 @@ PS:
 
 Read file </home/nguyenm5/coding/pinot/jul-28/active-semi-with-background/Human_1000.stderr> for stderr output of this job.
 
+Sender: LSF System <lsfadmin@lu10>
+Subject: Job 16161885: <semi-active> in cluster <lila> Done
+
+Job <semi-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Wed Jul 29 16:43:21 2020
+Job was executed on host(s) <12*lu10>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Thu Jul 30 04:28:05 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Thu Jul 30 04:28:05 2020
+Terminated at Fri Jul 31 14:04:58 2020
+Results reported at Fri Jul 31 14:04:58 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_gp --num_rounds 6 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition Human --output_folder /home/nguyenm5/coding/pinot/jul-28/active-semi-with-background --index 1 --unlabeled_data moonshot_unlabeled_small --device cuda:0 --seed 417 --unlabeled_volume 0.2
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   400684.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   121014 sec.
+    Turnaround time :                            163297 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='Human', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1000, num_rounds=6, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/jul-28/active-semi-with-background', q=96, seed=417, unlabeled_data='moonshot_unlabeled_small', unlabeled_volume=0.2)
+0
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-28/active-semi-with-background/Human_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lt11>
+Subject: Job 16161886: <semi-active> in cluster <lila> Done
+
+Job <semi-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Wed Jul 29 16:43:21 2020
+Job was executed on host(s) <12*lt11>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Thu Jul 30 04:30:39 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Thu Jul 30 04:30:39 2020
+Terminated at Fri Jul 31 16:03:26 2020
+Results reported at Fri Jul 31 16:03:26 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_gp --num_rounds 6 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition Human --output_folder /home/nguyenm5/coding/pinot/jul-28/active-semi-with-background --index 1 --unlabeled_data moonshot_unlabeled_small --device cuda:0 --seed 8888 --unlabeled_volume 0.2
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   524217.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   127968 sec.
+    Turnaround time :                            170405 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='Human', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1000, num_rounds=6, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/jul-28/active-semi-with-background', q=96, seed=8888, unlabeled_data='moonshot_unlabeled_small', unlabeled_volume=0.2)
+0
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-28/active-semi-with-background/Human_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lt05>
+Subject: Job 16161887: <semi-active> in cluster <lila> Done
+
+Job <semi-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Wed Jul 29 16:43:21 2020
+Job was executed on host(s) <12*lt05>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Thu Jul 30 04:43:09 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Thu Jul 30 04:43:09 2020
+Terminated at Fri Jul 31 17:50:04 2020
+Results reported at Fri Jul 31 17:50:04 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_gp --num_rounds 6 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition Human --output_folder /home/nguyenm5/coding/pinot/jul-28/active-semi-with-background --index 1 --unlabeled_data moonshot_unlabeled_small --device cuda:0 --seed 11 --unlabeled_volume 0.2
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   568929.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   133616 sec.
+    Turnaround time :                            176803 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='Human', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1000, num_rounds=6, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/jul-28/active-semi-with-background', q=96, seed=11, unlabeled_data='moonshot_unlabeled_small', unlabeled_volume=0.2)
+0
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-28/active-semi-with-background/Human_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls17>
+Subject: Job 16161884: <semi-active> in cluster <lila> Done
+
+Job <semi-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Wed Jul 29 16:43:21 2020
+Job was executed on host(s) <12*ls17>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Thu Jul 30 03:51:44 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Thu Jul 30 03:51:44 2020
+Terminated at Fri Jul 31 22:16:27 2020
+Results reported at Fri Jul 31 22:16:27 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_gp --num_rounds 6 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition Human --output_folder /home/nguyenm5/coding/pinot/jul-28/active-semi-with-background --index 1 --unlabeled_data moonshot_unlabeled_small --device cuda:0 --seed 2666 --unlabeled_volume 0.2
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   689832.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   152683 sec.
+    Turnaround time :                            192786 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='Human', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1000, num_rounds=6, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/jul-28/active-semi-with-background', q=96, seed=2666, unlabeled_data='moonshot_unlabeled_small', unlabeled_volume=0.2)
+0
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-28/active-semi-with-background/Human_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lu08>
+Subject: Job 16161896: <semi-active> in cluster <lila> Done
+
+Job <semi-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Wed Jul 29 16:43:23 2020
+Job was executed on host(s) <12*lu08>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Thu Jul 30 09:02:00 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Thu Jul 30 09:02:00 2020
+Terminated at Sat Aug  1 22:31:06 2020
+Results reported at Sat Aug  1 22:31:06 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_gp --num_rounds 6 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition Human --output_folder /home/nguyenm5/coding/pinot/jul-28/active-semi-with-background --index 1 --unlabeled_data moonshot_unlabeled_small --device cuda:0 --seed 2666 --unlabeled_volume 0.4
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   795964.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   221346 sec.
+    Turnaround time :                            280063 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='Human', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1000, num_rounds=6, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/jul-28/active-semi-with-background', q=96, seed=2666, unlabeled_data='moonshot_unlabeled_small', unlabeled_volume=0.4)
+0
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-28/active-semi-with-background/Human_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls06>
+Subject: Job 16161899: <semi-active> in cluster <lila> Done
+
+Job <semi-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Wed Jul 29 16:43:24 2020
+Job was executed on host(s) <12*ls06>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Thu Jul 30 09:04:30 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Thu Jul 30 09:04:30 2020
+Terminated at Sun Aug  2 00:31:13 2020
+Results reported at Sun Aug  2 00:31:13 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_gp --num_rounds 6 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition Human --output_folder /home/nguyenm5/coding/pinot/jul-28/active-semi-with-background --index 1 --unlabeled_data moonshot_unlabeled_small --device cuda:0 --seed 11 --unlabeled_volume 0.4
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   999268.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   228404 sec.
+    Turnaround time :                            287269 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='Human', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1000, num_rounds=6, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/jul-28/active-semi-with-background', q=96, seed=11, unlabeled_data='moonshot_unlabeled_small', unlabeled_volume=0.4)
+0
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-28/active-semi-with-background/Human_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lu02>
+Subject: Job 16161897: <semi-active> in cluster <lila> Done
+
+Job <semi-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Wed Jul 29 16:43:23 2020
+Job was executed on host(s) <12*lu02>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Thu Jul 30 09:03:24 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Thu Jul 30 09:03:24 2020
+Terminated at Sun Aug  2 00:39:27 2020
+Results reported at Sun Aug  2 00:39:27 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_gp --num_rounds 6 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition Human --output_folder /home/nguyenm5/coding/pinot/jul-28/active-semi-with-background --index 1 --unlabeled_data moonshot_unlabeled_small --device cuda:0 --seed 417 --unlabeled_volume 0.4
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   979950.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   228963 sec.
+    Turnaround time :                            287764 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='Human', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1000, num_rounds=6, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/jul-28/active-semi-with-background', q=96, seed=417, unlabeled_data='moonshot_unlabeled_small', unlabeled_volume=0.4)
+0
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-28/active-semi-with-background/Human_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lu07>
+Subject: Job 16161898: <semi-active> in cluster <lila> Done
+
+Job <semi-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Wed Jul 29 16:43:23 2020
+Job was executed on host(s) <12*lu07>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Thu Jul 30 09:03:41 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Thu Jul 30 09:03:41 2020
+Terminated at Sun Aug  2 00:47:15 2020
+Results reported at Sun Aug  2 00:47:15 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_gp --num_rounds 6 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition Human --output_folder /home/nguyenm5/coding/pinot/jul-28/active-semi-with-background --index 1 --unlabeled_data moonshot_unlabeled_small --device cuda:0 --seed 8888 --unlabeled_volume 0.4
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   999913.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   229415 sec.
+    Turnaround time :                            288232 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='Human', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1000, num_rounds=6, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/jul-28/active-semi-with-background', q=96, seed=8888, unlabeled_data='moonshot_unlabeled_small', unlabeled_volume=0.4)
+0
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/jul-28/active-semi-with-background/Human_1000.stderr> for stderr output of this job.
+

@@ -1,0 +1,18 @@
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/semi_supervised/learning_curve_semi.py", line 241, in <module>
+    net, optimizer = get_net_and_optimizer(args, args.architecture, unsup_scale, False) # No input transformation
+  File "scripts/semi_supervised/learning_curve_semi.py", line 183, in get_net_and_optimizer
+    if args.starting_epochs: # If we have a pretrained model, load it
+AttributeError: 'Namespace' object has no attribute 'starting_epochs'
+Using backend: pytorch
+/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/base.py:25: UserWarning: Currently adjacency_matrix() returns a matrix with destination as rows by default.  In 0.5 the result will have source as rows (i.e. transpose=True)
+  warnings.warn(msg, warn_type)
+/home/nguyenm5/coding/pinot/pinot/regressors/gaussian_process_regressor.py:325: UserWarning: torch.range is deprecated in favor of torch.arange and will be removed in 0.5. Note that arange generates values in [start; end), not [start; end].
+  torch.range(0, self.y_tr_sigma_diag.shape[0] - 1)[:, None],
+/home/nguyenm5/coding/pinot/pinot/regressors/gaussian_process_regressor.py:326: UserWarning: torch.range is deprecated in favor of torch.arange and will be removed in 0.5. Note that arange generates values in [start; end), not [start; end].
+  torch.range(0, self.y_tr_sigma_diag.shape[0] - 1)[None, :],
+/home/nguyenm5/coding/pinot/pinot/metrics.py:45: UserWarning: Using a target size (torch.Size([299, 1])) that is different to the input size (torch.Size([299])). This will likely lead to incorrect results due to broadcasting. Please ensure they have the same size.
+  return torch.nn.functional.mse_loss(y, y_hat).pow(0.5)
+/home/nguyenm5/coding/pinot/pinot/metrics.py:45: UserWarning: Using a target size (torch.Size([74, 1])) that is different to the input size (torch.Size([74])). This will likely lead to incorrect results due to broadcasting. Please ensure they have the same size.
+  return torch.nn.functional.mse_loss(y, y_hat).pow(0.5)
