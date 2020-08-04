@@ -1,0 +1,82 @@
+Sender: LSF System <lsfadmin@lt04>
+Subject: Job 16232250: <semi-exp> in cluster <lila> Exited
+
+Job <semi-exp> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug  3 17:04:49 2020
+Job was executed on host(s) <12*lt04>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug  3 17:37:43 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug  3 17:37:43 2020
+Terminated at Mon Aug  3 17:38:09 2020
+Results reported at Mon Aug  3 17:38:09 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/semi_supervised/learning_curve_semi.py --n_epochs 1 --cuda --regressor_type VariationalGaussianProcessRegressor --output /home/nguyenm5/coding/pinot/aug-03/arch-search --labeled_data moonshot --unlabeled_data moonshot_unlabeled_all --architecture GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh --volume 0.0 --start_epoch 0 --num_inducing_pts 100 --inner_opt_round 10
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   3.48 sec.
+    Max Memory :                                 -
+    Average Memory :                             -
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               -
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                5
+    Run time :                                   26 sec.
+    Turnaround time :                            2000 sec.
+
+The output (if any) follows:
+
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-03/error/VariationalGaussianProcessRegressor_GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh_0.0.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lt12>
+Subject: Job 16233565: <semi-exp> in cluster <lila> Exited
+
+Job <semi-exp> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug  3 18:28:34 2020
+Job was executed on host(s) <12*lt12>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug  3 18:29:58 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug  3 18:29:58 2020
+Terminated at Mon Aug  3 18:33:14 2020
+Results reported at Mon Aug  3 18:33:14 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/semi_supervised/learning_curve_semi.py --n_epochs 1 --cuda --regressor_type VariationalGaussianProcessRegressor --output /home/nguyenm5/coding/pinot/aug-03/arch-search --labeled_data moonshot --unlabeled_data moonshot_unlabeled_all --architecture GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh --volume 0.0 --start_epoch 0 --num_inducing_pts 100 --inner_opt_round 10
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   147.00 sec.
+    Max Memory :                                 3 GB
+    Average Memory :                             1.26 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               189.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   196 sec.
+    Turnaround time :                            280 sec.
+
+The output (if any) follows:
+
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-03/error/VariationalGaussianProcessRegressor_GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh_0.0.stderr> for stderr output of this job.
+

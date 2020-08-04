@@ -1,0 +1,860 @@
+Sender: LSF System <lsfadmin@lt18>
+Subject: Job 16237238: <sup-active> in cluster <lila> Done
+
+Job <sup-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug  3 20:47:01 2020
+Job was executed on host(s) <12*lt18>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug  3 20:57:14 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug  3 20:57:14 2020
+Terminated at Mon Aug  3 21:00:32 2020
+Results reported at Mon Aug  3 21:00:32 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net ExactGaussianProcessRegressor --num_rounds 7 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-03/active-sup --index 1 --device cuda:0 --seed 2666 --unlabeled_volume 0.0
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   547.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.74 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   198 sec.
+    Turnaround time :                            811 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='ExactGaussianProcessRegressor', num_epochs=1000, num_rounds=7, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-03/active-sup', q=96, seed=2666, unlabeled_data='', unlabeled_volume=0.0)
+0
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-03/active-sup/ThompsonSampling_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lt19>
+Subject: Job 16237239: <sup-active> in cluster <lila> Done
+
+Job <sup-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug  3 20:47:02 2020
+Job was executed on host(s) <12*lt19>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug  3 20:57:14 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug  3 20:57:14 2020
+Terminated at Mon Aug  3 21:00:37 2020
+Results reported at Mon Aug  3 21:00:37 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net ExactGaussianProcessRegressor --num_rounds 7 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-03/active-sup --index 1 --device cuda:0 --seed 417 --unlabeled_volume 0.0
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   499.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.75 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   204 sec.
+    Turnaround time :                            815 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='ExactGaussianProcessRegressor', num_epochs=1000, num_rounds=7, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-03/active-sup', q=96, seed=417, unlabeled_data='', unlabeled_volume=0.0)
+0
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-03/active-sup/ThompsonSampling_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lu09>
+Subject: Job 16237240: <sup-active> in cluster <lila> Done
+
+Job <sup-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug  3 20:47:02 2020
+Job was executed on host(s) <12*lu09>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug  3 20:57:14 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug  3 20:57:14 2020
+Terminated at Mon Aug  3 21:01:07 2020
+Results reported at Mon Aug  3 21:01:07 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net ExactGaussianProcessRegressor --num_rounds 7 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-03/active-sup --index 1 --device cuda:0 --seed 8888 --unlabeled_volume 0.0
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   584.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.79 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   233 sec.
+    Turnaround time :                            845 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='ExactGaussianProcessRegressor', num_epochs=1000, num_rounds=7, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-03/active-sup', q=96, seed=8888, unlabeled_data='', unlabeled_volume=0.0)
+0
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-03/active-sup/ThompsonSampling_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lu02>
+Subject: Job 16237242: <sup-active> in cluster <lila> Done
+
+Job <sup-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug  3 20:47:02 2020
+Job was executed on host(s) <12*lu02>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug  3 20:57:44 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug  3 20:57:44 2020
+Terminated at Mon Aug  3 21:01:22 2020
+Results reported at Mon Aug  3 21:01:22 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net ExactGaussianProcessRegressor --num_rounds 7 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-03/active-sup --index 1 --device cuda:0 --seed 1637 --unlabeled_volume 0.0
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   665.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.85 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   219 sec.
+    Turnaround time :                            860 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='ExactGaussianProcessRegressor', num_epochs=1000, num_rounds=7, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-03/active-sup', q=96, seed=1637, unlabeled_data='', unlabeled_volume=0.0)
+0
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-03/active-sup/ThompsonSampling_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls04>
+Subject: Job 16237241: <sup-active> in cluster <lila> Done
+
+Job <sup-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug  3 20:47:02 2020
+Job was executed on host(s) <12*ls04>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug  3 20:57:34 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug  3 20:57:34 2020
+Terminated at Mon Aug  3 21:01:54 2020
+Results reported at Mon Aug  3 21:01:54 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net ExactGaussianProcessRegressor --num_rounds 7 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-03/active-sup --index 1 --device cuda:0 --seed 11 --unlabeled_volume 0.0
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   799.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.86 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   261 sec.
+    Turnaround time :                            892 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='ExactGaussianProcessRegressor', num_epochs=1000, num_rounds=7, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-03/active-sup', q=96, seed=11, unlabeled_data='', unlabeled_volume=0.0)
+0
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-03/active-sup/ThompsonSampling_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lt09>
+Subject: Job 16237209: <sup-active> in cluster <lila> Exited
+
+Job <sup-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug  3 20:12:52 2020
+Job was executed on host(s) <12*lt09>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug  3 20:13:13 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug  3 20:13:13 2020
+Terminated at Tue Aug  4 05:54:15 2020
+Results reported at Tue Aug  4 05:54:15 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_gp --num_rounds 7 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-03/active-sup --index 1 --device cuda:0 --seed 8888 --unlabeled_volume 0.4
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   111766.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   34864 sec.
+    Turnaround time :                            34883 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1000, num_rounds=7, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-03/active-sup', q=96, seed=8888, unlabeled_data='', unlabeled_volume=0.4)
+0
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-03/active-sup/ThompsonSampling_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lt09>
+Subject: Job 16237208: <sup-active> in cluster <lila> Exited
+
+Job <sup-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug  3 20:12:52 2020
+Job was executed on host(s) <12*lt09>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug  3 20:13:12 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug  3 20:13:12 2020
+Terminated at Tue Aug  4 06:07:53 2020
+Results reported at Tue Aug  4 06:07:53 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_gp --num_rounds 7 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-03/active-sup --index 1 --device cuda:0 --seed 417 --unlabeled_volume 0.4
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   115367.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   35682 sec.
+    Turnaround time :                            35701 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1000, num_rounds=7, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-03/active-sup', q=96, seed=417, unlabeled_data='', unlabeled_volume=0.4)
+0
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-03/active-sup/ThompsonSampling_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls01>
+Subject: Job 16237204: <sup-active> in cluster <lila> Exited
+
+Job <sup-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug  3 20:12:52 2020
+Job was executed on host(s) <12*ls01>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug  3 20:13:12 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug  3 20:13:12 2020
+Terminated at Tue Aug  4 06:09:57 2020
+Results reported at Tue Aug  4 06:09:57 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_gp --num_rounds 7 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-03/active-sup --index 1 --device cuda:0 --seed 8888 --unlabeled_volume 0.2
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   120578.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   35806 sec.
+    Turnaround time :                            35825 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1000, num_rounds=7, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-03/active-sup', q=96, seed=8888, unlabeled_data='', unlabeled_volume=0.2)
+0
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-03/active-sup/ThompsonSampling_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls15>
+Subject: Job 16237207: <sup-active> in cluster <lila> Exited
+
+Job <sup-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug  3 20:12:52 2020
+Job was executed on host(s) <12*ls15>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug  3 20:13:12 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug  3 20:13:12 2020
+Terminated at Tue Aug  4 07:01:01 2020
+Results reported at Tue Aug  4 07:01:01 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_gp --num_rounds 7 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-03/active-sup --index 1 --device cuda:0 --seed 2666 --unlabeled_volume 0.4
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   149508.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   38870 sec.
+    Turnaround time :                            38889 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1000, num_rounds=7, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-03/active-sup', q=96, seed=2666, unlabeled_data='', unlabeled_volume=0.4)
+0
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-03/active-sup/ThompsonSampling_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lt01>
+Subject: Job 16237206: <sup-active> in cluster <lila> Exited
+
+Job <sup-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug  3 20:12:52 2020
+Job was executed on host(s) <12*lt01>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug  3 20:13:12 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug  3 20:13:12 2020
+Terminated at Tue Aug  4 07:15:35 2020
+Results reported at Tue Aug  4 07:15:35 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_gp --num_rounds 7 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-03/active-sup --index 1 --device cuda:0 --seed 1637 --unlabeled_volume 0.2
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   138598.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   39743 sec.
+    Turnaround time :                            39763 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1000, num_rounds=7, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-03/active-sup', q=96, seed=1637, unlabeled_data='', unlabeled_volume=0.2)
+0
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-03/active-sup/ThompsonSampling_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lt13>
+Subject: Job 16237210: <sup-active> in cluster <lila> Exited
+
+Job <sup-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug  3 20:12:52 2020
+Job was executed on host(s) <12*lt13>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug  3 20:13:12 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug  3 20:13:12 2020
+Terminated at Tue Aug  4 07:21:48 2020
+Results reported at Tue Aug  4 07:21:48 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_gp --num_rounds 7 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-03/active-sup --index 1 --device cuda:0 --seed 11 --unlabeled_volume 0.4
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   148412.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   40118 sec.
+    Turnaround time :                            40136 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1000, num_rounds=7, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-03/active-sup', q=96, seed=11, unlabeled_data='', unlabeled_volume=0.4)
+0
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-03/active-sup/ThompsonSampling_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls16>
+Subject: Job 16237202: <sup-active> in cluster <lila> Exited
+
+Job <sup-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug  3 20:12:51 2020
+Job was executed on host(s) <12*ls16>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug  3 20:13:12 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug  3 20:13:12 2020
+Terminated at Tue Aug  4 08:03:17 2020
+Results reported at Tue Aug  4 08:03:17 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_gp --num_rounds 7 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-03/active-sup --index 1 --device cuda:0 --seed 2666 --unlabeled_volume 0.2
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   187903.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   42606 sec.
+    Turnaround time :                            42626 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1000, num_rounds=7, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-03/active-sup', q=96, seed=2666, unlabeled_data='', unlabeled_volume=0.2)
+0
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-03/active-sup/ThompsonSampling_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls06>
+Subject: Job 16237201: <sup-active> in cluster <lila> Exited
+
+Job <sup-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug  3 20:12:51 2020
+Job was executed on host(s) <12*ls06>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug  3 20:13:12 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug  3 20:13:12 2020
+Terminated at Tue Aug  4 08:09:53 2020
+Results reported at Tue Aug  4 08:09:53 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_gp --num_rounds 7 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-03/active-sup --index 1 --device cuda:0 --seed 1637 --unlabeled_volume 0.0
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   190306.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   43002 sec.
+    Turnaround time :                            43022 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1000, num_rounds=7, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-03/active-sup', q=96, seed=1637, unlabeled_data='', unlabeled_volume=0.0)
+0
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-03/active-sup/ThompsonSampling_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lt10>
+Subject: Job 16237203: <sup-active> in cluster <lila> Exited
+
+Job <sup-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug  3 20:12:51 2020
+Job was executed on host(s) <12*lt10>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug  3 20:13:12 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug  3 20:13:12 2020
+Terminated at Tue Aug  4 08:17:01 2020
+Results reported at Tue Aug  4 08:17:01 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_gp --num_rounds 7 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-03/active-sup --index 1 --device cuda:0 --seed 417 --unlabeled_volume 0.2
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   134254.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   43431 sec.
+    Turnaround time :                            43450 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1000, num_rounds=7, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-03/active-sup', q=96, seed=417, unlabeled_data='', unlabeled_volume=0.2)
+0
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-03/active-sup/ThompsonSampling_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lt13>
+Subject: Job 16237211: <sup-active> in cluster <lila> Exited
+
+Job <sup-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug  3 20:12:52 2020
+Job was executed on host(s) <12*lt13>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug  3 20:13:12 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug  3 20:13:12 2020
+Terminated at Tue Aug  4 08:27:26 2020
+Results reported at Tue Aug  4 08:27:26 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_gp --num_rounds 7 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-03/active-sup --index 1 --device cuda:0 --seed 1637 --unlabeled_volume 0.4
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   193307.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   44055 sec.
+    Turnaround time :                            44074 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1000, num_rounds=7, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-03/active-sup', q=96, seed=1637, unlabeled_data='', unlabeled_volume=0.4)
+0
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-03/active-sup/ThompsonSampling_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls08>
+Subject: Job 16237200: <sup-active> in cluster <lila> Exited
+
+Job <sup-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug  3 20:12:51 2020
+Job was executed on host(s) <12*ls08>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug  3 20:13:12 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug  3 20:13:12 2020
+Terminated at Tue Aug  4 09:26:40 2020
+Results reported at Tue Aug  4 09:26:40 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_gp --num_rounds 7 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-03/active-sup --index 1 --device cuda:0 --seed 11 --unlabeled_volume 0.0
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   222525.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   47608 sec.
+    Turnaround time :                            47629 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1000, num_rounds=7, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-03/active-sup', q=96, seed=11, unlabeled_data='', unlabeled_volume=0.0)
+0
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-03/active-sup/ThompsonSampling_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lt06>
+Subject: Job 16237205: <sup-active> in cluster <lila> Exited
+
+Job <sup-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug  3 20:12:52 2020
+Job was executed on host(s) <12*lt06>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug  3 20:13:12 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug  3 20:13:12 2020
+Terminated at Tue Aug  4 10:25:07 2020
+Results reported at Tue Aug  4 10:25:07 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_gp --num_rounds 7 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-03/active-sup --index 1 --device cuda:0 --seed 11 --unlabeled_volume 0.2
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   235847.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   51116 sec.
+    Turnaround time :                            51135 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1000, num_rounds=7, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-03/active-sup', q=96, seed=11, unlabeled_data='', unlabeled_volume=0.2)
+0
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-03/active-sup/ThompsonSampling_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls12>
+Subject: Job 16237197: <sup-active> in cluster <lila> Exited
+
+Job <sup-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug  3 20:12:51 2020
+Job was executed on host(s) <12*ls12>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug  3 20:13:12 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug  3 20:13:12 2020
+Terminated at Tue Aug  4 10:46:03 2020
+Results reported at Tue Aug  4 10:46:03 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_gp --num_rounds 7 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-03/active-sup --index 1 --device cuda:0 --seed 2666 --unlabeled_volume 0.0
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   208168.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   52372 sec.
+    Turnaround time :                            52392 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1000, num_rounds=7, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-03/active-sup', q=96, seed=2666, unlabeled_data='', unlabeled_volume=0.0)
+0
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-03/active-sup/ThompsonSampling_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls14>
+Subject: Job 16237198: <sup-active> in cluster <lila> Exited
+
+Job <sup-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug  3 20:12:51 2020
+Job was executed on host(s) <12*ls14>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug  3 20:13:12 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug  3 20:13:12 2020
+Terminated at Tue Aug  4 10:50:23 2020
+Results reported at Tue Aug  4 10:50:23 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_gp --num_rounds 7 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-03/active-sup --index 1 --device cuda:0 --seed 417 --unlabeled_volume 0.0
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   204502.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   52630 sec.
+    Turnaround time :                            52652 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1000, num_rounds=7, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-03/active-sup', q=96, seed=417, unlabeled_data='', unlabeled_volume=0.0)
+0
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-03/active-sup/ThompsonSampling_1000.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lt20>
+Subject: Job 16237199: <sup-active> in cluster <lila> Exited
+
+Job <sup-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug  3 20:12:51 2020
+Job was executed on host(s) <12*lt20>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug  3 20:13:12 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug  3 20:13:12 2020
+Terminated at Tue Aug  4 11:13:35 2020
+Results reported at Tue Aug  4 11:13:35 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_gp --num_rounds 7 --num_trials 1 --num_epochs 1000 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-03/active-sup --index 1 --device cuda:0 --seed 8888 --unlabeled_volume 0.0
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   265251.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             2.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   54024 sec.
+    Turnaround time :                            54044 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1000, num_rounds=7, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-03/active-sup', q=96, seed=8888, unlabeled_data='', unlabeled_volume=0.0)
+0
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-03/active-sup/ThompsonSampling_1000.stderr> for stderr output of this job.
+

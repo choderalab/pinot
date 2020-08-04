@@ -1,0 +1,134 @@
+Using backend: pytorch
+/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/base.py:25: UserWarning: Currently adjacency_matrix() returns a matrix with destination as rows by default.  In 0.5 the result will have source as rows (i.e. transpose=True)
+  warnings.warn(msg, warn_type)
+/home/nguyenm5/coding/pinot/pinot/regressors/gaussian_process_regressor.py:325: UserWarning: torch.range is deprecated in favor of torch.arange and will be removed in 0.5. Note that arange generates values in [start; end), not [start; end].
+  torch.range(0, self.y_tr_sigma_diag.shape[0] - 1)[:, None],
+/home/nguyenm5/coding/pinot/pinot/regressors/gaussian_process_regressor.py:326: UserWarning: torch.range is deprecated in favor of torch.arange and will be removed in 0.5. Note that arange generates values in [start; end), not [start; end].
+  torch.range(0, self.y_tr_sigma_diag.shape[0] - 1)[None, :],
+Traceback (most recent call last):
+  File "scripts/semi_supervised/learning_curve_semi.py", line 276, in <module>
+    train_and_test_semi_supervised(net, optimizer, train_semi, train_labeled, test_labeled, args.n_epochs,
+  File "scripts/semi_supervised/learning_curve_semi.py", line 226, in train_and_test_semi_supervised
+    train.train()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 113, in train
+    self.train_once()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 96, in train_once
+    self.optimizer.step(l)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/autograd/grad_mode.py", line 15, in decorate_context
+    return func(*args, **kwargs)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/optim/adam.py", line 62, in step
+    loss = closure()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 92, in l
+    loss = torch.sum(self.net.loss(*x))
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 180, in loss
+    supeprvised_loss = self.optimize_output_regressor(h_labeled, y_labeled)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 232, in optimize_output_regressor
+    loss.backward()
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/tensor.py", line 198, in backward
+    torch.autograd.backward(self, gradient, retain_graph, create_graph)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/autograd/__init__.py", line 98, in backward
+    Variable._execution_engine.run_backward(
+RuntimeError: Trying to backward through the graph a second time, but the buffers have already been freed. Specify retain_graph=True when calling backward the first time. (apply at /opt/conda/conda-bld/pytorch_1591914743399/work/torch/csrc/autograd/generated/Functions.cpp:3882)
+frame #0: c10::Error::Error(c10::SourceLocation, std::string const&) + 0x4e (0x2b9944103b5e in /home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/lib/libc10.so)
+frame #1: torch::autograd::generated::IndexBackward::apply(std::vector<at::Tensor, std::allocator<at::Tensor> >&&) + 0x356 (0x2b991ef95606 in /home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/lib/libtorch_cpu.so)
+frame #2: <unknown function> + 0x2ae7df5 (0x2b991f44fdf5 in /home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: torch::autograd::Engine::evaluate_function(std::shared_ptr<torch::autograd::GraphTask>&, torch::autograd::Node*, torch::autograd::InputBuffer&) + 0x16f3 (0x2b991f44d0f3 in /home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: torch::autograd::Engine::thread_main(std::shared_ptr<torch::autograd::GraphTask> const&, bool) + 0x3d2 (0x2b991f44ded2 in /home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: torch::autograd::Engine::thread_init(int) + 0x39 (0x2b991f446549 in /home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: torch::autograd::python::PythonEngine::thread_init(int) + 0x38 (0x2b991bc95b08 in /home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/lib/libtorch_python.so)
+frame #7: <unknown function> + 0xc819d (0x2b990c64e19d in /home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/scipy/_lib/_uarray/../../../../../libstdc++.so.6)
+frame #8: <unknown function> + 0x7dd5 (0x2b98f8367dd5 in /lib64/libpthread.so.0)
+frame #9: clone + 0x6d (0x2b98f8679ead in /lib64/libc.so.6)
+
+Using backend: pytorch
+/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/base.py:25: UserWarning: Currently adjacency_matrix() returns a matrix with destination as rows by default.  In 0.5 the result will have source as rows (i.e. transpose=True)
+  warnings.warn(msg, warn_type)
+/home/nguyenm5/coding/pinot/pinot/regressors/gaussian_process_regressor.py:325: UserWarning: torch.range is deprecated in favor of torch.arange and will be removed in 0.5. Note that arange generates values in [start; end), not [start; end].
+  torch.range(0, self.y_tr_sigma_diag.shape[0] - 1)[:, None],
+/home/nguyenm5/coding/pinot/pinot/regressors/gaussian_process_regressor.py:326: UserWarning: torch.range is deprecated in favor of torch.arange and will be removed in 0.5. Note that arange generates values in [start; end), not [start; end].
+  torch.range(0, self.y_tr_sigma_diag.shape[0] - 1)[None, :],
+Traceback (most recent call last):
+  File "scripts/semi_supervised/learning_curve_semi.py", line 276, in <module>
+    train_and_test_semi_supervised(net, optimizer, train_semi, train_labeled, test_labeled, args.n_epochs,
+  File "scripts/semi_supervised/learning_curve_semi.py", line 226, in train_and_test_semi_supervised
+    train.train()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 113, in train
+    self.train_once()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 96, in train_once
+    self.optimizer.step(l)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/autograd/grad_mode.py", line 15, in decorate_context
+    return func(*args, **kwargs)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/optim/adam.py", line 62, in step
+    loss = closure()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 92, in l
+    loss = torch.sum(self.net.loss(*x))
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 180, in loss
+    supeprvised_loss = self.optimize_output_regressor(h_labeled, y_labeled)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 232, in optimize_output_regressor
+    loss.backward()
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/tensor.py", line 198, in backward
+    torch.autograd.backward(self, gradient, retain_graph, create_graph)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/autograd/__init__.py", line 98, in backward
+    Variable._execution_engine.run_backward(
+RuntimeError: Trying to backward through the graph a second time, but the buffers have already been freed. Specify retain_graph=True when calling backward the first time. (apply at /opt/conda/conda-bld/pytorch_1591914743399/work/torch/csrc/autograd/generated/Functions.cpp:3882)
+frame #0: c10::Error::Error(c10::SourceLocation, std::string const&) + 0x4e (0x2b832ef0eb5e in /home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/lib/libc10.so)
+frame #1: torch::autograd::generated::IndexBackward::apply(std::vector<at::Tensor, std::allocator<at::Tensor> >&&) + 0x356 (0x2b8309da0606 in /home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/lib/libtorch_cpu.so)
+frame #2: <unknown function> + 0x2ae7df5 (0x2b830a25adf5 in /home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: torch::autograd::Engine::evaluate_function(std::shared_ptr<torch::autograd::GraphTask>&, torch::autograd::Node*, torch::autograd::InputBuffer&) + 0x16f3 (0x2b830a2580f3 in /home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: torch::autograd::Engine::thread_main(std::shared_ptr<torch::autograd::GraphTask> const&, bool) + 0x3d2 (0x2b830a258ed2 in /home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: torch::autograd::Engine::thread_init(int) + 0x39 (0x2b830a251549 in /home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: torch::autograd::python::PythonEngine::thread_init(int) + 0x38 (0x2b8306aa0b08 in /home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/lib/libtorch_python.so)
+frame #7: <unknown function> + 0xc819d (0x2b82f745919d in /home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/scipy/_lib/_uarray/../../../../../libstdc++.so.6)
+frame #8: <unknown function> + 0x7dd5 (0x2b82e3172dd5 in /lib64/libpthread.so.0)
+frame #9: clone + 0x6d (0x2b82e3484ead in /lib64/libc.so.6)
+
+Using backend: pytorch
+/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/base.py:25: UserWarning: Currently adjacency_matrix() returns a matrix with destination as rows by default.  In 0.5 the result will have source as rows (i.e. transpose=True)
+  warnings.warn(msg, warn_type)
+/home/nguyenm5/coding/pinot/pinot/regressors/gaussian_process_regressor.py:325: UserWarning: torch.range is deprecated in favor of torch.arange and will be removed in 0.5. Note that arange generates values in [start; end), not [start; end].
+  torch.range(0, self.y_tr_sigma_diag.shape[0] - 1)[:, None],
+/home/nguyenm5/coding/pinot/pinot/regressors/gaussian_process_regressor.py:326: UserWarning: torch.range is deprecated in favor of torch.arange and will be removed in 0.5. Note that arange generates values in [start; end), not [start; end].
+  torch.range(0, self.y_tr_sigma_diag.shape[0] - 1)[None, :],
+Traceback (most recent call last):
+  File "scripts/semi_supervised/learning_curve_semi.py", line 276, in <module>
+    train_and_test_semi_supervised(net, optimizer, train_semi, train_labeled, test_labeled, args.n_epochs,
+  File "scripts/semi_supervised/learning_curve_semi.py", line 226, in train_and_test_semi_supervised
+    train.train()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 113, in train
+    self.train_once()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 96, in train_once
+    self.optimizer.step(l)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/autograd/grad_mode.py", line 15, in decorate_context
+    return func(*args, **kwargs)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/optim/adam.py", line 62, in step
+    loss = closure()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 92, in l
+    loss = torch.sum(self.net.loss(*x))
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 183, in loss
+    total_loss += supervised_loss.sum()
+UnboundLocalError: local variable 'supervised_loss' referenced before assignment
+Using backend: pytorch
+/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/base.py:25: UserWarning: Currently adjacency_matrix() returns a matrix with destination as rows by default.  In 0.5 the result will have source as rows (i.e. transpose=True)
+  warnings.warn(msg, warn_type)
+/home/nguyenm5/coding/pinot/pinot/regressors/gaussian_process_regressor.py:325: UserWarning: torch.range is deprecated in favor of torch.arange and will be removed in 0.5. Note that arange generates values in [start; end), not [start; end].
+  torch.range(0, self.y_tr_sigma_diag.shape[0] - 1)[:, None],
+/home/nguyenm5/coding/pinot/pinot/regressors/gaussian_process_regressor.py:326: UserWarning: torch.range is deprecated in favor of torch.arange and will be removed in 0.5. Note that arange generates values in [start; end), not [start; end].
+  torch.range(0, self.y_tr_sigma_diag.shape[0] - 1)[None, :],
+Traceback (most recent call last):
+  File "scripts/semi_supervised/learning_curve_semi.py", line 276, in <module>
+    train_and_test_semi_supervised(net, optimizer, train_semi, train_labeled, test_labeled, args.n_epochs,
+  File "scripts/semi_supervised/learning_curve_semi.py", line 226, in train_and_test_semi_supervised
+    train.train()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 113, in train
+    self.train_once()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 96, in train_once
+    self.optimizer.step(l)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/autograd/grad_mode.py", line 15, in decorate_context
+    return func(*args, **kwargs)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/optim/adam.py", line 62, in step
+    loss = closure()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 92, in l
+    loss = torch.sum(self.net.loss(*x))
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 183, in loss
+    total_loss += supervised_loss.sum()
+UnboundLocalError: local variable 'supervised_loss' referenced before assignment
