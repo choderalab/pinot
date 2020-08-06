@@ -132,3 +132,34 @@ Traceback (most recent call last):
   File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 183, in loss
     total_loss += supervised_loss.sum()
 UnboundLocalError: local variable 'supervised_loss' referenced before assignment
+Using backend: pytorch
+/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/base.py:25: UserWarning: Currently adjacency_matrix() returns a matrix with destination as rows by default.  In 0.5 the result will have source as rows (i.e. transpose=True)
+  warnings.warn(msg, warn_type)
+/home/nguyenm5/coding/pinot/pinot/regressors/gaussian_process_regressor.py:325: UserWarning: torch.range is deprecated in favor of torch.arange and will be removed in 0.5. Note that arange generates values in [start; end), not [start; end].
+  torch.range(0, self.y_tr_sigma_diag.shape[0] - 1)[:, None],
+/home/nguyenm5/coding/pinot/pinot/regressors/gaussian_process_regressor.py:326: UserWarning: torch.range is deprecated in favor of torch.arange and will be removed in 0.5. Note that arange generates values in [start; end), not [start; end].
+  torch.range(0, self.y_tr_sigma_diag.shape[0] - 1)[None, :],
+Traceback (most recent call last):
+  File "scripts/semi_supervised/learning_curve_semi.py", line 276, in <module>
+    train_and_test_semi_supervised(net, optimizer, train_semi, train_labeled, test_labeled, args.n_epochs,
+  File "scripts/semi_supervised/learning_curve_semi.py", line 226, in train_and_test_semi_supervised
+    train.train()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 113, in train
+    self.train_once()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 96, in train_once
+    self.optimizer.step(l)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/autograd/grad_mode.py", line 15, in decorate_context
+    return func(*args, **kwargs)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/optim/adam.py", line 62, in step
+    loss = closure()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 92, in l
+    loss = torch.sum(self.net.loss(*x))
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 180, in loss
+    supervised_loss = self.optimize_output_regressor(h_labeled, y_labeled)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 231, in optimize_output_regressor
+    loss = self._loss(h,y)
+  File "/home/nguyenm5/coding/pinot/pinot/net.py", line 94, in _loss
+    return self.output_regressor.loss(h, y, *args, **kwargs)
+  File "/home/nguyenm5/coding/pinot/pinot/regressors/gaussian_process_regressor.py", line 468, in loss
+    prior_tril = self._k_tr_tr().cholesky()
+RuntimeError: cholesky_cuda: U(20,20) is zero, singular U.

@@ -203,3 +203,85 @@ PS:
 
 Read file </home/nguyenm5/coding/pinot/aug-03/error/VariationalGaussianProcessRegressor_GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh_0.05.stderr> for stderr output of this job.
 
+Sender: LSF System <lsfadmin@lt07>
+Subject: Job 16237191: <semi-exp> in cluster <lila> Done
+
+Job <semi-exp> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug  3 20:05:15 2020
+Job was executed on host(s) <12*lt07>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug  3 20:05:32 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug  3 20:05:32 2020
+Terminated at Wed Aug  5 01:18:18 2020
+Results reported at Wed Aug  5 01:18:18 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/semi_supervised/learning_curve_semi.py --n_epochs 1001 --cuda --regressor_type VariationalGaussianProcessRegressor --output /home/nguyenm5/coding/pinot/aug-03/arch-search --labeled_data moonshot --unlabeled_data moonshot_unlabeled_all --architecture GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh --volume 0.05 --start_epoch 0 --num_inducing_pts 50 --inner_opt_round 10
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   1180649.00 sec.
+    Max Memory :                                 3 GB
+    Average Memory :                             3.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               189.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   105168 sec.
+    Turnaround time :                            105183 sec.
+
+The output (if any) follows:
+
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-03/error/VariationalGaussianProcessRegressor_GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh_0.05.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lt03>
+Subject: Job 16237188: <semi-exp> in cluster <lila> Done
+
+Job <semi-exp> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug  3 20:05:15 2020
+Job was executed on host(s) <12*lt03>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug  3 20:05:32 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug  3 20:05:32 2020
+Terminated at Wed Aug  5 02:44:55 2020
+Results reported at Wed Aug  5 02:44:55 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/semi_supervised/learning_curve_semi.py --n_epochs 1001 --cuda --regressor_type VariationalGaussianProcessRegressor --output /home/nguyenm5/coding/pinot/aug-03/arch-search --labeled_data moonshot --unlabeled_data moonshot_unlabeled_all --architecture GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh --volume 0.05 --start_epoch 0 --num_inducing_pts 20 --inner_opt_round 10
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   1184579.00 sec.
+    Max Memory :                                 3 GB
+    Average Memory :                             3.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               189.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   110362 sec.
+    Turnaround time :                            110380 sec.
+
+The output (if any) follows:
+
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-03/error/VariationalGaussianProcessRegressor_GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh_0.05.stderr> for stderr output of this job.
+
