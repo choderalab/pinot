@@ -1,0 +1,330 @@
+Sender: LSF System <lsfadmin@lt04>
+Subject: Job 16453836: <semi-active> in cluster <lila> Exited
+
+Job <semi-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Sun Aug  9 12:14:35 2020
+Job was executed on host(s) <12*lt04>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Sun Aug  9 12:16:01 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Sun Aug  9 12:16:01 2020
+Terminated at Sun Aug  9 12:21:19 2020
+Results reported at Sun Aug  9 12:21:19 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_gp --num_rounds 7 --num_trials 1 --num_epochs 1 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-09/active-sup --index 1 --device cuda:0 --seed 2666 --unlabeled_volume 0.2
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   140.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             0.33 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   317 sec.
+    Turnaround time :                            404 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1, num_rounds=7, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-09/active-sup', q=96, seed=2666, unlabeled_data='', unlabeled_volume=0.2)
+0
+epoch loss arr
+[array([7.323335], dtype=float32)]
+epoch loss arr
+[array([810.0758], dtype=float32)]
+epoch loss arr
+[array([1944.1434], dtype=float32)]
+epoch loss arr
+[array([3820.5488], dtype=float32)]
+epoch loss arr
+[array([7967.133], dtype=float32)]
+epoch loss arr
+[array([29313.262], dtype=float32)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-09/active-sup/ThompsonSampling_1.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lt04>
+Subject: Job 16453835: <semi-active> in cluster <lila> Exited
+
+Job <semi-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Sun Aug  9 12:14:35 2020
+Job was executed on host(s) <12*lt04>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Sun Aug  9 12:14:43 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Sun Aug  9 12:14:43 2020
+Terminated at Sun Aug  9 12:21:19 2020
+Results reported at Sun Aug  9 12:21:19 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_gp --num_rounds 7 --num_trials 1 --num_epochs 1 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-09/active-sup --index 1 --device cuda:0 --seed 2666 --unlabeled_volume 0.0
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   181.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             0.25 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   395 sec.
+    Turnaround time :                            404 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1, num_rounds=7, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-09/active-sup', q=96, seed=2666, unlabeled_data='', unlabeled_volume=0.0)
+0
+epoch loss arr
+[array([7.4451833], dtype=float32)]
+epoch loss arr
+[array([809.67365], dtype=float32)]
+epoch loss arr
+[array([1944.8916], dtype=float32)]
+epoch loss arr
+[array([3818.914], dtype=float32)]
+epoch loss arr
+[array([7962.0254], dtype=float32)]
+epoch loss arr
+[array([29286.771], dtype=float32)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-09/active-sup/ThompsonSampling_1.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lt08>
+Subject: Job 16453837: <semi-active> in cluster <lila> Exited
+
+Job <semi-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Sun Aug  9 12:14:36 2020
+Job was executed on host(s) <12*lt08>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Sun Aug  9 12:20:11 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Sun Aug  9 12:20:11 2020
+Terminated at Sun Aug  9 12:25:38 2020
+Results reported at Sun Aug  9 12:25:38 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_gp --num_rounds 7 --num_trials 1 --num_epochs 1 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-09/active-sup --index 1 --device cuda:0 --seed 2666 --unlabeled_volume 0.4
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   196.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             0.35 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   327 sec.
+    Turnaround time :                            662 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1, num_rounds=7, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-09/active-sup', q=96, seed=2666, unlabeled_data='', unlabeled_volume=0.4)
+0
+epoch loss arr
+[array([7.3225627], dtype=float32)]
+epoch loss arr
+[array([809.56934], dtype=float32)]
+epoch loss arr
+[array([1941.2605], dtype=float32)]
+epoch loss arr
+[array([3819.873], dtype=float32)]
+epoch loss arr
+[array([7968.5146], dtype=float32)]
+epoch loss arr
+[array([29272.535], dtype=float32)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-09/active-sup/ThompsonSampling_1.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lt15>
+Subject: Job 16453849: <semi-active> in cluster <lila> Done
+
+Job <semi-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Sun Aug  9 12:27:12 2020
+Job was executed on host(s) <12*lt15>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Sun Aug  9 12:28:01 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Sun Aug  9 12:28:01 2020
+Terminated at Sun Aug  9 12:35:48 2020
+Results reported at Sun Aug  9 12:35:48 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_gp --num_rounds 6 --num_trials 1 --num_epochs 1 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-09/active-sup --index 1 --device cuda:0 --seed 2666 --unlabeled_volume 0.0
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   210.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             0.28 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   467 sec.
+    Turnaround time :                            516 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1, num_rounds=6, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-09/active-sup', q=96, seed=2666, unlabeled_data='', unlabeled_volume=0.0)
+0
+epoch loss arr
+[array([7.3373404], dtype=float32)]
+epoch loss arr
+[array([809.3452], dtype=float32)]
+epoch loss arr
+[array([1938.3385], dtype=float32)]
+epoch loss arr
+[array([3814.564], dtype=float32)]
+epoch loss arr
+[array([7962.12], dtype=float32)]
+epoch loss arr
+[array([29306.701], dtype=float32)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-09/active-sup/ThompsonSampling_1.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls14>
+Subject: Job 16453850: <semi-active> in cluster <lila> Done
+
+Job <semi-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Sun Aug  9 12:27:12 2020
+Job was executed on host(s) <12*ls14>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Sun Aug  9 12:28:46 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Sun Aug  9 12:28:46 2020
+Terminated at Sun Aug  9 12:36:43 2020
+Results reported at Sun Aug  9 12:36:43 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_gp --num_rounds 6 --num_trials 1 --num_epochs 1 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-09/active-sup --index 1 --device cuda:0 --seed 2666 --unlabeled_volume 0.2
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   219.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             0.33 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   477 sec.
+    Turnaround time :                            571 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1, num_rounds=6, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-09/active-sup', q=96, seed=2666, unlabeled_data='', unlabeled_volume=0.2)
+0
+epoch loss arr
+[array([7.3274746], dtype=float32)]
+epoch loss arr
+[array([807.869], dtype=float32)]
+epoch loss arr
+[array([1938.188], dtype=float32)]
+epoch loss arr
+[array([3818.3862], dtype=float32)]
+epoch loss arr
+[array([7966.7383], dtype=float32)]
+epoch loss arr
+[array([29336.945], dtype=float32)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-09/active-sup/ThompsonSampling_1.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls06>
+Subject: Job 16453851: <semi-active> in cluster <lila> Done
+
+Job <semi-active> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Sun Aug  9 12:27:12 2020
+Job was executed on host(s) <12*ls06>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Sun Aug  9 12:31:12 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Sun Aug  9 12:31:12 2020
+Terminated at Sun Aug  9 12:39:12 2020
+Results reported at Sun Aug  9 12:39:12 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_gp --num_rounds 6 --num_trials 1 --num_epochs 1 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-09/active-sup --index 1 --device cuda:0 --seed 2666 --unlabeled_volume 0.4
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   220.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             0.27 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   481 sec.
+    Turnaround time :                            720 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_gp', num_epochs=1, num_rounds=6, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-09/active-sup', q=96, seed=2666, unlabeled_data='', unlabeled_volume=0.4)
+0
+epoch loss arr
+[array([7.7249937], dtype=float32)]
+epoch loss arr
+[array([811.2577], dtype=float32)]
+epoch loss arr
+[array([1942.217], dtype=float32)]
+epoch loss arr
+[array([3822.4565], dtype=float32)]
+epoch loss arr
+[array([7958.1387], dtype=float32)]
+epoch loss arr
+[array([29270.576], dtype=float32)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-09/active-sup/ThompsonSampling_1.stderr> for stderr output of this job.
+
