@@ -1,0 +1,726 @@
+Sender: LSF System <lsfadmin@lu08>
+Subject: Job 16481367: <semi-gp> in cluster <lila> Exited
+
+Job <semi-gp> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug 10 20:07:46 2020
+Job was executed on host(s) <12*lu08>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug 10 20:33:58 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug 10 20:33:58 2020
+Terminated at Mon Aug 10 20:44:14 2020
+Results reported at Mon Aug 10 20:44:14 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/semi_supervised/learning_curve_semi.py --n_epochs 251 --cuda --regressor_type ExactGaussianProcessRegressor --output /home/nguyenm5/coding/pinot/aug-10/arch-search --labeled_data moonshot --unlabeled_data moonshot_unlabeled_small --architecture GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh --volume 1.0 --start_epoch 0 --num_inducing_pts 20 --inner_opt_round 200 --semi --label_split 0.2 0.8
+------------------------------------------------------------
+
+TERM_OWNER: job killed by owner.
+Exited with exit code 130.
+
+Resource usage summary:
+
+    CPU time :                                   5647.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.37 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   615 sec.
+    Turnaround time :                            2188 sec.
+
+The output (if any) follows:
+
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-10/error/ExactGaussianProcessRegressor_GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh_1.0.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls18>
+Subject: Job 16481368: <semi-gp> in cluster <lila> Exited
+
+Job <semi-gp> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug 10 20:07:46 2020
+Job was executed on host(s) <12*ls18>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug 10 20:34:19 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug 10 20:34:19 2020
+Terminated at Mon Aug 10 20:44:15 2020
+Results reported at Mon Aug 10 20:44:15 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/semi_supervised/learning_curve_semi.py --n_epochs 251 --cuda --regressor_type ExactGaussianProcessRegressor --output /home/nguyenm5/coding/pinot/aug-10/arch-search --labeled_data moonshot --unlabeled_data moonshot_unlabeled_small --architecture GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh --volume 1.0 --start_epoch 0 --num_inducing_pts 20 --inner_opt_round 200 --semi --label_split 0.3 0.7
+------------------------------------------------------------
+
+TERM_OWNER: job killed by owner.
+Exited with exit code 130.
+
+Resource usage summary:
+
+    CPU time :                                   7780.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.72 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   596 sec.
+    Turnaround time :                            2189 sec.
+
+The output (if any) follows:
+
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-10/error/ExactGaussianProcessRegressor_GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh_1.0.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lt04>
+Subject: Job 16481366: <semi-gp> in cluster <lila> Exited
+
+Job <semi-gp> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug 10 20:07:46 2020
+Job was executed on host(s) <12*lt04>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug 10 20:33:34 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug 10 20:33:34 2020
+Terminated at Mon Aug 10 20:44:15 2020
+Results reported at Mon Aug 10 20:44:15 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/semi_supervised/learning_curve_semi.py --n_epochs 251 --cuda --regressor_type ExactGaussianProcessRegressor --output /home/nguyenm5/coding/pinot/aug-10/arch-search --labeled_data moonshot --unlabeled_data moonshot_unlabeled_small --architecture GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh --volume 1.0 --start_epoch 0 --num_inducing_pts 20 --inner_opt_round 200 --semi --label_split 0.1 0.9
+------------------------------------------------------------
+
+TERM_OWNER: job killed by owner.
+Exited with exit code 130.
+
+Resource usage summary:
+
+    CPU time :                                   5424.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.29 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   642 sec.
+    Turnaround time :                            2189 sec.
+
+The output (if any) follows:
+
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-10/error/ExactGaussianProcessRegressor_GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh_1.0.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls06>
+Subject: Job 16481369: <semi-gp> in cluster <lila> Exited
+
+Job <semi-gp> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug 10 20:07:46 2020
+Job was executed on host(s) <12*ls06>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug 10 20:35:20 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug 10 20:35:20 2020
+Terminated at Mon Aug 10 20:44:16 2020
+Results reported at Mon Aug 10 20:44:16 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/semi_supervised/learning_curve_semi.py --n_epochs 251 --cuda --regressor_type ExactGaussianProcessRegressor --output /home/nguyenm5/coding/pinot/aug-10/arch-search --labeled_data moonshot --unlabeled_data moonshot_unlabeled_small --architecture GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh --volume 1.0 --start_epoch 0 --num_inducing_pts 20 --inner_opt_round 200 --semi --label_split 0.4 0.6
+------------------------------------------------------------
+
+TERM_OWNER: job killed by owner.
+Exited with exit code 130.
+
+Resource usage summary:
+
+    CPU time :                                   5708.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.37 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   537 sec.
+    Turnaround time :                            2190 sec.
+
+The output (if any) follows:
+
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-10/error/ExactGaussianProcessRegressor_GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh_1.0.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lu02>
+Subject: Job 16481370: <semi-gp> in cluster <lila> Exited
+
+Job <semi-gp> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug 10 20:07:46 2020
+Job was executed on host(s) <12*lu02>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug 10 20:37:09 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug 10 20:37:09 2020
+Terminated at Mon Aug 10 20:44:22 2020
+Results reported at Mon Aug 10 20:44:22 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/semi_supervised/learning_curve_semi.py --n_epochs 251 --cuda --regressor_type ExactGaussianProcessRegressor --output /home/nguyenm5/coding/pinot/aug-10/arch-search --labeled_data moonshot --unlabeled_data moonshot_unlabeled_small --architecture GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh --volume 1.0 --start_epoch 0 --num_inducing_pts 20 --inner_opt_round 200 --semi --label_split 0.5 0.5
+------------------------------------------------------------
+
+TERM_OWNER: job killed by owner.
+Exited with exit code 130.
+
+Resource usage summary:
+
+    CPU time :                                   2481.00 sec.
+    Max Memory :                                 3 GB
+    Average Memory :                             1.05 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               189.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   434 sec.
+    Turnaround time :                            2196 sec.
+
+The output (if any) follows:
+
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-10/error/ExactGaussianProcessRegressor_GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh_1.0.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls09>
+Subject: Job 16481451: <semi-gp> in cluster <lila> Exited
+
+Job <semi-gp> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug 10 20:44:18 2020
+Job was executed on host(s) <12*ls09>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug 10 21:38:24 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug 10 21:38:24 2020
+Terminated at Tue Aug 11 03:30:00 2020
+Results reported at Tue Aug 11 03:30:00 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/semi_supervised/learning_curve_semi.py --n_epochs 251 --cuda --regressor_type ExactGaussianProcessRegressor --output /home/nguyenm5/coding/pinot/aug-10/arch-search --labeled_data moonshot --unlabeled_data moonshot_unlabeled_small --architecture GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh --volume 1.0 --start_epoch 0 --num_inducing_pts 20 --inner_opt_round 200 --semi --label_split 0.2 0.8
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   327691.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.99 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   21097 sec.
+    Turnaround time :                            24342 sec.
+
+The output (if any) follows:
+
+epoch loss arr
+[array([588.9034], dtype=float32), array([581.7164], dtype=float32), array([574.8004], dtype=float32), array([567.5707], dtype=float32), array([560.177], dtype=float32), array([552.8859], dtype=float32), array([545.4789], dtype=float32), array([538.3111], dtype=float32), array([531.5756], dtype=float32), array([525.20087], dtype=float32), array([519.1063], dtype=float32), array([513.0565], dtype=float32), array([507.22208], dtype=float32), array([501.90756], dtype=float32), array([496.79865], dtype=float32), array([491.34814], dtype=float32), array([486.20947], dtype=float32), array([480.9182], dtype=float32), array([475.90958], dtype=float32), array([470.53934], dtype=float32), array([464.85422], dtype=float32), array([459.29688], dtype=float32), array([453.5511], dtype=float32), array([447.49527], dtype=float32), array([441.10806], dtype=float32), array([434.63995], dtype=float32), array([427.4554], dtype=float32), array([420.30707], dtype=float32), array([412.45837], dtype=float32), array([404.53558], dtype=float32), array([396.41168], dtype=float32), array([387.23422], dtype=float32), array([378.78632], dtype=float32), array([369.73047], dtype=float32), array([360.4184], dtype=float32), array([351.40314], dtype=float32), array([342.2494], dtype=float32), array([333.4718], dtype=float32), array([325.33438], dtype=float32), array([317.4292], dtype=float32), array([310.48315], dtype=float32), array([304.77148], dtype=float32), array([299.1464], dtype=float32), array([295.5298], dtype=float32), array([292.56012], dtype=float32), array([290.22772], dtype=float32), array([288.7965], dtype=float32), array([287.56976], dtype=float32), array([286.62497], dtype=float32), array([285.94806], dtype=float32), array([284.5838], dtype=float32), array([283.2387], dtype=float32), array([282.14148], dtype=float32), array([280.39075], dtype=float32), array([278.79187], dtype=float32), array([276.51874], dtype=float32), array([274.0107], dtype=float32), array([271.85345], dtype=float32), array([269.54578], dtype=float32), array([267.20227], dtype=float32), array([265.0628], dtype=float32), array([262.83295], dtype=float32), array([260.7025], dtype=float32), array([259.07196], dtype=float32), array([257.42603], dtype=float32), array([255.83539], dtype=float32), array([254.65953], dtype=float32), array([253.62292], dtype=float32), array([252.39865], dtype=float32), array([251.5963], dtype=float32), array([250.68808], dtype=float32), array([250.02567], dtype=float32), array([249.4873], dtype=float32), array([248.70679], dtype=float32), array([247.8234], dtype=float32), array([247.01324], dtype=float32), array([246.14478], dtype=float32), array([245.19005], dtype=float32), array([244.16388], dtype=float32), array([243.12823], dtype=float32), array([242.16702], dtype=float32), array([241.11824], dtype=float32), array([240.34718], dtype=float32), array([239.32831], dtype=float32), array([238.53227], dtype=float32), array([238.06581], dtype=float32), array([237.34738], dtype=float32), array([236.55606], dtype=float32), array([236.20949], dtype=float32), array([235.61343], dtype=float32), array([235.17133], dtype=float32), array([234.69481], dtype=float32), array([234.2547], dtype=float32), array([233.72917], dtype=float32), array([233.23935], dtype=float32), array([232.77016], dtype=float32), array([232.34625], dtype=float32), array([232.09424], dtype=float32), array([231.67546], dtype=float32), array([231.34314], dtype=float32), array([231.02834], dtype=float32), array([230.71548], dtype=float32), array([230.82492], dtype=float32), array([230.30167], dtype=float32), array([230.1767], dtype=float32), array([229.79555], dtype=float32), array([229.78485], dtype=float32), array([229.31177], dtype=float32), array([229.03146], dtype=float32), array([228.84528], dtype=float32), array([228.53543], dtype=float32), array([228.39062], dtype=float32), array([228.09726], dtype=float32), array([227.84753], dtype=float32), array([227.61029], dtype=float32), array([227.52283], dtype=float32), array([227.28738], dtype=float32), array([227.11536], dtype=float32), array([226.77051], dtype=float32), array([226.55392], dtype=float32), array([226.41986], dtype=float32), array([226.18437], dtype=float32), array([226.06372], dtype=float32), array([225.78735], dtype=float32), array([225.5686], dtype=float32), array([225.46115], dtype=float32), array([225.23013], dtype=float32), array([225.00256], dtype=float32), array([224.94107], dtype=float32), array([224.70825], dtype=float32), array([224.4985], dtype=float32), array([224.36215], dtype=float32), array([224.18259], dtype=float32), array([224.02037], dtype=float32), array([223.84605], dtype=float32), array([223.82777], dtype=float32), array([223.50455], dtype=float32), array([223.4202], dtype=float32), array([222.99646], dtype=float32), array([223.01204], dtype=float32), array([222.80795], dtype=float32), array([222.69266], dtype=float32), array([222.5617], dtype=float32), array([222.38165], dtype=float32), array([222.06117], dtype=float32), array([222.07236], dtype=float32), array([221.93253], dtype=float32), array([221.88], dtype=float32), array([221.51373], dtype=float32), array([221.37698], dtype=float32), array([221.23679], dtype=float32), array([221.1265], dtype=float32), array([220.9374], dtype=float32), array([220.94824], dtype=float32), array([220.78143], dtype=float32), array([220.60431], dtype=float32), array([220.3741], dtype=float32), array([220.37946], dtype=float32), array([220.34828], dtype=float32), array([220.08641], dtype=float32), array([220.01302], dtype=float32), array([219.9074], dtype=float32), array([219.8447], dtype=float32), array([219.75229], dtype=float32), array([219.64716], dtype=float32), array([219.49127], dtype=float32), array([219.51755], dtype=float32), array([219.22713], dtype=float32), array([219.27243], dtype=float32), array([219.13428], dtype=float32), array([219.0356], dtype=float32), array([218.96832], dtype=float32), array([218.84451], dtype=float32), array([218.70786], dtype=float32), array([218.72255], dtype=float32), array([218.51044], dtype=float32), array([218.53384], dtype=float32), array([218.55597], dtype=float32), array([218.47488], dtype=float32), array([218.53473], dtype=float32), array([218.40776], dtype=float32), array([218.52142], dtype=float32), array([218.06924], dtype=float32), array([218.16684], dtype=float32), array([218.42393], dtype=float32), array([217.95439], dtype=float32), array([218.5899], dtype=float32), array([218.28528], dtype=float32), array([218.51285], dtype=float32), array([217.8273], dtype=float32), array([218.44075], dtype=float32), array([217.6464], dtype=float32), array([218.2037], dtype=float32), array([217.56142], dtype=float32), array([217.57587], dtype=float32), array([217.47404], dtype=float32), array([217.44897], dtype=float32), array([217.43246], dtype=float32), array([217.2363], dtype=float32), array([217.34332], dtype=float32), array([217.1059], dtype=float32), array([217.17361], dtype=float32), array([216.81937], dtype=float32), array([217.1227], dtype=float32), array([216.99594], dtype=float32), array([217.053], dtype=float32), array([216.76608], dtype=float32), array([216.93005], dtype=float32), array([216.58676], dtype=float32), array([216.67456], dtype=float32), array([216.46634], dtype=float32), array([216.68816], dtype=float32), array([216.67862], dtype=float32), array([216.46805], dtype=float32), array([216.55975], dtype=float32), array([216.49728], dtype=float32), array([216.358], dtype=float32), array([216.41174], dtype=float32), array([216.41818], dtype=float32), array([216.18304], dtype=float32), array([216.58917], dtype=float32), array([216.1159], dtype=float32), array([216.19153], dtype=float32), array([216.1645], dtype=float32), array([216.00793], dtype=float32), array([216.07947], dtype=float32), array([216.13904], dtype=float32), array([216.04362], dtype=float32), array([215.87881], dtype=float32), array([216.11157], dtype=float32), array([215.85582], dtype=float32), array([215.90439], dtype=float32), array([215.88239], dtype=float32), array([215.85025], dtype=float32), array([215.7078], dtype=float32), array([215.71732], dtype=float32), array([215.65964], dtype=float32), array([215.42131], dtype=float32), array([215.60074], dtype=float32), array([215.70042], dtype=float32), array([215.33997], dtype=float32), array([215.59537], dtype=float32), array([215.5484], dtype=float32), array([215.19247], dtype=float32), array([215.74072], dtype=float32), array([215.75606], dtype=float32), array([215.81653], dtype=float32), array([215.31598], dtype=float32), array([215.93314], dtype=float32), array([215.77296], dtype=float32), array([216.3127], dtype=float32)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-10/error/ExactGaussianProcessRegressor_GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh_1.0.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls09>
+Subject: Job 16481450: <semi-gp> in cluster <lila> Exited
+
+Job <semi-gp> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug 10 20:44:18 2020
+Job was executed on host(s) <12*ls09>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug 10 21:30:23 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug 10 21:30:23 2020
+Terminated at Tue Aug 11 03:42:19 2020
+Results reported at Tue Aug 11 03:42:19 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/semi_supervised/learning_curve_semi.py --n_epochs 251 --cuda --regressor_type ExactGaussianProcessRegressor --output /home/nguyenm5/coding/pinot/aug-10/arch-search --labeled_data moonshot --unlabeled_data moonshot_unlabeled_small --architecture GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh --volume 1.0 --start_epoch 0 --num_inducing_pts 20 --inner_opt_round 200 --semi --label_split 0.1 0.9
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   355180.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.97 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   22316 sec.
+    Turnaround time :                            25081 sec.
+
+The output (if any) follows:
+
+epoch loss arr
+[array([281.25864], dtype=float32), array([279.50897], dtype=float32), array([277.81137], dtype=float32), array([276.2606], dtype=float32), array([274.81116], dtype=float32), array([273.43857], dtype=float32), array([272.10754], dtype=float32), array([270.88947], dtype=float32), array([269.77686], dtype=float32), array([268.6918], dtype=float32), array([267.69806], dtype=float32), array([266.72952], dtype=float32), array([265.78058], dtype=float32), array([264.95718], dtype=float32), array([264.1294], dtype=float32), array([263.35284], dtype=float32), array([262.58942], dtype=float32), array([261.86285], dtype=float32), array([261.11444], dtype=float32), array([260.41626], dtype=float32), array([259.68872], dtype=float32), array([258.9257], dtype=float32), array([258.0847], dtype=float32), array([257.147], dtype=float32), array([255.95808], dtype=float32), array([254.635], dtype=float32), array([253.03719], dtype=float32), array([251.44391], dtype=float32), array([249.5738], dtype=float32), array([247.63661], dtype=float32), array([245.71173], dtype=float32), array([243.74956], dtype=float32), array([241.68073], dtype=float32), array([239.56824], dtype=float32), array([237.37079], dtype=float32), array([235.12448], dtype=float32), array([232.61778], dtype=float32), array([230.12341], dtype=float32), array([227.43048], dtype=float32), array([224.6005], dtype=float32), array([221.758], dtype=float32), array([218.5889], dtype=float32), array([215.25815], dtype=float32), array([211.63994], dtype=float32), array([208.15082], dtype=float32), array([204.11682], dtype=float32), array([199.89803], dtype=float32), array([195.85031], dtype=float32), array([191.38338], dtype=float32), array([186.89447], dtype=float32), array([182.23813], dtype=float32), array([177.63483], dtype=float32), array([172.95982], dtype=float32), array([168.72733], dtype=float32), array([164.53452], dtype=float32), array([160.76627], dtype=float32), array([157.65788], dtype=float32), array([154.8712], dtype=float32), array([152.72607], dtype=float32), array([151.28299], dtype=float32), array([150.23643], dtype=float32), array([149.82526], dtype=float32), array([149.72081], dtype=float32), array([149.8302], dtype=float32), array([149.86763], dtype=float32), array([150.10356], dtype=float32), array([150.1913], dtype=float32), array([150.1297], dtype=float32), array([149.77551], dtype=float32), array([149.5025], dtype=float32), array([148.7332], dtype=float32), array([148.02013], dtype=float32), array([147.33896], dtype=float32), array([146.54372], dtype=float32), array([145.76534], dtype=float32), array([145.19951], dtype=float32), array([144.5726], dtype=float32), array([144.17609], dtype=float32), array([143.9327], dtype=float32), array([143.72516], dtype=float32), array([143.40512], dtype=float32), array([143.41362], dtype=float32), array([143.32599], dtype=float32), array([143.23895], dtype=float32), array([143.3463], dtype=float32), array([143.23294], dtype=float32), array([143.1834], dtype=float32), array([143.19867], dtype=float32), array([142.9602], dtype=float32), array([142.6879], dtype=float32), array([142.66202], dtype=float32), array([142.23737], dtype=float32), array([142.08954], dtype=float32), array([141.9624], dtype=float32), array([141.55981], dtype=float32), array([141.37689], dtype=float32), array([141.32852], dtype=float32), array([141.11119], dtype=float32), array([141.03105], dtype=float32), array([140.7849], dtype=float32), array([140.72372], dtype=float32), array([140.6436], dtype=float32), array([140.40749], dtype=float32), array([140.15848], dtype=float32), array([140.25916], dtype=float32), array([140.1767], dtype=float32), array([139.97223], dtype=float32), array([139.86166], dtype=float32), array([139.72305], dtype=float32), array([139.79106], dtype=float32), array([139.46161], dtype=float32), array([139.35326], dtype=float32), array([139.16786], dtype=float32), array([139.04922], dtype=float32), array([139.04382], dtype=float32), array([138.76501], dtype=float32), array([138.80573], dtype=float32), array([138.60745], dtype=float32), array([138.60675], dtype=float32), array([138.52954], dtype=float32), array([138.38077], dtype=float32), array([138.29372], dtype=float32), array([138.26627], dtype=float32), array([138.10695], dtype=float32), array([138.07503], dtype=float32), array([138.04477], dtype=float32), array([137.96696], dtype=float32), array([137.96716], dtype=float32), array([137.76346], dtype=float32), array([137.75824], dtype=float32), array([137.66856], dtype=float32), array([137.52063], dtype=float32), array([137.52725], dtype=float32), array([137.36537], dtype=float32), array([137.38887], dtype=float32), array([137.28613], dtype=float32), array([137.22064], dtype=float32), array([137.14047], dtype=float32), array([137.08633], dtype=float32), array([137.02301], dtype=float32), array([136.86925], dtype=float32), array([136.77286], dtype=float32), array([136.7556], dtype=float32), array([136.83966], dtype=float32), array([136.64986], dtype=float32), array([136.60413], dtype=float32), array([136.75043], dtype=float32), array([136.63318], dtype=float32), array([136.66376], dtype=float32), array([136.5192], dtype=float32), array([136.50381], dtype=float32), array([136.68301], dtype=float32), array([136.31726], dtype=float32), array([136.2467], dtype=float32), array([136.30035], dtype=float32), array([136.19234], dtype=float32), array([136.18715], dtype=float32), array([136.14046], dtype=float32), array([136.00305], dtype=float32), array([136.00287], dtype=float32), array([135.92482], dtype=float32), array([135.8262], dtype=float32), array([135.80875], dtype=float32), array([135.73788], dtype=float32), array([135.74069], dtype=float32), array([135.7646], dtype=float32), array([135.63567], dtype=float32), array([135.51373], dtype=float32), array([135.49133], dtype=float32), array([135.5924], dtype=float32), array([136.45737], dtype=float32), array([135.67416], dtype=float32), array([135.96262], dtype=float32), array([136.0394], dtype=float32), array([136.13547], dtype=float32), array([135.84648], dtype=float32), array([135.58849], dtype=float32), array([135.2626], dtype=float32), array([135.50168], dtype=float32), array([136.87741], dtype=float32), array([136.57242], dtype=float32), array([137.11957], dtype=float32), array([137.36047], dtype=float32), array([137.37437], dtype=float32), array([137.4021], dtype=float32), array([137.4856], dtype=float32), array([137.4184], dtype=float32), array([137.36296], dtype=float32), array([137.24965], dtype=float32), array([137.03021], dtype=float32), array([136.88568], dtype=float32), array([136.58774], dtype=float32), array([136.31664], dtype=float32), array([136.11371], dtype=float32), array([135.92114], dtype=float32), array([135.53314], dtype=float32), array([135.4359], dtype=float32), array([135.47806], dtype=float32), array([135.64212], dtype=float32), array([135.73056], dtype=float32), array([135.75607], dtype=float32), array([135.63217], dtype=float32), array([135.61049], dtype=float32), array([135.23402], dtype=float32), array([135.11777], dtype=float32), array([134.9693], dtype=float32), array([135.00285], dtype=float32), array([135.1031], dtype=float32), array([134.93839], dtype=float32), array([134.83655], dtype=float32), array([134.76282], dtype=float32), array([134.69772], dtype=float32), array([134.67232], dtype=float32), array([134.66974], dtype=float32), array([134.60815], dtype=float32), array([134.52223], dtype=float32), array([134.35503], dtype=float32), array([134.45932], dtype=float32), array([134.29813], dtype=float32), array([134.3201], dtype=float32), array([134.28178], dtype=float32), array([134.43564], dtype=float32), array([135.91623], dtype=float32), array([135.2682], dtype=float32), array([134.70216], dtype=float32), array([134.76685], dtype=float32), array([135.00754], dtype=float32), array([134.92455], dtype=float32), array([134.95882], dtype=float32), array([134.82352], dtype=float32), array([134.7087], dtype=float32), array([134.38712], dtype=float32), array([134.23254], dtype=float32), array([134.13034], dtype=float32), array([134.13889], dtype=float32), array([134.32921], dtype=float32), array([135.05302], dtype=float32), array([134.88599], dtype=float32), array([135.03508], dtype=float32), array([134.37033], dtype=float32), array([134.64359], dtype=float32), array([134.31873], dtype=float32), array([134.28192], dtype=float32), array([134.2958], dtype=float32), array([134.10358], dtype=float32), array([134.23103], dtype=float32), array([134.33316], dtype=float32), array([134.20604], dtype=float32), array([134.08807], dtype=float32), array([133.82634], dtype=float32), array([133.86674], dtype=float32)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-10/error/ExactGaussianProcessRegressor_GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh_1.0.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lu09>
+Subject: Job 16481452: <semi-gp> in cluster <lila> Exited
+
+Job <semi-gp> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug 10 20:44:18 2020
+Job was executed on host(s) <12*lu09>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug 10 21:45:38 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug 10 21:45:38 2020
+Terminated at Tue Aug 11 03:58:31 2020
+Results reported at Tue Aug 11 03:58:31 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/semi_supervised/learning_curve_semi.py --n_epochs 251 --cuda --regressor_type ExactGaussianProcessRegressor --output /home/nguyenm5/coding/pinot/aug-10/arch-search --labeled_data moonshot --unlabeled_data moonshot_unlabeled_small --architecture GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh --volume 1.0 --start_epoch 0 --num_inducing_pts 20 --inner_opt_round 200 --semi --label_split 0.3 0.7
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   332599.00 sec.
+    Max Memory :                                 3 GB
+    Average Memory :                             2.24 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               189.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   22371 sec.
+    Turnaround time :                            26053 sec.
+
+The output (if any) follows:
+
+epoch loss arr
+[array([848.3625], dtype=float32), array([841.81067], dtype=float32), array([835.59094], dtype=float32), array([829.9847], dtype=float32), array([824.66113], dtype=float32), array([820.1054], dtype=float32), array([815.6294], dtype=float32), array([811.69543], dtype=float32), array([807.80176], dtype=float32), array([804.46204], dtype=float32), array([801.22064], dtype=float32), array([798.16187], dtype=float32), array([795.3384], dtype=float32), array([792.579], dtype=float32), array([790.0548], dtype=float32), array([787.7518], dtype=float32), array([785.4461], dtype=float32), array([783.1859], dtype=float32), array([781.1331], dtype=float32), array([779.1228], dtype=float32), array([777.2529], dtype=float32), array([775.48083], dtype=float32), array([773.72253], dtype=float32), array([772.0617], dtype=float32), array([770.4397], dtype=float32), array([768.894], dtype=float32), array([767.4725], dtype=float32), array([766.0125], dtype=float32), array([764.62726], dtype=float32), array([763.2648], dtype=float32), array([762.0249], dtype=float32), array([760.73816], dtype=float32), array([759.6295], dtype=float32), array([758.4891], dtype=float32), array([757.41113], dtype=float32), array([756.3699], dtype=float32), array([755.2525], dtype=float32), array([754.345], dtype=float32), array([753.29553], dtype=float32), array([752.39465], dtype=float32), array([751.642], dtype=float32), array([750.7018], dtype=float32), array([749.88434], dtype=float32), array([748.99805], dtype=float32), array([748.2731], dtype=float32), array([747.57056], dtype=float32), array([746.89136], dtype=float32), array([746.11804], dtype=float32), array([745.30383], dtype=float32), array([744.66534], dtype=float32), array([744.0232], dtype=float32), array([743.383], dtype=float32), array([742.74805], dtype=float32), array([742.0896], dtype=float32), array([741.53894], dtype=float32), array([740.9972], dtype=float32), array([740.3153], dtype=float32), array([739.7993], dtype=float32), array([739.13513], dtype=float32), array([738.66364], dtype=float32), array([738.19885], dtype=float32), array([737.48474], dtype=float32), array([736.9519], dtype=float32), array([736.4584], dtype=float32), array([735.9675], dtype=float32), array([735.51044], dtype=float32), array([734.9388], dtype=float32), array([734.4367], dtype=float32), array([733.84985], dtype=float32), array([733.2979], dtype=float32), array([732.758], dtype=float32), array([732.475], dtype=float32), array([731.8417], dtype=float32), array([731.3966], dtype=float32), array([730.9514], dtype=float32), array([730.45935], dtype=float32), array([729.79926], dtype=float32), array([729.37134], dtype=float32), array([728.9749], dtype=float32), array([728.4524], dtype=float32), array([727.9596], dtype=float32), array([727.4609], dtype=float32), array([727.07886], dtype=float32), array([726.6281], dtype=float32), array([726.1482], dtype=float32), array([725.68787], dtype=float32), array([725.25085], dtype=float32), array([724.63666], dtype=float32), array([724.3563], dtype=float32), array([723.84796], dtype=float32), array([723.4861], dtype=float32), array([722.9479], dtype=float32), array([722.45544], dtype=float32), array([722.2372], dtype=float32), array([721.7026], dtype=float32), array([721.2524], dtype=float32), array([720.7467], dtype=float32), array([720.48584], dtype=float32), array([720.13], dtype=float32), array([719.67395], dtype=float32), array([719.4645], dtype=float32), array([718.8751], dtype=float32), array([718.5304], dtype=float32), array([718.1404], dtype=float32), array([717.9176], dtype=float32), array([717.5954], dtype=float32), array([717.16693], dtype=float32), array([717.0585], dtype=float32), array([716.5083], dtype=float32), array([716.3276], dtype=float32), array([715.98804], dtype=float32), array([715.83276], dtype=float32), array([715.5221], dtype=float32), array([715.2345], dtype=float32), array([715.0116], dtype=float32), array([714.83044], dtype=float32), array([714.42725], dtype=float32), array([714.293], dtype=float32), array([714.13116], dtype=float32), array([713.87476], dtype=float32), array([713.6326], dtype=float32), array([713.2887], dtype=float32), array([713.1598], dtype=float32), array([713.0242], dtype=float32), array([712.7242], dtype=float32), array([712.64606], dtype=float32), array([712.3575], dtype=float32), array([712.1715], dtype=float32), array([711.8785], dtype=float32), array([711.8553], dtype=float32), array([711.6339], dtype=float32), array([711.4951], dtype=float32), array([711.30005], dtype=float32), array([711.053], dtype=float32), array([711.01215], dtype=float32), array([710.84174], dtype=float32), array([710.7451], dtype=float32), array([710.5438], dtype=float32), array([710.4077], dtype=float32), array([710.21326], dtype=float32), array([710.0675], dtype=float32), array([709.97656], dtype=float32), array([709.93176], dtype=float32), array([709.8554], dtype=float32), array([709.63135], dtype=float32), array([709.4425], dtype=float32), array([709.43], dtype=float32), array([709.31323], dtype=float32), array([709.2748], dtype=float32), array([709.0072], dtype=float32), array([708.8764], dtype=float32), array([708.9143], dtype=float32), array([708.7655], dtype=float32), array([708.4883], dtype=float32), array([708.396], dtype=float32), array([708.50336], dtype=float32), array([708.26135], dtype=float32), array([708.0913], dtype=float32), array([707.95404], dtype=float32), array([707.94165], dtype=float32), array([707.9574], dtype=float32), array([707.7152], dtype=float32), array([707.64087], dtype=float32), array([707.5156], dtype=float32), array([707.325], dtype=float32), array([707.3541], dtype=float32), array([707.1776], dtype=float32), array([706.98], dtype=float32), array([706.9868], dtype=float32), array([706.813], dtype=float32), array([706.79395], dtype=float32), array([706.6836], dtype=float32), array([706.5279], dtype=float32), array([706.44934], dtype=float32), array([706.3903], dtype=float32), array([706.34766], dtype=float32), array([706.06445], dtype=float32), array([706.16504], dtype=float32), array([706.065], dtype=float32), array([705.98016], dtype=float32), array([705.8755], dtype=float32), array([705.7451], dtype=float32), array([705.7158], dtype=float32), array([705.71136], dtype=float32), array([705.6495], dtype=float32), array([705.61017], dtype=float32), array([705.33997], dtype=float32), array([705.327], dtype=float32), array([705.3927], dtype=float32), array([705.38153], dtype=float32), array([705.06085], dtype=float32), array([705.1194], dtype=float32), array([705.0696], dtype=float32), array([704.956], dtype=float32), array([704.7759], dtype=float32), array([704.6668], dtype=float32), array([704.7554], dtype=float32), array([704.6252], dtype=float32), array([704.5805], dtype=float32), array([704.45386], dtype=float32), array([704.43005], dtype=float32), array([704.4043], dtype=float32), array([704.3887], dtype=float32), array([704.3374], dtype=float32), array([704.2844], dtype=float32), array([704.22437], dtype=float32), array([704.09467], dtype=float32), array([704.1492], dtype=float32), array([704.1991], dtype=float32), array([704.32715], dtype=float32), array([704.12024], dtype=float32), array([703.819], dtype=float32), array([703.8391], dtype=float32), array([704.02045], dtype=float32), array([703.73914], dtype=float32), array([703.64685], dtype=float32), array([703.62445], dtype=float32), array([703.569], dtype=float32), array([703.5817], dtype=float32), array([703.4846], dtype=float32), array([703.5005], dtype=float32), array([703.3515], dtype=float32), array([703.3425], dtype=float32), array([703.35614], dtype=float32), array([703.4018], dtype=float32), array([703.2503], dtype=float32), array([703.12085], dtype=float32), array([703.133], dtype=float32), array([703.02954], dtype=float32), array([702.9516], dtype=float32), array([703.0027], dtype=float32), array([702.9425], dtype=float32), array([702.952], dtype=float32), array([702.95087], dtype=float32), array([703.0616], dtype=float32), array([703.6017], dtype=float32), array([704.38574], dtype=float32), array([703.22845], dtype=float32), array([704.1236], dtype=float32), array([703.00995], dtype=float32), array([704.0609], dtype=float32), array([703.50995], dtype=float32), array([703.2283], dtype=float32), array([704.25024], dtype=float32), array([702.95447], dtype=float32), array([704.1305], dtype=float32), array([703.2754], dtype=float32), array([703.06506], dtype=float32), array([703.12274], dtype=float32), array([702.81506], dtype=float32), array([702.8645], dtype=float32)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-10/error/ExactGaussianProcessRegressor_GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh_1.0.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lt22>
+Subject: Job 16481453: <semi-gp> in cluster <lila> Exited
+
+Job <semi-gp> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug 10 20:44:18 2020
+Job was executed on host(s) <12*lt22>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug 10 22:08:20 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug 10 22:08:20 2020
+Terminated at Tue Aug 11 04:23:28 2020
+Results reported at Tue Aug 11 04:23:28 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/semi_supervised/learning_curve_semi.py --n_epochs 251 --cuda --regressor_type ExactGaussianProcessRegressor --output /home/nguyenm5/coding/pinot/aug-10/arch-search --labeled_data moonshot --unlabeled_data moonshot_unlabeled_small --architecture GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh --volume 1.0 --start_epoch 0 --num_inducing_pts 20 --inner_opt_round 200 --semi --label_split 0.4 0.6
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   371138.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.99 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   22507 sec.
+    Turnaround time :                            27550 sec.
+
+The output (if any) follows:
+
+epoch loss arr
+[array([1097.2252], dtype=float32), array([1084.8481], dtype=float32), array([1072.9805], dtype=float32), array([1061.9021], dtype=float32), array([1050.8823], dtype=float32), array([1040.7399], dtype=float32), array([1030.2654], dtype=float32), array([1020.4248], dtype=float32), array([1010.2848], dtype=float32), array([1000.1663], dtype=float32), array([989.78394], dtype=float32), array([978.7157], dtype=float32), array([968.0736], dtype=float32), array([956.025], dtype=float32), array([944.3318], dtype=float32), array([931.95886], dtype=float32), array([918.6089], dtype=float32), array([905.02606], dtype=float32), array([891.48486], dtype=float32), array([877.49036], dtype=float32), array([861.80884], dtype=float32), array([846.4724], dtype=float32), array([830.86084], dtype=float32), array([814.9728], dtype=float32), array([798.37897], dtype=float32), array([782.10504], dtype=float32), array([766.3625], dtype=float32), array([749.9104], dtype=float32), array([735.10706], dtype=float32), array([720.1618], dtype=float32), array([706.78625], dtype=float32), array([694.99316], dtype=float32), array([685.0122], dtype=float32), array([676.3198], dtype=float32), array([669.8998], dtype=float32), array([664.37305], dtype=float32), array([661.7153], dtype=float32), array([659.3744], dtype=float32), array([658.4055], dtype=float32), array([658.74176], dtype=float32), array([658.39307], dtype=float32), array([657.93176], dtype=float32), array([658.2827], dtype=float32), array([657.8892], dtype=float32), array([656.73376], dtype=float32), array([654.4937], dtype=float32), array([653.61224], dtype=float32), array([650.6344], dtype=float32), array([647.758], dtype=float32), array([645.78906], dtype=float32), array([644.01764], dtype=float32), array([642.34656], dtype=float32), array([640.49603], dtype=float32), array([638.69824], dtype=float32), array([637.27625], dtype=float32), array([635.76416], dtype=float32), array([634.90344], dtype=float32), array([634.7947], dtype=float32), array([633.7289], dtype=float32), array([633.73004], dtype=float32), array([632.00696], dtype=float32), array([631.6234], dtype=float32), array([631.82336], dtype=float32), array([630.6429], dtype=float32), array([630.39514], dtype=float32), array([629.26624], dtype=float32), array([628.90765], dtype=float32), array([627.45605], dtype=float32), array([626.9271], dtype=float32), array([625.97925], dtype=float32), array([624.7449], dtype=float32), array([624.19073], dtype=float32), array([623.7825], dtype=float32), array([622.9666], dtype=float32), array([621.9707], dtype=float32), array([620.54346], dtype=float32), array([621.00415], dtype=float32), array([620.0138], dtype=float32), array([619.3468], dtype=float32), array([619.37866], dtype=float32), array([618.34064], dtype=float32), array([617.8219], dtype=float32), array([616.9448], dtype=float32), array([616.3487], dtype=float32), array([615.62714], dtype=float32), array([615.45795], dtype=float32), array([614.98535], dtype=float32), array([614.3096], dtype=float32), array([613.77185], dtype=float32), array([612.6255], dtype=float32), array([612.01526], dtype=float32), array([611.4339], dtype=float32), array([610.84644], dtype=float32), array([610.25696], dtype=float32), array([609.7742], dtype=float32), array([609.7023], dtype=float32), array([608.89355], dtype=float32), array([608.297], dtype=float32), array([607.9684], dtype=float32), array([606.948], dtype=float32), array([606.49365], dtype=float32), array([605.8954], dtype=float32), array([605.444], dtype=float32), array([605.44446], dtype=float32), array([604.3833], dtype=float32), array([604.1678], dtype=float32), array([604.08057], dtype=float32), array([602.72284], dtype=float32), array([602.7492], dtype=float32), array([602.2496], dtype=float32), array([602.04663], dtype=float32), array([601.42395], dtype=float32), array([601.23975], dtype=float32), array([600.0825], dtype=float32), array([600.3048], dtype=float32), array([599.8054], dtype=float32), array([599.449], dtype=float32), array([599.1606], dtype=float32), array([598.14935], dtype=float32), array([598.17566], dtype=float32), array([597.3707], dtype=float32), array([597.5217], dtype=float32), array([596.6883], dtype=float32), array([596.6825], dtype=float32), array([596.5513], dtype=float32), array([595.7778], dtype=float32), array([595.526], dtype=float32), array([595.07025], dtype=float32), array([594.90265], dtype=float32), array([594.2299], dtype=float32), array([594.05695], dtype=float32), array([594.0681], dtype=float32), array([593.4022], dtype=float32), array([593.079], dtype=float32), array([592.95667], dtype=float32), array([592.8871], dtype=float32), array([592.2124], dtype=float32), array([591.7628], dtype=float32), array([591.07025], dtype=float32), array([591.092], dtype=float32), array([591.2639], dtype=float32), array([590.2555], dtype=float32), array([590.644], dtype=float32), array([590.05096], dtype=float32), array([589.4043], dtype=float32), array([589.2792], dtype=float32), array([589.2631], dtype=float32), array([589.1466], dtype=float32), array([588.4798], dtype=float32), array([588.46216], dtype=float32), array([587.9811], dtype=float32), array([588.0772], dtype=float32), array([587.68414], dtype=float32), array([587.0407], dtype=float32), array([586.9552], dtype=float32), array([586.92426], dtype=float32), array([586.5907], dtype=float32), array([586.48303], dtype=float32), array([586.3258], dtype=float32), array([586.0482], dtype=float32), array([585.9523], dtype=float32), array([585.59717], dtype=float32), array([585.2876], dtype=float32), array([585.4313], dtype=float32), array([585.0433], dtype=float32), array([585.0857], dtype=float32), array([584.3202], dtype=float32), array([584.1605], dtype=float32), array([583.871], dtype=float32), array([583.93335], dtype=float32), array([583.9863], dtype=float32), array([583.419], dtype=float32), array([583.6117], dtype=float32), array([583.345], dtype=float32), array([583.24524], dtype=float32), array([583.0746], dtype=float32), array([582.7677], dtype=float32), array([582.6581], dtype=float32), array([582.8543], dtype=float32), array([582.04126], dtype=float32), array([581.8325], dtype=float32), array([581.83484], dtype=float32), array([581.6655], dtype=float32), array([581.59406], dtype=float32), array([581.1951], dtype=float32), array([580.90454], dtype=float32), array([581.4245], dtype=float32), array([581.27216], dtype=float32), array([580.99677], dtype=float32), array([580.7906], dtype=float32), array([580.61456], dtype=float32), array([580.6908], dtype=float32), array([580.64557], dtype=float32), array([580.33795], dtype=float32), array([580.3855], dtype=float32), array([580.16364], dtype=float32), array([579.9772], dtype=float32), array([579.52783], dtype=float32), array([579.98584], dtype=float32), array([580.0591], dtype=float32), array([579.54456], dtype=float32), array([579.44836], dtype=float32), array([579.0959], dtype=float32), array([579.8015], dtype=float32), array([579.09924], dtype=float32), array([579.6006], dtype=float32), array([579.45264], dtype=float32), array([578.8316], dtype=float32), array([579.0231], dtype=float32), array([578.8218], dtype=float32), array([579.0144], dtype=float32), array([578.3631], dtype=float32), array([578.4973], dtype=float32), array([578.29767], dtype=float32), array([577.9413], dtype=float32), array([577.68005], dtype=float32), array([578.0906], dtype=float32), array([578.03894], dtype=float32), array([577.9148], dtype=float32), array([577.25366], dtype=float32), array([577.2767], dtype=float32), array([577.4607], dtype=float32), array([577.15515], dtype=float32), array([577.0524], dtype=float32), array([576.7806], dtype=float32), array([576.1563], dtype=float32), array([575.6323], dtype=float32), array([575.0349], dtype=float32), array([574.13837], dtype=float32), array([573.1289], dtype=float32), array([571.82544], dtype=float32), array([570.85046], dtype=float32), array([569.44244], dtype=float32), array([568.30725], dtype=float32), array([567.1721], dtype=float32), array([565.54565], dtype=float32), array([563.87177], dtype=float32), array([562.5951], dtype=float32), array([560.67664], dtype=float32), array([559.49915], dtype=float32), array([557.9616], dtype=float32), array([556.52356], dtype=float32), array([554.9735], dtype=float32), array([553.61597], dtype=float32), array([552.11743], dtype=float32), array([550.414], dtype=float32), array([548.8357], dtype=float32), array([547.2936], dtype=float32), array([546.02673], dtype=float32), array([544.30853], dtype=float32), array([543.1386], dtype=float32)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-10/error/ExactGaussianProcessRegressor_GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh_1.0.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lu08>
+Subject: Job 16481454: <semi-gp> in cluster <lila> Exited
+
+Job <semi-gp> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug 10 20:44:18 2020
+Job was executed on host(s) <12*lu08>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug 10 22:47:22 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug 10 22:47:22 2020
+Terminated at Tue Aug 11 05:28:53 2020
+Results reported at Tue Aug 11 05:28:53 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/semi_supervised/learning_curve_semi.py --n_epochs 251 --cuda --regressor_type ExactGaussianProcessRegressor --output /home/nguyenm5/coding/pinot/aug-10/arch-search --labeled_data moonshot --unlabeled_data moonshot_unlabeled_small --architecture GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh --volume 1.0 --start_epoch 0 --num_inducing_pts 20 --inner_opt_round 200 --semi --label_split 0.5 0.5
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   373989.00 sec.
+    Max Memory :                                 3 GB
+    Average Memory :                             2.96 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               189.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   24092 sec.
+    Turnaround time :                            31475 sec.
+
+The output (if any) follows:
+
+epoch loss arr
+[array([1449.5598], dtype=float32), array([1438.3175], dtype=float32), array([1427.8613], dtype=float32), array([1417.861], dtype=float32), array([1408.8286], dtype=float32), array([1399.7842], dtype=float32), array([1391.6396], dtype=float32), array([1383.894], dtype=float32), array([1376.9634], dtype=float32), array([1369.9912], dtype=float32), array([1363.78], dtype=float32), array([1357.8442], dtype=float32), array([1352.1289], dtype=float32), array([1346.7527], dtype=float32), array([1341.7836], dtype=float32), array([1336.9719], dtype=float32), array([1332.5398], dtype=float32), array([1328.3049], dtype=float32), array([1324.3159], dtype=float32), array([1320.6543], dtype=float32), array([1317.0352], dtype=float32), array([1313.7355], dtype=float32), array([1310.6503], dtype=float32), array([1307.5334], dtype=float32), array([1304.7778], dtype=float32), array([1302.0848], dtype=float32), array([1299.4446], dtype=float32), array([1297.0337], dtype=float32), array([1294.5941], dtype=float32), array([1292.5134], dtype=float32), array([1290.4868], dtype=float32), array([1288.4231], dtype=float32), array([1286.5701], dtype=float32), array([1284.8057], dtype=float32), array([1283.1377], dtype=float32), array([1281.5337], dtype=float32), array([1280.0397], dtype=float32), array([1278.6057], dtype=float32), array([1277.1667], dtype=float32), array([1275.8055], dtype=float32), array([1274.6443], dtype=float32), array([1273.4438], dtype=float32), array([1272.2456], dtype=float32), array([1270.953], dtype=float32), array([1269.9008], dtype=float32), array([1268.8728], dtype=float32), array([1267.7406], dtype=float32), array([1266.6499], dtype=float32), array([1265.6375], dtype=float32), array([1264.5955], dtype=float32), array([1263.69], dtype=float32), array([1262.5327], dtype=float32), array([1261.6389], dtype=float32), array([1260.5125], dtype=float32), array([1259.3893], dtype=float32), array([1258.3431], dtype=float32), array([1257.3282], dtype=float32), array([1256.3811], dtype=float32), array([1255.2665], dtype=float32), array([1254.3201], dtype=float32), array([1253.2617], dtype=float32), array([1252.1248], dtype=float32), array([1251.0776], dtype=float32), array([1250.1433], dtype=float32), array([1249.1395], dtype=float32), array([1248.249], dtype=float32), array([1247.0786], dtype=float32), array([1246.0754], dtype=float32), array([1245.0894], dtype=float32), array([1243.9739], dtype=float32), array([1242.9634], dtype=float32), array([1241.9102], dtype=float32), array([1240.8937], dtype=float32), array([1239.9274], dtype=float32), array([1239.1233], dtype=float32), array([1237.7515], dtype=float32), array([1237.031], dtype=float32), array([1235.9314], dtype=float32), array([1235.3092], dtype=float32), array([1234.2192], dtype=float32), array([1233.2657], dtype=float32), array([1232.5059], dtype=float32), array([1231.9845], dtype=float32), array([1230.9531], dtype=float32), array([1230.2087], dtype=float32), array([1229.5814], dtype=float32), array([1228.992], dtype=float32), array([1228.2424], dtype=float32), array([1227.2882], dtype=float32), array([1226.2383], dtype=float32), array([1225.6627], dtype=float32), array([1224.6776], dtype=float32), array([1223.655], dtype=float32), array([1222.6677], dtype=float32), array([1221.7112], dtype=float32), array([1220.5493], dtype=float32), array([1219.5828], dtype=float32), array([1218.4192], dtype=float32), array([1217.065], dtype=float32), array([1216.0325], dtype=float32), array([1215.2429], dtype=float32), array([1213.9825], dtype=float32), array([1213.235], dtype=float32), array([1211.95], dtype=float32), array([1210.834], dtype=float32), array([1209.7893], dtype=float32), array([1208.6718], dtype=float32), array([1207.876], dtype=float32), array([1206.77], dtype=float32), array([1205.7958], dtype=float32), array([1204.7385], dtype=float32), array([1203.9753], dtype=float32), array([1203.0082], dtype=float32), array([1201.8911], dtype=float32), array([1201.321], dtype=float32), array([1200.2036], dtype=float32), array([1199.1321], dtype=float32), array([1198.3113], dtype=float32), array([1197.6226], dtype=float32), array([1196.5557], dtype=float32), array([1195.9253], dtype=float32), array([1194.6998], dtype=float32), array([1193.8336], dtype=float32), array([1192.8779], dtype=float32), array([1190.9078], dtype=float32), array([1187.9971], dtype=float32), array([1183.4609], dtype=float32), array([1175.31], dtype=float32), array([1164.138], dtype=float32), array([1151.5011], dtype=float32), array([1137.5543], dtype=float32), array([1122.2454], dtype=float32), array([1106.4539], dtype=float32), array([1089.0881], dtype=float32), array([1071.4368], dtype=float32), array([1051.8408], dtype=float32), array([1031.7386], dtype=float32), array([1011.019], dtype=float32), array([988.41113], dtype=float32), array([964.68005], dtype=float32), array([941.1994], dtype=float32), array([916.7062], dtype=float32), array([889.7738], dtype=float32), array([863.0251], dtype=float32), array([835.5243], dtype=float32), array([806.3346], dtype=float32), array([777.0103], dtype=float32), array([746.63745], dtype=float32), array([715.5376], dtype=float32), array([685.8084], dtype=float32), array([657.0764], dtype=float32), array([631.2918], dtype=float32), array([609.9929], dtype=float32), array([594.4337], dtype=float32), array([585.83057], dtype=float32), array([581.792], dtype=float32), array([583.959], dtype=float32), array([588.55994], dtype=float32), array([594.054], dtype=float32), array([599.1077], dtype=float32), array([602.7473], dtype=float32), array([604.92505], dtype=float32), array([604.30945], dtype=float32), array([601.8908], dtype=float32), array([598.04584], dtype=float32), array([593.9066], dtype=float32), array([587.79047], dtype=float32), array([582.3577], dtype=float32), array([578.46643], dtype=float32), array([573.8867], dtype=float32), array([571.3084], dtype=float32), array([569.5691], dtype=float32), array([568.113], dtype=float32), array([568.2522], dtype=float32), array([568.4131], dtype=float32), array([568.99695], dtype=float32), array([569.73517], dtype=float32), array([569.69666], dtype=float32), array([569.5286], dtype=float32), array([569.00055], dtype=float32), array([568.3766], dtype=float32), array([567.004], dtype=float32), array([566.3355], dtype=float32), array([565.06537], dtype=float32), array([564.1254], dtype=float32), array([562.9682], dtype=float32), array([562.2581], dtype=float32), array([561.7402], dtype=float32), array([561.2823], dtype=float32), array([560.5129], dtype=float32), array([560.7289], dtype=float32), array([560.4826], dtype=float32), array([560.25977], dtype=float32), array([560.3325], dtype=float32), array([560.1405], dtype=float32), array([559.74744], dtype=float32), array([559.3787], dtype=float32), array([559.2167], dtype=float32), array([559.0157], dtype=float32), array([558.5292], dtype=float32), array([557.9309], dtype=float32), array([557.9511], dtype=float32), array([557.4046], dtype=float32), array([557.38837], dtype=float32), array([557.05756], dtype=float32), array([556.7897], dtype=float32), array([556.48254], dtype=float32), array([556.75653], dtype=float32), array([556.29913], dtype=float32), array([556.28467], dtype=float32), array([556.19116], dtype=float32), array([555.8237], dtype=float32), array([555.8214], dtype=float32), array([555.7081], dtype=float32), array([555.4105], dtype=float32), array([555.3117], dtype=float32), array([555.4265], dtype=float32), array([554.9753], dtype=float32), array([554.9103], dtype=float32), array([554.81494], dtype=float32), array([554.6708], dtype=float32), array([554.72363], dtype=float32), array([554.69495], dtype=float32), array([554.38184], dtype=float32), array([554.3015], dtype=float32), array([554.3363], dtype=float32), array([554.3484], dtype=float32), array([554.2894], dtype=float32), array([554.2094], dtype=float32), array([554.21155], dtype=float32), array([553.90393], dtype=float32), array([554.0298], dtype=float32), array([553.7692], dtype=float32), array([554.18164], dtype=float32), array([553.799], dtype=float32), array([553.46655], dtype=float32), array([553.27734], dtype=float32), array([553.4891], dtype=float32), array([552.84973], dtype=float32), array([553.1701], dtype=float32), array([553.16364], dtype=float32), array([552.92065], dtype=float32), array([553.08685], dtype=float32), array([552.939], dtype=float32), array([552.9951], dtype=float32), array([552.65576], dtype=float32), array([552.8086], dtype=float32), array([552.67633], dtype=float32), array([552.7076], dtype=float32), array([552.66626], dtype=float32), array([552.9538], dtype=float32)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-10/error/ExactGaussianProcessRegressor_GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh_1.0.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lt08>
+Subject: Job 16481455: <semi-gp> in cluster <lila> Exited
+
+Job <semi-gp> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug 10 20:44:18 2020
+Job was executed on host(s) <12*lt08>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug 10 23:04:01 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug 10 23:04:01 2020
+Terminated at Tue Aug 11 06:08:00 2020
+Results reported at Tue Aug 11 06:08:00 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/semi_supervised/learning_curve_semi.py --n_epochs 251 --cuda --regressor_type ExactGaussianProcessRegressor --output /home/nguyenm5/coding/pinot/aug-10/arch-search --labeled_data moonshot --unlabeled_data moonshot_unlabeled_small --architecture GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh --volume 1.0 --start_epoch 0 --num_inducing_pts 20 --inner_opt_round 200 --semi --label_split 0.6 0.4
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   410761.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.97 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   25439 sec.
+    Turnaround time :                            33822 sec.
+
+The output (if any) follows:
+
+epoch loss arr
+[array([1856.2244], dtype=float32), array([1833.7297], dtype=float32), array([1812.0997], dtype=float32), array([1793.0504], dtype=float32), array([1774.2402], dtype=float32), array([1757.4072], dtype=float32), array([1740.3337], dtype=float32), array([1725.3716], dtype=float32), array([1711.4156], dtype=float32), array([1696.7236], dtype=float32), array([1682.438], dtype=float32), array([1667.9299], dtype=float32), array([1652.003], dtype=float32), array([1635.4493], dtype=float32), array([1617.7803], dtype=float32), array([1599.0039], dtype=float32), array([1581.4518], dtype=float32), array([1562.84], dtype=float32), array([1545.8185], dtype=float32), array([1528.6394], dtype=float32), array([1511.3279], dtype=float32), array([1495.4121], dtype=float32), array([1479.7465], dtype=float32), array([1463.9529], dtype=float32), array([1449.0049], dtype=float32), array([1433.8793], dtype=float32), array([1418.8423], dtype=float32), array([1404.1738], dtype=float32), array([1389.0354], dtype=float32), array([1374.4175], dtype=float32), array([1358.8704], dtype=float32), array([1343.0442], dtype=float32), array([1327.8643], dtype=float32), array([1311.5356], dtype=float32), array([1295.1785], dtype=float32), array([1278.5452], dtype=float32), array([1260.4861], dtype=float32), array([1242.6522], dtype=float32), array([1224.341], dtype=float32), array([1204.5349], dtype=float32), array([1185.3818], dtype=float32), array([1165.4543], dtype=float32), array([1143.994], dtype=float32), array([1123.2285], dtype=float32), array([1102.258], dtype=float32), array([1081.691], dtype=float32), array([1060.1849], dtype=float32), array([1039.4915], dtype=float32), array([1020.1472], dtype=float32), array([1001.8386], dtype=float32), array([984.956], dtype=float32), array([969.0084], dtype=float32), array([955.3803], dtype=float32), array([944.0842], dtype=float32), array([933.80664], dtype=float32), array([925.4911], dtype=float32), array([919.27014], dtype=float32), array([914.55084], dtype=float32), array([910.96643], dtype=float32), array([908.6789], dtype=float32), array([905.6345], dtype=float32), array([904.58014], dtype=float32), array([903.6627], dtype=float32), array([900.9072], dtype=float32), array([899.00916], dtype=float32), array([896.6304], dtype=float32), array([894.56335], dtype=float32), array([891.1612], dtype=float32), array([887.69226], dtype=float32), array([883.5675], dtype=float32), array([879.24426], dtype=float32), array([874.60406], dtype=float32), array([869.1874], dtype=float32), array([864.1942], dtype=float32), array([859.0017], dtype=float32), array([854.5593], dtype=float32), array([848.9461], dtype=float32), array([844.49945], dtype=float32), array([839.1952], dtype=float32), array([835.01965], dtype=float32), array([829.95026], dtype=float32), array([825.33185], dtype=float32), array([820.8236], dtype=float32), array([816.8169], dtype=float32), array([811.6665], dtype=float32), array([807.90027], dtype=float32), array([803.6373], dtype=float32), array([798.2691], dtype=float32), array([794.3209], dtype=float32), array([789.47485], dtype=float32), array([785.4586], dtype=float32), array([780.6384], dtype=float32), array([775.3959], dtype=float32), array([770.1883], dtype=float32), array([766.3116], dtype=float32), array([761.27527], dtype=float32), array([757.11096], dtype=float32), array([752.63873], dtype=float32), array([748.5405], dtype=float32), array([743.7538], dtype=float32), array([740.6426], dtype=float32), array([736.1219], dtype=float32), array([732.79004], dtype=float32), array([729.4452], dtype=float32), array([726.3264], dtype=float32), array([723.9622], dtype=float32), array([722.0102], dtype=float32), array([719.85974], dtype=float32), array([718.2354], dtype=float32), array([716.78735], dtype=float32), array([715.41565], dtype=float32), array([713.8972], dtype=float32), array([713.19037], dtype=float32), array([711.67456], dtype=float32), array([710.6138], dtype=float32), array([709.2948], dtype=float32), array([707.7091], dtype=float32), array([706.3372], dtype=float32), array([704.83435], dtype=float32), array([704.3065], dtype=float32), array([702.58215], dtype=float32), array([702.329], dtype=float32), array([701.11633], dtype=float32), array([700.26196], dtype=float32), array([699.33124], dtype=float32), array([698.67896], dtype=float32), array([697.8667], dtype=float32), array([697.07837], dtype=float32), array([696.2512], dtype=float32), array([695.14734], dtype=float32), array([695.2006], dtype=float32), array([693.77356], dtype=float32), array([693.74915], dtype=float32), array([693.11], dtype=float32), array([692.0957], dtype=float32), array([691.3666], dtype=float32), array([691.013], dtype=float32), array([690.47144], dtype=float32), array([689.9215], dtype=float32), array([689.485], dtype=float32), array([688.95215], dtype=float32), array([688.3322], dtype=float32), array([687.88934], dtype=float32), array([687.5137], dtype=float32), array([686.82324], dtype=float32), array([686.4906], dtype=float32), array([685.84357], dtype=float32), array([685.773], dtype=float32), array([685.1292], dtype=float32), array([684.84955], dtype=float32), array([684.27985], dtype=float32), array([683.46844], dtype=float32), array([683.6804], dtype=float32), array([682.8595], dtype=float32), array([682.59607], dtype=float32), array([682.0425], dtype=float32), array([681.68677], dtype=float32), array([681.16113], dtype=float32), array([680.9573], dtype=float32), array([680.4431], dtype=float32), array([680.0233], dtype=float32), array([679.50464], dtype=float32), array([679.83044], dtype=float32), array([679.25195], dtype=float32), array([678.518], dtype=float32), array([678.16974], dtype=float32), array([678.36084], dtype=float32), array([678.1095], dtype=float32), array([677.5104], dtype=float32), array([677.2714], dtype=float32), array([677.18805], dtype=float32), array([676.5508], dtype=float32), array([676.90515], dtype=float32), array([676.26135], dtype=float32), array([676.16223], dtype=float32), array([675.8414], dtype=float32), array([675.4381], dtype=float32), array([674.96765], dtype=float32), array([674.7754], dtype=float32), array([675.01416], dtype=float32), array([674.74036], dtype=float32), array([674.1627], dtype=float32), array([674.4914], dtype=float32), array([673.9403], dtype=float32), array([673.977], dtype=float32), array([673.60034], dtype=float32), array([673.40784], dtype=float32), array([673.5195], dtype=float32), array([673.5956], dtype=float32), array([673.1161], dtype=float32), array([673.0509], dtype=float32), array([673.0739], dtype=float32), array([672.7324], dtype=float32), array([672.63196], dtype=float32), array([672.58813], dtype=float32), array([672.54913], dtype=float32), array([671.5773], dtype=float32), array([672.7661], dtype=float32), array([672.22363], dtype=float32), array([673.3019], dtype=float32), array([671.3378], dtype=float32), array([672.9448], dtype=float32), array([671.8407], dtype=float32), array([672.15173], dtype=float32), array([671.527], dtype=float32), array([671.2326], dtype=float32), array([671.0982], dtype=float32), array([671.4849], dtype=float32), array([670.7263], dtype=float32), array([670.797], dtype=float32), array([670.3805], dtype=float32), array([670.8671], dtype=float32), array([670.29645], dtype=float32), array([670.50446], dtype=float32), array([669.9685], dtype=float32), array([669.9321], dtype=float32), array([669.8425], dtype=float32), array([669.8582], dtype=float32), array([669.6144], dtype=float32), array([669.47485], dtype=float32), array([669.1338], dtype=float32), array([669.6393], dtype=float32), array([669.3963], dtype=float32), array([669.04364], dtype=float32), array([668.7997], dtype=float32), array([668.7456], dtype=float32), array([668.81036], dtype=float32), array([668.367], dtype=float32), array([668.39], dtype=float32), array([668.7573], dtype=float32), array([668.5748], dtype=float32), array([668.2871], dtype=float32), array([668.50836], dtype=float32), array([668.1571], dtype=float32), array([667.9665], dtype=float32), array([667.8847], dtype=float32), array([667.8209], dtype=float32), array([667.9241], dtype=float32), array([667.5725], dtype=float32), array([667.6505], dtype=float32), array([667.7085], dtype=float32), array([667.41394], dtype=float32), array([667.37195], dtype=float32), array([667.4304], dtype=float32), array([667.1175], dtype=float32), array([667.20776], dtype=float32), array([666.6963], dtype=float32), array([666.86804], dtype=float32), array([667.12244], dtype=float32), array([666.892], dtype=float32), array([666.6899], dtype=float32)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-10/error/ExactGaussianProcessRegressor_GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh_1.0.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lt17>
+Subject: Job 16481456: <semi-gp> in cluster <lila> Exited
+
+Job <semi-gp> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug 10 20:44:18 2020
+Job was executed on host(s) <12*lt17>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug 10 23:07:05 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug 10 23:07:05 2020
+Terminated at Tue Aug 11 06:08:57 2020
+Results reported at Tue Aug 11 06:08:57 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/semi_supervised/learning_curve_semi.py --n_epochs 251 --cuda --regressor_type ExactGaussianProcessRegressor --output /home/nguyenm5/coding/pinot/aug-10/arch-search --labeled_data moonshot --unlabeled_data moonshot_unlabeled_small --architecture GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh --volume 1.0 --start_epoch 0 --num_inducing_pts 20 --inner_opt_round 200 --semi --label_split 0.7 0.3
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   414852.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.98 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   25313 sec.
+    Turnaround time :                            33879 sec.
+
+The output (if any) follows:
+
+epoch loss arr
+[array([1932.6929], dtype=float32), array([1916.0045], dtype=float32), array([1898.209], dtype=float32), array([1882.5248], dtype=float32), array([1866.6215], dtype=float32), array([1852.2954], dtype=float32), array([1838.6945], dtype=float32), array([1826.1165], dtype=float32), array([1814.0818], dtype=float32), array([1802.9945], dtype=float32), array([1792.7534], dtype=float32), array([1782.3599], dtype=float32), array([1772.7173], dtype=float32), array([1763.6362], dtype=float32), array([1754.9658], dtype=float32), array([1745.8557], dtype=float32), array([1737.4521], dtype=float32), array([1728.4657], dtype=float32), array([1719.8904], dtype=float32), array([1710.7288], dtype=float32), array([1701.3894], dtype=float32), array([1692.2698], dtype=float32), array([1681.8689], dtype=float32), array([1671.9678], dtype=float32), array([1661.3759], dtype=float32), array([1649.767], dtype=float32), array([1638.2438], dtype=float32), array([1626.1952], dtype=float32), array([1612.7502], dtype=float32), array([1599.3712], dtype=float32), array([1585.0525], dtype=float32), array([1569.189], dtype=float32), array([1553.6337], dtype=float32), array([1536.5183], dtype=float32), array([1517.8429], dtype=float32), array([1499.4738], dtype=float32), array([1478.5198], dtype=float32), array([1457.3323], dtype=float32), array([1435.3959], dtype=float32), array([1412.3724], dtype=float32), array([1387.821], dtype=float32), array([1362.9397], dtype=float32), array([1337.1189], dtype=float32), array([1311.1455], dtype=float32), array([1285.3759], dtype=float32), array([1260.3679], dtype=float32), array([1236.1532], dtype=float32), array([1212.3119], dtype=float32), array([1191.6484], dtype=float32), array([1171.9778], dtype=float32), array([1156.1311], dtype=float32), array([1142.051], dtype=float32), array([1132.1366], dtype=float32), array([1123.6943], dtype=float32), array([1117.9407], dtype=float32), array([1116.2317], dtype=float32), array([1114.0364], dtype=float32), array([1111.6001], dtype=float32), array([1109.3365], dtype=float32), array([1107.8425], dtype=float32), array([1103.93], dtype=float32), array([1100.5522], dtype=float32), array([1097.552], dtype=float32), array([1092.0779], dtype=float32), array([1087.3975], dtype=float32), array([1082.5588], dtype=float32), array([1076.2671], dtype=float32), array([1069.8611], dtype=float32), array([1066.4312], dtype=float32), array([1060.7928], dtype=float32), array([1056.8777], dtype=float32), array([1053.5232], dtype=float32), array([1050.6434], dtype=float32), array([1047.868], dtype=float32), array([1046.2], dtype=float32), array([1042.2574], dtype=float32), array([1040.4744], dtype=float32), array([1037.9425], dtype=float32), array([1035.7136], dtype=float32), array([1034.413], dtype=float32), array([1030.9509], dtype=float32), array([1027.9591], dtype=float32), array([1025.6545], dtype=float32), array([1024.4839], dtype=float32), array([1020.9669], dtype=float32), array([1019.41656], dtype=float32), array([1016.65405], dtype=float32), array([1013.64374], dtype=float32), array([1012.61475], dtype=float32), array([1009.4141], dtype=float32), array([1007.4999], dtype=float32), array([1004.8274], dtype=float32), array([1001.3379], dtype=float32), array([999.149], dtype=float32), array([994.9289], dtype=float32), array([990.18945], dtype=float32), array([986.3096], dtype=float32), array([981.5955], dtype=float32), array([975.8491], dtype=float32), array([970.35236], dtype=float32), array([964.55133], dtype=float32), array([958.6252], dtype=float32), array([951.75037], dtype=float32), array([945.6551], dtype=float32), array([939.2044], dtype=float32), array([933.2702], dtype=float32), array([926.63086], dtype=float32), array([920.35315], dtype=float32), array([914.6748], dtype=float32), array([907.83887], dtype=float32), array([901.94775], dtype=float32), array([895.3695], dtype=float32), array([889.22144], dtype=float32), array([882.22424], dtype=float32), array([876.3867], dtype=float32), array([870.5654], dtype=float32), array([863.8629], dtype=float32), array([857.93164], dtype=float32), array([852.158], dtype=float32), array([846.791], dtype=float32), array([841.3369], dtype=float32), array([835.9889], dtype=float32), array([831.24585], dtype=float32), array([827.58514], dtype=float32), array([823.6249], dtype=float32), array([820.70374], dtype=float32), array([818.7313], dtype=float32), array([816.2999], dtype=float32), array([815.9655], dtype=float32), array([814.86304], dtype=float32), array([815.5219], dtype=float32), array([814.68994], dtype=float32), array([814.0029], dtype=float32), array([814.1562], dtype=float32), array([813.4686], dtype=float32), array([812.1536], dtype=float32), array([811.86206], dtype=float32), array([809.9855], dtype=float32), array([809.4973], dtype=float32), array([809.29517], dtype=float32), array([808.4789], dtype=float32), array([807.6665], dtype=float32), array([806.9795], dtype=float32), array([806.53577], dtype=float32), array([805.49866], dtype=float32), array([804.05164], dtype=float32), array([803.5543], dtype=float32), array([803.2516], dtype=float32), array([802.52563], dtype=float32), array([801.97394], dtype=float32), array([802.04156], dtype=float32), array([801.629], dtype=float32), array([801.4069], dtype=float32), array([801.2844], dtype=float32), array([801.12866], dtype=float32), array([800.4496], dtype=float32), array([800.3923], dtype=float32), array([799.91895], dtype=float32), array([799.02277], dtype=float32), array([798.7607], dtype=float32), array([798.5525], dtype=float32), array([797.72345], dtype=float32), array([797.70593], dtype=float32), array([797.3178], dtype=float32), array([796.95215], dtype=float32), array([796.5106], dtype=float32), array([796.15576], dtype=float32), array([795.62036], dtype=float32), array([795.60925], dtype=float32), array([795.61194], dtype=float32), array([794.6195], dtype=float32), array([794.04016], dtype=float32), array([794.3457], dtype=float32), array([793.56616], dtype=float32), array([793.23566], dtype=float32), array([793.0239], dtype=float32), array([792.57605], dtype=float32), array([792.2298], dtype=float32), array([791.92944], dtype=float32), array([791.9898], dtype=float32), array([791.2739], dtype=float32), array([791.4015], dtype=float32), array([790.7787], dtype=float32), array([790.44824], dtype=float32), array([790.1802], dtype=float32), array([790.19824], dtype=float32), array([790.19336], dtype=float32), array([789.364], dtype=float32), array([789.2395], dtype=float32), array([789.12036], dtype=float32), array([789.12006], dtype=float32), array([788.3032], dtype=float32), array([788.3772], dtype=float32), array([788.7707], dtype=float32), array([788.0073], dtype=float32), array([787.44543], dtype=float32), array([787.9374], dtype=float32), array([787.1821], dtype=float32), array([786.91833], dtype=float32), array([787.1889], dtype=float32), array([786.6915], dtype=float32), array([786.18445], dtype=float32), array([786.64874], dtype=float32), array([786.0762], dtype=float32), array([785.81903], dtype=float32), array([785.8579], dtype=float32), array([785.48193], dtype=float32), array([785.3956], dtype=float32), array([785.28424], dtype=float32), array([785.03394], dtype=float32), array([784.4627], dtype=float32), array([784.8044], dtype=float32), array([784.8142], dtype=float32), array([784.2647], dtype=float32), array([784.4961], dtype=float32), array([784.27625], dtype=float32), array([783.9779], dtype=float32), array([783.89636], dtype=float32), array([783.5752], dtype=float32), array([783.72327], dtype=float32), array([783.51904], dtype=float32), array([783.38293], dtype=float32), array([783.69525], dtype=float32), array([783.5086], dtype=float32), array([783.2638], dtype=float32), array([783.00244], dtype=float32), array([782.8628], dtype=float32), array([783.0338], dtype=float32), array([782.80835], dtype=float32), array([782.5095], dtype=float32), array([782.5047], dtype=float32), array([782.21643], dtype=float32), array([782.117], dtype=float32), array([782.339], dtype=float32), array([781.9093], dtype=float32), array([781.8639], dtype=float32), array([781.68774], dtype=float32), array([782.24274], dtype=float32), array([782.056], dtype=float32), array([781.67474], dtype=float32), array([781.60785], dtype=float32), array([781.4388], dtype=float32), array([781.73096], dtype=float32), array([781.8778], dtype=float32), array([780.94116], dtype=float32), array([781.78674], dtype=float32), array([781.7783], dtype=float32), array([780.9475], dtype=float32), array([781.78284], dtype=float32), array([781.00397], dtype=float32), array([780.9608], dtype=float32)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-10/error/ExactGaussianProcessRegressor_GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh_1.0.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lt17>
+Subject: Job 16481457: <semi-gp> in cluster <lila> Exited
+
+Job <semi-gp> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug 10 20:44:18 2020
+Job was executed on host(s) <12*lt17>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Mon Aug 10 23:33:56 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Mon Aug 10 23:33:56 2020
+Terminated at Tue Aug 11 06:24:04 2020
+Results reported at Tue Aug 11 06:24:04 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/semi_supervised/learning_curve_semi.py --n_epochs 251 --cuda --regressor_type ExactGaussianProcessRegressor --output /home/nguyenm5/coding/pinot/aug-10/arch-search --labeled_data moonshot --unlabeled_data moonshot_unlabeled_small --architecture GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh --volume 1.0 --start_epoch 0 --num_inducing_pts 20 --inner_opt_round 200 --semi --label_split 0.8 0.2
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   409839.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.97 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   24608 sec.
+    Turnaround time :                            34786 sec.
+
+The output (if any) follows:
+
+epoch loss arr
+[array([2015.353], dtype=float32), array([1989.1853], dtype=float32), array([1961.2654], dtype=float32), array([1932.8856], dtype=float32), array([1903.5709], dtype=float32), array([1875.19], dtype=float32), array([1844.4226], dtype=float32), array([1814.0762], dtype=float32), array([1781.9749], dtype=float32), array([1749.4818], dtype=float32), array([1717.7004], dtype=float32), array([1682.0901], dtype=float32), array([1651.2438], dtype=float32), array([1617.4602], dtype=float32), array([1584.2278], dtype=float32), array([1550.2941], dtype=float32), array([1517.8661], dtype=float32), array([1486.3894], dtype=float32), array([1455.4095], dtype=float32), array([1425.7958], dtype=float32), array([1398.4768], dtype=float32), array([1374.9795], dtype=float32), array([1352.9009], dtype=float32), array([1333.1394], dtype=float32), array([1318.4421], dtype=float32), array([1305.0195], dtype=float32), array([1295.4651], dtype=float32), array([1288.6536], dtype=float32), array([1284.177], dtype=float32), array([1277.4825], dtype=float32), array([1274.9993], dtype=float32), array([1270.4343], dtype=float32), array([1267.5697], dtype=float32), array([1262.9429], dtype=float32), array([1257.6959], dtype=float32), array([1250.6013], dtype=float32), array([1246.066], dtype=float32), array([1240.9697], dtype=float32), array([1234.004], dtype=float32), array([1229.2319], dtype=float32), array([1224.0304], dtype=float32), array([1218.8087], dtype=float32), array([1213.9055], dtype=float32), array([1210.4758], dtype=float32), array([1207.7031], dtype=float32), array([1205.8008], dtype=float32), array([1204.0842], dtype=float32), array([1202.3387], dtype=float32), array([1200.4285], dtype=float32), array([1198.8633], dtype=float32), array([1197.3325], dtype=float32), array([1196.1414], dtype=float32), array([1195.206], dtype=float32), array([1193.3291], dtype=float32), array([1191.1821], dtype=float32), array([1190.3784], dtype=float32), array([1187.6693], dtype=float32), array([1186.635], dtype=float32), array([1183.3489], dtype=float32), array([1183.2123], dtype=float32), array([1180.3325], dtype=float32), array([1179.2089], dtype=float32), array([1178.2058], dtype=float32), array([1176.7887], dtype=float32), array([1175.3883], dtype=float32), array([1174.9446], dtype=float32), array([1173.347], dtype=float32), array([1172.4138], dtype=float32), array([1171.1769], dtype=float32), array([1170.3875], dtype=float32), array([1169.0322], dtype=float32), array([1167.1285], dtype=float32), array([1166.0881], dtype=float32), array([1164.919], dtype=float32), array([1164.4097], dtype=float32), array([1162.4308], dtype=float32), array([1161.1335], dtype=float32), array([1160.6829], dtype=float32), array([1158.2515], dtype=float32), array([1158.2349], dtype=float32), array([1157.238], dtype=float32), array([1155.2468], dtype=float32), array([1155.0417], dtype=float32), array([1152.9783], dtype=float32), array([1151.0547], dtype=float32), array([1149.6998], dtype=float32), array([1147.6636], dtype=float32), array([1146.8477], dtype=float32), array([1143.8624], dtype=float32), array([1140.7823], dtype=float32), array([1138.9458], dtype=float32), array([1136.0297], dtype=float32), array([1132.9259], dtype=float32), array([1127.8539], dtype=float32), array([1124.056], dtype=float32), array([1119.581], dtype=float32), array([1115.6361], dtype=float32), array([1111.6104], dtype=float32), array([1107.9913], dtype=float32), array([1104.2216], dtype=float32), array([1098.2146], dtype=float32), array([1094.0273], dtype=float32), array([1090.4141], dtype=float32), array([1085.519], dtype=float32), array([1080.8724], dtype=float32), array([1076.6163], dtype=float32), array([1071.4263], dtype=float32), array([1066.3732], dtype=float32), array([1062.3162], dtype=float32), array([1057.3949], dtype=float32), array([1052.0791], dtype=float32), array([1047.6685], dtype=float32), array([1043.3762], dtype=float32), array([1038.3052], dtype=float32), array([1033.215], dtype=float32), array([1028.0355], dtype=float32), array([1023.0608], dtype=float32), array([1017.92834], dtype=float32), array([1013.23096], dtype=float32), array([1007.2842], dtype=float32), array([1002.8983], dtype=float32), array([997.5047], dtype=float32), array([992.4351], dtype=float32), array([987.31934], dtype=float32), array([981.7927], dtype=float32), array([976.41614], dtype=float32), array([971.6735], dtype=float32), array([966.8749], dtype=float32), array([961.32336], dtype=float32), array([956.82947], dtype=float32), array([952.75073], dtype=float32), array([949.1339], dtype=float32), array([945.2943], dtype=float32), array([942.22943], dtype=float32), array([939.3928], dtype=float32), array([937.5597], dtype=float32), array([935.10986], dtype=float32), array([933.70544], dtype=float32), array([932.3761], dtype=float32), array([931.04346], dtype=float32), array([929.8415], dtype=float32), array([928.8777], dtype=float32), array([928.5016], dtype=float32), array([926.29065], dtype=float32), array([926.044], dtype=float32), array([924.18823], dtype=float32), array([923.63306], dtype=float32), array([921.81775], dtype=float32), array([920.7708], dtype=float32), array([919.43066], dtype=float32), array([919.00635], dtype=float32), array([918.09607], dtype=float32), array([917.0405], dtype=float32), array([915.86206], dtype=float32), array([915.00903], dtype=float32), array([913.91644], dtype=float32), array([913.71094], dtype=float32), array([912.652], dtype=float32), array([912.089], dtype=float32), array([910.9408], dtype=float32), array([910.0665], dtype=float32), array([908.96466], dtype=float32), array([908.7213], dtype=float32), array([907.63434], dtype=float32), array([906.8872], dtype=float32), array([906.7787], dtype=float32), array([906.10925], dtype=float32), array([904.6061], dtype=float32), array([904.48627], dtype=float32), array([903.8011], dtype=float32), array([903.71814], dtype=float32), array([903.29285], dtype=float32), array([902.6665], dtype=float32), array([901.8026], dtype=float32), array([901.5047], dtype=float32), array([901.1844], dtype=float32), array([901.01135], dtype=float32), array([900.4293], dtype=float32), array([900.20886], dtype=float32), array([899.7842], dtype=float32), array([899.52374], dtype=float32), array([899.11475], dtype=float32), array([898.4896], dtype=float32), array([898.72095], dtype=float32), array([898.0546], dtype=float32), array([897.84485], dtype=float32), array([897.26013], dtype=float32), array([897.16907], dtype=float32), array([897.36005], dtype=float32), array([896.4906], dtype=float32), array([896.05676], dtype=float32), array([896.2916], dtype=float32), array([895.91754], dtype=float32), array([895.574], dtype=float32), array([895.1992], dtype=float32), array([894.82043], dtype=float32), array([894.4734], dtype=float32), array([893.774], dtype=float32), array([893.8425], dtype=float32), array([893.6367], dtype=float32), array([893.3946], dtype=float32), array([893.2085], dtype=float32), array([892.4618], dtype=float32), array([892.1902], dtype=float32), array([892.1167], dtype=float32), array([892.8756], dtype=float32), array([892.7469], dtype=float32), array([891.7162], dtype=float32), array([892.0942], dtype=float32), array([891.77686], dtype=float32), array([891.2201], dtype=float32), array([891.39685], dtype=float32), array([890.9745], dtype=float32), array([890.69934], dtype=float32), array([891.145], dtype=float32), array([889.7925], dtype=float32), array([890.4773], dtype=float32), array([890.0182], dtype=float32), array([890.00024], dtype=float32), array([890.2571], dtype=float32), array([890.2329], dtype=float32), array([890.16394], dtype=float32), array([889.3729], dtype=float32), array([889.0707], dtype=float32), array([889.4558], dtype=float32), array([888.5724], dtype=float32), array([889.0123], dtype=float32), array([889.0486], dtype=float32), array([888.6832], dtype=float32), array([888.82184], dtype=float32), array([888.10986], dtype=float32), array([888.4273], dtype=float32), array([888.2018], dtype=float32), array([887.99207], dtype=float32), array([887.831], dtype=float32), array([887.32007], dtype=float32), array([887.50806], dtype=float32), array([887.307], dtype=float32), array([887.19476], dtype=float32), array([887.0846], dtype=float32), array([886.302], dtype=float32), array([886.5366], dtype=float32), array([886.50635], dtype=float32), array([886.0585], dtype=float32), array([885.87], dtype=float32), array([885.73474], dtype=float32), array([885.5741], dtype=float32), array([885.7198], dtype=float32), array([885.3111], dtype=float32), array([884.7676], dtype=float32), array([884.61426], dtype=float32)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-10/error/ExactGaussianProcessRegressor_GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh_1.0.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lu02>
+Subject: Job 16481452: <semi-gp> in cluster <lila> Exited
+
+Job <semi-gp> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug 10 20:44:18 2020
+Job was executed on host(s) <12*lu02>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Tue Aug 11 03:59:41 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Tue Aug 11 03:59:41 2020
+Terminated at Tue Aug 11 10:14:45 2020
+Results reported at Tue Aug 11 10:14:45 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/semi_supervised/learning_curve_semi.py --n_epochs 251 --cuda --regressor_type ExactGaussianProcessRegressor --output /home/nguyenm5/coding/pinot/aug-10/arch-search --labeled_data moonshot --unlabeled_data moonshot_unlabeled_small --architecture GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh --volume 1.0 --start_epoch 0 --num_inducing_pts 20 --inner_opt_round 200 --semi --label_split 0.3 0.7
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   337563.00 sec.
+    Max Memory :                                 3 GB
+    Average Memory :                             2.33 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               189.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   22505 sec.
+    Turnaround time :                            48627 sec.
+
+The output (if any) follows:
+
+epoch loss arr
+[array([853.1796], dtype=float32), array([847.15845], dtype=float32), array([841.36676], dtype=float32), array([835.86304], dtype=float32), array([830.8645], dtype=float32), array([826.08997], dtype=float32), array([821.7532], dtype=float32), array([817.6131], dtype=float32), array([813.8335], dtype=float32), array([810.08813], dtype=float32), array([806.7425], dtype=float32), array([803.5928], dtype=float32), array([800.61725], dtype=float32), array([797.7482], dtype=float32), array([795.00574], dtype=float32), array([792.4656], dtype=float32), array([790.11707], dtype=float32), array([787.7414], dtype=float32), array([785.53217], dtype=float32), array([783.53125], dtype=float32), array([781.41626], dtype=float32), array([779.5123], dtype=float32), array([777.7333], dtype=float32), array([775.9722], dtype=float32), array([774.2764], dtype=float32), array([772.66754], dtype=float32), array([771.0636], dtype=float32), array([769.6289], dtype=float32), array([768.17065], dtype=float32), array([766.77765], dtype=float32), array([765.4119], dtype=float32), array([764.1548], dtype=float32), array([762.9324], dtype=float32), array([761.65326], dtype=float32), array([760.5609], dtype=float32), array([759.4546], dtype=float32), array([758.4127], dtype=float32), array([757.32245], dtype=float32), array([756.328], dtype=float32), array([755.34717], dtype=float32), array([754.37286], dtype=float32), array([753.57263], dtype=float32), array([752.6326], dtype=float32), array([751.7104], dtype=float32), array([750.8023], dtype=float32), array([750.0408], dtype=float32), array([749.125], dtype=float32), array([748.33124], dtype=float32), array([747.5799], dtype=float32), array([746.74927], dtype=float32), array([745.99115], dtype=float32), array([745.23047], dtype=float32), array([744.46136], dtype=float32), array([743.6462], dtype=float32), array([743.0214], dtype=float32), array([742.41956], dtype=float32), array([741.7365], dtype=float32), array([740.9496], dtype=float32), array([740.2731], dtype=float32), array([739.51715], dtype=float32), array([738.8988], dtype=float32), array([738.2927], dtype=float32), array([737.58844], dtype=float32), array([737.0266], dtype=float32), array([736.3345], dtype=float32), array([735.7369], dtype=float32), array([735.0031], dtype=float32), array([734.53424], dtype=float32), array([733.7766], dtype=float32), array([733.1368], dtype=float32), array([732.5869], dtype=float32), array([731.97815], dtype=float32), array([731.2769], dtype=float32), array([730.6971], dtype=float32), array([729.9957], dtype=float32), array([729.4979], dtype=float32), array([728.9206], dtype=float32), array([728.24084], dtype=float32), array([727.8108], dtype=float32), array([727.1592], dtype=float32), array([726.7129], dtype=float32), array([726.1753], dtype=float32), array([725.5945], dtype=float32), array([725.07904], dtype=float32), array([724.703], dtype=float32), array([724.08044], dtype=float32), array([723.6856], dtype=float32), array([723.0048], dtype=float32), array([722.6776], dtype=float32), array([722.1682], dtype=float32), array([721.81415], dtype=float32), array([721.3259], dtype=float32), array([720.8976], dtype=float32), array([720.4413], dtype=float32), array([720.2479], dtype=float32), array([719.71375], dtype=float32), array([719.398], dtype=float32), array([718.97766], dtype=float32), array([718.6138], dtype=float32), array([718.18164], dtype=float32), array([717.81104], dtype=float32), array([717.36774], dtype=float32), array([717.0185], dtype=float32), array([716.7001], dtype=float32), array([716.3473], dtype=float32), array([716.0315], dtype=float32), array([715.7022], dtype=float32), array([715.34766], dtype=float32), array([715.072], dtype=float32), array([714.6895], dtype=float32), array([714.3175], dtype=float32), array([714.03955], dtype=float32), array([713.6776], dtype=float32), array([713.3785], dtype=float32), array([712.9734], dtype=float32), array([712.5248], dtype=float32), array([712.0657], dtype=float32), array([711.4028], dtype=float32), array([710.23755], dtype=float32), array([707.71814], dtype=float32), array([703.30945], dtype=float32), array([696.7207], dtype=float32), array([688.7911], dtype=float32), array([679.7539], dtype=float32), array([669.53064], dtype=float32), array([658.812], dtype=float32), array([646.3684], dtype=float32), array([633.0896], dtype=float32), array([619.01843], dtype=float32), array([603.42175], dtype=float32), array([586.9962], dtype=float32), array([569.2273], dtype=float32), array([550.1177], dtype=float32), array([529.61664], dtype=float32), array([508.46912], dtype=float32), array([486.4402], dtype=float32), array([463.50928], dtype=float32), array([440.80722], dtype=float32), array([418.63272], dtype=float32), array([397.54413], dtype=float32), array([380.70685], dtype=float32), array([367.7467], dtype=float32), array([360.26193], dtype=float32), array([357.44925], dtype=float32), array([358.32028], dtype=float32), array([361.30994], dtype=float32), array([364.80862], dtype=float32), array([367.71063], dtype=float32), array([370.00284], dtype=float32), array([370.2619], dtype=float32), array([368.60022], dtype=float32), array([366.1499], dtype=float32), array([362.74686], dtype=float32), array([358.5796], dtype=float32), array([354.21814], dtype=float32), array([350.78146], dtype=float32), array([347.5121], dtype=float32), array([345.35382], dtype=float32), array([343.85004], dtype=float32), array([343.76605], dtype=float32), array([344.3075], dtype=float32), array([344.74026], dtype=float32), array([345.35596], dtype=float32), array([345.52454], dtype=float32), array([345.4253], dtype=float32), array([345.03864], dtype=float32), array([344.0537], dtype=float32), array([342.89117], dtype=float32), array([341.87488], dtype=float32), array([340.8667], dtype=float32), array([339.98083], dtype=float32), array([339.01065], dtype=float32), array([338.4926], dtype=float32), array([338.0444], dtype=float32), array([337.69952], dtype=float32), array([337.60974], dtype=float32), array([337.61578], dtype=float32), array([337.44553], dtype=float32), array([337.3202], dtype=float32), array([337.35156], dtype=float32), array([336.9482], dtype=float32), array([336.93762], dtype=float32), array([336.4035], dtype=float32), array([336.10266], dtype=float32), array([335.74884], dtype=float32), array([335.47968], dtype=float32), array([335.18396], dtype=float32), array([334.87485], dtype=float32), array([334.66565], dtype=float32), array([334.58154], dtype=float32), array([334.63745], dtype=float32), array([334.30756], dtype=float32), array([334.37274], dtype=float32), array([334.1048], dtype=float32), array([333.99933], dtype=float32), array([333.8072], dtype=float32), array([333.79648], dtype=float32), array([333.42883], dtype=float32), array([333.33655], dtype=float32), array([333.1698], dtype=float32), array([332.94485], dtype=float32), array([332.87994], dtype=float32), array([332.66455], dtype=float32), array([332.654], dtype=float32), array([332.4253], dtype=float32), array([332.46484], dtype=float32), array([332.3806], dtype=float32), array([332.388], dtype=float32), array([332.03513], dtype=float32), array([332.02795], dtype=float32), array([332.0443], dtype=float32), array([331.89075], dtype=float32), array([331.70343], dtype=float32), array([331.67188], dtype=float32), array([331.61707], dtype=float32), array([331.3659], dtype=float32), array([331.28552], dtype=float32), array([331.41058], dtype=float32), array([331.95697], dtype=float32), array([331.39014], dtype=float32), array([331.1443], dtype=float32), array([331.1419], dtype=float32), array([331.0117], dtype=float32), array([330.79428], dtype=float32), array([330.9278], dtype=float32), array([330.80865], dtype=float32), array([330.75174], dtype=float32), array([330.815], dtype=float32), array([330.53787], dtype=float32), array([330.5478], dtype=float32), array([330.49976], dtype=float32), array([330.37195], dtype=float32), array([330.37766], dtype=float32), array([330.45056], dtype=float32), array([330.39813], dtype=float32), array([330.20493], dtype=float32), array([330.09625], dtype=float32), array([330.13715], dtype=float32), array([330.0677], dtype=float32), array([330.0358], dtype=float32), array([329.86258], dtype=float32), array([330.07794], dtype=float32), array([329.87662], dtype=float32), array([329.81488], dtype=float32), array([330.09192], dtype=float32), array([329.86517], dtype=float32), array([329.55048], dtype=float32), array([329.73517], dtype=float32), array([329.6657], dtype=float32), array([329.98767], dtype=float32), array([329.56186], dtype=float32)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-10/error/ExactGaussianProcessRegressor_GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh_1.0.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lu09>
+Subject: Job 16481454: <semi-gp> in cluster <lila> Exited
+
+Job <semi-gp> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug 10 20:44:18 2020
+Job was executed on host(s) <12*lu09>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Tue Aug 11 05:30:14 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Tue Aug 11 05:30:14 2020
+Terminated at Tue Aug 11 11:45:14 2020
+Results reported at Tue Aug 11 11:45:14 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/semi_supervised/learning_curve_semi.py --n_epochs 251 --cuda --regressor_type ExactGaussianProcessRegressor --output /home/nguyenm5/coding/pinot/aug-10/arch-search --labeled_data moonshot --unlabeled_data moonshot_unlabeled_small --architecture GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh --volume 1.0 --start_epoch 0 --num_inducing_pts 20 --inner_opt_round 200 --semi --label_split 0.5 0.5
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   366557.00 sec.
+    Max Memory :                                 3 GB
+    Average Memory :                             2.97 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               189.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   22499 sec.
+    Turnaround time :                            54056 sec.
+
+The output (if any) follows:
+
+epoch loss arr
+[array([1453.2594], dtype=float32), array([1431.7844], dtype=float32), array([1411.3887], dtype=float32), array([1392.7415], dtype=float32), array([1374.158], dtype=float32), array([1357.361], dtype=float32), array([1341.3256], dtype=float32), array([1325.921], dtype=float32), array([1311.4353], dtype=float32), array([1297.513], dtype=float32), array([1284.2595], dtype=float32), array([1271.6885], dtype=float32), array([1258.924], dtype=float32), array([1246.8215], dtype=float32), array([1234.4452], dtype=float32), array([1221.9828], dtype=float32), array([1209.4253], dtype=float32), array([1196.8397], dtype=float32), array([1184.1487], dtype=float32), array([1170.842], dtype=float32), array([1156.977], dtype=float32), array([1142.7173], dtype=float32), array([1127.5054], dtype=float32), array([1111.4731], dtype=float32), array([1095.164], dtype=float32), array([1078.5793], dtype=float32), array([1060.2544], dtype=float32), array([1043.0558], dtype=float32), array([1023.7821], dtype=float32), array([1004.52997], dtype=float32), array([984.5594], dtype=float32), array([964.1106], dtype=float32), array([944.9757], dtype=float32), array([925.73676], dtype=float32), array([907.37866], dtype=float32), array([889.2385], dtype=float32), array([872.82184], dtype=float32), array([857.8448], dtype=float32), array([845.65454], dtype=float32), array([835.23083], dtype=float32), array([827.07544], dtype=float32), array([820.9783], dtype=float32), array([815.8121], dtype=float32), array([811.57764], dtype=float32), array([810.2262], dtype=float32), array([808.0247], dtype=float32), array([806.3819], dtype=float32), array([806.13257], dtype=float32), array([803.8086], dtype=float32), array([802.53516], dtype=float32), array([799.19104], dtype=float32), array([797.1009], dtype=float32), array([793.3639], dtype=float32), array([789.0464], dtype=float32), array([786.10364], dtype=float32), array([782.2543], dtype=float32), array([778.978], dtype=float32), array([776.0569], dtype=float32), array([773.9855], dtype=float32), array([770.97156], dtype=float32), array([768.1897], dtype=float32), array([766.5237], dtype=float32), array([763.9506], dtype=float32), array([762.68396], dtype=float32), array([760.3866], dtype=float32), array([759.02576], dtype=float32), array([758.08044], dtype=float32), array([756.3209], dtype=float32), array([754.86145], dtype=float32), array([753.80334], dtype=float32), array([752.4441], dtype=float32), array([750.2258], dtype=float32), array([748.96375], dtype=float32), array([746.5639], dtype=float32), array([745.4241], dtype=float32), array([743.7949], dtype=float32), array([742.3054], dtype=float32), array([740.5536], dtype=float32), array([738.7346], dtype=float32), array([737.2485], dtype=float32), array([735.57385], dtype=float32), array([733.9552], dtype=float32), array([732.9253], dtype=float32), array([731.31067], dtype=float32), array([730.02563], dtype=float32), array([728.9724], dtype=float32), array([727.89014], dtype=float32), array([727.50793], dtype=float32), array([725.9776], dtype=float32), array([724.69507], dtype=float32), array([723.89124], dtype=float32), array([722.4828], dtype=float32), array([721.6572], dtype=float32), array([720.1273], dtype=float32), array([719.3653], dtype=float32), array([718.73706], dtype=float32), array([717.06274], dtype=float32), array([716.4435], dtype=float32), array([715.2353], dtype=float32), array([713.88336], dtype=float32), array([713.75055], dtype=float32), array([712.6299], dtype=float32), array([712.035], dtype=float32), array([710.73047], dtype=float32), array([709.5963], dtype=float32), array([708.5915], dtype=float32), array([707.23956], dtype=float32), array([707.10925], dtype=float32), array([705.673], dtype=float32), array([704.74207], dtype=float32), array([702.689], dtype=float32), array([701.0072], dtype=float32), array([699.18726], dtype=float32), array([697.7184], dtype=float32), array([695.43665], dtype=float32), array([692.7206], dtype=float32), array([690.33655], dtype=float32), array([687.9645], dtype=float32), array([684.957], dtype=float32), array([682.42584], dtype=float32), array([679.9603], dtype=float32), array([676.6754], dtype=float32), array([673.52527], dtype=float32), array([670.6245], dtype=float32), array([667.76843], dtype=float32), array([664.1218], dtype=float32), array([661.0698], dtype=float32), array([657.72266], dtype=float32), array([654.7389], dtype=float32), array([651.04443], dtype=float32), array([648.16125], dtype=float32), array([644.3513], dtype=float32), array([640.7848], dtype=float32), array([637.00806], dtype=float32), array([633.53125], dtype=float32), array([630.1411], dtype=float32), array([626.3884], dtype=float32), array([622.3971], dtype=float32), array([618.38916], dtype=float32), array([615.1107], dtype=float32), array([611.3676], dtype=float32), array([607.80396], dtype=float32), array([604.22974], dtype=float32), array([600.99194], dtype=float32), array([598.0754], dtype=float32), array([595.24115], dtype=float32), array([592.4426], dtype=float32), array([589.6029], dtype=float32), array([587.96155], dtype=float32), array([586.0272], dtype=float32), array([584.83167], dtype=float32), array([584.14526], dtype=float32), array([582.7638], dtype=float32), array([582.3167], dtype=float32), array([581.6808], dtype=float32), array([581.53357], dtype=float32), array([580.8353], dtype=float32), array([580.7398], dtype=float32), array([580.28284], dtype=float32), array([579.5586], dtype=float32), array([579.02386], dtype=float32), array([578.5202], dtype=float32), array([578.4429], dtype=float32), array([577.8991], dtype=float32), array([577.4048], dtype=float32), array([577.00183], dtype=float32), array([575.8423], dtype=float32), array([575.82184], dtype=float32), array([575.09467], dtype=float32), array([574.4308], dtype=float32), array([573.6397], dtype=float32), array([573.1786], dtype=float32), array([572.95764], dtype=float32), array([572.46277], dtype=float32), array([572.5859], dtype=float32), array([571.85376], dtype=float32), array([571.9923], dtype=float32), array([571.8965], dtype=float32), array([571.03864], dtype=float32), array([570.3337], dtype=float32), array([570.4423], dtype=float32), array([570.0812], dtype=float32), array([569.9853], dtype=float32), array([569.7172], dtype=float32), array([569.3407], dtype=float32), array([568.5817], dtype=float32), array([568.51135], dtype=float32), array([568.3999], dtype=float32), array([568.4656], dtype=float32), array([567.82166], dtype=float32), array([567.6422], dtype=float32), array([567.22687], dtype=float32), array([567.4449], dtype=float32), array([566.89087], dtype=float32), array([566.74176], dtype=float32), array([566.7393], dtype=float32), array([566.17444], dtype=float32), array([566.30225], dtype=float32), array([566.02423], dtype=float32), array([565.69025], dtype=float32), array([565.4869], dtype=float32), array([565.4663], dtype=float32), array([565.14294], dtype=float32), array([565.0921], dtype=float32), array([564.744], dtype=float32), array([564.5462], dtype=float32), array([564.20874], dtype=float32), array([564.58374], dtype=float32), array([563.8873], dtype=float32), array([563.9204], dtype=float32), array([563.5469], dtype=float32), array([563.69055], dtype=float32), array([563.8596], dtype=float32), array([563.4272], dtype=float32), array([563.4156], dtype=float32), array([563.1846], dtype=float32), array([562.8365], dtype=float32), array([562.68634], dtype=float32), array([562.5342], dtype=float32), array([562.4328], dtype=float32), array([562.72485], dtype=float32), array([562.4037], dtype=float32), array([562.19495], dtype=float32), array([561.8346], dtype=float32), array([561.7384], dtype=float32), array([561.4667], dtype=float32), array([561.5758], dtype=float32), array([561.6206], dtype=float32), array([561.50354], dtype=float32), array([561.39276], dtype=float32), array([561.04785], dtype=float32), array([561.33673], dtype=float32), array([561.1907], dtype=float32), array([560.7135], dtype=float32), array([560.4729], dtype=float32), array([560.41235], dtype=float32), array([560.1953], dtype=float32), array([560.4655], dtype=float32), array([560.42676], dtype=float32), array([560.45264], dtype=float32), array([560.59033], dtype=float32), array([560.2849], dtype=float32), array([560.81506], dtype=float32), array([560.7351], dtype=float32), array([560.5254], dtype=float32), array([560.0404], dtype=float32), array([560.54395], dtype=float32), array([560.2022], dtype=float32), array([559.80273], dtype=float32), array([559.89764], dtype=float32), array([559.54175], dtype=float32)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-10/error/ExactGaussianProcessRegressor_GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh_1.0.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lt21>
+Subject: Job 16481452: <semi-gp> in cluster <lila> Exited
+
+Job <semi-gp> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug 10 20:44:18 2020
+Job was executed on host(s) <12*lt21>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Tue Aug 11 10:14:54 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Tue Aug 11 10:14:54 2020
+Terminated at Tue Aug 11 16:23:59 2020
+Results reported at Tue Aug 11 16:23:59 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/semi_supervised/learning_curve_semi.py --n_epochs 251 --cuda --regressor_type ExactGaussianProcessRegressor --output /home/nguyenm5/coding/pinot/aug-10/arch-search --labeled_data moonshot --unlabeled_data moonshot_unlabeled_small --architecture GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh --volume 1.0 --start_epoch 0 --num_inducing_pts 20 --inner_opt_round 200 --semi --label_split 0.3 0.7
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   337104.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.97 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   22144 sec.
+    Turnaround time :                            70781 sec.
+
+The output (if any) follows:
+
+epoch loss arr
+[array([898.50287], dtype=float32), array([880.7676], dtype=float32), array([864.37134], dtype=float32), array([848.23846], dtype=float32), array([834.477], dtype=float32), array([820.0967], dtype=float32), array([807.1849], dtype=float32), array([794.71277], dtype=float32), array([783.1318], dtype=float32), array([771.71936], dtype=float32), array([760.7707], dtype=float32), array([750.7613], dtype=float32), array([740.2079], dtype=float32), array([730.45154], dtype=float32), array([720.52576], dtype=float32), array([710.9587], dtype=float32), array([700.7639], dtype=float32), array([690.8032], dtype=float32), array([680.5329], dtype=float32), array([670.63635], dtype=float32), array([659.5659], dtype=float32), array([649.4509], dtype=float32), array([638.7018], dtype=float32), array([627.6478], dtype=float32), array([617.4935], dtype=float32), array([606.62445], dtype=float32), array([595.4541], dtype=float32), array([585.1481], dtype=float32), array([575.3699], dtype=float32), array([565.1666], dtype=float32), array([555.7774], dtype=float32), array([547.61005], dtype=float32), array([539.80853], dtype=float32), array([532.29193], dtype=float32), array([525.8814], dtype=float32), array([521.30646], dtype=float32), array([516.31665], dtype=float32), array([512.5667], dtype=float32), array([510.20944], dtype=float32), array([507.84076], dtype=float32), array([506.03064], dtype=float32), array([503.74603], dtype=float32), array([502.16577], dtype=float32), array([500.50006], dtype=float32), array([498.58737], dtype=float32), array([496.50174], dtype=float32), array([494.21362], dtype=float32), array([491.7962], dtype=float32), array([489.78577], dtype=float32), array([486.66925], dtype=float32), array([483.9556], dtype=float32), array([481.91754], dtype=float32), array([479.70697], dtype=float32), array([477.17508], dtype=float32), array([475.0157], dtype=float32), array([473.49945], dtype=float32), array([470.9997], dtype=float32), array([469.30344], dtype=float32), array([467.42133], dtype=float32), array([466.16614], dtype=float32), array([464.84723], dtype=float32), array([463.57632], dtype=float32), array([461.83688], dtype=float32), array([460.55865], dtype=float32), array([458.8652], dtype=float32), array([457.30182], dtype=float32), array([456.13794], dtype=float32), array([454.40137], dtype=float32), array([452.671], dtype=float32), array([451.64343], dtype=float32), array([450.02246], dtype=float32), array([448.8594], dtype=float32), array([447.27658], dtype=float32), array([445.94894], dtype=float32), array([444.26447], dtype=float32), array([443.01434], dtype=float32), array([442.15625], dtype=float32), array([440.7544], dtype=float32), array([439.7682], dtype=float32), array([437.84164], dtype=float32), array([437.0092], dtype=float32), array([435.98065], dtype=float32), array([434.91772], dtype=float32), array([434.22778], dtype=float32), array([432.9298], dtype=float32), array([431.88864], dtype=float32), array([431.0171], dtype=float32), array([429.9803], dtype=float32), array([429.00287], dtype=float32), array([428.21613], dtype=float32), array([427.07587], dtype=float32), array([426.04764], dtype=float32), array([425.08417], dtype=float32), array([423.91284], dtype=float32), array([422.69672], dtype=float32), array([421.30057], dtype=float32), array([420.1297], dtype=float32), array([418.57687], dtype=float32), array([416.68185], dtype=float32), array([415.49048], dtype=float32), array([414.04523], dtype=float32), array([411.9037], dtype=float32), array([410.22992], dtype=float32), array([407.97632], dtype=float32), array([406.0033], dtype=float32), array([404.4034], dtype=float32), array([402.42523], dtype=float32), array([400.69147], dtype=float32), array([398.38837], dtype=float32), array([396.21216], dtype=float32), array([394.23114], dtype=float32), array([392.5564], dtype=float32), array([390.3217], dtype=float32), array([388.55634], dtype=float32), array([386.37756], dtype=float32), array([384.1195], dtype=float32), array([382.43982], dtype=float32), array([380.17047], dtype=float32), array([377.74164], dtype=float32), array([376.0291], dtype=float32), array([373.7514], dtype=float32), array([371.61264], dtype=float32), array([369.79694], dtype=float32), array([367.32233], dtype=float32), array([365.05768], dtype=float32), array([363.00922], dtype=float32), array([361.41193], dtype=float32), array([359.34558], dtype=float32), array([357.44214], dtype=float32), array([355.37018], dtype=float32), array([353.67282], dtype=float32), array([351.7597], dtype=float32), array([350.16086], dtype=float32), array([348.57135], dtype=float32), array([347.20602], dtype=float32), array([345.7813], dtype=float32), array([344.61896], dtype=float32), array([343.54742], dtype=float32), array([342.86023], dtype=float32), array([342.02258], dtype=float32), array([341.63263], dtype=float32), array([341.25418], dtype=float32), array([340.70312], dtype=float32), array([340.6015], dtype=float32), array([340.25476], dtype=float32), array([339.99976], dtype=float32), array([339.89154], dtype=float32), array([339.638], dtype=float32), array([339.491], dtype=float32), array([339.26776], dtype=float32), array([339.01004], dtype=float32), array([338.6485], dtype=float32), array([338.25854], dtype=float32), array([338.1375], dtype=float32), array([337.69763], dtype=float32), array([337.49704], dtype=float32), array([337.1568], dtype=float32), array([336.89795], dtype=float32), array([336.70886], dtype=float32), array([336.43903], dtype=float32), array([336.32135], dtype=float32), array([336.06284], dtype=float32), array([336.03534], dtype=float32), array([335.96063], dtype=float32), array([335.79736], dtype=float32), array([335.7684], dtype=float32), array([335.57843], dtype=float32), array([335.44794], dtype=float32), array([335.39435], dtype=float32), array([335.1852], dtype=float32), array([334.88522], dtype=float32), array([334.8249], dtype=float32), array([335.01794], dtype=float32), array([334.63525], dtype=float32), array([334.776], dtype=float32), array([334.4043], dtype=float32), array([334.456], dtype=float32), array([334.47195], dtype=float32), array([334.15485], dtype=float32), array([334.0337], dtype=float32), array([334.15393], dtype=float32), array([334.05005], dtype=float32), array([334.05563], dtype=float32), array([333.9427], dtype=float32), array([333.74542], dtype=float32), array([333.8266], dtype=float32), array([333.73236], dtype=float32), array([333.5263], dtype=float32), array([333.52136], dtype=float32), array([333.5741], dtype=float32), array([333.4032], dtype=float32), array([333.23956], dtype=float32), array([333.2223], dtype=float32), array([333.3515], dtype=float32), array([333.2035], dtype=float32), array([332.9141], dtype=float32), array([332.91516], dtype=float32), array([333.12354], dtype=float32), array([332.87762], dtype=float32), array([332.92233], dtype=float32), array([332.73737], dtype=float32), array([332.61786], dtype=float32), array([332.749], dtype=float32), array([332.43896], dtype=float32), array([332.4887], dtype=float32), array([332.29788], dtype=float32), array([332.4651], dtype=float32), array([332.484], dtype=float32), array([332.123], dtype=float32), array([332.2532], dtype=float32), array([332.02844], dtype=float32), array([332.20395], dtype=float32), array([332.3957], dtype=float32), array([332.23642], dtype=float32), array([332.11646], dtype=float32), array([331.83746], dtype=float32), array([331.8487], dtype=float32), array([331.94693], dtype=float32), array([331.75024], dtype=float32), array([331.8176], dtype=float32), array([331.72626], dtype=float32), array([331.6745], dtype=float32), array([331.55017], dtype=float32), array([331.63638], dtype=float32), array([331.49356], dtype=float32), array([331.60004], dtype=float32), array([331.60422], dtype=float32), array([331.4101], dtype=float32), array([331.39758], dtype=float32), array([331.37262], dtype=float32), array([331.2784], dtype=float32), array([331.29395], dtype=float32), array([331.201], dtype=float32), array([331.16095], dtype=float32), array([331.0163], dtype=float32), array([331.03857], dtype=float32), array([331.12158], dtype=float32), array([331.00714], dtype=float32), array([330.92255], dtype=float32), array([330.98483], dtype=float32), array([330.9809], dtype=float32), array([330.93402], dtype=float32), array([330.9654], dtype=float32), array([331.04285], dtype=float32), array([331.13422], dtype=float32), array([330.7649], dtype=float32), array([330.8326], dtype=float32), array([330.76468], dtype=float32), array([331.0243], dtype=float32), array([330.67157], dtype=float32), array([330.497], dtype=float32)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-10/error/ExactGaussianProcessRegressor_GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh_1.0.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls01>
+Subject: Job 16481454: <semi-gp> in cluster <lila> Exited
+
+Job <semi-gp> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Mon Aug 10 20:44:18 2020
+Job was executed on host(s) <12*ls01>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Tue Aug 11 11:51:22 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Tue Aug 11 11:51:22 2020
+Terminated at Tue Aug 11 17:59:55 2020
+Results reported at Tue Aug 11 17:59:55 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/semi_supervised/learning_curve_semi.py --n_epochs 251 --cuda --regressor_type ExactGaussianProcessRegressor --output /home/nguyenm5/coding/pinot/aug-10/arch-search --labeled_data moonshot --unlabeled_data moonshot_unlabeled_small --architecture GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh --volume 1.0 --start_epoch 0 --num_inducing_pts 20 --inner_opt_round 200 --semi --label_split 0.5 0.5
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   367765.00 sec.
+    Max Memory :                                 2 GB
+    Average Memory :                             1.98 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               190.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   22114 sec.
+    Turnaround time :                            76537 sec.
+
+The output (if any) follows:
+
+epoch loss arr
+[array([1483.6135], dtype=float32), array([1470.4133], dtype=float32), array([1457.8184], dtype=float32), array([1446.087], dtype=float32), array([1435.5592], dtype=float32), array([1425.5188], dtype=float32), array([1416.0884], dtype=float32), array([1407.5947], dtype=float32), array([1398.983], dtype=float32), array([1391.2118], dtype=float32), array([1383.9406], dtype=float32), array([1377.2749], dtype=float32), array([1370.852], dtype=float32), array([1365.2014], dtype=float32), array([1359.3849], dtype=float32), array([1354.1576], dtype=float32), array([1349.2239], dtype=float32), array([1344.4725], dtype=float32), array([1340.111], dtype=float32), array([1335.9658], dtype=float32), array([1332.1687], dtype=float32), array([1328.3907], dtype=float32), array([1325.0442], dtype=float32), array([1321.7556], dtype=float32), array([1318.7317], dtype=float32), array([1315.9144], dtype=float32), array([1313.1921], dtype=float32), array([1310.6235], dtype=float32), array([1308.2075], dtype=float32), array([1305.9465], dtype=float32), array([1303.8687], dtype=float32), array([1301.9158], dtype=float32), array([1300.0287], dtype=float32), array([1298.258], dtype=float32), array([1296.6627], dtype=float32), array([1295.1101], dtype=float32), array([1293.6765], dtype=float32), array([1292.2179], dtype=float32), array([1290.9199], dtype=float32), array([1289.7009], dtype=float32), array([1288.4998], dtype=float32), array([1287.352], dtype=float32), array([1286.2466], dtype=float32), array([1285.1935], dtype=float32), array([1284.0814], dtype=float32), array([1282.9928], dtype=float32), array([1281.8602], dtype=float32), array([1280.6611], dtype=float32), array([1279.2852], dtype=float32), array([1277.6495], dtype=float32), array([1275.6294], dtype=float32), array([1273.1998], dtype=float32), array([1270.0842], dtype=float32), array([1266.1715], dtype=float32), array([1261.8558], dtype=float32), array([1256.7874], dtype=float32), array([1250.9946], dtype=float32), array([1244.912], dtype=float32), array([1238.0867], dtype=float32), array([1231.2769], dtype=float32), array([1223.6428], dtype=float32), array([1215.4749], dtype=float32), array([1206.6713], dtype=float32), array([1197.6111], dtype=float32), array([1188.0632], dtype=float32), array([1176.7349], dtype=float32), array([1165.6417], dtype=float32), array([1153.439], dtype=float32), array([1140.1073], dtype=float32), array([1125.5444], dtype=float32), array([1109.7288], dtype=float32), array([1093.119], dtype=float32), array([1075.2767], dtype=float32), array([1055.7838], dtype=float32), array([1035.2421], dtype=float32), array([1012.136], dtype=float32), array([989.3816], dtype=float32), array([965.1865], dtype=float32), array([938.9471], dtype=float32), array([912.5215], dtype=float32), array([885.9407], dtype=float32), array([858.95593], dtype=float32), array([834.60736], dtype=float32), array([810.8523], dtype=float32), array([790.60034], dtype=float32), array([771.5685], dtype=float32), array([757.68176], dtype=float32), array([746.4984], dtype=float32), array([739.0148], dtype=float32), array([734.04517], dtype=float32), array([732.5093], dtype=float32), array([731.2588], dtype=float32), array([731.3218], dtype=float32), array([730.66846], dtype=float32), array([728.964], dtype=float32), array([727.88324], dtype=float32), array([724.70856], dtype=float32), array([720.90295], dtype=float32), array([716.935], dtype=float32), array([710.5215], dtype=float32), array([703.5801], dtype=float32), array([697.90985], dtype=float32), array([691.8978], dtype=float32), array([686.29596], dtype=float32), array([681.0718], dtype=float32), array([675.70624], dtype=float32), array([670.59875], dtype=float32), array([667.0807], dtype=float32), array([663.01074], dtype=float32), array([659.73047], dtype=float32), array([656.61053], dtype=float32), array([653.7419], dtype=float32), array([651.4984], dtype=float32), array([648.8833], dtype=float32), array([646.241], dtype=float32), array([643.4326], dtype=float32), array([640.71643], dtype=float32), array([638.3702], dtype=float32), array([635.5112], dtype=float32), array([632.8263], dtype=float32), array([629.7179], dtype=float32), array([626.05286], dtype=float32), array([623.1837], dtype=float32), array([620.03156], dtype=float32), array([617.28973], dtype=float32), array([614.0657], dtype=float32), array([610.93567], dtype=float32), array([608.7849], dtype=float32), array([605.6756], dtype=float32), array([604.2334], dtype=float32), array([601.43835], dtype=float32), array([599.1034], dtype=float32), array([597.43225], dtype=float32), array([595.31665], dtype=float32), array([593.3976], dtype=float32), array([592.295], dtype=float32), array([591.1843], dtype=float32), array([589.307], dtype=float32), array([588.0232], dtype=float32), array([587.7215], dtype=float32), array([586.416], dtype=float32), array([585.7455], dtype=float32), array([585.03723], dtype=float32), array([584.5008], dtype=float32), array([583.8248], dtype=float32), array([583.7549], dtype=float32), array([583.1382], dtype=float32), array([583.19775], dtype=float32), array([582.184], dtype=float32), array([581.53516], dtype=float32), array([581.64935], dtype=float32), array([581.5709], dtype=float32), array([581.1145], dtype=float32), array([580.19116], dtype=float32), array([580.54846], dtype=float32), array([580.5243], dtype=float32), array([579.72156], dtype=float32), array([579.2379], dtype=float32), array([579.4619], dtype=float32), array([579.0233], dtype=float32), array([579.27466], dtype=float32), array([578.8544], dtype=float32), array([578.7523], dtype=float32), array([578.2426], dtype=float32), array([578.4114], dtype=float32), array([577.8685], dtype=float32), array([577.76324], dtype=float32), array([577.5585], dtype=float32), array([577.0936], dtype=float32), array([577.30005], dtype=float32), array([577.49365], dtype=float32), array([576.967], dtype=float32), array([576.8643], dtype=float32), array([576.86847], dtype=float32), array([576.7897], dtype=float32), array([576.26245], dtype=float32), array([576.3868], dtype=float32), array([575.73315], dtype=float32), array([575.9876], dtype=float32), array([575.9172], dtype=float32), array([575.59924], dtype=float32), array([575.3949], dtype=float32), array([575.35077], dtype=float32), array([575.38574], dtype=float32), array([574.9246], dtype=float32), array([574.7677], dtype=float32), array([575.05005], dtype=float32), array([574.44336], dtype=float32), array([574.5686], dtype=float32), array([574.2388], dtype=float32), array([574.17645], dtype=float32), array([573.8982], dtype=float32), array([573.59076], dtype=float32), array([574.04205], dtype=float32), array([573.6931], dtype=float32), array([573.3581], dtype=float32), array([573.32874], dtype=float32), array([573.4595], dtype=float32), array([573.54], dtype=float32), array([572.9919], dtype=float32), array([572.9349], dtype=float32), array([572.94635], dtype=float32), array([572.47266], dtype=float32), array([572.54724], dtype=float32), array([572.37305], dtype=float32), array([572.48395], dtype=float32), array([571.9589], dtype=float32), array([572.00476], dtype=float32), array([571.8766], dtype=float32), array([571.8181], dtype=float32), array([571.6495], dtype=float32), array([571.47205], dtype=float32), array([571.573], dtype=float32), array([571.6398], dtype=float32), array([571.56476], dtype=float32), array([571.0169], dtype=float32), array([571.5319], dtype=float32), array([571.12646], dtype=float32), array([571.6289], dtype=float32), array([571.07434], dtype=float32), array([571.362], dtype=float32), array([571.17084], dtype=float32), array([570.8694], dtype=float32), array([570.9825], dtype=float32), array([571.3056], dtype=float32), array([570.7186], dtype=float32), array([571.32104], dtype=float32), array([570.934], dtype=float32), array([570.9317], dtype=float32), array([570.05505], dtype=float32), array([571.1892], dtype=float32), array([570.0509], dtype=float32), array([570.73035], dtype=float32), array([569.87726], dtype=float32), array([570.4148], dtype=float32), array([569.7843], dtype=float32), array([570.046], dtype=float32), array([569.68134], dtype=float32), array([569.8624], dtype=float32), array([569.48645], dtype=float32), array([569.9235], dtype=float32), array([569.34064], dtype=float32), array([569.4263], dtype=float32), array([569.07007], dtype=float32), array([569.0827], dtype=float32), array([569.2156], dtype=float32), array([569.1023], dtype=float32), array([568.9853], dtype=float32), array([568.976], dtype=float32), array([568.63684], dtype=float32), array([568.67755], dtype=float32)]
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-10/error/ExactGaussianProcessRegressor_GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh GraphConv 64 activation tanh_1.0.stderr> for stderr output of this job.
+

@@ -1,0 +1,319 @@
+Using backend: pytorch
+/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/base.py:25: UserWarning: Currently adjacency_matrix() returns a matrix with destination as rows by default.  In 0.5 the result will have source as rows (i.e. transpose=True)
+  warnings.warn(msg, warn_type)
+/home/nguyenm5/coding/pinot/pinot/metrics.py:45: UserWarning: Using a target size (torch.Size([37, 1])) that is different to the input size (torch.Size([37])). This will likely lead to incorrect results due to broadcasting. Please ensure they have the same size.
+  return torch.nn.functional.mse_loss(y, y_hat).pow(0.5)
+/home/nguyenm5/coding/pinot/pinot/metrics.py:45: UserWarning: Using a target size (torch.Size([336, 1])) that is different to the input size (torch.Size([336])). This will likely lead to incorrect results due to broadcasting. Please ensure they have the same size.
+  return torch.nn.functional.mse_loss(y, y_hat).pow(0.5)
+Traceback (most recent call last):
+  File "scripts/semi_supervised/learning_curve_semi.py", line 308, in <module>
+    torch.save(states, os.path.join(args.output, savefile +\
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/serialization.py", line 369, in save
+    with _open_file_like(f, 'wb') as opened_file:
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/serialization.py", line 234, in _open_file_like
+    return _open_file(name_or_buffer, mode)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/serialization.py", line 215, in __init__
+    super(_open_file, self).__init__(open(name, mode))
+OSError: [Errno 36] File name too long: '/home/nguyenm5/coding/pinot/aug-10/arch-search/data=moonshot_regressor=ExactGaussianProcessRegressor_volume=0.0_induce=20_inner=10_split=[0.1, 0.9]_semi=True_a=GraphConv.64.activation.tanh.GraphConv.64.activation.tanh.GraphConv.64.activation.tanh.GraphConv.64.activation.tanh_regr=ExactGaussianProcessRegressor.th'
+Using backend: pytorch
+/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/base.py:25: UserWarning: Currently adjacency_matrix() returns a matrix with destination as rows by default.  In 0.5 the result will have source as rows (i.e. transpose=True)
+  warnings.warn(msg, warn_type)
+Traceback (most recent call last):
+  File "scripts/semi_supervised/learning_curve_semi.py", line 299, in <module>
+    train_and_test_semi_supervised(net, optimizer, train_semi, train_labeled, test_labeled, args.n_epochs,
+  File "scripts/semi_supervised/learning_curve_semi.py", line 244, in train_and_test_semi_supervised
+    train.train()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 117, in train
+    epoch_loss = self.train_once()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 92, in train_once
+    loss = torch.sum(self.net.loss(*x))
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 155, in loss
+    total_loss = self.loss_unsupervised(g, h) * self.unsup_scale
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 267, in loss_unsupervised
+    recon_loss = self.decoder.decode_and_compute_recon_error(g, z_sample)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/decoder.py", line 311, in decode_and_compute_recon_error
+    E_true = self.edge_tensor_from_g(subgraph)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/decoder.py", line 274, in edge_tensor_from_g
+    E[list(torch.cat((indices[:, e_idx], torch.tensor([-1]))))]
+KeyboardInterrupt
+Using backend: pytorch
+/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/base.py:25: UserWarning: Currently adjacency_matrix() returns a matrix with destination as rows by default.  In 0.5 the result will have source as rows (i.e. transpose=True)
+  warnings.warn(msg, warn_type)
+Traceback (most recent call last):
+  File "scripts/semi_supervised/learning_curve_semi.py", line 299, in <module>
+    train_and_test_semi_supervised(net, optimizer, train_semi, train_labeled, test_labeled, args.n_epochs,
+  File "scripts/semi_supervised/learning_curve_semi.py", line 244, in train_and_test_semi_supervised
+    train.train()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 117, in train
+    epoch_loss = self.train_once()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 92, in train_once
+    loss = torch.sum(self.net.loss(*x))
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 155, in loss
+    total_loss = self.loss_unsupervised(g, h) * self.unsup_scale
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 267, in loss_unsupervised
+    recon_loss = self.decoder.decode_and_compute_recon_error(g, z_sample)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/decoder.py", line 311, in decode_and_compute_recon_error
+    E_true = self.edge_tensor_from_g(subgraph)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/decoder.py", line 273, in edge_tensor_from_g
+    E[list(one_hot)] = 1.0
+KeyboardInterrupt
+Using backend: pytorch
+/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/base.py:25: UserWarning: Currently adjacency_matrix() returns a matrix with destination as rows by default.  In 0.5 the result will have source as rows (i.e. transpose=True)
+  warnings.warn(msg, warn_type)
+Traceback (most recent call last):
+  File "scripts/semi_supervised/learning_curve_semi.py", line 299, in <module>
+    train_and_test_semi_supervised(net, optimizer, train_semi, train_labeled, test_labeled, args.n_epochs,
+  File "scripts/semi_supervised/learning_curve_semi.py", line 244, in train_and_test_semi_supervised
+    train.train()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 117, in train
+    epoch_loss = self.train_once()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 92, in train_once
+    loss = torch.sum(self.net.loss(*x))
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 155, in loss
+    total_loss = self.loss_unsupervised(g, h) * self.unsup_scale
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 267, in loss_unsupervised
+    recon_loss = self.decoder.decode_and_compute_recon_error(g, z_sample)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/decoder.py", line 311, in decode_and_compute_recon_error
+    E_true = self.edge_tensor_from_g(subgraph)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/decoder.py", line 274, in edge_tensor_from_g
+    E[list(torch.cat((indices[:, e_idx], torch.tensor([-1]))))]
+KeyboardInterrupt
+Using backend: pytorch
+/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/base.py:25: UserWarning: Currently adjacency_matrix() returns a matrix with destination as rows by default.  In 0.5 the result will have source as rows (i.e. transpose=True)
+  warnings.warn(msg, warn_type)
+Traceback (most recent call last):
+  File "scripts/semi_supervised/learning_curve_semi.py", line 299, in <module>
+    train_and_test_semi_supervised(net, optimizer, train_semi, train_labeled, test_labeled, args.n_epochs,
+  File "scripts/semi_supervised/learning_curve_semi.py", line 244, in train_and_test_semi_supervised
+    train.train()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 117, in train
+    epoch_loss = self.train_once()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 93, in train_once
+    loss.backward()
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/tensor.py", line 198, in backward
+    torch.autograd.backward(self, gradient, retain_graph, create_graph)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/autograd/__init__.py", line 98, in backward
+    Variable._execution_engine.run_backward(
+KeyboardInterrupt
+Using backend: pytorch
+/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/base.py:25: UserWarning: Currently adjacency_matrix() returns a matrix with destination as rows by default.  In 0.5 the result will have source as rows (i.e. transpose=True)
+  warnings.warn(msg, warn_type)
+Traceback (most recent call last):
+  File "scripts/semi_supervised/learning_curve_semi.py", line 299, in <module>
+    train_and_test_semi_supervised(net, optimizer, train_semi, train_labeled, test_labeled, args.n_epochs,
+  File "scripts/semi_supervised/learning_curve_semi.py", line 244, in train_and_test_semi_supervised
+    train.train()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 117, in train
+    epoch_loss = self.train_once()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 92, in train_once
+    loss = torch.sum(self.net.loss(*x))
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 155, in loss
+    total_loss = self.loss_unsupervised(g, h) * self.unsup_scale
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 267, in loss_unsupervised
+    recon_loss = self.decoder.decode_and_compute_recon_error(g, z_sample)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/decoder.py", line 295, in decode_and_compute_recon_error
+    decoded_subgraphs = self.forward(g, z_sample)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/decoder.py", line 410, in forward
+    gs_unbatched = dgl.unbatch(g)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/graph.py", line 4260, in unbatch
+    return [DGLGraph(graph_data=pttns[i],
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/graph.py", line 4260, in <listcomp>
+    return [DGLGraph(graph_data=pttns[i],
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/graph.py", line 1014, in __init__
+    self._msg_frame = FrameRef(Frame(num_rows=self.number_of_edges()))
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/frame.py", line 494, in __init__
+    def __init__(self, frame=None, index=None):
+KeyboardInterrupt
+Using backend: pytorch
+/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/base.py:25: UserWarning: Currently adjacency_matrix() returns a matrix with destination as rows by default.  In 0.5 the result will have source as rows (i.e. transpose=True)
+  warnings.warn(msg, warn_type)
+Traceback (most recent call last):
+  File "scripts/semi_supervised/learning_curve_semi.py", line 299, in <module>
+    train_and_test_semi_supervised(net, optimizer, train_semi, train_labeled, test_labeled, args.n_epochs,
+  File "scripts/semi_supervised/learning_curve_semi.py", line 244, in train_and_test_semi_supervised
+    train.train()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 117, in train
+    epoch_loss = self.train_once()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 92, in train_once
+    loss = torch.sum(self.net.loss(*x))
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 155, in loss
+    total_loss = self.loss_unsupervised(g, h) * self.unsup_scale
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 267, in loss_unsupervised
+    recon_loss = self.decoder.decode_and_compute_recon_error(g, z_sample)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/decoder.py", line 311, in decode_and_compute_recon_error
+    E_true = self.edge_tensor_from_g(subgraph)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/decoder.py", line 267, in edge_tensor_from_g
+    e = torch.tensor([etypes[e_idx]])
+KeyboardInterrupt
+Using backend: pytorch
+/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/base.py:25: UserWarning: Currently adjacency_matrix() returns a matrix with destination as rows by default.  In 0.5 the result will have source as rows (i.e. transpose=True)
+  warnings.warn(msg, warn_type)
+Traceback (most recent call last):
+  File "scripts/semi_supervised/learning_curve_semi.py", line 299, in <module>
+    train_and_test_semi_supervised(net, optimizer, train_semi, train_labeled, test_labeled, args.n_epochs,
+  File "scripts/semi_supervised/learning_curve_semi.py", line 244, in train_and_test_semi_supervised
+    train.train()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 117, in train
+    epoch_loss = self.train_once()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 92, in train_once
+    loss = torch.sum(self.net.loss(*x))
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 180, in loss
+    supervised_loss = self.optimize_output_regressor(h_labeled, y_labeled)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 232, in optimize_output_regressor
+    loss.backward(retain_graph=True)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/tensor.py", line 198, in backward
+    torch.autograd.backward(self, gradient, retain_graph, create_graph)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/autograd/__init__.py", line 98, in backward
+    Variable._execution_engine.run_backward(
+KeyboardInterrupt
+Using backend: pytorch
+/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/base.py:25: UserWarning: Currently adjacency_matrix() returns a matrix with destination as rows by default.  In 0.5 the result will have source as rows (i.e. transpose=True)
+  warnings.warn(msg, warn_type)
+/home/nguyenm5/coding/pinot/pinot/metrics.py:45: UserWarning: Using a target size (torch.Size([37, 1])) that is different to the input size (torch.Size([37])). This will likely lead to incorrect results due to broadcasting. Please ensure they have the same size.
+  return torch.nn.functional.mse_loss(y, y_hat).pow(0.5)
+/home/nguyenm5/coding/pinot/pinot/metrics.py:45: UserWarning: Using a target size (torch.Size([336, 1])) that is different to the input size (torch.Size([336])). This will likely lead to incorrect results due to broadcasting. Please ensure they have the same size.
+  return torch.nn.functional.mse_loss(y, y_hat).pow(0.5)
+Traceback (most recent call last):
+  File "scripts/semi_supervised/learning_curve_semi.py", line 308, in <module>
+    torch.save(states, os.path.join(args.output, savefile +\
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/serialization.py", line 369, in save
+    with _open_file_like(f, 'wb') as opened_file:
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/serialization.py", line 234, in _open_file_like
+    return _open_file(name_or_buffer, mode)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/serialization.py", line 215, in __init__
+    super(_open_file, self).__init__(open(name, mode))
+OSError: [Errno 36] File name too long: '/home/nguyenm5/coding/pinot/aug-10/arch-search/data=moonshot_regressor=ExactGaussianProcessRegressor_volume=0.0_induce=20_inner=10_split=[0.1, 0.9]_semi=True_a=GraphConv.64.activation.tanh.GraphConv.64.activation.tanh.GraphConv.64.activation.tanh.GraphConv.64.activation.tanh_regr=ExactGaussianProcessRegressor.th'
+Using backend: pytorch
+/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/base.py:25: UserWarning: Currently adjacency_matrix() returns a matrix with destination as rows by default.  In 0.5 the result will have source as rows (i.e. transpose=True)
+  warnings.warn(msg, warn_type)
+/home/nguyenm5/coding/pinot/pinot/metrics.py:45: UserWarning: Using a target size (torch.Size([74, 1])) that is different to the input size (torch.Size([74])). This will likely lead to incorrect results due to broadcasting. Please ensure they have the same size.
+  return torch.nn.functional.mse_loss(y, y_hat).pow(0.5)
+/home/nguyenm5/coding/pinot/pinot/metrics.py:45: UserWarning: Using a target size (torch.Size([299, 1])) that is different to the input size (torch.Size([299])). This will likely lead to incorrect results due to broadcasting. Please ensure they have the same size.
+  return torch.nn.functional.mse_loss(y, y_hat).pow(0.5)
+Traceback (most recent call last):
+  File "scripts/semi_supervised/learning_curve_semi.py", line 308, in <module>
+    torch.save(states, os.path.join(args.output, savefile +\
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/serialization.py", line 369, in save
+    with _open_file_like(f, 'wb') as opened_file:
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/serialization.py", line 234, in _open_file_like
+    return _open_file(name_or_buffer, mode)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/serialization.py", line 215, in __init__
+    super(_open_file, self).__init__(open(name, mode))
+OSError: [Errno 36] File name too long: '/home/nguyenm5/coding/pinot/aug-10/arch-search/data=moonshot_regressor=ExactGaussianProcessRegressor_volume=0.0_induce=20_inner=10_split=[0.2, 0.8]_semi=True_a=GraphConv.64.activation.tanh.GraphConv.64.activation.tanh.GraphConv.64.activation.tanh.GraphConv.64.activation.tanh_regr=ExactGaussianProcessRegressor.th'
+Using backend: pytorch
+/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/base.py:25: UserWarning: Currently adjacency_matrix() returns a matrix with destination as rows by default.  In 0.5 the result will have source as rows (i.e. transpose=True)
+  warnings.warn(msg, warn_type)
+/home/nguyenm5/coding/pinot/pinot/metrics.py:45: UserWarning: Using a target size (torch.Size([112, 1])) that is different to the input size (torch.Size([112])). This will likely lead to incorrect results due to broadcasting. Please ensure they have the same size.
+  return torch.nn.functional.mse_loss(y, y_hat).pow(0.5)
+/home/nguyenm5/coding/pinot/pinot/metrics.py:45: UserWarning: Using a target size (torch.Size([261, 1])) that is different to the input size (torch.Size([261])). This will likely lead to incorrect results due to broadcasting. Please ensure they have the same size.
+  return torch.nn.functional.mse_loss(y, y_hat).pow(0.5)
+Traceback (most recent call last):
+  File "scripts/semi_supervised/learning_curve_semi.py", line 308, in <module>
+    torch.save(states, os.path.join(args.output, savefile +\
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/serialization.py", line 369, in save
+    with _open_file_like(f, 'wb') as opened_file:
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/serialization.py", line 234, in _open_file_like
+    return _open_file(name_or_buffer, mode)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/serialization.py", line 215, in __init__
+    super(_open_file, self).__init__(open(name, mode))
+OSError: [Errno 36] File name too long: '/home/nguyenm5/coding/pinot/aug-10/arch-search/data=moonshot_regressor=ExactGaussianProcessRegressor_volume=0.0_induce=20_inner=10_split=[0.3, 0.7]_semi=True_a=GraphConv.64.activation.tanh.GraphConv.64.activation.tanh.GraphConv.64.activation.tanh.GraphConv.64.activation.tanh_regr=ExactGaussianProcessRegressor.th'
+Using backend: pytorch
+/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/base.py:25: UserWarning: Currently adjacency_matrix() returns a matrix with destination as rows by default.  In 0.5 the result will have source as rows (i.e. transpose=True)
+  warnings.warn(msg, warn_type)
+/home/nguyenm5/coding/pinot/pinot/metrics.py:45: UserWarning: Using a target size (torch.Size([149, 1])) that is different to the input size (torch.Size([149])). This will likely lead to incorrect results due to broadcasting. Please ensure they have the same size.
+  return torch.nn.functional.mse_loss(y, y_hat).pow(0.5)
+/home/nguyenm5/coding/pinot/pinot/metrics.py:45: UserWarning: Using a target size (torch.Size([224, 1])) that is different to the input size (torch.Size([224])). This will likely lead to incorrect results due to broadcasting. Please ensure they have the same size.
+  return torch.nn.functional.mse_loss(y, y_hat).pow(0.5)
+Traceback (most recent call last):
+  File "scripts/semi_supervised/learning_curve_semi.py", line 308, in <module>
+    torch.save(states, os.path.join(args.output, savefile +\
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/serialization.py", line 369, in save
+    with _open_file_like(f, 'wb') as opened_file:
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/serialization.py", line 234, in _open_file_like
+    return _open_file(name_or_buffer, mode)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/serialization.py", line 215, in __init__
+    super(_open_file, self).__init__(open(name, mode))
+OSError: [Errno 36] File name too long: '/home/nguyenm5/coding/pinot/aug-10/arch-search/data=moonshot_regressor=ExactGaussianProcessRegressor_volume=0.0_induce=20_inner=10_split=[0.4, 0.6]_semi=True_a=GraphConv.64.activation.tanh.GraphConv.64.activation.tanh.GraphConv.64.activation.tanh.GraphConv.64.activation.tanh_regr=ExactGaussianProcessRegressor.th'
+Using backend: pytorch
+/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/base.py:25: UserWarning: Currently adjacency_matrix() returns a matrix with destination as rows by default.  In 0.5 the result will have source as rows (i.e. transpose=True)
+  warnings.warn(msg, warn_type)
+/home/nguyenm5/coding/pinot/pinot/metrics.py:45: UserWarning: Using a target size (torch.Size([187, 1])) that is different to the input size (torch.Size([187])). This will likely lead to incorrect results due to broadcasting. Please ensure they have the same size.
+  return torch.nn.functional.mse_loss(y, y_hat).pow(0.5)
+Traceback (most recent call last):
+  File "scripts/semi_supervised/learning_curve_semi.py", line 308, in <module>
+    torch.save(states, os.path.join(args.output, savefile +\
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/serialization.py", line 369, in save
+    with _open_file_like(f, 'wb') as opened_file:
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/serialization.py", line 234, in _open_file_like
+    return _open_file(name_or_buffer, mode)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/serialization.py", line 215, in __init__
+    super(_open_file, self).__init__(open(name, mode))
+OSError: [Errno 36] File name too long: '/home/nguyenm5/coding/pinot/aug-10/arch-search/data=moonshot_regressor=ExactGaussianProcessRegressor_volume=0.0_induce=20_inner=10_split=[0.5, 0.5]_semi=True_a=GraphConv.64.activation.tanh.GraphConv.64.activation.tanh.GraphConv.64.activation.tanh.GraphConv.64.activation.tanh_regr=ExactGaussianProcessRegressor.th'
+Using backend: pytorch
+/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/base.py:25: UserWarning: Currently adjacency_matrix() returns a matrix with destination as rows by default.  In 0.5 the result will have source as rows (i.e. transpose=True)
+  warnings.warn(msg, warn_type)
+/home/nguyenm5/coding/pinot/pinot/metrics.py:45: UserWarning: Using a target size (torch.Size([224, 1])) that is different to the input size (torch.Size([224])). This will likely lead to incorrect results due to broadcasting. Please ensure they have the same size.
+  return torch.nn.functional.mse_loss(y, y_hat).pow(0.5)
+/home/nguyenm5/coding/pinot/pinot/metrics.py:45: UserWarning: Using a target size (torch.Size([149, 1])) that is different to the input size (torch.Size([149])). This will likely lead to incorrect results due to broadcasting. Please ensure they have the same size.
+  return torch.nn.functional.mse_loss(y, y_hat).pow(0.5)
+Traceback (most recent call last):
+  File "scripts/semi_supervised/learning_curve_semi.py", line 308, in <module>
+    torch.save(states, os.path.join(args.output, savefile +\
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/serialization.py", line 369, in save
+    with _open_file_like(f, 'wb') as opened_file:
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/serialization.py", line 234, in _open_file_like
+    return _open_file(name_or_buffer, mode)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/serialization.py", line 215, in __init__
+    super(_open_file, self).__init__(open(name, mode))
+OSError: [Errno 36] File name too long: '/home/nguyenm5/coding/pinot/aug-10/arch-search/data=moonshot_regressor=ExactGaussianProcessRegressor_volume=0.0_induce=20_inner=10_split=[0.6, 0.4]_semi=True_a=GraphConv.64.activation.tanh.GraphConv.64.activation.tanh.GraphConv.64.activation.tanh.GraphConv.64.activation.tanh_regr=ExactGaussianProcessRegressor.th'
+Using backend: pytorch
+/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/base.py:25: UserWarning: Currently adjacency_matrix() returns a matrix with destination as rows by default.  In 0.5 the result will have source as rows (i.e. transpose=True)
+  warnings.warn(msg, warn_type)
+/home/nguyenm5/coding/pinot/pinot/metrics.py:45: UserWarning: Using a target size (torch.Size([261, 1])) that is different to the input size (torch.Size([261])). This will likely lead to incorrect results due to broadcasting. Please ensure they have the same size.
+  return torch.nn.functional.mse_loss(y, y_hat).pow(0.5)
+/home/nguyenm5/coding/pinot/pinot/metrics.py:45: UserWarning: Using a target size (torch.Size([112, 1])) that is different to the input size (torch.Size([112])). This will likely lead to incorrect results due to broadcasting. Please ensure they have the same size.
+  return torch.nn.functional.mse_loss(y, y_hat).pow(0.5)
+Traceback (most recent call last):
+  File "scripts/semi_supervised/learning_curve_semi.py", line 308, in <module>
+    torch.save(states, os.path.join(args.output, savefile +\
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/serialization.py", line 369, in save
+    with _open_file_like(f, 'wb') as opened_file:
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/serialization.py", line 234, in _open_file_like
+    return _open_file(name_or_buffer, mode)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/serialization.py", line 215, in __init__
+    super(_open_file, self).__init__(open(name, mode))
+OSError: [Errno 36] File name too long: '/home/nguyenm5/coding/pinot/aug-10/arch-search/data=moonshot_regressor=ExactGaussianProcessRegressor_volume=0.0_induce=20_inner=10_split=[0.7, 0.3]_semi=True_a=GraphConv.64.activation.tanh.GraphConv.64.activation.tanh.GraphConv.64.activation.tanh.GraphConv.64.activation.tanh_regr=ExactGaussianProcessRegressor.th'
+Using backend: pytorch
+/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/base.py:25: UserWarning: Currently adjacency_matrix() returns a matrix with destination as rows by default.  In 0.5 the result will have source as rows (i.e. transpose=True)
+  warnings.warn(msg, warn_type)
+/home/nguyenm5/coding/pinot/pinot/metrics.py:45: UserWarning: Using a target size (torch.Size([299, 1])) that is different to the input size (torch.Size([299])). This will likely lead to incorrect results due to broadcasting. Please ensure they have the same size.
+  return torch.nn.functional.mse_loss(y, y_hat).pow(0.5)
+/home/nguyenm5/coding/pinot/pinot/metrics.py:45: UserWarning: Using a target size (torch.Size([74, 1])) that is different to the input size (torch.Size([74])). This will likely lead to incorrect results due to broadcasting. Please ensure they have the same size.
+  return torch.nn.functional.mse_loss(y, y_hat).pow(0.5)
+Traceback (most recent call last):
+  File "scripts/semi_supervised/learning_curve_semi.py", line 308, in <module>
+    torch.save(states, os.path.join(args.output, savefile +\
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/serialization.py", line 369, in save
+    with _open_file_like(f, 'wb') as opened_file:
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/serialization.py", line 234, in _open_file_like
+    return _open_file(name_or_buffer, mode)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/serialization.py", line 215, in __init__
+    super(_open_file, self).__init__(open(name, mode))
+OSError: [Errno 36] File name too long: '/home/nguyenm5/coding/pinot/aug-10/arch-search/data=moonshot_regressor=ExactGaussianProcessRegressor_volume=0.0_induce=20_inner=10_split=[0.8, 0.2]_semi=True_a=GraphConv.64.activation.tanh.GraphConv.64.activation.tanh.GraphConv.64.activation.tanh.GraphConv.64.activation.tanh_regr=ExactGaussianProcessRegressor.th'
+Using backend: pytorch
+/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/base.py:25: UserWarning: Currently adjacency_matrix() returns a matrix with destination as rows by default.  In 0.5 the result will have source as rows (i.e. transpose=True)
+  warnings.warn(msg, warn_type)
+/home/nguyenm5/coding/pinot/pinot/metrics.py:45: UserWarning: Using a target size (torch.Size([224, 1])) that is different to the input size (torch.Size([224])). This will likely lead to incorrect results due to broadcasting. Please ensure they have the same size.
+  return torch.nn.functional.mse_loss(y, y_hat).pow(0.5)
+/home/nguyenm5/coding/pinot/pinot/metrics.py:45: UserWarning: Using a target size (torch.Size([149, 1])) that is different to the input size (torch.Size([149])). This will likely lead to incorrect results due to broadcasting. Please ensure they have the same size.
+  return torch.nn.functional.mse_loss(y, y_hat).pow(0.5)
+Traceback (most recent call last):
+  File "scripts/semi_supervised/learning_curve_semi.py", line 308, in <module>
+    torch.save(states, os.path.join(args.output, savefile +\
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/serialization.py", line 369, in save
+    with _open_file_like(f, 'wb') as opened_file:
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/serialization.py", line 234, in _open_file_like
+    return _open_file(name_or_buffer, mode)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/serialization.py", line 215, in __init__
+    super(_open_file, self).__init__(open(name, mode))
+OSError: [Errno 36] File name too long: '/home/nguyenm5/coding/pinot/aug-10/arch-search/data=moonshot_regressor=ExactGaussianProcessRegressor_volume=0.0_induce=20_inner=10_split=[0.6, 0.4]_semi=True_a=GraphConv.64.activation.tanh.GraphConv.64.activation.tanh.GraphConv.64.activation.tanh.GraphConv.64.activation.tanh_regr=ExactGaussianProcessRegressor.th'
