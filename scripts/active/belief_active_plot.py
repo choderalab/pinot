@@ -3,8 +3,8 @@ warnings.filterwarnings("ignore")
 
 import copy
 import math
-from collections import defaultdict
 from contextlib import suppress
+from collections import defaultdict, OrderedDict
 
 import toolz
 import torch
@@ -270,9 +270,17 @@ class BeliefActivePlot():
         -------
         results
         """
-        # get the real solution
-        ds = self.generate_data()[0]
-        acq_fn = self.get_acquisition()
+        # get the data
+        ds, ds_dates = self.generate_data()
+
+        # prepare autonomous acquisition functions
+        acq_fn = self.get_acquisition_fn()
+        
+        # get acquisitions if using human function
+        if self.acquisition == 'Human' and ds_dates:
+            acquisitions_preset = self.gather_acquisitions(ds_dates)
+        else:
+            acquisitions_preset = None
 
         for i in range(self.num_trials):
 
@@ -297,6 +305,7 @@ class BeliefActivePlot():
                 num_epochs=self.num_epochs,
                 early_stopping=False,
                 q=self.q,
+                acquisitions_preset=acquisitions_preset,
                 slice_fn=pinot.active.experiment._slice_fn_tuple,
                 collate_fn=pinot.active.experiment._collate_fn_graph,
                 train_class=self.train
@@ -304,7 +313,7 @@ class BeliefActivePlot():
 
             # run experiment
             acquisitions = self.bo.run(num_rounds=self.num_rounds)
-            
+
             # process acquisitions into pandas-friendly format
             self.results = self.process_results(acquisitions, ds, i)
             
@@ -344,8 +353,8 @@ class BeliefActivePlot():
         Returns
         -------
         beliefs : dict
-            Values are 'prospective' and 'retrospective'
-            Keys are 
+            Keys are 'prospective' and 'retrospective'
+            Values are dictionaries of beliefs
         
         """        
         # loop through rounds
@@ -439,32 +448,30 @@ class BeliefActivePlot():
         self.results : defaultdict
             Processed data
         """
-        # get the final acquired points
-        seen, _ = acquisitions[-1]
-        
-        # get max f(x)
+        # unpack data
         gs, ys = ds
-        actual_sol = torch.max(ys).item()
 
-        # pad if experiment stopped early
-        # candidates_acquired = limit + 1 because we begin with a blind pick
-        results_size = len(ys) + 1
-
-        if self.net == 'multitask':
-            results_data = actual_sol*np.ones((results_size, ys.size(1)))
+        # for acquisitions each round
+        for round_, acquisition in acquisitions.items():
+            
+            # unpack acquisition indices
+            seen, _ = acquisition
+            
+            # get actual values
             output = ys[seen]
-            output[torch.isnan(output)] = -np.inf
-        else:
-            results_data = actual_sol*np.ones(results_size)
-            output = ys[seen]
+            
+            # find the max of the points seen so far
+            result = torch.max(output).item()
+            self.results.append(
+                {
+                    'Acquisition Function': self.acquisition,
+                    'Trial': i,
+                    'Datapoints Acquired': len(seen),
+                    'Round': round_,
+                    'Value': result
+                }
+            )
 
-        results_data[:len(seen)] = np.maximum.accumulate(output.cpu().squeeze())
-
-        # record results
-        for step, result in enumerate(results_data):
-            self.results.append({'Acquisition Function': self.acquisition,
-                                 'Trial': i, 'Datapoint Acquired': step,
-                                 'Round': step // self.q, 'Value': result})
         return self.results
 
 
@@ -475,18 +482,54 @@ class BeliefActivePlot():
         ds = getattr(pinot.data, self.data)()
         
         # Limit to first two fields of tuple
-        if len(ds[0]) > 2:
-            ds = [(d[0], d[1]) for d in ds]
+        ds_data = [(d[0], d[1]) for d in ds]
         
+        # Gather dates if available
+        if len(ds[0]) > 2:
+            ds_dates = [d[2] for d in ds]
+        else:
+            ds_dates = []
+
         # Batch data
-        ds = pinot.data.utils.batch(ds, len(ds), seed=None)
+        ds_data = pinot.data.utils.batch(ds_data, len(ds), seed=None)
         
         # Move data to GPU
-        ds = [tuple([i.to(self.device) for i in ds[0]])]
+        ds_data = [tuple([i.to(self.device) for i in ds_data[0]])]
         
-        return ds
+        return ds_data[0], ds_dates
 
-    def get_acquisition(self):
+
+    def gather_acquisitions(self, ds_dates):
+        """ Annotates acquisition times for human.
+        """
+        # Bin dates
+        _, inverse = np.unique(ds_dates, return_inverse=True)
+        
+        # construct acquisitions
+        acquisitions = OrderedDict()
+        ds_range = np.arange(len(ds_dates))
+        num_rounds = inverse[-1] + 1
+
+        # for each round
+        for round_ in range(num_rounds):
+            
+            # find mask for the round
+            in_round = inverse == round_
+            
+            # get the first index *after* the mask
+            unseen_idx = np.argwhere(in_round)[-1][0] + 1
+            
+            # use that index to subset before and after
+            seen = ds_range[:unseen_idx].tolist()
+            unseen = ds_range[unseen_idx:].tolist()
+            
+            # make acquisition tuple and add to acquisitions
+            acquisitions[round_] = tuple([seen, unseen])
+
+        return acquisitions
+
+
+    def get_acquisition_fn(self):
         """ Retrieve acquisition function and prepare for BO Experiment
         """
         acquisitions = {
