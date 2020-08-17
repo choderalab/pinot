@@ -68,11 +68,14 @@ class SemiSupervisedNet(pinot.Net):
         unsup_scale=1.0,
         embedding_dim=64,
         generative_hidden_dim=64,
+        output_regr_optim_steps=0,
+        **kwargs,
     ):
 
         super(SemiSupervisedNet, self).__init__(
             representation=representation,
             output_regressor_class=output_regressor_class,
+            **kwargs,
         )
 
         # Recommended class: pinot.representation.sequential.Sequential
@@ -103,7 +106,7 @@ class SemiSupervisedNet(pinot.Net):
         # Generative hidden dim is the size of the hidden layer of the
         # generative output regressor network
         self.generative_hidden_dim = generative_hidden_dim
-
+        self.output_regr_optim_steps = output_regr_optim_steps
         self.output_regressor_generative = nn.ModuleList(
             [
                 nn.Sequential(
@@ -148,18 +151,16 @@ class SemiSupervisedNet(pinot.Net):
         # Compute the node representation
         # Call this function to compute the nodes representations
         h = self.representation.forward(g, pool=None)  # We always call this
-        # Compute unsupervised loss
+        # Compute unsupervised loss weighted by unsup_scale
         total_loss = self.loss_unsupervised(g, h) * self.unsup_scale
         # Compute the graph representation from node representation
         # Then compute graph representation, by pooling
         h = self.representation.pool(g, h)
-
         # Then compute supervised loss
         if len(y[~torch.isnan(y)]) != 0:
             # Only compute supervised loss for the labeled data
             h_labeled = h[~torch.isnan(y).flatten(), :]
             y_labeled = y[~torch.isnan(y)].unsqueeze(1)
-
             if (
                 self.has_exact_gp is True
             ):  # Save the last graph batch + ys if exact GP
@@ -173,7 +174,12 @@ class SemiSupervisedNet(pinot.Net):
                 )
 
             # The output-regressor needs to implement a loss function
-            supervised_loss = self.loss_supervised(h_labeled, y_labeled)
+            # Potentially perform multiple optimization steps on the 
+            # output regressor when we have unlabeled data >> labeled data
+            if self.output_regr_optim_steps:
+                supervised_loss = self.optimize_output_regressor(h_labeled, y_labeled)
+            else:
+                supervised_loss = self.loss_supervised(h_labeled, y_labeled)
             total_loss += supervised_loss.sum()
         return total_loss
 
@@ -197,6 +203,37 @@ class SemiSupervisedNet(pinot.Net):
         """
         # If output regressor has loss function implemented
         return self._loss(h, y)
+
+    def optimize_output_regressor(self, h, y):
+        """
+        Perform optimization on the output regressor while freezing
+        the representation. We recommend doing this when we have a lot more
+        unlabeled data than labeled data.
+
+        Parameters
+        ----------
+        h : FloatTensor
+            Of shape (num_subgraphs, latent_dim)
+            The latent representation of the subgraphs
+
+        y : FloatTensor
+            Of shape (num_subgraphs,)
+            The measurements associated with the subgraphs
+
+        Returns
+        -------
+            loss:
+                Invokes loss function of the output regressor
+        """
+        optimizer = torch.optim.Adam(self.output_regressor.parameters(), 1e-4)
+        for _ in range(self.output_regr_optim_steps):
+            optimizer.zero_grad()
+            loss = self._loss(h,y)
+            loss.backward(retain_graph=True)
+            optimizer.step()
+        optimizer.zero_grad()
+        loss = self._loss(h,y)
+        return loss
 
     def loss_unsupervised(self, g, h):
         """

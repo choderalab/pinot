@@ -268,7 +268,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
         if self.net_state_dict is not None:
             self.net.load_state_dict(self.net_state_dict)
 
-    def blind_pick(self, seed=2666):
+    def blind_pick(self, seed=2666, n=1):
         """ Randomly pick index from the candidate pool.
 
         Parameters
@@ -291,9 +291,14 @@ class BayesOptExperiment(ActiveLearningExperiment):
 
         """
         import random
+        import numpy as np
         random.seed(seed)
-        best = random.choice(self.unseen)
-        self.seen.append(self.unseen.pop(best))
+        # Pick n random molecules without replacement
+        best = np.random.choice(self.unseen, n, False)
+        best = np.sort(best) # Sort by index (increasing)
+        best = np.flip(best) # Reverse this list so that when we
+        # pop we don't run into out of bound error
+        self.seen.extend([self.unseen.pop(mol) for mol in best])
         return best
 
     def train(self):
@@ -377,13 +382,13 @@ class BayesOptExperiment(ActiveLearningExperiment):
 
         """
         idx = 0
-        self.blind_pick(seed=seed)
+        self.blind_pick(seed=seed, n=self.q)
         self.update_data()
 
         while idx < num_rounds:
             
-            if self.early_stopping and self.y_best == self.best_possible:
-                break
+            #if self.early_stopping and self.y_best == self.best_possible:
+            #    break
 
             self.train()
             self.states[idx] = copy.deepcopy(self.net.state_dict())
@@ -406,10 +411,14 @@ class SemiSupervisedBayesOptExperiment(BayesOptExperiment):
     """Implements active learning experiment with single task target
     with Semi Supervised model."""
 
-    def __init__(self, unlabeled_data=None, *args, **kwargs):
+    def __init__(self, unlabeled_data=None,
+        seed=2666,
+        batch_size=None, *args, **kwargs):
         
         super(SemiSupervisedBayesOptExperiment, self).__init__(*args, **kwargs)
         self.unlabeled_data = unlabeled_data
+        self.batch_size     = batch_size
+        self.seed           = seed
 
     def train(self):
         """Train the model with new data."""
@@ -418,17 +427,29 @@ class SemiSupervisedBayesOptExperiment(BayesOptExperiment):
         semi_supervised_data = pinot.data.utils.prepare_semi_supervised_data(
             self.flatten_data(self.unseen_data),
             self.flatten_data(self.seen_data),
+            self.seed
         )
         
         # Combine this also with the background unlabeled data (if any)
         if self.unlabeled_data:
             semi_supervised_data = pinot.data.utils.prepare_semi_supervised_data(
-                self.unlabeled_data, semi_supervised_data
+                self.unlabeled_data,
+                semi_supervised_data,
+                self.seed
             )
-
-        batched_semi_supervised_data = pinot.data.utils.batch(
-            semi_supervised_data, batch_size=len(semi_supervised_data)
-        )
+        
+        # If batch size is not speciified, use full batch
+        # Then shuffle the data
+        if not self.batch_size:
+            batched_semi_supervised_data = pinot.data.utils.batch(
+                semi_supervised_data, batch_size=len(semi_supervised_data),
+                shuffle=True, seed=self.seed
+            )
+        else:
+            batched_semi_supervised_data = pinot.data.utils.batch(
+                semi_supervised_data, batch_size=self.batch_size,
+                shuffle=True, seed=self.seed
+            )
 
         # reset
         self.reset_net()
@@ -436,21 +457,19 @@ class SemiSupervisedBayesOptExperiment(BayesOptExperiment):
         # Compute the unsupervised scaling constant and reset it
         # as the number of labeled data points change after every epoch
         if self.unlabeled_data:
-            unsup_scale = float(len(self.seen_data))/(len(self.unseen_data) + len(self.unlabeled_data))
+            unsup_scale = float(len(self.seen))/(len(self.unseen) + len(self.unlabeled_data))
         else:
-            unsup_scale = float(len(self.seen_data))/len(self.unseen_data)
+            unsup_scale = float(len(self.seen))/len(self.unseen)
         
         # Update the unsupervised scale constant of SemiSupervisedNet
         self.net.unsup_scale = unsup_scale
-
         # set to train status
         self.net.train()
-
         # train the model
         self.net = pinot.app.experiment.Train(
             data=batched_semi_supervised_data,
-            optimizer=self.optimizer,
-            n_epochs=self.n_epochs,
+            optimizer=self.optimizer(self.net),
+            n_epochs=self.num_epochs,
             net=self.net,
             record_interval=999999,
         ).train()
@@ -474,3 +493,117 @@ class SemiSupervisedBayesOptExperiment(BayesOptExperiment):
 
         flattened_data = list(zip(gs, ys))
         return flattened_data
+
+    def blind_pick(self, seed=2666, n=1):
+        """
+        Randomly picking by maximizing the variance of the picked molecule 
+        """
+        import random
+        import numpy as np
+
+        self.unseen_data = self.slice_fn(self.data, self.unseen)
+        self.seen_data   = tuple()
+
+        semi_supervised_data = pinot.data.utils.prepare_semi_supervised_data(
+            self.flatten_data(self.unseen_data),
+            self.seen_data,
+            self.seed
+        )
+        
+        # Combine this also with the background unlabeled data (if any)
+        if self.unlabeled_data:
+            semi_supervised_data = pinot.data.utils.prepare_semi_supervised_data(
+                self.unlabeled_data,
+                semi_supervised_data,
+                self.seed
+            )
+        
+        # If batch size is not speciified, use full batch
+        # Then shuffle the data
+        if not self.batch_size:
+            batched_semi_supervised_data = pinot.data.utils.batch(
+                semi_supervised_data, batch_size=len(semi_supervised_data),
+                shuffle=True, seed=self.seed
+            )
+        else:
+            batched_semi_supervised_data = pinot.data.utils.batch(
+                semi_supervised_data, batch_size=self.batch_size,
+                shuffle=True, seed=self.seed
+            )
+
+        # reset
+        self.reset_net()
+        # Update the unsupervised scale constant of SemiSupervisedNet
+        self.net.unsup_scale = 1.0
+        # set to train status
+        self.net.train()
+        # train the model
+        self.net = pinot.app.experiment.Train(
+            data=batched_semi_supervised_data,
+            optimizer=self.optimizer(self.net),
+            n_epochs=self.num_epochs,
+            net=self.net,
+            record_interval=999999,
+        ).train()
+
+        # Compute the representations of the unseen molecules
+        gs_unseen = dgl.batch([g for (g,y) in self.flatten_data(self.unseen_data)])
+        gs_vector = self.net.representation(gs_unseen) # [num_unseen, hidden_dim]
+
+        # Pick n random molecules without replacement
+        best = self.pick_points_from_representation(gs_vector, n)
+        best = np.sort(best) # Sort by index (increasing)
+        best = np.flip(best) # Reverse this list so that when we
+        # pop we don't run into out of bound error
+        self.seen.extend([self.unseen.pop(mol) for mol in best])
+        return best
+
+    def pick_points_from_representation(self, gs_vector, n=1):
+        """
+        Pick points that are "far" apart. Similar to the initialization step
+        of k-means++
+        """
+        selected = []
+        import numpy as np
+        import random
+        np.random.seed(self.seed)
+        N, _ = gs_vector.shape
+        print(gs_vector.shape)
+        assert(n <= N)
+
+        # Pick the first point randomly
+        i = np.random.choice(N)
+        selected.append(i)
+        
+        # Compute the pairwise distances between every pair of points
+        distances = [
+            [
+                torch.sum((gs_vector[i, :]-gs_vector[j, :])**2).cpu().numpy() for i in range(N)
+            ]
+            for j in range(N)
+        ]
+        distances = np.array(distances)
+        d_min     = np.minimum(distances)
+
+        while len(selected) < n:
+            d_record = d_min
+            # Get the list of unselected candidates
+            unselected = [i for i in range(N) if i not in selected]
+            cand = unselected[0]
+            # Find the point that has the max of min { distance to any points }
+            for i in unselected: # For each unselected point
+                # Compute the minimum distance from this unselected point
+                # to all the selected points
+                d = min([distances[i, j] for j in range(N) if j in selected])
+
+                # If this unselected point is further
+                if d > d_record:
+                    d_record = d
+                    cand = i
+
+            # At the end of this, cand has the max min distance to all
+            # the selected lists. Add this point to the list of selected points
+            selected.append(cand)
+
+        return selected
+

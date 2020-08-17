@@ -17,7 +17,7 @@ from pinot.metrics import _independent
 from pinot.active.acquisition import thompson_sampling, _pi, _ei_analytical, _ucb
 from pinot.active.biophysical_acquisition import (biophysical_thompson_sampling,
                                                   _sample_and_marginalize_delta_G)
-
+import os
 ######################
 # Utilities
 
@@ -194,9 +194,13 @@ class BeliefActivePlot():
 
     def __init__(self, net, config,
                  lr, optimizer_type,
-                 data, acquisition, num_samples, num_thompson_samples, q,
+                 data, unlabeled_data, unlabeled_volume,
+                 acquisition, num_samples, num_thompson_samples, q,
                  beliefs,
-                 device, num_trials, num_rounds, num_epochs):
+                 device, num_trials, num_rounds, num_epochs,
+                 num_inducing_points=20,
+                 num_inner_opt_rounds=200,
+                 ):
 
         # net config
         self.net = net
@@ -208,6 +212,8 @@ class BeliefActivePlot():
 
         # experiment config
         self.data = data
+        self.unlabeled_data = unlabeled_data
+        self.unlabeled_volume = unlabeled_volume
         self.acquisition = acquisition
         self.num_samples = num_samples
         self.num_thompson_samples = num_thompson_samples
@@ -222,6 +228,19 @@ class BeliefActivePlot():
             'MaxUCB': max_upper_confidence_bound,
             'MaxExpectedImprovement': max_expected_improvement,
         }
+
+        # handle semi
+        if 'semi' in self.net:
+            self.bo_cls = pinot.active.experiment.SemiSupervisedBayesOptExperiment
+            if self.net == 'semi_vgp':
+                self.num_inducing_points = num_inducing_points
+                self.num_inner_opt_rounds = num_inner_opt_rounds
+
+        elif self.net == 'multitask':
+            self.bo_cls = pinot.multitask.MultitaskBayesOptExperiment
+            self.train = pinot.multitask.MultitaskTrain
+        else:
+            self.bo_cls = pinot.active.experiment.BayesOptExperiment
 
         # housekeeping
         self.device = torch.device(device)
@@ -274,6 +293,12 @@ class BeliefActivePlot():
         ds = self.generate_data()[0]
         acq_fn = self.get_acquisition()
 
+        if self.unlabeled_data:
+            unlabeled_data = getattr(pinot.data, self.unlabeled_data)()
+            # Use a portion of the unlabeled data
+            unlabeled_data, _ = pinot.data.utils.split(unlabeled_data, [self.unlabeled_volume, 1-self.unlabeled_volume])
+            unlabeled_data = [(g.to(self.device),y.to(self.device)) for (g,y) in unlabeled_data]
+
         for i in range(self.num_trials):
 
             print(i)
@@ -289,7 +314,7 @@ class BeliefActivePlot():
             )
 
             # instantiate experiment
-            self.bo = pinot.active.experiment.BayesOptExperiment(
+            self.bo = self.bo_cls(
                 net=net,
                 data=ds,
                 optimizer=optimizer,
@@ -301,6 +326,11 @@ class BeliefActivePlot():
                 collate_fn=pinot.active.experiment._collate_fn_graph,
                 train_class=self.train
             )
+
+            if self.unlabeled_data:
+                self.bo.unlabeled_data = unlabeled_data
+            if self.net == "semi_vgp":
+                self.bo.batch_size = 32
 
             # run experiment
             acquisitions = self.bo.run(num_rounds=self.num_rounds)
@@ -519,7 +549,7 @@ class BeliefActivePlot():
             output_regressor = pinot.regressors.NeuralNetworkRegressor
             net = SemiSupervisedNet(
                 representation=representation,
-                output_regressor=output_regressor
+                output_regressor_class=output_regressor
             )
 
         elif self.net == 'semi_gp':
@@ -527,14 +557,25 @@ class BeliefActivePlot():
 
             net = SemiSupervisedNet(
                 representation=representation,
-                output_regressor=output_regressor,
+                output_regressor_class=output_regressor,
+            )
+        elif self.net == 'semi_vgp':
+            output_regressor = pinot.regressors.VariationalGaussianProcessRegressor
+
+            net = SemiSupervisedNet(
+                representation = representation,
+                output_regressor_class=output_regressor,
+                n_inducing_points=self.num_inducing_points,
+                # Picked this from experiment results
+                output_regr_optim_steps=self.num_inner_opt_rounds,
+                # Depending on how much data is available as background
             )
 
         elif self.net == 'multitask':
             output_regressor = pinot.regressors.ExactGaussianProcessRegressor
             net = pinot.multitask.MultitaskNet(
                 representation=representation,
-                output_regressor=output_regressor,
+                output_regressor_class=output_regressor,
             )
 
         return net
@@ -548,16 +589,19 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--net', type=str, default='ExactGaussianProcessRegressor')
     parser.add_argument('--config', nargs='+', type=str,
-        default=['GraphConv', '32', 'activation', 'tanh',
-                 'GraphConv', '32', 'activation', 'tanh',
-                 'GraphConv', '32', 'activation', 'tanh'])
+        default=['GraphConv', '64', 'activation', 'tanh',
+                 'GraphConv', '64', 'activation', 'tanh',
+                 'GraphConv', '64', 'activation', 'tanh',
+                 'GraphConv', '64', 'activation', 'tanh'])
 
     parser.add_argument('--lr', type=float, default=1e-4)
     parser.add_argument('--optimizer', type=str, default='Adam')
 
     parser.add_argument('--data', type=str, default='esol')
+    parser.add_argument('--unlabeled_data', type=str, default="")
     parser.add_argument('--acquisition', type=str, default='ExpectedImprovement')
     parser.add_argument('--num_samples', type=int, default=1000)
+    parser.add_argument('--num_thompson_samples', type=int, default=1000)
     parser.add_argument('--q', type=int, default=1)
     
     parser.add_argument('--beliefs', nargs='+', type=str,
@@ -571,10 +615,20 @@ if __name__ == '__main__':
 
     parser.add_argument('--index_provided', type=bool, default=True)
     parser.add_argument('--index', type=int, default=0)
+    parser.add_argument('--output_folder', type=str, default="plotting_active")
+    parser.add_argument('--seed', type=int, default=2666, help="Seed for weight initialization")
+    parser.add_argument('--unlabeled_volume', type=float, default=0.2, help="volume of unlabeled data to use")
 
+    # Variational GP
+    parser.add_argument('--num_inducing_points', type=int, default=20, help="Number of inducing points for VGP")
+    parser.add_argument('--num_inner_opt_rounds', type=int, default=200, help="Number of inner loops for training VGP")
+    
     args = parser.parse_args()
+    print(args)
+    
+    torch.manual_seed(args.seed)
 
-    plot = TSActivePlot(
+    plot = BeliefActivePlot(
         # net config
         net=args.net,
         config=args.config,
@@ -585,6 +639,8 @@ if __name__ == '__main__':
 
         # experiment config
         data=args.data,
+        unlabeled_data=args.unlabeled_data,
+        unlabeled_volume=args.unlabeled_volume,
         acquisition=args.acquisition,
         num_samples=args.num_samples,
         num_thompson_samples=args.num_thompson_samples,        
@@ -598,15 +654,24 @@ if __name__ == '__main__':
         num_trials=args.num_trials,
         num_rounds=args.num_rounds,
         num_epochs=args.num_epochs,
+
+        # Variational GP
+        num_inducing_points=args.num_inducing_points,
+        num_inner_opt_rounds=args.num_inner_opt_rounds,
     )
 
+    # If the output folder doesn't exist, create one
+    if not os.path.isdir(args.output_folder):
+        os.mkdir(args.output_folder)
+    
     # run experiment
     best_df, pro_ts_df, retro_ts_df = plot.generate()
 
     # write to disk
     beliefs_string = '_'.join(args.beliefs)
-    filename = f'{args.net}_{args.optimizer}_{args.data}_num_epochs{args.num_epochs}_{args.acquisition}_q{args.q}_beliefs{beliefs_string}_{args.index}.csv'
+    filename =\
+    f'{args.net}_{args.data}_epochs{args.num_epochs}_{args.acquisition}_{args.seed}_{args.unlabeled_volume}_induce{args.num_inducing_points}_{args.num_inner_opt_rounds}.csv'
     
-    best_df.to_csv(f'best_{filename}')
-    pro_ts_df.to_csv(f'pro_{filename}')
-    retro_ts_df.to_csv(f'retro_{filename}')
+    best_df.to_csv(os.path.join(args.output_folder, f'best_{filename}'))
+    pro_ts_df.to_csv(os.path.join(args.output_folder, f'pro_{filename}'))
+    retro_ts_df.to_csv(os.path.join(args.output_folder, f'retro_{filename}'))

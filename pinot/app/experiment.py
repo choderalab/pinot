@@ -13,6 +13,7 @@ import os
 from abc import ABC
 import copy
 import pinot
+import time
 
 # =============================================================================
 # MODULE CLASSES
@@ -63,30 +64,38 @@ class Train:
         data,
         optimizer,
         n_epochs=100,
+        start_epoch=0,
         record_interval=1,
         lr_scheduler=None,
+        save_folder=None,
+        logger=None,
     ):
 
         self.data = data
         self.optimizer = optimizer
         self.n_epochs = n_epochs
+        self.start_epoch = start_epoch
         self.net = net
         self.record_interval = record_interval
         self.states = {}
         self.lr_scheduler = lr_scheduler
+        self.save_folder = save_folder
+        self.logger = logger
 
     def train_once(self):
         """Train the model for one batch."""
+        epoch_loss = torch.tensor([0.]).cuda() # Keep track of epoch loss
         for x in self.data:
+            #def l():
+            #""" """
+            self.optimizer.zero_grad()
+            loss = torch.sum(self.net.loss(*x))
+            loss.backward()
+            epoch_loss += loss
+            #    return loss
+            self.optimizer.step()
 
-            def l():
-                """ """
-                self.optimizer.zero_grad()
-                loss = torch.sum(self.net.loss(*x))
-                loss.backward()
-                return loss
-
-            self.optimizer.step(l)
+        return epoch_loss.detach().cpu().numpy()
 
     def train(self):
         """Train the model for multiple steps and
@@ -100,19 +109,37 @@ class Train:
         -------
 
         """
+        
+        epoch_loss_arr = [] # Keep track of the epoch loss
 
-        for epoch_idx in range(int(self.n_epochs)):
-            self.train_once()
+        for epoch_idx in range(self.start_epoch, int(self.n_epochs)):
+            start = time.time()
+            epoch_loss = self.train_once()
+
+            epoch_loss_arr.append(epoch_loss) # Keep track of the epoch loss
+
             if self.lr_scheduler is not None:
                 self.lr_scheduler.step()
 
             if epoch_idx % self.record_interval == 0:
+                if self.save_folder: # If a save folder is specified
+                # Save the learned models
+                    if not os.path.isdir(self.save_folder):
+                    # If the model folder doesn't exist create it
+                        os.mkdir(self.save_folder)
+                    torch.save(self.net.state_dict(), os.path.join(self.save_folder, f"{epoch_idx}.th"))
                 self.states[epoch_idx] = copy.deepcopy(self.net.state_dict())
+            end = time.time()
+            if self.logger:
+                self.logger.debug("Finished training one epoch after {} seconds".format(end-start))
 
         self.states["final"] = copy.deepcopy(self.net.state_dict())
 
         if hasattr(self.optimizer, "expecation_params"):
             self.optimizer.expectation_params()
+        
+        print("epoch loss arr")
+        print(epoch_loss_arr)
 
         return self.net
 

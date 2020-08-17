@@ -8,7 +8,7 @@ import sys
 
 from .datasets import esol, freesolv, lipophilicity, curve, moonshot_mixed
 from .unlabeled_datasets import moses_tiny, zinc_tiny,\
-    moonshot_semi_small, esol_semi_small,\
+    moonshot_semi_small, esol_semi_small, moonshot_unlabeled_all,\
     moonshot_unlabeled_small, esol_unlabeled_small
 
 # =============================================================================
