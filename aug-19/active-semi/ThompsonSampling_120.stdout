@@ -1,0 +1,656 @@
+Sender: LSF System <lsfadmin@lt19>
+Subject: Job 16777378: <active-init-try> in cluster <lila> Exited
+
+Job <active-init-try> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Tue Aug 18 14:49:32 2020
+Job was executed on host(s) <12*lt19>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Tue Aug 18 14:54:04 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Tue Aug 18 14:54:04 2020
+Terminated at Tue Aug 18 14:58:16 2020
+Results reported at Tue Aug 18 14:58:16 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_vgp --num_rounds 5 --num_trials 1 --num_epochs 120 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-19/active-semi --index 1 --unlabeled_data moonshot_unlabeled_all --device cuda:0 --seed 2666 --unlabeled_volume 0.4 --num_inducing_points 50 --num_inner_opt_rounds 50
+------------------------------------------------------------
+
+TERM_OWNER: job killed by owner.
+Exited with exit code 130.
+
+Resource usage summary:
+
+    CPU time :                                   524.00 sec.
+    Max Memory :                                 3 GB
+    Average Memory :                             2.29 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               189.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   254 sec.
+    Turnaround time :                            524 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_vgp', num_epochs=120, num_inducing_points=50, num_inner_opt_rounds=50, num_rounds=5, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-19/active-semi', q=96, seed=2666, unlabeled_data='moonshot_unlabeled_all', unlabeled_volume=0.4)
+0
+We have 23849 molecules
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-19/active-semi/ThompsonSampling_120.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lt21>
+Subject: Job 16777387: <active-init-try> in cluster <lila> Exited
+
+Job <active-init-try> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Tue Aug 18 14:49:35 2020
+Job was executed on host(s) <12*lt21>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Tue Aug 18 14:55:21 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Tue Aug 18 14:55:21 2020
+Terminated at Tue Aug 18 14:58:16 2020
+Results reported at Tue Aug 18 14:58:16 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_vgp --num_rounds 5 --num_trials 1 --num_epochs 120 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-19/active-semi --index 1 --unlabeled_data moonshot_unlabeled_all --device cuda:0 --seed 1637 --unlabeled_volume 0.4 --num_inducing_points 20 --num_inner_opt_rounds 50
+------------------------------------------------------------
+
+TERM_OWNER: job killed by owner.
+Exited with exit code 130.
+
+Resource usage summary:
+
+    CPU time :                                   113.00 sec.
+    Max Memory :                                 3 GB
+    Average Memory :                             1.51 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               189.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                8
+    Run time :                                   175 sec.
+    Turnaround time :                            521 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', early_stopping=False, index=1, index_provided=True, lr=0.0001, net='semi_vgp', num_epochs=120, num_inducing_points=20, num_inner_opt_rounds=50, num_rounds=5, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-19/active-semi', q=96, seed=1637, unlabeled_data='moonshot_unlabeled_all', unlabeled_volume=0.4)
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-19/active-semi/ThompsonSampling_120.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lu01>
+Subject: Job 16777385: <active-init-try> in cluster <lila> Exited
+
+Job <active-init-try> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Tue Aug 18 14:49:34 2020
+Job was executed on host(s) <12*lu01>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Tue Aug 18 14:54:53 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Tue Aug 18 14:54:53 2020
+Terminated at Tue Aug 18 14:58:18 2020
+Results reported at Tue Aug 18 14:58:18 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_vgp --num_rounds 5 --num_trials 1 --num_epochs 120 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-19/active-semi --index 1 --unlabeled_data moonshot_unlabeled_all --device cuda:0 --seed 8888 --unlabeled_volume 0.4 --num_inducing_points 20 --num_inner_opt_rounds 50
+------------------------------------------------------------
+
+TERM_OWNER: job killed by owner.
+Exited with exit code 130.
+
+Resource usage summary:
+
+    CPU time :                                   284.00 sec.
+    Max Memory :                                 4 GB
+    Average Memory :                             2.66 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               188.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   204 sec.
+    Turnaround time :                            524 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', early_stopping=False, index=1, index_provided=True, lr=0.0001, net='semi_vgp', num_epochs=120, num_inducing_points=20, num_inner_opt_rounds=50, num_rounds=5, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-19/active-semi', q=96, seed=8888, unlabeled_data='moonshot_unlabeled_all', unlabeled_volume=0.4)
+0
+We have 23849 molecules
+Sender: LSF System <lsfadmin@lt22>
+Subject: Job 16777382: <active-init-try> in cluster <lila> Exited
+
+Job <active-init-try> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Tue Aug 18 14:49:32 2020
+Job was executed on host(s) <12*lt22>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Tue Aug 18 14:54:25 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Tue Aug 18 14:54:25 2020
+Terminated at Tue Aug 18 14:58:18 2020
+Results reported at Tue Aug 18 14:58:18 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_vgp --num_rounds 5 --num_trials 1 --num_epochs 120 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-19/active-semi --index 1 --unlabeled_data moonshot_unlabeled_all --device cuda:0 --seed 1637 --unlabeled_volume 0.4 --num_inducing_points 50 --num_inner_opt_rounds 50
+------------------------------------------------------------
+
+TERM_OWNER: job killed by owner.
+Exited with exit code 130.
+
+Resource usage summary:
+
+    CPU time :                                   522.00 sec.
+    Max Memory :                                 3 GB
+    Average Memory :                             2.56 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               189.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   233 sec.
+    Turnaround time :                            526 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', early_stopping=False, index=1, index_provided=True, lr=0.0001, net='semi_vgp', num_epochs=120, num_inducing_points=50, num_inner_opt_rounds=50, num_rounds=5, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-19/active-semi', q=96, seed=1637, unlabeled_data='moonshot_unlabeled_all', unlabeled_volume=0.4)
+0
+We have 23849 molecules
+Sender: LSF System <lsfadmin@ls14>
+Subject: Job 16777384: <active-init-try> in cluster <lila> Exited
+
+Job <active-init-try> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Tue Aug 18 14:49:34 2020
+Job was executed on host(s) <12*ls14>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Tue Aug 18 14:54:41 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Tue Aug 18 14:54:41 2020
+Terminated at Tue Aug 18 14:58:18 2020
+Results reported at Tue Aug 18 14:58:18 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_vgp --num_rounds 5 --num_trials 1 --num_epochs 120 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-19/active-semi --index 1 --unlabeled_data moonshot_unlabeled_all --device cuda:0 --seed 417 --unlabeled_volume 0.4 --num_inducing_points 20 --num_inner_opt_rounds 50
+------------------------------------------------------------
+
+TERM_OWNER: job killed by owner.
+Exited with exit code 130.
+
+Resource usage summary:
+
+    CPU time :                                   445.00 sec.
+    Max Memory :                                 3 GB
+    Average Memory :                             2.58 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               189.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   216 sec.
+    Turnaround time :                            524 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', early_stopping=False, index=1, index_provided=True, lr=0.0001, net='semi_vgp', num_epochs=120, num_inducing_points=20, num_inner_opt_rounds=50, num_rounds=5, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-19/active-semi', q=96, seed=417, unlabeled_data='moonshot_unlabeled_all', unlabeled_volume=0.4)
+0
+We have 23849 molecules
+Sender: LSF System <lsfadmin@lt08>
+Subject: Job 16777380: <active-init-try> in cluster <lila> Exited
+
+Job <active-init-try> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Tue Aug 18 14:49:32 2020
+Job was executed on host(s) <12*lt08>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Tue Aug 18 14:54:05 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Tue Aug 18 14:54:05 2020
+Terminated at Tue Aug 18 14:58:18 2020
+Results reported at Tue Aug 18 14:58:18 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_vgp --num_rounds 5 --num_trials 1 --num_epochs 120 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-19/active-semi --index 1 --unlabeled_data moonshot_unlabeled_all --device cuda:0 --seed 8888 --unlabeled_volume 0.4 --num_inducing_points 50 --num_inner_opt_rounds 50
+------------------------------------------------------------
+
+TERM_OWNER: job killed by owner.
+Exited with exit code 130.
+
+Resource usage summary:
+
+    CPU time :                                   450.00 sec.
+    Max Memory :                                 3 GB
+    Average Memory :                             2.18 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               189.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   252 sec.
+    Turnaround time :                            526 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_vgp', num_epochs=120, num_inducing_points=50, num_inner_opt_rounds=50, num_rounds=5, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-19/active-semi', q=96, seed=8888, unlabeled_data='moonshot_unlabeled_all', unlabeled_volume=0.4)
+0
+We have 23849 molecules
+Sender: LSF System <lsfadmin@lt15>
+Subject: Job 16777386: <active-init-try> in cluster <lila> Exited
+
+Job <active-init-try> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Tue Aug 18 14:49:35 2020
+Job was executed on host(s) <12*lt15>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Tue Aug 18 14:55:10 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Tue Aug 18 14:55:10 2020
+Terminated at Tue Aug 18 14:58:18 2020
+Results reported at Tue Aug 18 14:58:18 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_vgp --num_rounds 5 --num_trials 1 --num_epochs 120 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-19/active-semi --index 1 --unlabeled_data moonshot_unlabeled_all --device cuda:0 --seed 11 --unlabeled_volume 0.4 --num_inducing_points 20 --num_inner_opt_rounds 50
+------------------------------------------------------------
+
+TERM_OWNER: job killed by owner.
+Exited with exit code 130.
+
+Resource usage summary:
+
+    CPU time :                                   247.00 sec.
+    Max Memory :                                 3 GB
+    Average Memory :                             2.23 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               189.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   187 sec.
+    Turnaround time :                            523 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', early_stopping=False, index=1, index_provided=True, lr=0.0001, net='semi_vgp', num_epochs=120, num_inducing_points=20, num_inner_opt_rounds=50, num_rounds=5, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-19/active-semi', q=96, seed=11, unlabeled_data='moonshot_unlabeled_all', unlabeled_volume=0.4)
+0
+We have 23849 molecules
+Sender: LSF System <lsfadmin@lu08>
+Subject: Job 16777383: <active-init-try> in cluster <lila> Exited
+
+Job <active-init-try> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Tue Aug 18 14:49:32 2020
+Job was executed on host(s) <12*lu08>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Tue Aug 18 14:54:26 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Tue Aug 18 14:54:26 2020
+Terminated at Tue Aug 18 14:58:18 2020
+Results reported at Tue Aug 18 14:58:18 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_vgp --num_rounds 5 --num_trials 1 --num_epochs 120 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-19/active-semi --index 1 --unlabeled_data moonshot_unlabeled_all --device cuda:0 --seed 2666 --unlabeled_volume 0.4 --num_inducing_points 20 --num_inner_opt_rounds 50
+------------------------------------------------------------
+
+TERM_OWNER: job killed by owner.
+Exited with exit code 130.
+
+Resource usage summary:
+
+    CPU time :                                   413.00 sec.
+    Max Memory :                                 4 GB
+    Average Memory :                             3.06 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               188.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   231 sec.
+    Turnaround time :                            526 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', early_stopping=False, index=1, index_provided=True, lr=0.0001, net='semi_vgp', num_epochs=120, num_inducing_points=20, num_inner_opt_rounds=50, num_rounds=5, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-19/active-semi', q=96, seed=2666, unlabeled_data='moonshot_unlabeled_all', unlabeled_volume=0.4)
+0
+We have 23849 molecules
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-19/active-semi/ThompsonSampling_120.stderr> for stderr output of this job.
+
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-19/active-semi/ThompsonSampling_120.stderr> for stderr output of this job.
+
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-19/active-semi/ThompsonSampling_120.stderr> for stderr output of this job.
+
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-19/active-semi/ThompsonSampling_120.stderr> for stderr output of this job.
+
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-19/active-semi/ThompsonSampling_120.stderr> for stderr output of this job.
+
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-19/active-semi/ThompsonSampling_120.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lt19>
+Subject: Job 16777379: <active-init-try> in cluster <lila> Exited
+
+Job <active-init-try> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Tue Aug 18 14:49:32 2020
+Job was executed on host(s) <12*lt19>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Tue Aug 18 14:54:04 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Tue Aug 18 14:54:04 2020
+Terminated at Tue Aug 18 14:58:18 2020
+Results reported at Tue Aug 18 14:58:18 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_vgp --num_rounds 5 --num_trials 1 --num_epochs 120 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-19/active-semi --index 1 --unlabeled_data moonshot_unlabeled_all --device cuda:0 --seed 417 --unlabeled_volume 0.4 --num_inducing_points 50 --num_inner_opt_rounds 50
+------------------------------------------------------------
+
+TERM_OWNER: job killed by owner.
+Exited with exit code 130.
+
+Resource usage summary:
+
+    CPU time :                                   529.00 sec.
+    Max Memory :                                 3 GB
+    Average Memory :                             2.29 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               189.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   255 sec.
+    Turnaround time :                            526 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', index=1, index_provided=True, lr=0.0001, net='semi_vgp', num_epochs=120, num_inducing_points=50, num_inner_opt_rounds=50, num_rounds=5, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-19/active-semi', q=96, seed=417, unlabeled_data='moonshot_unlabeled_all', unlabeled_volume=0.4)
+0
+We have 23849 molecules
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-19/active-semi/ThompsonSampling_120.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls14>
+Subject: Job 16777381: <active-init-try> in cluster <lila> Exited
+
+Job <active-init-try> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Tue Aug 18 14:49:32 2020
+Job was executed on host(s) <12*ls14>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Tue Aug 18 14:54:24 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Tue Aug 18 14:54:24 2020
+Terminated at Tue Aug 18 14:58:18 2020
+Results reported at Tue Aug 18 14:58:18 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_vgp --num_rounds 5 --num_trials 1 --num_epochs 120 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-19/active-semi --index 1 --unlabeled_data moonshot_unlabeled_all --device cuda:0 --seed 11 --unlabeled_volume 0.4 --num_inducing_points 50 --num_inner_opt_rounds 50
+------------------------------------------------------------
+
+TERM_OWNER: job killed by owner.
+Exited with exit code 130.
+
+Resource usage summary:
+
+    CPU time :                                   494.00 sec.
+    Max Memory :                                 3 GB
+    Average Memory :                             2.49 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               189.00 GB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                21
+    Run time :                                   234 sec.
+    Turnaround time :                            526 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', early_stopping=False, index=1, index_provided=True, lr=0.0001, net='semi_vgp', num_epochs=120, num_inducing_points=50, num_inner_opt_rounds=50, num_rounds=5, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-19/active-semi', q=96, seed=11, unlabeled_data='moonshot_unlabeled_all', unlabeled_volume=0.4)
+0
+We have 23849 molecules
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-19/active-semi/ThompsonSampling_120.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls16>
+Subject: Job 16777410: <active-init-try> in cluster <lila> Exited
+
+Job <active-init-try> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Tue Aug 18 15:05:52 2020
+Job was executed on host(s) <12*ls16>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Tue Aug 18 15:10:41 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Tue Aug 18 15:10:41 2020
+Terminated at Wed Aug 19 02:03:13 2020
+Results reported at Wed Aug 19 02:03:13 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_vgp --num_rounds 5 --num_trials 1 --num_epochs 120 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-19/active-semi --index 1 --unlabeled_data moonshot_unlabeled_all --device cuda:0 --seed 11 --unlabeled_volume 0.4 --num_inducing_points 50 --num_inner_opt_rounds 50 --early_stopping
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   164480.00 sec.
+    Max Memory :                                 3 GB
+    Average Memory :                             3.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               189.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   39152 sec.
+    Turnaround time :                            39441 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', early_stopping=True, index=1, index_provided=True, lr=0.0001, net='semi_vgp', num_epochs=120, num_inducing_points=50, num_inner_opt_rounds=50, num_rounds=5, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-19/active-semi', q=96, seed=11, unlabeled_data='moonshot_unlabeled_all', unlabeled_volume=0.4)
+0
+We have 23849 molecules
+All that training took 331.7854051589966 seconds
+epoch loss arr
+[array([60615.223], dtype=float32), array([41799.863], dtype=float32), array([39909.457], dtype=float32), array([37829.426], dtype=float32), array([36660.453], dtype=float32), array([34986.895], dtype=float32), array([33852.375], dtype=float32), array([33039.957], dtype=float32), array([32412.91], dtype=float32), array([27096.785], dtype=float32), array([21099.908], dtype=float32), array([20457.904], dtype=float32), array([20107.533], dtype=float32), array([19850.822], dtype=float32), array([19635.61], dtype=float32), array([19483.096], dtype=float32), array([19332.582], dtype=float32), array([19249.535], dtype=float32), array([19134.63], dtype=float32), array([19052.348], dtype=float32), array([18977.8], dtype=float32), array([18932.18], dtype=float32), array([18874.75], dtype=float32), array([18824.316], dtype=float32), array([18770.69], dtype=float32), array([18732.264], dtype=float32), array([18694.32], dtype=float32), array([18662.006], dtype=float32), array([18620.623], dtype=float32), array([18604.586], dtype=float32), array([18571.229], dtype=float32), array([18534.258], dtype=float32), array([18520.604], dtype=float32), array([18507.396], dtype=float32), array([18482.633], dtype=float32), array([18456.094], dtype=float32), array([18446.818], dtype=float32), array([18428.773], dtype=float32), array([18406.492], dtype=float32), array([18392.564], dtype=float32), array([18390.834], dtype=float32), array([18377.863], dtype=float32), array([18355.273], dtype=float32), array([18348.338], dtype=float32), array([18327.895], dtype=float32), array([18308.213], dtype=float32), array([18301.79], dtype=float32), array([18291.611], dtype=float32), array([18282.146], dtype=float32), array([18270.092], dtype=float32), array([18263.072], dtype=float32), array([18244.688], dtype=float32), array([18236.303], dtype=float32), array([18230.807], dtype=float32), array([18213.656], dtype=float32), array([18212.465], dtype=float32), array([18200.822], dtype=float32), array([18197.47], dtype=float32), array([18191.38], dtype=float32), array([18174.426], dtype=float32), array([18166.676], dtype=float32), array([18164.105], dtype=float32), array([18150.26], dtype=float32), array([18152.736], dtype=float32), array([18140.05], dtype=float32), array([18139.604], dtype=float32), array([18131.49], dtype=float32), array([18125.527], dtype=float32), array([18125.51], dtype=float32), array([18108.084], dtype=float32), array([18107.904], dtype=float32), array([18096.5], dtype=float32), array([18096.49], dtype=float32), array([18074.127], dtype=float32), array([18101.502], dtype=float32), array([18071.992], dtype=float32), array([18072.578], dtype=float32), array([18071.717], dtype=float32), array([18066.322], dtype=float32), array([18054.453], dtype=float32), array([18064.602], dtype=float32), array([18035.342], dtype=float32), array([18042.535], dtype=float32), array([18034.857], dtype=float32), array([18043.184], dtype=float32), array([18035.336], dtype=float32), array([18042.52], dtype=float32), array([18016.633], dtype=float32), array([18021.646], dtype=float32), array([18017.973], dtype=float32), array([18007.451], dtype=float32), array([18010.809], dtype=float32), array([18015.361], dtype=float32), array([18009.434], dtype=float32), array([17991.418], dtype=float32), array([17997.314], dtype=float32), array([17993.412], dtype=float32), array([17989.99], dtype=float32), array([17991.625], dtype=float32), array([17977.654], dtype=float32), array([17980.494], dtype=float32), array([17981.758], dtype=float32), array([17966.371], dtype=float32), array([17968.4], dtype=float32), array([17966.193], dtype=float32), array([17965.812], dtype=float32), array([17960.7], dtype=float32), array([17964.668], dtype=float32), array([17951.621], dtype=float32), array([17949.855], dtype=float32), array([17959.62], dtype=float32), array([17946.15], dtype=float32), array([17946.188], dtype=float32), array([17939.861], dtype=float32), array([17937.27], dtype=float32), array([17943.283], dtype=float32), array([17936.686], dtype=float32), array([17937.746], dtype=float32), array([17936.012], dtype=float32), array([17943.85], dtype=float32)]
+Pre-training took 38946.334970235825 seconds
+Picking initialization took 44.046449184417725 seconds
+y-best:  tensor(1.0824, device='cuda:0')
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-19/active-semi/ThompsonSampling_120.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lu09>
+Subject: Job 16777415: <active-init-try> in cluster <lila> Exited
+
+Job <active-init-try> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Tue Aug 18 15:05:54 2020
+Job was executed on host(s) <12*lu09>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Tue Aug 18 15:12:05 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Tue Aug 18 15:12:05 2020
+Terminated at Wed Aug 19 05:45:17 2020
+Results reported at Wed Aug 19 05:45:17 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_vgp --num_rounds 5 --num_trials 1 --num_epochs 120 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-19/active-semi --index 1 --unlabeled_data moonshot_unlabeled_all --device cuda:0 --seed 11 --unlabeled_volume 0.4 --num_inducing_points 20 --num_inner_opt_rounds 50 --early_stopping
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   261931.00 sec.
+    Max Memory :                                 4 GB
+    Average Memory :                             3.99 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               188.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   52394 sec.
+    Turnaround time :                            52763 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', early_stopping=True, index=1, index_provided=True, lr=0.0001, net='semi_vgp', num_epochs=120, num_inducing_points=20, num_inner_opt_rounds=50, num_rounds=5, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-19/active-semi', q=96, seed=11, unlabeled_data='moonshot_unlabeled_all', unlabeled_volume=0.4)
+0
+We have 23849 molecules
+All that training took 448.3370552062988 seconds
+epoch loss arr
+[array([120149.82], dtype=float32), array([117613.6], dtype=float32), array([112449.79], dtype=float32), array([110049.18], dtype=float32), array([60684.07], dtype=float32), array([27613.61], dtype=float32), array([24343.814], dtype=float32), array([22862.422], dtype=float32), array([22046.928], dtype=float32), array([21548.63], dtype=float32), array([21161.186], dtype=float32), array([20836.422], dtype=float32), array([20533.99], dtype=float32), array([20280.182], dtype=float32), array([20038.217], dtype=float32), array([19786.621], dtype=float32), array([19551.299], dtype=float32), array([19339.057], dtype=float32), array([19162.912], dtype=float32), array([19015.375], dtype=float32), array([18907.58], dtype=float32), array([18814.018], dtype=float32), array([18743.736], dtype=float32), array([18676.2], dtype=float32), array([18637.426], dtype=float32), array([18586.402], dtype=float32), array([18576.498], dtype=float32), array([18541.988], dtype=float32), array([18506.19], dtype=float32), array([18487.113], dtype=float32), array([18461.12], dtype=float32), array([18423.014], dtype=float32), array([18420.104], dtype=float32), array([18394.383], dtype=float32), array([18392.006], dtype=float32), array([18381.477], dtype=float32), array([18362.56], dtype=float32), array([18330.225], dtype=float32), array([18322.803], dtype=float32), array([18313.264], dtype=float32), array([18282.227], dtype=float32), array([18282.074], dtype=float32), array([18266.309], dtype=float32), array([18249.406], dtype=float32), array([18239.143], dtype=float32), array([18220.291], dtype=float32), array([18226.883], dtype=float32), array([18203.338], dtype=float32), array([18196.572], dtype=float32), array([18181.19], dtype=float32), array([18186.729], dtype=float32), array([18161.143], dtype=float32), array([18136.61], dtype=float32), array([18143.963], dtype=float32), array([18138.469], dtype=float32), array([18113.193], dtype=float32), array([18113.072], dtype=float32), array([18125.371], dtype=float32), array([18098.443], dtype=float32), array([18094.785], dtype=float32), array([18091.328], dtype=float32), array([18076.682], dtype=float32), array([18073.799], dtype=float32), array([18069.088], dtype=float32), array([18064.764], dtype=float32), array([18055.947], dtype=float32), array([18048.287], dtype=float32), array([18041.129], dtype=float32), array([18044.113], dtype=float32), array([18033.074], dtype=float32), array([18017.914], dtype=float32), array([18023.424], dtype=float32), array([18016.46], dtype=float32), array([17995.504], dtype=float32), array([18004.068], dtype=float32), array([18007.098], dtype=float32), array([17996.637], dtype=float32), array([17989.742], dtype=float32), array([17986.291], dtype=float32), array([17984.027], dtype=float32), array([17980.406], dtype=float32), array([17973.164], dtype=float32), array([17986.635], dtype=float32), array([17963.307], dtype=float32), array([17959.053], dtype=float32), array([17961.4], dtype=float32), array([17964.227], dtype=float32), array([17946.145], dtype=float32), array([17955.781], dtype=float32), array([17954.076], dtype=float32), array([17942.967], dtype=float32), array([17952.709], dtype=float32), array([17928.707], dtype=float32), array([17925.904], dtype=float32), array([17931.875], dtype=float32), array([17927.492], dtype=float32), array([17929.361], dtype=float32), array([17926.896], dtype=float32), array([17920.729], dtype=float32), array([17916.385], dtype=float32), array([17912.688], dtype=float32), array([17908.387], dtype=float32), array([17915.709], dtype=float32), array([17910.086], dtype=float32), array([17913.93], dtype=float32), array([17892.65], dtype=float32), array([17893.295], dtype=float32), array([17903.531], dtype=float32), array([17897.676], dtype=float32), array([17893.84], dtype=float32), array([17893.02], dtype=float32), array([17883.16], dtype=float32), array([17889.89], dtype=float32), array([17888.508], dtype=float32), array([17872.39], dtype=float32), array([17884.4], dtype=float32), array([17883.123], dtype=float32), array([17870.418], dtype=float32), array([17878.686], dtype=float32), array([17869.816], dtype=float32)]
+Pre-training took 52121.76092648506 seconds
+Picking initialization took 48.3059937953949 seconds
+y-best:  tensor(1.0824, device='cuda:0')
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-19/active-semi/ThompsonSampling_120.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@ls16>
+Subject: Job 16777413: <active-init-try> in cluster <lila> Done
+
+Job <active-init-try> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Tue Aug 18 15:05:54 2020
+Job was executed on host(s) <12*ls16>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Tue Aug 18 15:11:20 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Tue Aug 18 15:11:20 2020
+Terminated at Wed Aug 19 20:06:47 2020
+Results reported at Wed Aug 19 20:06:47 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_vgp --num_rounds 5 --num_trials 1 --num_epochs 120 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-19/active-semi --index 1 --unlabeled_data moonshot_unlabeled_all --device cuda:0 --seed 417 --unlabeled_volume 0.4 --num_inducing_points 20 --num_inner_opt_rounds 50 --early_stopping
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   350287.00 sec.
+    Max Memory :                                 4 GB
+    Average Memory :                             3.45 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               188.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   104127 sec.
+    Turnaround time :                            104453 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', early_stopping=True, index=1, index_provided=True, lr=0.0001, net='semi_vgp', num_epochs=120, num_inducing_points=20, num_inner_opt_rounds=50, num_rounds=5, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-19/active-semi', q=96, seed=417, unlabeled_data='moonshot_unlabeled_all', unlabeled_volume=0.4)
+0
+We have 23849 molecules
+All that training took 327.494398355484 seconds
+epoch loss arr
+[array([54811.137], dtype=float32), array([34701.27], dtype=float32), array([31209.727], dtype=float32), array([27135.453], dtype=float32), array([25504.725], dtype=float32), array([24715.766], dtype=float32), array([23946.904], dtype=float32), array([23220.105], dtype=float32), array([22455.504], dtype=float32), array([21746.83], dtype=float32), array([21157.734], dtype=float32), array([20678.371], dtype=float32), array([20311.486], dtype=float32), array([20051.912], dtype=float32), array([19834.342], dtype=float32), array([19642.81], dtype=float32), array([19450.953], dtype=float32), array([19254.26], dtype=float32), array([19099.729], dtype=float32), array([19002.14], dtype=float32), array([18925.45], dtype=float32), array([18849.62], dtype=float32), array([18785.209], dtype=float32), array([18728.514], dtype=float32), array([18679.506], dtype=float32), array([18635.156], dtype=float32), array([18587.871], dtype=float32), array([18565.744], dtype=float32), array([18517.324], dtype=float32), array([18489.854], dtype=float32), array([18462.744], dtype=float32), array([18436.266], dtype=float32), array([18410.387], dtype=float32), array([18387.387], dtype=float32), array([18356.701], dtype=float32), array([18336.027], dtype=float32), array([18316.504], dtype=float32), array([18292.832], dtype=float32), array([18283.256], dtype=float32), array([18262.775], dtype=float32), array([18257.994], dtype=float32), array([18237.863], dtype=float32), array([18215.248], dtype=float32), array([18206.16], dtype=float32), array([18193.299], dtype=float32), array([18193.105], dtype=float32), array([18174.379], dtype=float32), array([18170.168], dtype=float32), array([18144.344], dtype=float32), array([18137.285], dtype=float32), array([18119.387], dtype=float32), array([18115.855], dtype=float32), array([18101.516], dtype=float32), array([18093.748], dtype=float32), array([18088.418], dtype=float32), array([18077.432], dtype=float32), array([18073.154], dtype=float32), array([18053.1], dtype=float32), array([18063.092], dtype=float32), array([18053.033], dtype=float32), array([18039.266], dtype=float32), array([18035.123], dtype=float32), array([18041.082], dtype=float32), array([18026.055], dtype=float32), array([18022.295], dtype=float32), array([18014.326], dtype=float32), array([18008.623], dtype=float32), array([17997.166], dtype=float32), array([17992.965], dtype=float32), array([17977.059], dtype=float32), array([17998.559], dtype=float32), array([17983.518], dtype=float32), array([17991.943], dtype=float32), array([17980.684], dtype=float32), array([17980.207], dtype=float32), array([17962.174], dtype=float32), array([17964.848], dtype=float32), array([17960.514], dtype=float32), array([17963.08], dtype=float32), array([17947.766], dtype=float32), array([17951.24], dtype=float32), array([17948.352], dtype=float32), array([17937.176], dtype=float32), array([17944.166], dtype=float32), array([17944.62], dtype=float32), array([17944.191], dtype=float32), array([17942.816], dtype=float32), array([17939.957], dtype=float32), array([17926.117], dtype=float32), array([17928.176], dtype=float32), array([17925.621], dtype=float32), array([17929.588], dtype=float32), array([17915.154], dtype=float32), array([17911.283], dtype=float32), array([17918.533], dtype=float32), array([17900.535], dtype=float32), array([17911.51], dtype=float32), array([17919.648], dtype=float32), array([17905.49], dtype=float32), array([17906.75], dtype=float32), array([17906.521], dtype=float32), array([17909.357], dtype=float32), array([17899.664], dtype=float32), array([17908.28], dtype=float32), array([17905.434], dtype=float32), array([17886.342], dtype=float32), array([17887.236], dtype=float32), array([17893.078], dtype=float32), array([17886.053], dtype=float32), array([17892.318], dtype=float32), array([17893.674], dtype=float32), array([17889.11], dtype=float32), array([17882.84], dtype=float32), array([17876.594], dtype=float32), array([17870.477], dtype=float32), array([17872.684], dtype=float32), array([17862.94], dtype=float32), array([17871.408], dtype=float32), array([17872.346], dtype=float32), array([17867.684], dtype=float32)]
+Pre-training took 38586.451191186905 seconds
+Picking initialization took 44.22868728637695 seconds
+y-best:  tensor(1.0396, device='cuda:0')
+All that training took 556.7265479564667 seconds
+epoch loss arr
+[array([201.64807], dtype=float32), array([197.65245], dtype=float32), array([201.89229], dtype=float32), array([193.80121], dtype=float32), array([190.744], dtype=float32), array([187.90808], dtype=float32), array([187.73972], dtype=float32), array([188.88695], dtype=float32), array([190.90408], dtype=float32), array([192.68423], dtype=float32), array([194.86377], dtype=float32), array([197.98708], dtype=float32), array([202.16035], dtype=float32), array([205.92595], dtype=float32), array([209.51778], dtype=float32), array([212.86957], dtype=float32), array([216.88994], dtype=float32), array([222.0677], dtype=float32), array([224.20541], dtype=float32), array([227.23271], dtype=float32), array([229.72551], dtype=float32), array([232.7751], dtype=float32), array([236.18121], dtype=float32), array([238.63155], dtype=float32), array([240.7176], dtype=float32), array([242.3719], dtype=float32), array([243.82416], dtype=float32), array([245.64684], dtype=float32), array([246.92], dtype=float32), array([247.69472], dtype=float32), array([248.69867], dtype=float32), array([249.39209], dtype=float32), array([250.0734], dtype=float32), array([251.56387], dtype=float32), array([252.04677], dtype=float32), array([253.27364], dtype=float32), array([254.4744], dtype=float32), array([255.73213], dtype=float32), array([256.74792], dtype=float32), array([258.4577], dtype=float32), array([259.63586], dtype=float32), array([260.7999], dtype=float32), array([260.83548], dtype=float32), array([261.90054], dtype=float32), array([263.11996], dtype=float32), array([264.54688], dtype=float32), array([265.01245], dtype=float32), array([265.82034], dtype=float32), array([262.38385], dtype=float32), array([264.21637], dtype=float32), array([262.22256], dtype=float32), array([268.24335], dtype=float32), array([259.6317], dtype=float32), array([262.2801], dtype=float32), array([264.79758], dtype=float32), array([265.32336], dtype=float32), array([261.55267], dtype=float32), array([261.24905], dtype=float32), array([261.63382], dtype=float32), array([264.2892], dtype=float32), array([271.3655], dtype=float32), array([277.82123], dtype=float32), array([274.9324], dtype=float32), array([279.89136], dtype=float32), array([271.16092], dtype=float32), array([278.5142], dtype=float32), array([273.9131], dtype=float32), array([279.33347], dtype=float32), array([277.32275], dtype=float32), array([292.0641], dtype=float32), array([278.1266], dtype=float32), array([282.04605], dtype=float32), array([297.79807], dtype=float32), array([282.81262], dtype=float32), array([287.1784], dtype=float32), array([275.4559], dtype=float32), array([275.7488], dtype=float32), array([289.11282], dtype=float32), array([281.7933], dtype=float32), array([285.2842], dtype=float32), array([276.92603], dtype=float32), array([304.2167], dtype=float32), array([278.37872], dtype=float32), array([272.9187], dtype=float32), array([277.64615], dtype=float32), array([260.99643], dtype=float32), array([257.44128], dtype=float32), array([262.85117], dtype=float32), array([256.81473], dtype=float32), array([260.60715], dtype=float32), array([260.14383], dtype=float32), array([249.49771], dtype=float32), array([256.32327], dtype=float32), array([266.50583], dtype=float32), array([264.67163], dtype=float32), array([267.82544], dtype=float32), array([274.9461], dtype=float32), array([270.98975], dtype=float32), array([267.98456], dtype=float32), array([273.6519], dtype=float32), array([282.0014], dtype=float32), array([245.05649], dtype=float32), array([273.65088], dtype=float32), array([281.52124], dtype=float32), array([260.4679], dtype=float32), array([282.64523], dtype=float32), array([280.2719], dtype=float32), array([274.82803], dtype=float32), array([267.10968], dtype=float32), array([257.24164], dtype=float32), array([263.07224], dtype=float32), array([276.13345], dtype=float32), array([270.51804], dtype=float32), array([277.09854], dtype=float32), array([273.29044], dtype=float32), array([271.21268], dtype=float32), array([271.75366], dtype=float32), array([267.73627], dtype=float32), array([269.08508], dtype=float32), array([268.8551], dtype=float32)]
+y-best:  tensor(1.0824, device='cuda:0')
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-19/active-semi/ThompsonSampling_120.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lu10>
+Subject: Job 16777416: <active-init-try> in cluster <lila> Done
+
+Job <active-init-try> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Tue Aug 18 15:05:54 2020
+Job was executed on host(s) <12*lu10>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Tue Aug 18 15:12:10 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Tue Aug 18 15:12:10 2020
+Terminated at Wed Aug 19 22:04:20 2020
+Results reported at Wed Aug 19 22:04:20 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_vgp --num_rounds 5 --num_trials 1 --num_epochs 120 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-19/active-semi --index 1 --unlabeled_data moonshot_unlabeled_all --device cuda:0 --seed 1637 --unlabeled_volume 0.4 --num_inducing_points 20 --num_inner_opt_rounds 50 --early_stopping
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   456408.00 sec.
+    Max Memory :                                 4 GB
+    Average Memory :                             4.00 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               188.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   111130 sec.
+    Turnaround time :                            111506 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', early_stopping=True, index=1, index_provided=True, lr=0.0001, net='semi_vgp', num_epochs=120, num_inducing_points=20, num_inner_opt_rounds=50, num_rounds=5, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-19/active-semi', q=96, seed=1637, unlabeled_data='moonshot_unlabeled_all', unlabeled_volume=0.4)
+0
+We have 23849 molecules
+All that training took 307.59022212028503 seconds
+epoch loss arr
+[array([53652.23], dtype=float32), array([32145.23], dtype=float32), array([29689.012], dtype=float32), array([27226.191], dtype=float32), array([25329.17], dtype=float32), array([24586.873], dtype=float32), array([23773.537], dtype=float32), array([22839.479], dtype=float32), array([21982.74], dtype=float32), array([21272.893], dtype=float32), array([20681.781], dtype=float32), array([20214.15], dtype=float32), array([19854.12], dtype=float32), array([19551.57], dtype=float32), array([19323.203], dtype=float32), array([19138.729], dtype=float32), array([19010.783], dtype=float32), array([18898.16], dtype=float32), array([18807.896], dtype=float32), array([18726.406], dtype=float32), array([18665.432], dtype=float32), array([18615.033], dtype=float32), array([18559.664], dtype=float32), array([18497.797], dtype=float32), array([18482.512], dtype=float32), array([18423.527], dtype=float32), array([18398.26], dtype=float32), array([18360.191], dtype=float32), array([18329.814], dtype=float32), array([18292.365], dtype=float32), array([18272.988], dtype=float32), array([18242.893], dtype=float32), array([18241.6], dtype=float32), array([18214.146], dtype=float32), array([18195.994], dtype=float32), array([18173.23], dtype=float32), array([18168.393], dtype=float32), array([18157.553], dtype=float32), array([18134.664], dtype=float32), array([18140.018], dtype=float32), array([18135.72], dtype=float32), array([18111.33], dtype=float32), array([18105.867], dtype=float32), array([18110.51], dtype=float32), array([18096.55], dtype=float32), array([18081.26], dtype=float32), array([18075.889], dtype=float32), array([18078.764], dtype=float32), array([18074.99], dtype=float32), array([18062.273], dtype=float32), array([18060.87], dtype=float32), array([18055.863], dtype=float32), array([18042.807], dtype=float32), array([18042.459], dtype=float32), array([18036.516], dtype=float32), array([18031.363], dtype=float32), array([18029.752], dtype=float32), array([18033.22], dtype=float32), array([18018.957], dtype=float32), array([18019.94], dtype=float32), array([18015.277], dtype=float32), array([18000.492], dtype=float32), array([18004.354], dtype=float32), array([18006.309], dtype=float32), array([17993.73], dtype=float32), array([17987.014], dtype=float32), array([17985.74], dtype=float32), array([17980.688], dtype=float32), array([17973.39], dtype=float32), array([17968.066], dtype=float32), array([17979.2], dtype=float32), array([17976.613], dtype=float32), array([17965.7], dtype=float32), array([17965.715], dtype=float32), array([17959.557], dtype=float32), array([17954.752], dtype=float32), array([17946.004], dtype=float32), array([17952.865], dtype=float32), array([17944.135], dtype=float32), array([17942.97], dtype=float32), array([17942.064], dtype=float32), array([17940.014], dtype=float32), array([17948.225], dtype=float32), array([17925.932], dtype=float32), array([17934.945], dtype=float32), array([17930.793], dtype=float32), array([17927.318], dtype=float32), array([17932.598], dtype=float32), array([17931.05], dtype=float32), array([17918.19], dtype=float32), array([17907.814], dtype=float32), array([17921.89], dtype=float32), array([17911.191], dtype=float32), array([17910.13], dtype=float32), array([17901.85], dtype=float32), array([17901.459], dtype=float32), array([17908.783], dtype=float32), array([17910.021], dtype=float32), array([17896.357], dtype=float32), array([17893.916], dtype=float32), array([17897.12], dtype=float32), array([17895.705], dtype=float32), array([17890.889], dtype=float32), array([17898.586], dtype=float32), array([17882.658], dtype=float32), array([17881.156], dtype=float32), array([17880.143], dtype=float32), array([17894.14], dtype=float32), array([17877.756], dtype=float32), array([17878.754], dtype=float32), array([17863.355], dtype=float32), array([17881.303], dtype=float32), array([17878.], dtype=float32), array([17874.426], dtype=float32), array([17865.24], dtype=float32), array([17873.158], dtype=float32), array([17869.71], dtype=float32), array([17863.793], dtype=float32), array([17856.207], dtype=float32), array([17870.738], dtype=float32)]
+Pre-training took 45809.85985326767 seconds
+Picking initialization took 48.151097536087036 seconds
+y-best:  tensor(1.0810, device='cuda:0')
+All that training took 557.4062852859497 seconds
+epoch loss arr
+[array([201.60648], dtype=float32), array([197.43251], dtype=float32), array([193.98415], dtype=float32), array([188.0136], dtype=float32), array([194.55739], dtype=float32), array([189.82259], dtype=float32), array([185.59842], dtype=float32), array([183.03114], dtype=float32), array([185.47464], dtype=float32), array([193.62898], dtype=float32), array([200.4843], dtype=float32), array([211.34831], dtype=float32), array([221.56386], dtype=float32), array([232.37259], dtype=float32), array([244.98898], dtype=float32), array([257.9448], dtype=float32), array([267.8907], dtype=float32), array([274.2698], dtype=float32), array([283.77234], dtype=float32), array([291.4507], dtype=float32), array([299.03394], dtype=float32), array([307.86185], dtype=float32), array([313.3246], dtype=float32), array([313.83105], dtype=float32), array([321.61053], dtype=float32), array([324.87054], dtype=float32), array([332.3315], dtype=float32), array([337.85043], dtype=float32), array([342.5322], dtype=float32), array([344.96536], dtype=float32), array([339.62054], dtype=float32), array([345.35226], dtype=float32), array([340.13043], dtype=float32), array([343.07333], dtype=float32), array([347.07822], dtype=float32), array([358.43298], dtype=float32), array([351.24945], dtype=float32), array([333.5008], dtype=float32), array([343.72934], dtype=float32), array([326.0949], dtype=float32), array([357.2911], dtype=float32), array([372.27496], dtype=float32), array([384.1978], dtype=float32), array([348.68967], dtype=float32), array([331.77515], dtype=float32), array([361.53992], dtype=float32), array([336.2848], dtype=float32), array([343.36694], dtype=float32), array([372.44797], dtype=float32), array([347.8733], dtype=float32), array([363.97702], dtype=float32), array([376.0492], dtype=float32), array([372.14627], dtype=float32), array([382.3311], dtype=float32), array([382.82846], dtype=float32), array([357.02206], dtype=float32), array([366.56787], dtype=float32), array([358.04132], dtype=float32), array([373.61554], dtype=float32), array([394.5229], dtype=float32), array([381.70276], dtype=float32), array([348.28235], dtype=float32), array([352.58713], dtype=float32), array([352.02277], dtype=float32), array([337.48035], dtype=float32), array([363.09216], dtype=float32), array([347.98], dtype=float32), array([349.18927], dtype=float32), array([347.7664], dtype=float32), array([357.09793], dtype=float32), array([384.77908], dtype=float32), array([365.25583], dtype=float32), array([375.86966], dtype=float32), array([336.99103], dtype=float32), array([347.03262], dtype=float32), array([369.3678], dtype=float32), array([370.02292], dtype=float32), array([366.06674], dtype=float32), array([351.5345], dtype=float32), array([354.7618], dtype=float32), array([353.71042], dtype=float32), array([349.92783], dtype=float32), array([339.02875], dtype=float32), array([336.19968], dtype=float32), array([349.67587], dtype=float32), array([341.673], dtype=float32), array([346.0329], dtype=float32), array([346.86438], dtype=float32), array([340.31635], dtype=float32), array([353.6229], dtype=float32), array([361.2893], dtype=float32), array([352.06204], dtype=float32), array([349.32956], dtype=float32), array([349.15054], dtype=float32), array([355.64395], dtype=float32), array([348.08246], dtype=float32), array([352.10495], dtype=float32), array([358.90604], dtype=float32), array([347.67084], dtype=float32), array([350.17023], dtype=float32), array([356.47836], dtype=float32), array([359.22833], dtype=float32), array([366.2144], dtype=float32), array([378.9308], dtype=float32), array([374.14764], dtype=float32), array([385.22275], dtype=float32), array([371.29346], dtype=float32), array([372.9634], dtype=float32), array([392.0133], dtype=float32), array([368.38913], dtype=float32), array([388.3562], dtype=float32), array([395.8352], dtype=float32), array([404.04108], dtype=float32), array([402.72974], dtype=float32), array([397.5203], dtype=float32), array([427.66425], dtype=float32), array([425.9028], dtype=float32), array([394.28625], dtype=float32), array([393.70938], dtype=float32), array([390.2486], dtype=float32)]
+y-best:  tensor(1.0824, device='cuda:0')
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-19/active-semi/ThompsonSampling_120.stderr> for stderr output of this job.
+

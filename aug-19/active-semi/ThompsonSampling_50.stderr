@@ -1,0 +1,262 @@
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/belief_active_plot.py", line 668, in <module>
+    
+  File "scripts/active/belief_active_plot.py", line 264, in generate
+    
+  File "scripts/active/belief_active_plot.py", line 336, in run_trials
+    
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 385, in run
+    self.blind_pick(seed=seed, n=self.q)
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 543, in blind_pick
+    self.net = pinot.app.experiment.Train(
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 117, in train
+    epoch_loss = self.train_once()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 92, in train_once
+    loss = torch.sum(self.net.loss(*x))
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 155, in loss
+    total_loss = self.loss_unsupervised(g, h) * self.unsup_scale
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 267, in loss_unsupervised
+    recon_loss = self.decoder.decode_and_compute_recon_error(g, z_sample)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/decoder.py", line 561, in decode_and_compute_recon_error
+    E_true = self.edge_tensor_from_g(subgraph)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/decoder.py", line 524, in edge_tensor_from_g
+    E[list(torch.cat((indices[:, e_idx], torch.tensor([-1]))))]
+KeyboardInterrupt
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/belief_active_plot.py", line 668, in <module>
+    
+  File "scripts/active/belief_active_plot.py", line 264, in generate
+    
+  File "scripts/active/belief_active_plot.py", line 336, in run_trials
+    
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 385, in run
+    self.blind_pick(seed=seed, n=self.q)
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 543, in blind_pick
+    self.net = pinot.app.experiment.Train(
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 117, in train
+    epoch_loss = self.train_once()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 93, in train_once
+    loss.backward()
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/tensor.py", line 198, in backward
+    torch.autograd.backward(self, gradient, retain_graph, create_graph)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/autograd/__init__.py", line 98, in backward
+    Variable._execution_engine.run_backward(
+KeyboardInterrupt
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/belief_active_plot.py", line 668, in <module>
+    
+  File "scripts/active/belief_active_plot.py", line 264, in generate
+    
+  File "scripts/active/belief_active_plot.py", line 336, in run_trials
+    
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 385, in run
+    self.blind_pick(seed=seed, n=self.q)
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 543, in blind_pick
+    self.net = pinot.app.experiment.Train(
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 117, in train
+    epoch_loss = self.train_once()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 92, in train_once
+    loss = torch.sum(self.net.loss(*x))
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 155, in loss
+    total_loss = self.loss_unsupervised(g, h) * self.unsup_scale
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 267, in loss_unsupervised
+    recon_loss = self.decoder.decode_and_compute_recon_error(g, z_sample)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/decoder.py", line 561, in decode_and_compute_recon_error
+    E_true = self.edge_tensor_from_g(subgraph)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/decoder.py", line 512, in edge_tensor_from_g
+    indices = g.adjacency_matrix().coalesce().indices()
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/graph.py", line 3602, in adjacency_matrix
+    return self._graph.adjacency_matrix(transpose, ctx)[0]
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/graph_index.py", line 731, in adjacency_matrix
+    adj, shuffle_idx = F.sparse_matrix(dat, ('coo', idx), (n, n))
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/backend/pytorch/tensor.py", line 50, in sparse_matrix
+    spmat = th.sparse_coo_tensor(index[1], data, shape)
+KeyboardInterrupt
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/belief_active_plot.py", line 668, in <module>
+    
+  File "scripts/active/belief_active_plot.py", line 264, in generate
+    
+  File "scripts/active/belief_active_plot.py", line 336, in run_trials
+    
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 385, in run
+    self.blind_pick(seed=seed, n=self.q)
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 543, in blind_pick
+    self.net = pinot.app.experiment.Train(
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 117, in train
+    epoch_loss = self.train_once()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 92, in train_once
+    loss = torch.sum(self.net.loss(*x))
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 153, in loss
+    h = self.representation.forward(g, pool=None)  # We always call this
+  File "/home/nguyenm5/coding/pinot/pinot/representation/sequential.py", line 344, in forward
+    h = getattr(self, exe)(g, h)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/torch/nn/modules/module.py", line 550, in __call__
+    result = self.forward(*input, **kwargs)
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/nn/pytorch/conv/graphconv.py", line 131, in forward
+    degs = graph.out_degrees().to(feat.device).float().clamp(min=1)
+KeyboardInterrupt
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/belief_active_plot.py", line 668, in <module>
+    
+  File "scripts/active/belief_active_plot.py", line 264, in generate
+    
+  File "scripts/active/belief_active_plot.py", line 336, in run_trials
+    
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 385, in run
+    self.blind_pick(seed=seed, n=self.q)
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 543, in blind_pick
+    self.net = pinot.app.experiment.Train(
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 117, in train
+    epoch_loss = self.train_once()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 92, in train_once
+    loss = torch.sum(self.net.loss(*x))
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 155, in loss
+    total_loss = self.loss_unsupervised(g, h) * self.unsup_scale
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 267, in loss_unsupervised
+    recon_loss = self.decoder.decode_and_compute_recon_error(g, z_sample)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/decoder.py", line 561, in decode_and_compute_recon_error
+    E_true = self.edge_tensor_from_g(subgraph)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/decoder.py", line 524, in edge_tensor_from_g
+    E[list(torch.cat((indices[:, e_idx], torch.tensor([-1]))))]
+KeyboardInterrupt
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/belief_active_plot.py", line 668, in <module>
+    
+  File "scripts/active/belief_active_plot.py", line 264, in generate
+    
+  File "scripts/active/belief_active_plot.py", line 336, in run_trials
+    
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 385, in run
+    self.blind_pick(seed=seed, n=self.q)
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 543, in blind_pick
+    self.net = pinot.app.experiment.Train(
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 117, in train
+    epoch_loss = self.train_once()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 92, in train_once
+    loss = torch.sum(self.net.loss(*x))
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 155, in loss
+    total_loss = self.loss_unsupervised(g, h) * self.unsup_scale
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 267, in loss_unsupervised
+    recon_loss = self.decoder.decode_and_compute_recon_error(g, z_sample)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/decoder.py", line 561, in decode_and_compute_recon_error
+    E_true = self.edge_tensor_from_g(subgraph)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/decoder.py", line 512, in edge_tensor_from_g
+    indices = g.adjacency_matrix().coalesce().indices()
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/graph.py", line 3602, in adjacency_matrix
+    return self._graph.adjacency_matrix(transpose, ctx)[0]
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/graph_index.py", line 731, in adjacency_matrix
+    adj, shuffle_idx = F.sparse_matrix(dat, ('coo', idx), (n, n))
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/backend/pytorch/tensor.py", line 50, in sparse_matrix
+    spmat = th.sparse_coo_tensor(index[1], data, shape)
+KeyboardInterrupt
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/belief_active_plot.py", line 668, in <module>
+    
+  File "scripts/active/belief_active_plot.py", line 264, in generate
+    
+  File "scripts/active/belief_active_plot.py", line 336, in run_trials
+    
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 385, in run
+    self.blind_pick(seed=seed, n=self.q)
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 543, in blind_pick
+    self.net = pinot.app.experiment.Train(
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 117, in train
+    epoch_loss = self.train_once()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 92, in train_once
+    loss = torch.sum(self.net.loss(*x))
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 155, in loss
+    total_loss = self.loss_unsupervised(g, h) * self.unsup_scale
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 273, in loss_unsupervised
+    torch.sum(1 + 2 * logvar - mu.pow(2) - logvar.exp().pow(2), 1)
+KeyboardInterrupt
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/belief_active_plot.py", line 668, in <module>
+    
+  File "scripts/active/belief_active_plot.py", line 264, in generate
+    
+  File "scripts/active/belief_active_plot.py", line 336, in run_trials
+    
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 385, in run
+    self.blind_pick(seed=seed, n=self.q)
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 543, in blind_pick
+    self.net = pinot.app.experiment.Train(
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 117, in train
+    epoch_loss = self.train_once()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 92, in train_once
+    loss = torch.sum(self.net.loss(*x))
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 155, in loss
+    total_loss = self.loss_unsupervised(g, h) * self.unsup_scale
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 267, in loss_unsupervised
+    recon_loss = self.decoder.decode_and_compute_recon_error(g, z_sample)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/decoder.py", line 561, in decode_and_compute_recon_error
+    E_true = self.edge_tensor_from_g(subgraph)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/decoder.py", line 520, in edge_tensor_from_g
+    one_hot = torch.cat((indices[:, e_idx], e.long()))
+KeyboardInterrupt
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/belief_active_plot.py", line 668, in <module>
+    
+  File "scripts/active/belief_active_plot.py", line 264, in generate
+    
+  File "scripts/active/belief_active_plot.py", line 336, in run_trials
+    
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 385, in run
+    self.blind_pick(seed=seed, n=self.q)
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 543, in blind_pick
+    self.net = pinot.app.experiment.Train(
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 117, in train
+    epoch_loss = self.train_once()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 92, in train_once
+    loss = torch.sum(self.net.loss(*x))
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 155, in loss
+    total_loss = self.loss_unsupervised(g, h) * self.unsup_scale
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 267, in loss_unsupervised
+    recon_loss = self.decoder.decode_and_compute_recon_error(g, z_sample)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/decoder.py", line 561, in decode_and_compute_recon_error
+    E_true = self.edge_tensor_from_g(subgraph)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/decoder.py", line 524, in edge_tensor_from_g
+    E[list(torch.cat((indices[:, e_idx], torch.tensor([-1]))))]
+KeyboardInterrupt
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/belief_active_plot.py", line 668, in <module>
+    
+  File "scripts/active/belief_active_plot.py", line 264, in generate
+    
+  File "scripts/active/belief_active_plot.py", line 336, in run_trials
+    
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 385, in run
+    self.blind_pick(seed=seed, n=self.q)
+  File "/home/nguyenm5/coding/pinot/pinot/active/experiment.py", line 543, in blind_pick
+    self.net = pinot.app.experiment.Train(
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 117, in train
+    epoch_loss = self.train_once()
+  File "/home/nguyenm5/coding/pinot/pinot/app/experiment.py", line 92, in train_once
+    loss = torch.sum(self.net.loss(*x))
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 155, in loss
+    total_loss = self.loss_unsupervised(g, h) * self.unsup_scale
+  File "/home/nguyenm5/coding/pinot/pinot/generative/semi_supervised_net.py", line 267, in loss_unsupervised
+    recon_loss = self.decoder.decode_and_compute_recon_error(g, z_sample)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/decoder.py", line 561, in decode_and_compute_recon_error
+    E_true = self.edge_tensor_from_g(subgraph)
+  File "/home/nguyenm5/coding/pinot/pinot/generative/decoder.py", line 512, in edge_tensor_from_g
+    indices = g.adjacency_matrix().coalesce().indices()
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/graph.py", line 3602, in adjacency_matrix
+    return self._graph.adjacency_matrix(transpose, ctx)[0]
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/graph_index.py", line 731, in adjacency_matrix
+    adj, shuffle_idx = F.sparse_matrix(dat, ('coo', idx), (n, n))
+  File "/home/nguyenm5/anaconda3/envs/pinot/lib/python3.8/site-packages/dgl/backend/pytorch/tensor.py", line 50, in sparse_matrix
+    spmat = th.sparse_coo_tensor(index[1], data, shape)
+KeyboardInterrupt
+Using backend: pytorch
+Using backend: pytorch
