@@ -556,3 +556,181 @@ PS:
 
 Read file </home/nguyenm5/coding/pinot/aug-19/active-semi/ThompsonSampling_50.stderr> for stderr output of this job.
 
+Sender: LSF System <lsfadmin@lu03>
+Subject: Job 16777399: <active-init-try> in cluster <lila> Done
+
+Job <active-init-try> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Tue Aug 18 15:05:51 2020
+Job was executed on host(s) <12*lu03>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Tue Aug 18 15:06:19 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Tue Aug 18 15:06:19 2020
+Terminated at Fri Aug 21 00:26:55 2020
+Results reported at Fri Aug 21 00:26:55 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_vgp --num_rounds 5 --num_trials 1 --num_epochs 50 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-19/active-semi --index 1 --unlabeled_data moonshot_unlabeled_all --device cuda:0 --seed 8888 --unlabeled_volume 1.0 --num_inducing_points 50 --num_inner_opt_rounds 120 --early_stopping
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   602222.00 sec.
+    Max Memory :                                 5 GB
+    Average Memory :                             4.85 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               187.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   206436 sec.
+    Turnaround time :                            206464 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', early_stopping=True, index=1, index_provided=True, lr=0.0001, net='semi_vgp', num_epochs=50, num_inducing_points=50, num_inner_opt_rounds=120, num_rounds=5, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-19/active-semi', q=96, seed=8888, unlabeled_data='moonshot_unlabeled_all', unlabeled_volume=1.0)
+0
+We have 58836 molecules
+All that training took 882.4208903312683 seconds
+epoch loss arr
+[array([99128.586], dtype=float32), array([68354.8], dtype=float32), array([60349.46], dtype=float32), array([55614.594], dtype=float32), array([51766.684], dtype=float32), array([49214.03], dtype=float32), array([47849.91], dtype=float32), array([47036.965], dtype=float32), array([46479.82], dtype=float32), array([46030.58], dtype=float32), array([45707.395], dtype=float32), array([45469.35], dtype=float32), array([45296.258], dtype=float32), array([45173.04], dtype=float32), array([45056.723], dtype=float32), array([44979.04], dtype=float32), array([44909.72], dtype=float32), array([44843.523], dtype=float32), array([44795.48], dtype=float32), array([44753.94], dtype=float32), array([44702.527], dtype=float32), array([44674.5], dtype=float32), array([44662.26], dtype=float32), array([44621.387], dtype=float32), array([44600.38], dtype=float32), array([44581.965], dtype=float32), array([44529.906], dtype=float32), array([44541.68], dtype=float32), array([44509.848], dtype=float32), array([44488.85], dtype=float32), array([44457.8], dtype=float32), array([44450.16], dtype=float32), array([44429.51], dtype=float32), array([44421.227], dtype=float32), array([44403.82], dtype=float32), array([44366.43], dtype=float32), array([44354.02], dtype=float32), array([44345.797], dtype=float32), array([44323.39], dtype=float32), array([44313.617], dtype=float32), array([44304.39], dtype=float32), array([44280.11], dtype=float32), array([44270.45], dtype=float32), array([44261.453], dtype=float32), array([44238.125], dtype=float32), array([44244.48], dtype=float32), array([44216.613], dtype=float32), array([44189.902], dtype=float32), array([44202.684], dtype=float32), array([44177.855], dtype=float32)]
+Pre-training took 44335.50713610649 seconds
+Picking initialization took 57.859215259552 seconds
+y-best:  tensor(1.0810, device='cuda:0')
+All that training took 1507.4572892189026 seconds
+epoch loss arr
+[array([245.23409], dtype=float32), array([223.98827], dtype=float32), array([184.00111], dtype=float32), array([170.65286], dtype=float32), array([165.1009], dtype=float32), array([165.41945], dtype=float32), array([169.80348], dtype=float32), array([171.67433], dtype=float32), array([174.56241], dtype=float32), array([175.65323], dtype=float32), array([176.48285], dtype=float32), array([178.26422], dtype=float32), array([176.63718], dtype=float32), array([175.3195], dtype=float32), array([174.74785], dtype=float32), array([173.12965], dtype=float32), array([173.64955], dtype=float32), array([174.1684], dtype=float32), array([174.83034], dtype=float32), array([174.63048], dtype=float32), array([175.79112], dtype=float32), array([175.96976], dtype=float32), array([176.33253], dtype=float32), array([176.93169], dtype=float32), array([176.57657], dtype=float32), array([176.48407], dtype=float32), array([175.82338], dtype=float32), array([175.91196], dtype=float32), array([174.61792], dtype=float32), array([174.1146], dtype=float32), array([174.37297], dtype=float32), array([174.15497], dtype=float32), array([174.1163], dtype=float32), array([173.94902], dtype=float32), array([174.44019], dtype=float32), array([173.87828], dtype=float32), array([173.15158], dtype=float32), array([172.05], dtype=float32), array([171.27237], dtype=float32), array([171.35466], dtype=float32), array([171.80243], dtype=float32), array([172.2464], dtype=float32), array([172.71173], dtype=float32), array([172.87904], dtype=float32), array([172.51193], dtype=float32), array([171.74374], dtype=float32), array([170.14955], dtype=float32), array([169.57695], dtype=float32), array([168.38696], dtype=float32), array([167.46677], dtype=float32)]
+y-best:  tensor(1.0810, device='cuda:0')
+All that training took 1858.9539391994476 seconds
+epoch loss arr
+[array([431.5555], dtype=float32), array([428.67822], dtype=float32), array([387.1773], dtype=float32), array([392.66705], dtype=float32), array([392.80292], dtype=float32), array([386.88077], dtype=float32), array([384.86407], dtype=float32), array([382.02072], dtype=float32), array([381.25244], dtype=float32), array([381.48343], dtype=float32), array([382.94272], dtype=float32), array([387.70004], dtype=float32), array([392.84796], dtype=float32), array([391.20657], dtype=float32), array([388.08502], dtype=float32), array([384.16916], dtype=float32), array([389.2985], dtype=float32), array([390.4237], dtype=float32), array([387.942], dtype=float32), array([385.53284], dtype=float32), array([385.32034], dtype=float32), array([384.3413], dtype=float32), array([383.36603], dtype=float32), array([384.38434], dtype=float32), array([386.66052], dtype=float32), array([388.83835], dtype=float32), array([386.73224], dtype=float32), array([384.19388], dtype=float32), array([381.81406], dtype=float32), array([382.65955], dtype=float32), array([381.45163], dtype=float32), array([379.7517], dtype=float32), array([377.56686], dtype=float32), array([382.72858], dtype=float32), array([379.46976], dtype=float32), array([375.8196], dtype=float32), array([367.60532], dtype=float32), array([375.1636], dtype=float32), array([382.4917], dtype=float32), array([380.85538], dtype=float32), array([382.0927], dtype=float32), array([388.58847], dtype=float32), array([387.15356], dtype=float32), array([386.03955], dtype=float32), array([386.1215], dtype=float32), array([384.08408], dtype=float32), array([381.00687], dtype=float32), array([378.79636], dtype=float32), array([378.21625], dtype=float32), array([379.51703], dtype=float32)]
+y-best:  tensor(1.0824, device='cuda:0')
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-19/active-semi/ThompsonSampling_50.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lu07>
+Subject: Job 16777402: <active-init-try> in cluster <lila> Done
+
+Job <active-init-try> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Tue Aug 18 15:05:52 2020
+Job was executed on host(s) <12*lu07>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Tue Aug 18 15:07:15 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Tue Aug 18 15:07:15 2020
+Terminated at Fri Aug 21 01:04:16 2020
+Results reported at Fri Aug 21 01:04:16 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_vgp --num_rounds 5 --num_trials 1 --num_epochs 50 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-19/active-semi --index 1 --unlabeled_data moonshot_unlabeled_all --device cuda:0 --seed 2666 --unlabeled_volume 1.0 --num_inducing_points 20 --num_inner_opt_rounds 120 --early_stopping
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   701766.00 sec.
+    Max Memory :                                 5 GB
+    Average Memory :                             4.83 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               187.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   208622 sec.
+    Turnaround time :                            208704 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', early_stopping=True, index=1, index_provided=True, lr=0.0001, net='semi_vgp', num_epochs=50, num_inducing_points=20, num_inner_opt_rounds=120, num_rounds=5, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-19/active-semi', q=96, seed=2666, unlabeled_data='moonshot_unlabeled_all', unlabeled_volume=1.0)
+0
+We have 58836 molecules
+All that training took 1033.7874619960785 seconds
+epoch loss arr
+[array([101967.52], dtype=float32), array([66242.55], dtype=float32), array([61235.902], dtype=float32), array([56583.88], dtype=float32), array([52260.223], dtype=float32), array([49644.574], dtype=float32), array([48167.46], dtype=float32), array([47275.473], dtype=float32), array([46699.504], dtype=float32), array([46237.11], dtype=float32), array([45857.34], dtype=float32), array([45582.934], dtype=float32), array([45375.723], dtype=float32), array([45221.523], dtype=float32), array([45097.742], dtype=float32), array([45001.254], dtype=float32), array([44917.664], dtype=float32), array([44845.27], dtype=float32), array([44752.996], dtype=float32), array([44724.906], dtype=float32), array([44667.17], dtype=float32), array([44611.04], dtype=float32), array([44561.992], dtype=float32), array([44536.332], dtype=float32), array([44523.49], dtype=float32), array([44464.867], dtype=float32), array([44435.695], dtype=float32), array([44413.69], dtype=float32), array([44380.266], dtype=float32), array([44350.88], dtype=float32), array([44330.633], dtype=float32), array([44316.695], dtype=float32), array([44291.996], dtype=float32), array([44261.95], dtype=float32), array([44245.145], dtype=float32), array([44226.16], dtype=float32), array([44211.28], dtype=float32), array([44198.84], dtype=float32), array([44184.87], dtype=float32), array([44163.637], dtype=float32), array([44153.34], dtype=float32), array([44127.18], dtype=float32), array([44127.074], dtype=float32), array([44093.344], dtype=float32), array([44102.62], dtype=float32), array([44059.496], dtype=float32), array([44054.047], dtype=float32), array([44044.457], dtype=float32), array([44028.69], dtype=float32), array([44031.06], dtype=float32)]
+Pre-training took 49961.43444561958 seconds
+Picking initialization took 50.17104625701904 seconds
+y-best:  tensor(1.0396, device='cuda:0')
+All that training took 1549.29563498497 seconds
+epoch loss arr
+[array([220.86786], dtype=float32), array([211.35818], dtype=float32), array([195.01509], dtype=float32), array([201.8294], dtype=float32), array([217.19623], dtype=float32), array([239.70032], dtype=float32), array([263.75482], dtype=float32), array([278.24255], dtype=float32), array([280.49625], dtype=float32), array([295.25894], dtype=float32), array([301.97095], dtype=float32), array([304.94858], dtype=float32), array([303.8244], dtype=float32), array([306.65588], dtype=float32), array([304.95145], dtype=float32), array([303.02533], dtype=float32), array([304.19205], dtype=float32), array([307.4708], dtype=float32), array([300.5232], dtype=float32), array([300.37195], dtype=float32), array([307.68048], dtype=float32), array([309.72107], dtype=float32), array([316.48], dtype=float32), array([325.33167], dtype=float32), array([323.0471], dtype=float32), array([316.19418], dtype=float32), array([317.7415], dtype=float32), array([322.51645], dtype=float32), array([317.81787], dtype=float32), array([320.0735], dtype=float32), array([321.70752], dtype=float32), array([327.23053], dtype=float32), array([316.9098], dtype=float32), array([317.14557], dtype=float32), array([325.74603], dtype=float32), array([320.79742], dtype=float32), array([322.32086], dtype=float32), array([321.14435], dtype=float32), array([309.54285], dtype=float32), array([309.31717], dtype=float32), array([305.94977], dtype=float32), array([302.5138], dtype=float32), array([304.5811], dtype=float32), array([306.4603], dtype=float32), array([302.01917], dtype=float32), array([305.63663], dtype=float32), array([300.88467], dtype=float32), array([293.33914], dtype=float32), array([296.47556], dtype=float32), array([297.0173], dtype=float32)]
+y-best:  tensor(1.0396, device='cuda:0')
+All that training took 1780.8048450946808 seconds
+epoch loss arr
+[array([739.3916], dtype=float32), array([666.6028], dtype=float32), array([608.6329], dtype=float32), array([584.3398], dtype=float32), array([578.73444], dtype=float32), array([580.4675], dtype=float32), array([582.2432], dtype=float32), array([579.903], dtype=float32), array([575.2859], dtype=float32), array([565.1155], dtype=float32), array([571.38135], dtype=float32), array([597.58624], dtype=float32), array([600.32025], dtype=float32), array([579.8655], dtype=float32), array([557.43756], dtype=float32), array([566.6751], dtype=float32), array([553.9897], dtype=float32), array([575.9835], dtype=float32), array([570.7813], dtype=float32), array([564.61426], dtype=float32), array([572.74255], dtype=float32), array([573.48315], dtype=float32), array([596.94403], dtype=float32), array([570.23474], dtype=float32), array([563.8156], dtype=float32), array([555.9056], dtype=float32), array([557.3889], dtype=float32), array([563.09515], dtype=float32), array([556.8682], dtype=float32), array([564.78174], dtype=float32), array([556.10065], dtype=float32), array([536.14764], dtype=float32), array([534.2646], dtype=float32), array([542.81085], dtype=float32), array([543.5542], dtype=float32), array([544.7858], dtype=float32), array([531.6976], dtype=float32), array([528.03156], dtype=float32), array([535.3712], dtype=float32), array([532.47723], dtype=float32), array([527.5714], dtype=float32), array([534.26306], dtype=float32), array([528.6917], dtype=float32), array([530.6028], dtype=float32), array([534.4521], dtype=float32), array([541.45953], dtype=float32), array([540.6441], dtype=float32), array([554.50916], dtype=float32), array([552.6936], dtype=float32), array([527.8252], dtype=float32)]
+y-best:  tensor(1.0824, device='cuda:0')
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-19/active-semi/ThompsonSampling_50.stderr> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lu08>
+Subject: Job 16777404: <active-init-try> in cluster <lila> Done
+
+Job <active-init-try> was submitted from host <lilac> by user <nguyenm5> in cluster <lila> at Tue Aug 18 15:05:52 2020
+Job was executed on host(s) <12*lu08>, in queue <gpuqueue>, as user <nguyenm5> in cluster <lila> at Tue Aug 18 15:08:20 2020
+</home/nguyenm5> was used as the home directory.
+</home/nguyenm5/coding/pinot> was used as the working directory.
+Started at Tue Aug 18 15:08:20 2020
+Terminated at Fri Aug 21 12:33:30 2020
+Results reported at Fri Aug 21 12:33:30 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/nguyenm5/anaconda3/envs/pinot/bin/python scripts/active/belief_active_plot.py --net semi_vgp --num_rounds 5 --num_trials 1 --num_epochs 50 --data moonshot_sorted --q 96 --acquisition ThompsonSampling --output_folder /home/nguyenm5/coding/pinot/aug-19/active-semi --index 1 --unlabeled_data moonshot_unlabeled_all --device cuda:0 --seed 8888 --unlabeled_volume 1.0 --num_inducing_points 20 --num_inner_opt_rounds 120 --early_stopping
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   777163.00 sec.
+    Max Memory :                                 6 GB
+    Average Memory :                             4.96 GB
+    Total Requested Memory :                     192.00 GB
+    Delta Memory :                               186.00 GB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                21
+    Run time :                                   249910 sec.
+    Turnaround time :                            250058 sec.
+
+The output (if any) follows:
+
+Namespace(acquisition='ThompsonSampling', beliefs=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement'], config=['GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh', 'GraphConv', '64', 'activation', 'tanh'], data='moonshot_sorted', device='cuda:0', early_stopping=True, index=1, index_provided=True, lr=0.0001, net='semi_vgp', num_epochs=50, num_inducing_points=20, num_inner_opt_rounds=120, num_rounds=5, num_samples=1000, num_thompson_samples=1000, num_trials=1, optimizer='Adam', output_folder='/home/nguyenm5/coding/pinot/aug-19/active-semi', q=96, seed=8888, unlabeled_data='moonshot_unlabeled_all', unlabeled_volume=1.0)
+0
+We have 58836 molecules
+All that training took 795.335319519043 seconds
+epoch loss arr
+[array([106686.63], dtype=float32), array([67990.055], dtype=float32), array([61291.9], dtype=float32), array([55858.566], dtype=float32), array([52054.9], dtype=float32), array([49648.414], dtype=float32), array([48104.656], dtype=float32), array([47072.79], dtype=float32), array([46422.312], dtype=float32), array([46016.02], dtype=float32), array([45711.258], dtype=float32), array([45495.77], dtype=float32), array([45301.4], dtype=float32), array([45185.027], dtype=float32), array([45080.438], dtype=float32), array([44995.934], dtype=float32), array([44895.254], dtype=float32), array([44823.62], dtype=float32), array([44765.992], dtype=float32), array([44684.613], dtype=float32), array([44620.94], dtype=float32), array([44589.383], dtype=float32), array([44538.547], dtype=float32), array([44517.883], dtype=float32), array([44464.31], dtype=float32), array([44452.652], dtype=float32), array([44419.15], dtype=float32), array([44382.74], dtype=float32), array([44389.098], dtype=float32), array([44355.67], dtype=float32), array([44338.223], dtype=float32), array([44314.137], dtype=float32), array([44303.824], dtype=float32), array([44275.71], dtype=float32), array([44260.84], dtype=float32), array([44247.285], dtype=float32), array([44229.676], dtype=float32), array([44223.13], dtype=float32), array([44207.695], dtype=float32), array([44190.793], dtype=float32), array([44172.324], dtype=float32), array([44171.86], dtype=float32), array([44152.434], dtype=float32), array([44149.168], dtype=float32), array([44145.652], dtype=float32), array([44125.38], dtype=float32), array([44112.465], dtype=float32), array([44100.523], dtype=float32), array([44082.62], dtype=float32), array([44077.438], dtype=float32)]
+Pre-training took 42171.145740270615 seconds
+Picking initialization took 49.90442943572998 seconds
+y-best:  tensor(1.0396, device='cuda:0')
+All that training took 1162.7683219909668 seconds
+epoch loss arr
+[array([221.9202], dtype=float32), array([222.00168], dtype=float32), array([208.2605], dtype=float32), array([213.26111], dtype=float32), array([227.27911], dtype=float32), array([252.14938], dtype=float32), array([278.56912], dtype=float32), array([300.45844], dtype=float32), array([316.4049], dtype=float32), array([341.53522], dtype=float32), array([360.6304], dtype=float32), array([377.09103], dtype=float32), array([383.48688], dtype=float32), array([411.57587], dtype=float32), array([412.6986], dtype=float32), array([421.09683], dtype=float32), array([414.2765], dtype=float32), array([423.09427], dtype=float32), array([388.4355], dtype=float32), array([404.5589], dtype=float32), array([427.87735], dtype=float32), array([408.07053], dtype=float32), array([413.60754], dtype=float32), array([413.13538], dtype=float32), array([389.6439], dtype=float32), array([415.1617], dtype=float32), array([433.23978], dtype=float32), array([368.2709], dtype=float32), array([407.76706], dtype=float32), array([399.89212], dtype=float32), array([396.88254], dtype=float32), array([411.4988], dtype=float32), array([413.51935], dtype=float32), array([375.65234], dtype=float32), array([397.09464], dtype=float32), array([427.06146], dtype=float32), array([409.73996], dtype=float32), array([380.7747], dtype=float32), array([383.60385], dtype=float32), array([387.03198], dtype=float32), array([365.75772], dtype=float32), array([439.44238], dtype=float32), array([378.21362], dtype=float32), array([378.8615], dtype=float32), array([402.00885], dtype=float32), array([377.85904], dtype=float32), array([352.29816], dtype=float32), array([396.3927], dtype=float32), array([356.32257], dtype=float32), array([397.35074], dtype=float32)]
+y-best:  tensor(1.0396, device='cuda:0')
+All that training took 1216.8050322532654 seconds
+epoch loss arr
+[array([620.06537], dtype=float32), array([561.9387], dtype=float32), array([538.7952], dtype=float32), array([528.76874], dtype=float32), array([523.4467], dtype=float32), array([527.48566], dtype=float32), array([535.76337], dtype=float32), array([537.20544], dtype=float32), array([532.8748], dtype=float32), array([531.6312], dtype=float32), array([525.56244], dtype=float32), array([520.54034], dtype=float32), array([519.723], dtype=float32), array([517.6281], dtype=float32), array([513.813], dtype=float32), array([509.78366], dtype=float32), array([504.64532], dtype=float32), array([495.07477], dtype=float32), array([486.9762], dtype=float32), array([476.48926], dtype=float32), array([472.29413], dtype=float32), array([472.19516], dtype=float32), array([468.10995], dtype=float32), array([468.66904], dtype=float32), array([474.57077], dtype=float32), array([467.69528], dtype=float32), array([470.11954], dtype=float32), array([470.6982], dtype=float32), array([466.26895], dtype=float32), array([461.50946], dtype=float32), array([516.6173], dtype=float32), array([458.3999], dtype=float32), array([460.33994], dtype=float32), array([459.81406], dtype=float32), array([457.08575], dtype=float32), array([541.14575], dtype=float32), array([469.34192], dtype=float32), array([473.10168], dtype=float32), array([472.6279], dtype=float32), array([483.55872], dtype=float32), array([477.50122], dtype=float32), array([494.32828], dtype=float32), array([478.6563], dtype=float32), array([478.23074], dtype=float32), array([477.95056], dtype=float32), array([477.00012], dtype=float32), array([550.8803], dtype=float32), array([591.23566], dtype=float32), array([611.2501], dtype=float32), array([620.7999], dtype=float32)]
+y-best:  tensor(1.0810, device='cuda:0')
+All that training took 1610.2668237686157 seconds
+epoch loss arr
+[array([1640.7094], dtype=float32), array([1635.2612], dtype=float32), array([1644.5846], dtype=float32), array([1659.8208], dtype=float32), array([1679.1161], dtype=float32), array([1698.1204], dtype=float32), array([1717.954], dtype=float32), array([1731.5292], dtype=float32), array([1742.942], dtype=float32), array([1754.907], dtype=float32), array([1766.7374], dtype=float32), array([1779.2537], dtype=float32), array([1797.5273], dtype=float32), array([1818.0804], dtype=float32), array([1837.9304], dtype=float32), array([1854.5599], dtype=float32), array([1865.8131], dtype=float32), array([1870.6798], dtype=float32), array([1872.6699], dtype=float32), array([1875.4243], dtype=float32), array([1879.0623], dtype=float32), array([1878.8726], dtype=float32), array([1878.3601], dtype=float32), array([1876.9712], dtype=float32), array([1872.8398], dtype=float32), array([1868.5138], dtype=float32), array([1868.1713], dtype=float32), array([1868.0452], dtype=float32), array([1869.1056], dtype=float32), array([1871.1543], dtype=float32), array([1873.2388], dtype=float32), array([1876.9849], dtype=float32), array([1881.3082], dtype=float32), array([1885.2256], dtype=float32), array([1888.575], dtype=float32), array([1888.7516], dtype=float32), array([1889.5065], dtype=float32), array([1885.5994], dtype=float32), array([1880.9191], dtype=float32), array([1874.686], dtype=float32), array([1868.0295], dtype=float32), array([1863.0115], dtype=float32), array([1857.5754], dtype=float32), array([1851.9221], dtype=float32), array([1849.4542], dtype=float32), array([1842.8905], dtype=float32), array([1842.4414], dtype=float32), array([1840.811], dtype=float32), array([1830.0828], dtype=float32), array([1825.6663], dtype=float32)]
+y-best:  tensor(1.0824, device='cuda:0')
+
+
+PS:
+
+Read file </home/nguyenm5/coding/pinot/aug-19/active-semi/ThompsonSampling_50.stderr> for stderr output of this job.
+
