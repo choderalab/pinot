@@ -1,0 +1,25 @@
+Using backend: pytorch
+Using backend: pytorch
+Using backend: pytorch
+Using backend: pytorch
+Using backend: pytorch
+Using backend: pytorch
+Using backend: pytorch
+Traceback (most recent call last):
+  File "scripts/active/belief_active_plot.py", line 674, in <module>
+    best_df, pro_ts_df, retro_ts_df = plot.generate()
+  File "scripts/active/belief_active_plot.py", line 266, in generate
+    final_results, prospective_beliefs, retrospective_beliefs = self.run_trials(ds)
+  File "scripts/active/belief_active_plot.py", line 341, in run_trials
+    self.results = self.process_results(acquisitions, ds, i)
+  File "scripts/active/belief_active_plot.py", line 475, in process_results
+    seen, _ = acquisitions[-1]
+IndexError: list index out of range
+Using backend: pytorch
+Using backend: pytorch
+Using backend: pytorch
+Using backend: pytorch
+Using backend: pytorch
+Using backend: pytorch
+Using backend: pytorch
+Using backend: pytorch
