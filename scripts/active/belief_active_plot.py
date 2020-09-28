@@ -34,8 +34,8 @@ def _get_thompson_values(net, data, q=1):
     thetas = distribution.sample((q,)).detach()
 
     # find the max of each sample
-    thompson_values = torch.max(thetas, axis=1).values
-    return thompson_values
+    thompson_values, thompson_indices = torch.max(thetas, axis=1)
+    return thompson_values, thompson_indices
 
 
 def _get_biophysical_thompson_values(
@@ -83,8 +83,8 @@ def thompson_sample(net, data, unseen, num_samples=1, **kwargs):
         if isinstance(net.output_regressor, pinot.regressors.BiophysicalRegressor):
             ts_values = _get_biophysical_thompson_values(net, data, q=num_samples)
         else:
-            ts_values = _get_thompson_values(net, data, q=num_samples)
-        return ts_values
+            ts_values, ts_indices = _get_thompson_values(net, data, q=num_samples)
+        return ts_values, ts_indices
 
     # save log sigma
     sigma = torch.exp(net.output_regressor.log_sigma)
@@ -109,20 +109,22 @@ def thompson_sample(net, data, unseen, num_samples=1, **kwargs):
 
         # prospective evaluates only unseen data
         unseen_data = pinot.active.experiment._slice_fn_tuple(data, unseen)
-        thompson_samples['prospective'] = _ts(
+        ts_values, ts_indices = _ts(
             net,
             unseen_data,
             num_samples=num_samples
-        ) + epsilon.sample((num_samples,))
+        )
+        thompson_samples['prospective'] = ts_values + epsilon.sample((num_samples,))
 
     # get retrospective thompson samples on all data
-    thompson_samples['retrospective'] = _ts(
+    ts_values, ts_indices = _ts(
         net,
         data,
         num_samples=num_samples
-    ) + epsilon.sample((num_samples, ))
-
-    return thompson_samples
+    )
+    thompson_samples['retrospective'] = ts_values + epsilon.sample((num_samples,))
+    
+    return thompson_samples, ts_indices
 
 
 def _max_utility(net, data, unseen, utility_func):
@@ -195,7 +197,7 @@ class BeliefActivePlot():
     def __init__(self, net, config,
                  lr, optimizer_type,
                  data, acquisition, num_samples, num_thompson_samples, q,
-                 beliefs,
+                 beliefs, early_stopping,
                  device, num_trials, num_rounds, num_epochs):
 
         # net config
@@ -213,6 +215,7 @@ class BeliefActivePlot():
         self.num_thompson_samples = num_thompson_samples
         self.q = q
         self.train = pinot.app.experiment.Train
+        self.early_stopping = early_stopping
 
         # beliefs
         self.belief_functions = beliefs
@@ -303,7 +306,7 @@ class BeliefActivePlot():
                 optimizer=optimizer,
                 acquisition=acq_fn,
                 num_epochs=self.num_epochs,
-                early_stopping=False,
+                early_stopping=self.early_stopping,
                 q=self.q,
                 acquisitions_preset=acquisitions_preset,
                 slice_fn=pinot.active.experiment._slice_fn_tuple,
@@ -318,17 +321,19 @@ class BeliefActivePlot():
             self.results = self.process_results(acquisitions, ds, i)
             
             # get beliefs
-            self.beliefs = self.get_beliefs(net, ds, acquisitions, methods=self.belief_functions)
+            if self.belief_functions:
+                
+                self.beliefs = self.get_beliefs(net, ds, acquisitions, methods=self.belief_functions)
 
-            # generate long-form records for pandas
-            self.prospective_beliefs.extend(
-                self.process_beliefs(self.beliefs['prospective'], i)
-            )
+                # generate long-form records for pandas
+                self.prospective_beliefs.extend(
+                    self.process_beliefs(self.beliefs['prospective'], i)
+                )
 
-            # generate long-form records for pandas
-            self.retrospective_beliefs.extend(
-                self.process_beliefs(self.beliefs['retrospective'], i)
-            )
+                # generate long-form records for pandas
+                self.retrospective_beliefs.extend(
+                    self.process_beliefs(self.beliefs['retrospective'], i)
+                )
 
         return self.results, self.prospective_beliefs, self.retrospective_beliefs
 
@@ -375,11 +380,13 @@ class BeliefActivePlot():
             # gather pro and retro beliefs for each belief function
             for belief_name, belief_function in self.belief_functions_dict.items():
                 if belief_name in methods:
-                    round_belief = belief_function(
+                    round_belief, round_belief_index = belief_function(
                         net, ds, unseen,
                         num_samples=self.num_thompson_samples
                     )
-                    round_beliefs.append({belief_name: round_belief})
+                    round_beliefs.append(
+                        {belief_name: {'belief': round_belief, 'index': round_belief_index}}
+                    )
 
         # convert from list of dicts to dict of lists
         beliefs = {'prospective': defaultdict(list), 'retrospective': defaultdict(list)}
@@ -387,8 +394,11 @@ class BeliefActivePlot():
             for m in methods:
                 for direction in beliefs.keys():
                     with suppress(KeyError):
-                        belief = round_record[m][direction]
-                        beliefs[direction][m].append(belief)
+                        belief, index = (
+                            round_record[m]['belief'][direction],
+                            round_record[m]['belief'][direction]
+                        )
+                        beliefs[direction][m].append(index, belief)
         return beliefs
 
 
@@ -417,7 +427,8 @@ class BeliefActivePlot():
 
             for step, beliefs in enumerate(step_beliefs):
 
-                for belief_index, belief in enumerate(beliefs):
+                # beliefs are a tuple of the element index and the belief value
+                for belief_index, belief in beliefs:
                     
                     belief_list.append(
                         {'Acquisition Function': self.acquisition,

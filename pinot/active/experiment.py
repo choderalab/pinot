@@ -393,6 +393,8 @@ class BayesOptExperiment(ActiveLearningExperiment):
         self.update_data()
         
         while idx < num_rounds:
+
+            print(idx)
             
             if self.early_stopping and self.y_best == self.best_possible:
                 break
