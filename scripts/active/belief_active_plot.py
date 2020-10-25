@@ -35,6 +35,7 @@ def _get_thompson_values(net, data, q=1):
 
     # find the max of each sample
     thompson_values, thompson_indices = torch.max(thetas, axis=1)
+
     return thompson_values, thompson_indices
 
 
@@ -102,7 +103,8 @@ def thompson_sample(net, data, unseen, num_samples=1, **kwargs):
     net.eval()
 
     # initialize thompson sampling dict
-    thompson_samples = {}
+    thompson_samples_values = {}
+    thompson_samples_indices = {}
     
     # get prospective thompson samples
     if unseen:
@@ -114,7 +116,8 @@ def thompson_sample(net, data, unseen, num_samples=1, **kwargs):
             unseen_data,
             num_samples=num_samples
         )
-        thompson_samples['prospective'] = ts_values + epsilon.sample((num_samples,))
+        thompson_samples_indices['prospective'] = ts_indices
+        thompson_samples_values['prospective'] = ts_values + epsilon.sample((num_samples,))
 
     # get retrospective thompson samples on all data
     ts_values, ts_indices = _ts(
@@ -122,9 +125,10 @@ def thompson_sample(net, data, unseen, num_samples=1, **kwargs):
         data,
         num_samples=num_samples
     )
-    thompson_samples['retrospective'] = ts_values + epsilon.sample((num_samples,))
+    thompson_samples_indices['retrospective'] = ts_indices
+    thompson_samples_values['retrospective'] = ts_values + epsilon.sample((num_samples,))
     
-    return thompson_samples, ts_indices
+    return thompson_samples_indices, thompson_samples_values
 
 
 def _max_utility(net, data, unseen, utility_func):
@@ -322,7 +326,7 @@ class BeliefActivePlot():
             
             # get beliefs
             if self.belief_functions:
-                
+
                 self.beliefs = self.get_beliefs(net, ds, acquisitions, methods=self.belief_functions)
 
                 # generate long-form records for pandas
@@ -380,12 +384,12 @@ class BeliefActivePlot():
             # gather pro and retro beliefs for each belief function
             for belief_name, belief_function in self.belief_functions_dict.items():
                 if belief_name in methods:
-                    round_belief, round_belief_index = belief_function(
+                    round_belief_index, round_belief = belief_function(
                         net, ds, unseen,
                         num_samples=self.num_thompson_samples
                     )
                     round_beliefs.append(
-                        {belief_name: {'belief': round_belief, 'index': round_belief_index}}
+                        {belief_name: {'index': round_belief_index, 'belief': round_belief}}
                     )
 
         # convert from list of dicts to dict of lists
@@ -394,11 +398,11 @@ class BeliefActivePlot():
             for m in methods:
                 for direction in beliefs.keys():
                     with suppress(KeyError):
-                        belief, index = (
-                            round_record[m]['belief'][direction],
+                        index, belief = (
+                            round_record[m]['index'][direction],
                             round_record[m]['belief'][direction]
                         )
-                        beliefs[direction][m].append(index, belief)
+                        beliefs[direction][m].append(tuple([index, belief]))
         return beliefs
 
 
@@ -428,15 +432,17 @@ class BeliefActivePlot():
             for step, beliefs in enumerate(step_beliefs):
 
                 # beliefs are a tuple of the element index and the belief value
-                for belief_index, belief in beliefs:
+                belief_index, belief = beliefs
+
+                for bidx in range(len(belief)):
                     
                     belief_list.append(
                         {'Acquisition Function': self.acquisition,
                          'Belief Function': belief_name,
                          'Trial': i,
                          'Round': step,
-                         'Index': belief_index,
-                         'Value': belief.item()}
+                         'Index': belief_index[bidx].item(),
+                         'Value': belief[bidx].item()}
                     )
 
         return belief_list
@@ -478,6 +484,7 @@ class BeliefActivePlot():
                     'Acquisition Function': self.acquisition,
                     'Trial': i,
                     'Datapoints Acquired': len(seen),
+                    'Datapoint Indices': seen,
                     'Round': round_,
                     'Value': result
                 }
