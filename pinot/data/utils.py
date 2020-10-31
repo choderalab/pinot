@@ -7,7 +7,6 @@ import numpy as np
 import torch
 import dgl
 import random
-from tqdm import tqdm
 
 # =============================================================================
 # MODULE FUNCTIONS
@@ -80,7 +79,7 @@ def from_csv(
             ]
 
             ds = []
-            for idx, smiles in enumerate(tqdm(df_smiles)):
+            for idx, smiles in enumerate(df_smiles):
                 if idx in valid_idxs:
                     try:
                         mol = Chem.MolFromSmiles(smiles)
