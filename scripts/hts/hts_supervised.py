@@ -15,7 +15,7 @@ def run(args):
     logging.basicConfig(filename=os.path.join(args.output, args.log), filemode='w', format='%(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
     logging.debug(args)
 
-    savefile = "reg={}_a={}_n={}_b={}_wd={}_lsp={}_percent={}".format(args.regressor_type, args.architecture, args.n_epochs, args.batch_size, args.weight_decay, args.label_split, args.percent_data)
+    savefile = "reg={}_a={}_n={}_b={}_wd={}_lsp={}_frac={}".format(args.regressor_type, args.architecture, args.n_epochs, args.batch_size, args.weight_decay, args.label_split, args.sample_frac)
     logging.debug("savefile = {}".format(savefile))
 
     #############################################################################
@@ -25,18 +25,27 @@ def run(args):
     #############################################################################
 
     start = time.time()
-    data_all = getattr(pinot.data, args.data)()
+    try:
+        # see if we've already serialized it
+        data = pinot.data.datasets.Dataset()
+        data = data_all.load('./out/mpro_hts.bin')
+    
+    except:
+        print(args.sample_frac)
+        if not os.path.exists('./out/'): os.makedirs('./out/')
 
-    data_all = [(g.to(device), y.to(device)) for (g,y) in data_all]
-    data = [(g, y) for (g,y) in data_all if ~torch.isnan(y)]
+        # otherwise, load from scratch
+        data = getattr(pinot.data, args.data)(sample_frac=args.sample_frac[0])
+        data.save('./out/mpro_hts.bin')
 
-
+    # move to cuda
+    data = data.to(device)
+    
     # Split the labeled moonshot data into training set and test set
-    train_labeled, test_labeled = pinot.data.utils.split(data, args.label_split)
+    train_data, test_data = data.split(args.label_split)
 
     # Do minibatching on LABELED data
     batch_size = args.batch_size
-    one_batch_train_labeled = pinot.data.utils.batch(train_labeled, len(train_labeled))
     end = time.time()
     logging.debug("Finished loading all data after {} seconds".format(end-start))
 
@@ -48,7 +57,7 @@ def run(args):
     #############################################################################
 
 
-    def get_net_and_optimizer(args, unsup_scale):
+    def get_net_and_optimizer(args):
         representation = pinot.representation.sequential.SequentialMix(
             args.architecture,
         )
@@ -60,15 +69,10 @@ def run(args):
         else:
             output_regressor = pinot.regressors.VariationalGaussianProcessRegressor
 
-        decoder = pinot.generative.DecoderNetwork
-
         # First train a fully supervised Net to use as Baseline
-        net = pinot.generative.SemiSupervisedNet(
+        net = pinot.Net(
             representation=representation,
             output_regressor=output_regressor,
-            decoder=decoder,
-            unsup_scale=unsup_scale,
-            embedding_dim=args.embedding_dim
         )
         optimizer = pinot.app.utils.optimizer_translation(
             opt_string=args.optimizer,
@@ -78,35 +82,38 @@ def run(args):
         net.to(device)
         return net, optimizer(net)
 
-    def train_and_test_semi_supervised(net, optimizer, semi_data, labeled_train, labeled_test, n_epochs):
-        train = pinot.app.experiment.Train(net=net, data=semi_data, optimizer=optimizer, n_epochs=n_epochs)
-        train.train()
+    def train_and_test(net, optimizer, train_data, test_data, n_epochs):
+        
+        train_and_test = pinot.TrainAndTest(
+            net=net,
+            optimizer=optimizer,
+            n_epochs=n_epochs,
+            data_tr=train_data,
+            data_te=test_data,
+        )
 
-        train_metrics = pinot.app.experiment.Test(net=net, data=labeled_train, states=train.states, metrics=[pinot.metrics.r2, pinot.metrics.avg_nll, pinot.metrics.rmse])
-        train_results = train_metrics.test()
+        result = train_and_test.run()
 
-        test_metrics = pinot.app.experiment.Test(net=net, data=labeled_test, states=train.states, metrics=[pinot.metrics.r2, pinot.metrics.avg_nll, pinot.metrics.rmse])
-        test_results = test_metrics.test()
+        return result['training'], result['test']
 
-        return train_results, test_results, train.states
-
-    supNet, optimizer = get_net_and_optimizer(args, 0.) # Note that with unsup_scale = 0., this becomes a supervised only model
+    supNet, optimizer = get_net_and_optimizer(args)
 
     start = time.time()
-    # Use batch training if exact GP or mini-batch if NN/variational GP
-    train = one_batch_train_labeled if args.regressor_type == "gp" else pinot.data.utils.batch(train_labeled, batch_size)
-    suptrain, suptest, supstates = train_and_test_semi_supervised(supNet, optimizer, train, train_labeled, test_labeled, args.n_epochs)
+    
+    # mini-batch because we're using variational GP
+    train_data = train_data.batch(batch_size)
+    print(train_data)
+    train_results, test_results = train_and_test(supNet, optimizer, train_data, test_data, args.n_epochs)
 
     end = time.time()
     logging.debug("Finished training supervised net after {} seconds and save state dict".format(end-start))
     torch.save(supNet.state_dict(), os.path.join(args.output, savefile + "_sup.th"))
-    torch.save(supstates, os.path.join(args.output, savefile + "_sup_all_states.th"))
 
     sup_train_metrics = {}
     sup_test_metrics  = {}
-    for metric in suptrain.keys():
-        sup_train_metrics[metric] = suptrain[metric]["final"]
-        sup_test_metrics[metric]  = suptest[metric]["final"]
+    for metric in train_results.keys():
+        sup_train_metrics[metric] = train_results[metric]["final"]
+        sup_test_metrics[metric]  = test_results[metric]["final"]
 
     logging.debug(sup_train_metrics)
     logging.debug(sup_test_metrics)
@@ -123,7 +130,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--regressor_type', 
         type=str,
-        default='gp',
+        default='vgp',
         choices=["gp", "nn", "vgp"],
         help="Type of output regressor, Gaussian Process, Variational GP or Neural Networks"
     )
@@ -142,7 +149,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--data',
         type=str,
-        default="moonshot",
+        default="mpro_hts",
         help="Labeled data set name"
     )
 
@@ -156,7 +163,7 @@ if __name__ == '__main__':
         '--architecture',
         nargs="+",
         type=str,
-        default=[128, "tanh", 128, "tanh"],
+        default=[32, "tanh", 32, "tanh"],
         help="Graph neural network architecture"
     )
     parser.add_argument(
@@ -194,7 +201,7 @@ if __name__ == '__main__':
     )
 
     parser.add_argument(
-        '--percent_data',
+        '--sample_frac',
         nargs="+",
         type=float,
         default=0.1,
