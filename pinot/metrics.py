@@ -36,8 +36,8 @@ def _independent(distribution):
 # =============================================================================
 def _rmse(y, y_hat):
     """RMSE"""
-    if y_hat.dim() == 1:
-        y_hat = y_hat.unsqueeze(1)
+    y_hat = y_hat.unsqueeze(1) if y_hat.dim() == 1 else y_hat
+    y = y.unsqueeze(1) if y.dim() == 1 else y
     assert y.shape == y_hat.shape
     assert y.dim() == 2
     assert y.shape[-1] == 1
@@ -54,16 +54,15 @@ def rmse(net, g, y, *args, n_samples=16, **kwargs):
                 net.condition(g, *args, **kwargs)
             ).sample().detach().cpu()
 
-        results.append(
-            _rmse(y, y_hat))
+        results.append(_rmse(y, y_hat))
 
     return torch.tensor(results).mean()
 
 
 
 def _r2(y, y_hat):
-    if y_hat.dim() == 1:
-        y_hat = y_hat.unsqueeze(1)
+    y_hat = y_hat.unsqueeze(1) if y_hat.dim() == 1 else y_hat
+    y = y.unsqueeze(1) if y.dim() == 1 else y
     assert y.shape == y_hat.shape
     assert y.dim() == 2
     assert y.shape[-1] == 1

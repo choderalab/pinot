@@ -23,6 +23,7 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
     def __init__(self, ds=None):
         super(Dataset, self).__init__()
         self.ds = ds
+        self.device = torch.device("cpu")  # initialize on cpu
 
     def __len__(self):
         # 0 len if no graphs
@@ -102,6 +103,11 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
         return self.__class__(
             self.ds + x.ds
         )
+
+    def to(self, device):
+        self.device = device
+        self.ds = [(g.to(device), y.to(device)) for (g,y) in self.ds]
+        return self
 
 
 

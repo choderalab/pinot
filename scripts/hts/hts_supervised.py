@@ -4,6 +4,7 @@ def run(args):
     import os
     import logging
     import time
+    import pickle
 
     # Specify accelerator (if any)
     device = torch.device("cuda:0" if args.cuda else "cpu:0")
@@ -15,7 +16,7 @@ def run(args):
     logging.basicConfig(filename=os.path.join(args.output, args.log), filemode='w', format='%(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
     logging.debug(args)
 
-    savefile = "reg={}_a={}_n={}_b={}_wd={}_lsp={}_frac={}".format(args.regressor_type, args.architecture, args.n_epochs, args.batch_size, args.weight_decay, args.label_split, args.sample_frac)
+    savefile = f'reg={args.regressor_type}_a={args.architecture}_n={args.n_epochs}_b={args.batch_size}_wd={args.weight_decay}_lsp={args.label_split}_frac={args.sample_frac}_{args.index}'
     logging.debug("savefile = {}".format(savefile))
 
     #############################################################################
@@ -28,15 +29,15 @@ def run(args):
     try:
         # see if we've already serialized it
         data = pinot.data.datasets.Dataset()
-        data = data_all.load('./out/mpro_hts.bin')
+        data = data_all.load(f'./{args.output}/mpro_hts_{args.label_split}.bin')
     
     except:
         print(args.sample_frac)
-        if not os.path.exists('./out/'): os.makedirs('./out/')
+        if not os.path.exists(f'./{args.output}/'): os.makedirs(f'./{args.output}/')
 
         # otherwise, load from scratch
         data = getattr(pinot.data, args.data)(sample_frac=args.sample_frac[0])
-        data.save('./out/mpro_hts.bin')
+        data.save(f'./{args.output}/mpro_hts_{args.label_split}.bin')
 
     # move to cuda
     data = data.to(device)
@@ -72,7 +73,7 @@ def run(args):
         # First train a fully supervised Net to use as Baseline
         net = pinot.Net(
             representation=representation,
-            output_regressor=output_regressor,
+            output_regressor_class=output_regressor,
         )
         optimizer = pinot.app.utils.optimizer_translation(
             opt_string=args.optimizer,
@@ -102,7 +103,6 @@ def run(args):
     
     # mini-batch because we're using variational GP
     train_data = train_data.batch(batch_size)
-    print(train_data)
     train_results, test_results = train_and_test(supNet, optimizer, train_data, test_data, args.n_epochs)
 
     end = time.time()
@@ -114,6 +114,9 @@ def run(args):
     for metric in train_results.keys():
         sup_train_metrics[metric] = train_results[metric]["final"]
         sup_test_metrics[metric]  = test_results[metric]["final"]
+
+    pickle.dump(train_results, open(f'./{args.output}/train_results_{savefile}.p', 'wb'))
+    pickle.dump(test_results, open(f'./{args.output}/test_results_{savefile}.p', 'wb'))
 
     logging.debug(sup_train_metrics)
     logging.debug(sup_test_metrics)
@@ -156,26 +159,26 @@ if __name__ == '__main__':
     parser.add_argument(
         '--n_epochs',
         type=int,
-        default=100,
+        default=500,
         help="number of training epochs"
     )
     parser.add_argument(
         '--architecture',
         nargs="+",
         type=str,
-        default=[32, "tanh", 32, "tanh"],
+        default=[32, "tanh", 32, "tanh", 32, "tanh"],
         help="Graph neural network architecture"
     )
     parser.add_argument(
         '--cuda',
         action="store_true",
-        default=False,
+        default=True,
         help="Using GPU"
     )
     parser.add_argument(
         '--output',
         type=str,
-        default="learning_curve",
+        default="out",
         help="Name of folder to store results"
     )
 
@@ -214,6 +217,12 @@ if __name__ == '__main__':
         type=float,
         default=[0.8,0.2],
         help="Training-testing split for labeled data"
+    )
+    parser.add_argument(
+        '--index',
+        type=int,
+        default=1,
+        help="Arbitrary index to append to logs"
     )
 
     args = parser.parse_args()

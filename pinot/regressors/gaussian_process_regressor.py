@@ -320,8 +320,8 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
 
         # (n_inducing_points, n_inducing_points)
         mask = torch.gt(
-            torch.range(0, self.y_tr_sigma_diag.shape[0] - 1)[:, None],
-            torch.range(0, self.y_tr_sigma_diag.shape[0] - 1)[None, :],
+            torch.arange(0, self.y_tr_sigma_diag.shape[0])[:, None],
+            torch.arange(0, self.y_tr_sigma_diag.shape[0])[None, :],
         )
 
         mask = mask.to(device=y_tr_diag.device)

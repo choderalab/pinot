@@ -77,12 +77,12 @@ class Train:
 
     def train_once(self):
         """Train the model for one batch."""
-        for x in self.data:
+        for d in self.data:
 
             def l():
                 """ """
                 self.optimizer.zero_grad()
-                loss = torch.sum(self.net.loss(*x))
+                loss = torch.sum(self.net.loss(*d))
                 loss.backward()
                 return loss
 
@@ -205,8 +205,6 @@ class Test:
             g = xs[0]
             y = xs[1]
             _args = xs[2:]
-
-            # print('here')
 
             for metric in self.metrics:  # loop through the metrics
                 results[metric.__name__][state_name] = (
