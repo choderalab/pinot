@@ -26,10 +26,11 @@ def run(args):
     #############################################################################
 
     start = time.time()
+    split_str = f'{args.label_split[0]}_{args.label_split[1]}'
     try:
         # see if we've already serialized it
         data = pinot.data.datasets.Dataset()
-        data = data.load(f'./{args.output}/mpro_hts_{'_'.join(args.label_split)}.bin')
+        data = data.load(f'./{args.output}/mpro_hts_{split_str}.bin')
     
     except:
 
@@ -37,7 +38,7 @@ def run(args):
 
         # otherwise, load from scratch
         data = getattr(pinot.data, args.data)(sample_frac=args.sample_frac[0])
-        data.save(f'./{args.output}/mpro_hts_{'_'.join(args.label_split)}.bin')
+        data.save(f'./{args.output}/mpro_hts_{split_str}.bin')
 
     # move to cuda
     data = data.to(device)
@@ -214,8 +215,8 @@ if __name__ == '__main__':
     parser.add_argument(
         '--label_split',
         nargs="+",
-        type=float,
-        default=[0.8,0.2],
+        type=list,
+        default=[4, 1],
         help="Training-testing split for labeled data"
     )
     parser.add_argument(
