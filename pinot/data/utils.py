@@ -7,6 +7,7 @@ import numpy as np
 import torch
 import dgl
 import random
+from tqdm import tqdm
 
 # =============================================================================
 # MODULE FUNCTIONS
@@ -21,6 +22,7 @@ def from_csv(
     seed=2666,
     scale=1.0,
     dropna=False,
+    sample_frac=1.0,
     shuffle=True,
     **kwargs
 ):
@@ -42,6 +44,8 @@ def from_csv(
          (Default value = 1.0)
     dropna :
          (Default value = False)
+    sample_frac : float
+        Proportion of rows to read in
     shuffle :
          (Default value = True)
     **kwargs :
@@ -54,7 +58,9 @@ def from_csv(
 
     def _from_csv():
         """ """
-        df = pd.read_csv(path, error_bad_lines=False, **kwargs)
+        df_unsampled = pd.read_csv(path, error_bad_lines=False, **kwargs)
+
+        df = df_unsampled.sample(frac=sample_frac)
 
         if dropna is True:
             df = df.dropna(axis=0, subset=[df.columns[y_cols[0]]])
@@ -67,30 +73,27 @@ def from_csv(
 
             df_smiles = [str(x) for x in df_smiles]
 
-            idxs = [
+            valid_idxs = [
                 idx
                 for idx in range(len(df_smiles))
                 if "nan" not in df_smiles[idx]
             ]
 
-            df_smiles = [df_smiles[idx] for idx in idxs]
-
-            mols = [Chem.MolFromSmiles(smiles) for smiles in df_smiles]
-            gs = [pinot.graph.from_rdkit_mol(mol) for mol in mols]
+            ds = []
+            for idx, smiles in enumerate(tqdm(df_smiles)):
+                if idx in valid_idxs:
+                    try:
+                        mol = Chem.MolFromSmiles(smiles)
+                        g = pinot.graph.from_rdkit_mol(mol)
+                        y = torch.tensor(
+                            scale * df_y.values[idx], dtype=torch.float32
+                        )
+                        ds.append(tuple([g, y]))
+                    except:
+                        pass
 
         elif toolkit == "openeye":
             raise NotImplementedError
-
-        ds = list(
-            zip(
-                gs,
-                list(
-                    torch.tensor(
-                        scale * df_y.values[idxs], dtype=torch.float32
-                    )
-                ),
-            )
-        )
 
         if shuffle is True:
             random.seed(seed)
@@ -308,7 +311,7 @@ def prepare_semi_supervised_data(unlabelled_data, labelled_data, seed=2666):
     return semi_supervised_data
 
 
-def prepare_semi_supeprvised_data_from_labeled_data(
+def prepare_semi_supervised_data_from_labeled_data(
     labelled_data, r=0.2, seed=2666
 ):
     """Create semi-supervised data from labelled data by randomly removing the

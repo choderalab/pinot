@@ -2,8 +2,11 @@
 # IMPORTS
 # =============================================================================
 import pinot
-import numpy as np
 import dgl
+from dgl.data.utils import save_graphs
+from dgl.data.utils import load_graphs
+
+import numpy as np
 import pandas as pd
 import abc
 import torch
@@ -68,6 +71,37 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
         """Read csv dataset. """
         self.ds = pinot.data.utils.from_csv(*args, **kwargs)()
         return self
+
+    def save(self, path):
+        """ Save dataset to path.
+        Parameters
+        ----------
+        path : path-like object
+        """
+        gs, ys = zip(*self.ds)
+        graph_labels = {'y': torch.stack(ys)}
+        save_graphs(path, gs, graph_labels)
+    
+    def load(self, path, indices=None):
+        """ Load path to dataset.
+        Parameters
+        ----------
+        path : str
+            location of the saved serialized file
+        indices : list of int
+            subset of indices to import
+        """
+        gs, labels = load_graphs(path, idx_list=indices)
+        ys = labels['y']
+        self.ds = list(zip(gs, ys))
+
+        return self
+
+    def __add__(self, x):
+        return self.__class__(
+            self.ds + x.ds
+        )
+
 
 
 class AttributedDataset(Dataset):
