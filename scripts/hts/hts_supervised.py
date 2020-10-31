@@ -29,7 +29,7 @@ def run(args):
     try:
         # see if we've already serialized it
         data = pinot.data.datasets.Dataset()
-        data = data_all.load(f'./{args.output}/mpro_hts_{args.label_split}.bin')
+        data = data.load(f'./{args.output}/mpro_hts_{args.label_split}.bin')
     
     except:
         print(args.sample_frac)
