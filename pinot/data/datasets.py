@@ -74,6 +74,7 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
 
     def save(self, path):
         """ Save dataset to path.
+
         Parameters
         ----------
         path : path-like object
@@ -94,7 +95,7 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
         gs, labels = load_graphs(path, idx_list=indices)
         ys = labels['y']
         self.ds = list(zip(gs, ys))
-
+        
         return self
 
     def __add__(self, x):
