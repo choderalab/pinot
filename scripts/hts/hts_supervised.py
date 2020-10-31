@@ -29,15 +29,15 @@ def run(args):
     try:
         # see if we've already serialized it
         data = pinot.data.datasets.Dataset()
-        data = data.load(f'./{args.output}/mpro_hts_{args.label_split}.bin')
+        data = data.load(f'./{args.output}/mpro_hts_{'_'.join(args.label_split)}.bin')
     
     except:
-        print(args.sample_frac)
+
         if not os.path.exists(f'./{args.output}/'): os.makedirs(f'./{args.output}/')
 
         # otherwise, load from scratch
         data = getattr(pinot.data, args.data)(sample_frac=args.sample_frac[0])
-        data.save(f'./{args.output}/mpro_hts_{args.label_split}.bin')
+        data.save(f'./{args.output}/mpro_hts_{'_'.join(args.label_split)}.bin')
 
     # move to cuda
     data = data.to(device)
