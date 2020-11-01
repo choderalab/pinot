@@ -35,9 +35,6 @@ def run(args):
         data = data.load(f'./{args.output}/mpro_hts_{split_str}.bin')
     
     except:
-
-        if not os.path.exists(f'./{args.output}/'): os.makedirs(f'./{args.output}/')
-
         # otherwise, load from scratch
         data = getattr(pinot.data, args.data)(sample_frac=args.sample_frac[0])
         data.save(f'./{args.output}/mpro_hts_{split_str}.bin')
