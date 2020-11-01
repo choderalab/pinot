@@ -35,7 +35,7 @@ def run(args):
     if os.path.isfile(path):
         # see if we've already serialized it
         data = pinot.data.datasets.Dataset()
-        data = data.load()
+        data = data.load(path)
     else:
         # otherwise, load from scratch
         data = getattr(pinot.data, args.data)(sample_frac=args.sample_frac[0])
