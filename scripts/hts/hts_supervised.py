@@ -47,7 +47,7 @@ def run(args):
     train_data, test_data = data.split(args.label_split)
 
     # Do minibatching on LABELED data
-    batch_size = args.batch_size
+    batch_size = args.batch_size if args.regressor_type != 'gp' else len(train_data)
     end = time.time()
     logging.debug("Finished loading all data after {} seconds".format(end-start))
 
@@ -134,7 +134,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--regressor_type', 
         type=str,
-        default='vgp',
+        default='gp',
         choices=["gp", "nn", "vgp"],
         help="Type of output regressor, Gaussian Process, Variational GP or Neural Networks"
     )
@@ -208,7 +208,7 @@ if __name__ == '__main__':
         '--sample_frac',
         nargs="+",
         type=float,
-        default=0.1,
+        default=0.005, # 0.1
         help="Proportion of dataset to use"
     )
 

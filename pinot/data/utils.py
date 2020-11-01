@@ -264,7 +264,8 @@ def batch(ds, batch_size, seed=2666, shuffle=False, partial_batch=False):
     ys = []
     for d in ds:
         gs.extend(dgl.unbatch(d[0]))
-        ys.extend(d[1])
+        ys.extend(list(d[1]))
+    ys = [y.unsqueeze(0) for y in ys]
 
     gs_batched = [
         dgl.batch(gs[idx * batch_size : (idx + 1) * batch_size])

@@ -155,6 +155,26 @@ class Test:
 
     def test(self):
         """ Run test experiment. """
+        
+        def _independent(distribution):
+            """ Make predictive distribution for test set independent.
+
+            Parameters
+            ----------
+            distribution : `torch.distribution.Distribution`
+                Input distribution.
+
+            Returns
+            -------
+            distribution : `torch.distribution.Distribution`
+                Output distribution.
+
+            """
+            return torch.distributions.normal.Normal(
+                loc=distribution.mean.flatten(),
+                scale=distribution.variance.pow(0.5).flatten(),
+        )
+
         # switch to test
         self.net.eval()
 
@@ -164,46 +184,42 @@ class Test:
         for metric in self.metrics:
             results[metric.__name__] = {}
 
+        # make g, y into single batches
+        g, y = self.data.batch(len(self.data))[0]
         for state_name, state in self.states.items():  # loop through states
+            
             self.net.load_state_dict(state)
 
-            # concat y and y_hat in test set
+            if self.net.has_exact_gp:
+                batch_size = len(self.data)
+            else:
+                batch_size = 32
 
-            # y = []
-            # g = []
-            # for g_, y_ in self.data:
-            #     y.append(y_)
-            #     if isinstance(g_, dgl.DGLGraph):
-            #         g.append(g_)
-            #     else:
-            #         g += dgl.unbatch(g_)
-            #
-            # if y[0].dim() == 0:
-            #     y = torch.stack(y)
-            # else:
-            #     y = torch.cat(y)
-            #
-            # g = dgl.batch(g)
-            def _batch(x):
-                if isinstance(x[0], dgl.DGLGraph):
-                    _x = []
-                    for _g in x:
-                        _x += dgl.unbatch(_g)
-                    return dgl.batch(_x)
+            # compute conditional distribution in batched fashion
+            locs, scales = [], []
+            for idx, d in enumerate(self.data.batch(batch_size, partial_batch=True)):
+    
+                g_batch, _ = d
+                distribution_batch = self.net.condition(g_batch)
+                loc_batch = distribution_batch.mean.flatten().cpu()
+                scale_batch = distribution_batch.variance.pow(0.5).flatten().cpu()
+                locs.append(loc_batch)
+                scales.append(scale_batch)
 
-                else:
-                    if x[0].dim() == 0:
-                        return torch.stack(x)
+            distribution = torch.distributions.normal.Normal(
+                loc=torch.cat(locs),
+                scale=torch.cat(scales)
+            )
 
-                    else:
-                        return torch.cat(x)
-
+            y = y.detach().cpu().reshape(-1, 1)
             for metric in self.metrics:  # loop through the metrics
                 results[metric.__name__][state_name] = (
                     metric(
                         self.net,
-                        self.data,
-                        sampler=self.sampler
+                        distribution,
+                        y,
+                        sampler=self.sampler,
+                        batch_size=batch_size
                     )
                     .detach()
                     .cpu()

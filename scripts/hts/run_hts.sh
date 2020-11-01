@@ -1,4 +1,3 @@
-logfolder="$PWD/hts-logs"
 for regressor in 'vgp' 'nn'
 do
     for architecture in 'GraphConv 32 activation tanh GraphConv 32 activation tanh GraphConv 32 activation tanh'
