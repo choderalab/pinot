@@ -82,7 +82,7 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
         """
         gs, ys = zip(*self.ds)
         graph_labels = {'y': torch.stack(ys)}
-        save_graphs(path, gs, graph_labels)
+        save_graphs(path, list(gs), graph_labels)
     
     def load(self, path, indices=None):
         """ Load path to dataset.
