@@ -10,8 +10,10 @@ def run(args):
     device = torch.device("cuda:0" if args.cuda else "cpu:0")
 
     # If output folder doesn't exist, create a new one
-    if not os.path.exists(args.output):
+    try:
         os.mkdir(args.output)
+    except:
+        pass
 
     logging.basicConfig(filename=os.path.join(args.output, args.log), filemode='w', format='%(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
     logging.debug(args)
