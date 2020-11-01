@@ -30,7 +30,7 @@ def run(args):
     start = time.time()
     split_str = f'{args.label_split[0]}_{args.label_split[1]}'
 
-    path = f'./{args.output}/mpro_hts_{split_str}.bin'
+    path = f'./{args.output}/mpro_hts_{split_str}_{args.sample_frac}.bin'
     
     if os.path.isfile(path):
         # see if we've already serialized it
