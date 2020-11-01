@@ -198,22 +198,12 @@ class Test:
                     else:
                         return torch.cat(x)
 
-            xs = list(zip(*self.data))
-            xs = [_batch(x) for x in xs]
-
-            # get input and auxiliary arguments
-            g = xs[0]
-            y = xs[1]
-            _args = xs[2:]
-
             for metric in self.metrics:  # loop through the metrics
                 results[metric.__name__][state_name] = (
                     metric(
                         self.net,
-                        g,
-                        y,
-                        *_args,
-                        sampler=self.sampler,
+                        self.data,
+                        sampler=self.sampler
                     )
                     .detach()
                     .cpu()

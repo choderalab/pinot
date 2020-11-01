@@ -234,7 +234,7 @@ def split(ds, partition):
     return ds_batched
 
 
-def batch(ds, batch_size, seed=2666, shuffle=False):
+def batch(ds, batch_size, seed=2666, shuffle=False, partial_batch=False):
     """Batch graphs and values after shuffling.
 
     Parameters
@@ -256,11 +256,15 @@ def batch(ds, batch_size, seed=2666, shuffle=False):
     n_data_points = len(ds)
     n_batches = n_data_points // batch_size  # drop the rest
 
-    if shuffle is True:
+    if shuffle:
         random.seed(seed)
         random.shuffle(ds)
 
-    gs, ys = tuple(zip(*ds))
+    gs = []
+    ys = []
+    for d in ds:
+        gs.extend(dgl.unbatch(d[0]))
+        ys.extend(d[1])
 
     gs_batched = [
         dgl.batch(gs[idx * batch_size : (idx + 1) * batch_size])
@@ -271,6 +275,14 @@ def batch(ds, batch_size, seed=2666, shuffle=False):
         torch.stack(ys[idx * batch_size : (idx + 1) * batch_size], dim=0)
         for idx in range(n_batches)
     ]
+
+    if partial_batch and n_data_points % batch_size != 0:
+        gs_batched.append(
+            dgl.batch(gs[(n_batches) * batch_size : ])
+        )
+        ys_batched.append(
+            torch.stack(ys[(n_batches) * batch_size : ], dim=0)
+        )
 
     return list(zip(gs_batched, ys_batched))
 

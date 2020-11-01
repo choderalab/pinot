@@ -31,7 +31,7 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
             return 0
 
         else:
-            return len(self.ds)
+            return sum(len(d[1]) for d in self.ds) # len(self.ds)
 
     def __getitem__(self, idx):
         if self.ds is None:
@@ -54,12 +54,17 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
     def split(self, *args, **kwargs):
         """Split the dataset according to some partition. """
         ds = pinot.data.utils.split(self, *args, **kwargs)
-        return ds
+        dataset_partitions = []
+        for ds_partition in ds:
+            dataset_partitions.append(
+                type(self)(ds_partition)
+            )
+        return tuple(dataset_partitions)
 
     def batch(self, *args, **kwargs):
         """Batch dataset."""
         ds = pinot.data.utils.batch(self, *args, **kwargs)
-        return ds
+        return type(self)(ds)
 
     def shuffle(self, *args, **kwargs):
         """ Shuffle the records in the dataset. """
