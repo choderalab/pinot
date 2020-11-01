@@ -29,12 +29,14 @@ def run(args):
 
     start = time.time()
     split_str = f'{args.label_split[0]}_{args.label_split[1]}'
-    try:
+
+    path = f'./{args.output}/mpro_hts_{split_str}.bin'
+    
+    if os.path.isfile(path):
         # see if we've already serialized it
         data = pinot.data.datasets.Dataset()
-        data = data.load(f'./{args.output}/mpro_hts_{split_str}.bin')
-    
-    except:
+        data = data.load()
+    else:
         # otherwise, load from scratch
         data = getattr(pinot.data, args.data)(sample_frac=args.sample_frac[0])
         data.save(f'./{args.output}/mpro_hts_{split_str}.bin')
