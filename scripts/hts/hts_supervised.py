@@ -39,7 +39,7 @@ def run(args):
     else:
         # otherwise, load from scratch
         data = getattr(pinot.data, args.data)(sample_frac=args.sample_frac[0])
-        data.save(f'./{args.output}/mpro_hts_{split_str}.bin')
+        data.save(f'./{args.output}/mpro_hts_{split_str}_{args.sample_frac}.bin')
 
     # move to cuda
     data = data.to(device)
