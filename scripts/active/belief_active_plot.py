@@ -566,6 +566,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--device', type=str, default='cuda:0')
     parser.add_argument('--num_trials', type=int, default=1)
+    parser.add_argument('--num_thompson_samples', type=int, default=500)
     parser.add_argument('--num_rounds', type=int, default=100)
     parser.add_argument('--num_epochs', type=int, default=10)
 
@@ -574,7 +575,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    plot = TSActivePlot(
+    plot = BeliefActivePlot(
         # net config
         net=args.net,
         config=args.config,
