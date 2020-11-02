@@ -635,7 +635,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    plot = TSActivePlot(
+    plot = BeliefActivePlot(
         # net config
         net=args.net,
         config=args.config,
