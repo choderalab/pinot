@@ -65,6 +65,7 @@ class Train:
         n_epochs=100,
         record_interval=1,
         lr_scheduler=None,
+        annealing=1.0
     ):
 
         self.data = data
@@ -74,6 +75,7 @@ class Train:
         self.record_interval = record_interval
         self.states = {}
         self.lr_scheduler = lr_scheduler
+        self.annealing = annealing
 
     def train_once(self):
         """Train the model for one batch."""
@@ -83,7 +85,13 @@ class Train:
             def l():
                 """ """
                 self.optimizer.zero_grad()
-                loss = torch.sum(self.net.loss(*d, kl_loss_scaling=batch_ratio))
+                loss = torch.sum(
+                    self.net.loss(
+                        *d,
+                        kl_loss_scaling=batch_ratio,
+                        annealing=self.annealing
+                    )
+                )
                 loss.backward()
                 return loss
 
@@ -284,6 +292,7 @@ class TrainAndTest:
         record_interval=1,
         train_cls=Train,
         lr_scheduler=None,
+        annealing=1.0
     ):
         self.net = net  # deepcopy the model object
         self.data_tr = data_tr
@@ -294,6 +303,7 @@ class TrainAndTest:
         self.record_interval = record_interval
         self.train_cls = train_cls
         self.lr_scheduler = lr_scheduler
+        self.annealing = annealing
 
     def __str__(self):
         _str = ""
@@ -324,6 +334,7 @@ class TrainAndTest:
             optimizer=self.optimizer,
             n_epochs=self.n_epochs,
             lr_scheduler=self.lr_scheduler,
+            annealing=self.annealing,
         )
 
         print('training now')

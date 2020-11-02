@@ -463,26 +463,33 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
             Loss function.
 
         """
-        # define prior
-        prior_mean = torch.zeros(self.n_inducing_points, 1)
-        prior_tril = self._k_tr_tr().cholesky()
+        if annealing != 0:
 
-        prior_tril = prior_tril.to(device=x_te.device)
-        prior_mean = prior_mean.to(device=x_te.device)
+            # define prior
+            prior_mean = torch.zeros(self.n_inducing_points, 1)
+            prior_tril = self._k_tr_tr().cholesky()
+
+            prior_tril = prior_tril.to(device=x_te.device)
+            prior_mean = prior_mean.to(device=x_te.device)
+
+            log_p_u = self.exp_log_full_gaussian(
+                self.y_tr_mu, self._y_tr_sigma(), prior_mean, prior_tril
+            )
+
+            log_q_u = -self.entropy_full_gaussian(
+                self.y_tr_mu, self._y_tr_sigma()
+            )
+
+            kl_term = kl_loss_scaling * annealing * (log_q_u - log_p_u)
+
+        else:
+            kl_term = 0.
 
         distribution = self.condition(x_te)
 
         nll = -distribution.log_prob(y_te.flatten()).mean()
 
-        log_p_u = self.exp_log_full_gaussian(
-            self.y_tr_mu, self._y_tr_sigma(), prior_mean, prior_tril
-        )
-
-        log_q_u = -self.entropy_full_gaussian(
-            self.y_tr_mu, self._y_tr_sigma()
-        )
-
-        loss = nll + kl_loss_scaling * annealing * (log_q_u - log_p_u)
+        loss = nll + kl_term
 
         # import pdb; pdb.set_trace()
         return loss

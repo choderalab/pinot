@@ -93,6 +93,7 @@ def run(args):
             n_epochs=n_epochs,
             data_tr=train_data,
             data_te=test_data,
+            annealing=annealing,
         )
 
         result = train_and_test.run()
@@ -105,7 +106,7 @@ def run(args):
     
     # mini-batch because we're using variational GP
     train_data = train_data.batch(batch_size)
-    train_results, test_results = train_and_test(supNet, optimizer, train_data, test_data, args.n_epochs)
+    train_results, test_results = train_and_test(supNet, optimizer, train_data, test_data, args.n_epochs, args.annealing)
 
     end = time.time()
     logging.debug("Finished training supervised net after {} seconds and save state dict".format(end-start))
@@ -225,6 +226,18 @@ if __name__ == '__main__':
         type=int,
         default=1,
         help="Arbitrary index to append to logs"
+    )
+    parser.add_argument(
+        '--annealing',
+        type=float,
+        default=1.0,
+        help="Scaling factor on the KL term in the variational inference loss"
+    )
+    parser.add_argument(
+        '--n_inducing_points',
+        type=int,
+        default=100,
+        help="Number of inducing points to use for variational inference"
     )
 
     args = parser.parse_args()
