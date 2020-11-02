@@ -19,7 +19,7 @@ def run(args):
     logging.basicConfig(filename=os.path.join(args.output, args.log), filemode='w', format='%(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
     logging.debug(args)
 
-    savefile = f'reg={args.regressor_type}_a={args.architecture}_n={args.n_epochs}_b={args.batch_size}_wd={args.weight_decay}_lsp={args.label_split}_frac={args.sample_frac}_{args.index}'
+    savefile = f'reg={args.regressor_type}_a={args.architecture}_n={args.n_epochs}_b={args.batch_size}_wd={args.weight_decay}_lsp={args.label_split}_frac={args.sample_frac}_anneal={args.annealing}_induce={args.n_inducing_points}_{args.index}'
     logging.debug("savefile = {}".format(savefile))
 
     #############################################################################
@@ -76,6 +76,7 @@ def run(args):
         net = pinot.Net(
             representation=representation,
             output_regressor_class=output_regressor,
+            n_inducing_points=args.n_inducing_points
         )
         optimizer = pinot.app.utils.optimizer_translation(
             opt_string=args.optimizer,
@@ -85,7 +86,7 @@ def run(args):
         net.to(device)
         return net, optimizer(net)
 
-    def train_and_test(net, optimizer, train_data, test_data, n_epochs):
+    def train_and_test(net, optimizer, train_data, test_data, n_epochs, annealing):
         
         train_and_test = pinot.TrainAndTest(
             net=net,
