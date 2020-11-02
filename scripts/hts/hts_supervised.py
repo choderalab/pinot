@@ -12,6 +12,7 @@ def run(args):
     # If output folder doesn't exist, create a new one
     try:
         os.mkdir('bin')
+        os.mkdir(args.output)
     except:
         pass
 
@@ -116,8 +117,8 @@ def run(args):
         sup_train_metrics[metric] = train_results[metric]["final"]
         sup_test_metrics[metric]  = test_results[metric]["final"]
 
-    pickle.dump(train_results, open(f'./bin/train_results_{savefile}.p', 'wb'))
-    pickle.dump(test_results, open(f'./bin/test_results_{savefile}.p', 'wb'))
+    pickle.dump(train_results, open(f'./{args.output}/train_results_{savefile}.p', 'wb'))
+    pickle.dump(test_results, open(f'./{args.output}/test_results_{savefile}.p', 'wb'))
 
     logging.debug(sup_train_metrics)
     logging.debug(sup_test_metrics)
@@ -173,7 +174,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--cuda',
         action="store_true",
-        default=True,
+        default=False,
         help="Using GPU"
     )
     parser.add_argument(

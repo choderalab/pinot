@@ -78,11 +78,12 @@ class Train:
     def train_once(self):
         """Train the model for one batch."""
         for d in self.data:
+            batch_ratio = len(d[1]) / len(self.data)
 
             def l():
                 """ """
                 self.optimizer.zero_grad()
-                loss = torch.sum(self.net.loss(*d))
+                loss = torch.sum(self.net.loss(*d, kl_loss_scaling=batch_ratio))
                 loss.backward()
                 return loss
 

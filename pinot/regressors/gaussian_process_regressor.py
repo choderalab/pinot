@@ -258,7 +258,6 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
         n_inducing_points=100,
         mu_initializer_std=0.1,
         sigma_initializer_value=-2.0,
-        kl_loss_scaling=1e-2,
         grid_boundary=1.0,
     ):
         super(VariationalGaussianProcessRegressor, self).__init__()
@@ -310,8 +309,6 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
         )
 
         self.n_inducing_points = n_inducing_points
-
-        self.kl_loss_scaling = kl_loss_scaling
 
     def _y_tr_sigma(self):
         """ Getting the covariance matrix for variational training input."""
@@ -443,7 +440,7 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
 
         return distribution
 
-    def loss(self, x_te, y_te, *args, **kwargs):
+    def loss(self, x_te, y_te, kl_loss_scaling=1.0, annealing=1.0, *args, **kwargs):
         """ Loss function.
 
         Parameters
@@ -454,6 +451,11 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
         y_te : `torch.Tensor`, `shape=(n_te, )`
             Training target.
 
+        kl_loss_scaling : float
+            Scaling factor, should be batch size / dataset size for appropriate VI objective
+
+        annealing : float
+            A scaling factor that might help with optimization during early training
 
         Returns
         -------
@@ -480,7 +482,7 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
             self.y_tr_mu, self._y_tr_sigma()
         )
 
-        loss = nll + self.kl_loss_scaling * (log_q_u - log_p_u)
+        loss = nll + kl_loss_scaling * annealing * (log_q_u - log_p_u)
 
         # import pdb; pdb.set_trace()
         return loss
