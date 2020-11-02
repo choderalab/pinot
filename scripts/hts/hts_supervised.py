@@ -11,7 +11,7 @@ def run(args):
 
     # If output folder doesn't exist, create a new one
     try:
-        os.mkdir(args.output)
+        os.mkdir('bin')
     except:
         pass
 
@@ -29,7 +29,7 @@ def run(args):
 
     start = time.time()
 
-    path = f'./{args.output}/mpro_hts_{args.sample_frac[0]}.bin'
+    path = f'./bin/mpro_hts_{args.sample_frac[0]}.bin'
     
     if os.path.isfile(path):
         # see if we've already serialized it
@@ -116,8 +116,8 @@ def run(args):
         sup_train_metrics[metric] = train_results[metric]["final"]
         sup_test_metrics[metric]  = test_results[metric]["final"]
 
-    pickle.dump(train_results, open(f'./{args.output}/train_results_{savefile}.p', 'wb'))
-    pickle.dump(test_results, open(f'./{args.output}/test_results_{savefile}.p', 'wb'))
+    pickle.dump(train_results, open(f'./bin/train_results_{savefile}.p', 'wb'))
+    pickle.dump(test_results, open(f'./bin/test_results_{savefile}.p', 'wb'))
 
     logging.debug(sup_train_metrics)
     logging.debug(sup_test_metrics)
