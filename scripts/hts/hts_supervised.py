@@ -61,6 +61,7 @@ def run(args):
 
 
     def get_net_and_optimizer(args):
+        
         representation = pinot.representation.sequential.SequentialMix(
             args.architecture,
         )
@@ -86,7 +87,7 @@ def run(args):
         net.to(device)
         return net, optimizer(net)
 
-    def train_and_test(net, optimizer, train_data, test_data, n_epochs, annealing):
+    def train_and_test(net, optimizer, train_data, test_data, n_epochs, annealing, record_interval):
         
         train_and_test = pinot.TrainAndTest(
             net=net,
@@ -95,6 +96,7 @@ def run(args):
             data_tr=train_data,
             data_te=test_data,
             annealing=annealing,
+            record_interval=record_interval,
         )
 
         result = train_and_test.run()
@@ -107,7 +109,15 @@ def run(args):
     
     # mini-batch because we're using variational GP
     train_data = train_data.batch(batch_size)
-    train_results, test_results = train_and_test(supNet, optimizer, train_data, test_data, args.n_epochs, args.annealing)
+    train_results, test_results = train_and_test(
+        supNet,
+        optimizer,
+        train_data,
+        test_data,
+        args.n_epochs,
+        args.annealing,
+        args.record_interval
+    )
 
     end = time.time()
     logging.debug("Finished training supervised net after {} seconds and save state dict".format(end-start))
@@ -240,6 +250,13 @@ if __name__ == '__main__':
         default=100,
         help="Number of inducing points to use for variational inference"
     )
+    parser.add_argument(
+        '--record_interval',
+        type=int,
+        default=50,
+        help="Number of intervals before recording metrics"
+    )
+
 
     args = parser.parse_args()
 

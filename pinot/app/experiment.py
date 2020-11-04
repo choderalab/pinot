@@ -12,6 +12,7 @@ from datetime import datetime
 import os
 from abc import ABC
 import copy
+import logging
 import pinot
 
 # =============================================================================
@@ -65,7 +66,8 @@ class Train:
         n_epochs=100,
         record_interval=1,
         lr_scheduler=None,
-        annealing=1.0
+        annealing=1.0,
+        logging=None,
     ):
 
         self.data = data
@@ -76,10 +78,16 @@ class Train:
         self.states = {}
         self.lr_scheduler = lr_scheduler
         self.annealing = annealing
+        self.logging = logging
 
     def train_once(self):
-        """Train the model for one batch."""
+        """
+        TODO: FIX THE LOGGING MECHANISM
+        Train the model for one batch.
+        """
+        total_loss = 0.
         for d in self.data:
+            
             batch_ratio = len(d[1]) / len(self.data)
 
             def l():
@@ -93,9 +101,14 @@ class Train:
                     )
                 )
                 loss.backward()
+                self.loss_temp = loss.detach().cpu()
                 return loss
 
             self.optimizer.step(l)
+            total_loss += self.loss_temp / len(d[1])
+
+        mean_loss = total_loss / len(self.data)
+        return mean_loss
 
     def train(self):
         """Train the model for multiple steps and
@@ -111,16 +124,22 @@ class Train:
         """
 
         for epoch_idx in range(int(self.n_epochs)):
-            self.train_once()
+            
+            mean_loss = self.train_once()
+
             if self.lr_scheduler is not None:
                 self.lr_scheduler.step()
 
             if epoch_idx % self.record_interval == 0:
+                
+                if logging is not None:
+                    logging.debug(f'Epoch {epoch_idx} average loss: {mean_loss}')
+
                 self.states[epoch_idx] = copy.deepcopy(self.net.state_dict())
 
         self.states["final"] = copy.deepcopy(self.net.state_dict())
 
-        if hasattr(self.optimizer, "expecation_params"):
+        if hasattr(self.optimizer, "expectation_params"):
             self.optimizer.expectation_params()
 
         return self.net
@@ -275,6 +294,10 @@ class TrainAndTest:
         (Default value = None)
         Learning rate scheduler, will apply after every training epoch
 
+    logging: 
+        (Default value = None)
+        A preconfigured logging object that can send to disk the average epoch loss
+
     Methods
     -------
     run : conduct experiment
@@ -292,7 +315,8 @@ class TrainAndTest:
         record_interval=1,
         train_cls=Train,
         lr_scheduler=None,
-        annealing=1.0
+        annealing=1.0,
+        logging=None
     ):
         self.net = net  # deepcopy the model object
         self.data_tr = data_tr
@@ -304,6 +328,7 @@ class TrainAndTest:
         self.train_cls = train_cls
         self.lr_scheduler = lr_scheduler
         self.annealing = annealing
+        self.logging = logging
 
     def __str__(self):
         _str = ""
@@ -335,6 +360,7 @@ class TrainAndTest:
             n_epochs=self.n_epochs,
             lr_scheduler=self.lr_scheduler,
             annealing=self.annealing,
+            logging=self.logging
         )
 
         print('training now')
