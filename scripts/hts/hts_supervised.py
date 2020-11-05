@@ -87,7 +87,15 @@ def run(args):
         net.to(device)
         return net, optimizer(net)
 
-    def train_and_test(net, optimizer, train_data, test_data, n_epochs, annealing, record_interval):
+    def train_and_test(
+        net,
+        optimizer,
+        train_data,
+        test_data,
+        n_epochs,
+        annealing,
+        record_interval,
+        state_save_file):
         
         train_and_test = pinot.TrainAndTest(
             net=net,
@@ -97,6 +105,7 @@ def run(args):
             data_te=test_data,
             annealing=annealing,
             record_interval=record_interval,
+            state_save_file=state_save_file
         )
 
         result = train_and_test.run()
@@ -116,7 +125,8 @@ def run(args):
         test_data,
         args.n_epochs,
         args.annealing,
-        args.record_interval
+        args.record_interval,
+        savefile
     )
 
     end = time.time()

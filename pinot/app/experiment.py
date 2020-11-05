@@ -13,6 +13,7 @@ import os
 from abc import ABC
 import copy
 import logging
+import pickle
 import pinot
 
 # =============================================================================
@@ -68,6 +69,7 @@ class Train:
         lr_scheduler=None,
         annealing=1.0,
         logging=None,
+        state_save_file=None
     ):
 
         self.data = data
@@ -79,6 +81,7 @@ class Train:
         self.lr_scheduler = lr_scheduler
         self.annealing = annealing
         self.logging = logging
+        self.state_save_file = state_save_file
 
     def train_once(self):
         """
@@ -127,15 +130,23 @@ class Train:
             
             mean_loss = self.train_once()
 
-            if self.lr_scheduler is not None:
+            if self.lr_scheduler:
                 self.lr_scheduler.step()
 
             if epoch_idx % self.record_interval == 0:
                 
-                if logging is not None:
+                self.states[epoch_idx] = copy.deepcopy(self.net.state_dict())
+
+                if logging:
                     logging.debug(f'Epoch {epoch_idx} average loss: {mean_loss}')
 
-                self.states[epoch_idx] = copy.deepcopy(self.net.state_dict())
+                # TODO: fix this hack
+                if self.state_save_file:
+                    pickle.dump(
+                        self.states,
+                        open(f'./out/dict_state_{self.state_save_file}.p', 'wb')
+                    )
+
 
         self.states["final"] = copy.deepcopy(self.net.state_dict())
 
@@ -298,6 +309,9 @@ class TrainAndTest:
         (Default value = None)
         A preconfigured logging object that can send to disk the average epoch loss
 
+    state_save_file : str
+        (Default value = None)
+
     Methods
     -------
     run : conduct experiment
@@ -316,7 +330,8 @@ class TrainAndTest:
         train_cls=Train,
         lr_scheduler=None,
         annealing=1.0,
-        logging=None
+        logging=None,
+        state_save_file=None
     ):
         self.net = net  # deepcopy the model object
         self.data_tr = data_tr
@@ -329,6 +344,7 @@ class TrainAndTest:
         self.lr_scheduler = lr_scheduler
         self.annealing = annealing
         self.logging = logging
+        self.state_save_file = state_save_file
 
     def __str__(self):
         _str = ""
@@ -360,7 +376,8 @@ class TrainAndTest:
             n_epochs=self.n_epochs,
             lr_scheduler=self.lr_scheduler,
             annealing=self.annealing,
-            logging=self.logging
+            logging=self.logging,
+            state_save_file=self.state_save_file
         )
 
         print('training now')
