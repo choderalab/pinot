@@ -19,7 +19,13 @@ def run(args):
     logging.basicConfig(filename=os.path.join(args.output, args.log), filemode='w', format='%(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
     logging.debug(args)
 
-    savefile = f'reg={args.regressor_type}_a={args.architecture}_n={args.n_epochs}_b={args.batch_size}_wd={args.weight_decay}_lsp={args.label_split}_frac={args.sample_frac}_anneal={args.annealing}_induce={args.n_inducing_points}_{args.index}'
+    layer_type = args.architecture[0]
+    n_layers = len(args.architecture) // 4
+    n_units = args.architecture[1]
+    activation = args.architecture[3]
+
+    savefile = f'reg={args.regressor_type}_a={n_layers}x_{n_layers}x_{layer_type}_{activation}_n={args.n_epochs}_b={args.batch_size}_wd={args.weight_decay}_lsp={args.label_split[0]}_frac={args.sample_frac}_anneal={args.annealing}_induce={args.n_inducing_points}_{args.index}'
+    print(savefile)
     logging.debug("savefile = {}".format(savefile))
 
     #############################################################################
