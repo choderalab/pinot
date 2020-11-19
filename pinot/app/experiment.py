@@ -369,7 +369,10 @@ class TrainAndTest:
 
     def run(self):
         """ Run train and test experiments. """
-        train = self.train_cls(
+        
+        print('training now')
+        
+        tr = self.train_cls(
             net=self.net,
             data=self.data_tr,
             optimizer=self.optimizer,
@@ -378,40 +381,36 @@ class TrainAndTest:
             annealing=self.annealing,
             logging=self.logging,
             state_save_file=self.state_save_file
-        )
+        ).train()
 
-        print('training now')
-
-        train.train()
-
-        self.states = train.states
+        self.states = tr.states
+        del tr
 
         print('testing now')
-        test = Test(
-            net=self.net,
-            data=self.data_te,
-            metrics=self.metrics,
-            states=self.states,
-            sampler=self.optimizer,
-        )
-
-        test.test()
-
-        self.results_te = test.results
-
-        test = Test(
+        
+        te_data_tr = Test(
             net=self.net,
             data=self.data_tr,
             metrics=self.metrics,
             states=self.states,
             sampler=self.optimizer,
-        )
+        ).test()
 
-        test.test()
+        self.results_tr = te_data_tr.results
 
-        self.results_tr = test.results
+        del te_data_tr
 
-        del train
+        te_data_te = Test(
+            net=self.net,
+            data=self.data_te,
+            metrics=self.metrics,
+            states=self.states,
+            sampler=self.optimizer,
+        ).test()
+
+        self.results_te = te_data_te.results
+
+        del te_data_te
 
         return {"test": self.results_te, "training": self.results_tr}
 

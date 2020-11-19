@@ -93,7 +93,7 @@ def run(args):
         net.to(device)
         return net, optimizer(net)
 
-    def train_and_test(
+    def train_and_test_func(
         net,
         optimizer,
         train_data,
@@ -124,7 +124,7 @@ def run(args):
     
     # mini-batch because we're using variational GP
     train_data = train_data.batch(batch_size)
-    train_results, test_results = train_and_test(
+    train_results, test_results = train_and_test_func(
         supNet,
         optimizer,
         train_data,

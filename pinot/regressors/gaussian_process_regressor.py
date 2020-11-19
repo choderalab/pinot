@@ -66,7 +66,7 @@ class ExactGaussianProcessRegressor(GaussianProcessRegressor):
 
     """
 
-    def __init__(self, in_features, kernel=None, log_sigma=-3.0):
+    def __init__(self, in_features, kernel=None, log_sigma=-3.0, *args, **kwargs):
         super(ExactGaussianProcessRegressor, self).__init__()
 
         if kernel is None:
