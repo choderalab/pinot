@@ -315,13 +315,15 @@ class BayesOptExperiment(ActiveLearningExperiment):
         self.net.train()
 
         # train the model
-        self.net = self.train_class(
+        tr = self.train_class(
             data=[self.seen_data],
             optimizer=self.optimizer(self.net),
             n_epochs=self.num_epochs,
             net=self.net,
             record_interval=999999,
         ).train()
+
+        self.net = tr.net
 
 
     def acquire(self):

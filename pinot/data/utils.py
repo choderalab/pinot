@@ -87,6 +87,14 @@ def from_csv(
                         y = torch.tensor(
                             scale * df_y.values[idx], dtype=torch.float32
                         )
+
+                        # check if graph has only one node, then add self-loop
+                        if g.num_nodes() == 1:
+                            continue
+                            # might call `remove_self_loop` to guard double-loops
+                            # g = dgl.add_self_loop(g)
+                            # TODO: for now, batch is not working when I run this
+
                         ds.append(tuple([g, y]))
                     except:
                         pass
