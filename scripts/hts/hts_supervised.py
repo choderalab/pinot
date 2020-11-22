@@ -53,7 +53,20 @@ def run(args):
     # Split the labeled moonshot data into training set and test set
     train_data, test_data = data.split(args.label_split)
 
-    # Do minibatching on LABELED data
+    # Normalize training data using train mean and train std
+    gs, ys_tr = zip(*train_data.ds)
+    ys_tr = torch.cat(ys_tr).reshape(-1, 1)
+    mean_tr, std_tr = ys_tr.mean(), ys_tr.std()
+    ys_norm_tr = (ys_tr - mean_tr)/std_tr
+    train_data.ds = list(zip(gs, ys_norm_tr))
+
+    # Normalize testing data using train mean and train std
+    gs, ys_te = zip(*test_data.ds)
+    ys_te = torch.cat(ys_te).reshape(-1, 1)
+    ys_norm_te = (ys_te - mean_tr)/std_tr
+    test_data.ds = list(zip(gs, ys_norm_te))
+
+    # Set batch size and log
     batch_size = args.batch_size if args.regressor_type != 'gp' else len(train_data)
     end = time.time()
     logging.debug("Finished loading all data after {} seconds".format(end-start))

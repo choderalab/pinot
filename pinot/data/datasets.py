@@ -57,7 +57,7 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
         dataset_partitions = []
         for ds_partition in ds:
             dataset_partitions.append(
-                type(self)(ds_partition)
+                type(self)(ds_partition.ds)
             )
         return tuple(dataset_partitions)
 
@@ -101,7 +101,6 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
         gs, labels = load_graphs(path, idx_list=indices)
         ys = labels['y']
         self.ds = list(zip(gs, ys))
-        
         return self
 
     def __add__(self, x):
@@ -113,7 +112,6 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
         self.device = device
         self.ds = [(g.to(device), y.to(device)) for (g,y) in self.ds]
         return self
-
 
 
 class AttributedDataset(Dataset):

@@ -612,9 +612,11 @@ if __name__ == '__main__':
         default=['GraphConv', '32', 'activation', 'tanh',
                  'GraphConv', '32', 'activation', 'tanh',
                  'GraphConv', '32', 'activation', 'tanh'])
+    parser.add_argument('--optimizer', type=str, default='Adam')
 
     parser.add_argument('--lr', type=float, default=1e-4)
-    parser.add_argument('--optimizer', type=str, default='Adam')
+    parser.add_argument('--output', type=str, default="out", help="Name of folder to store results")
+
 
     parser.add_argument('--data', type=str, default='esol')
     parser.add_argument('--acquisition', type=str, default='ExpectedImprovement')
@@ -634,6 +636,19 @@ if __name__ == '__main__':
 
     parser.add_argument('--index_provided', type=bool, default=True)
     parser.add_argument('--index', type=int, default=0)
+    parser.add_argument(
+        '--annealing',
+        type=float,
+        default=1.0,
+        help="Scaling factor on the KL term in the variational inference loss"
+    )
+    parser.add_argument(
+        '--n_inducing_points',
+        type=int,
+        default=100,
+        help="Number of inducing points to use for variational inference"
+    )
+
 
     args = parser.parse_args()
 
@@ -671,6 +686,6 @@ if __name__ == '__main__':
     beliefs_string = '_'.join(args.beliefs)
     filename = f'{args.net}_{args.optimizer}_{args.data}_num_epochs{args.num_epochs}_{args.acquisition}_q{args.q}_beliefs{beliefs_string}_{args.index}.csv'
     
-    best_df.to_csv(f'best_{filename}')
-    pro_ts_df.to_csv(f'pro_{filename}')
-    retro_ts_df.to_csv(f'retro_{filename}')
+    best_df.to_csv(f'{args.output}/best_{filename}')
+    pro_ts_df.to_csv(f'{args.output}/pro_{filename}')
+    retro_ts_df.to_csv(f'{args.output}/retro_{filename}')
