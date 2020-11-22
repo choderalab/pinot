@@ -153,7 +153,7 @@ class Train:
         if hasattr(self.optimizer, "expectation_params"):
             self.optimizer.expectation_params()
 
-        return self.net
+        return self
 
 
 class Test:
@@ -267,7 +267,7 @@ class Test:
 
 
         self.results = results
-        return dict(results)
+        return self
 
 
 class TrainAndTest:
