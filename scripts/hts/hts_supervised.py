@@ -288,9 +288,8 @@ if __name__ == '__main__':
     )
     parser.add_argument(
         '--normalize', 
-        type=bool,
+        action="store_true",
         default=False,
-        choices=[True, False],
         help="Whether to normalize the targets of the dataset"
     )
 
