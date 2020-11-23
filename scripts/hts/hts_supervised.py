@@ -287,12 +287,6 @@ if __name__ == '__main__':
         help="Number of intervals before recording metrics"
     )
     parser.add_argument(
-        '--normalize', 
-        action="store_true",
-        default=False,
-        help="Whether to normalize the targets of the dataset"
-    )
-    parser.add_argument(
         '--normalize',
         type=int,
         default=0,
