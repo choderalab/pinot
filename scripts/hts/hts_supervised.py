@@ -292,6 +292,13 @@ if __name__ == '__main__':
         default=False,
         help="Whether to normalize the targets of the dataset"
     )
+    parser.add_argument(
+        '--normalize',
+        type=int,
+        default=0,
+        help="Number of inducing points to use for variational inference"
+    )
+
 
     args = parser.parse_args()
 
