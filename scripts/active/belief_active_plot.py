@@ -666,6 +666,8 @@ if __name__ == '__main__':
         # net config
         net=args.net,
         config=args.config,
+        num_inducing_points=args.n_inducing_points,
+        annealing=args.annealing,
 
         # optimizer config
         optimizer_type=args.optimizer,

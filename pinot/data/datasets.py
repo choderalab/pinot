@@ -51,7 +51,7 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
         ds = iter(self.ds)
         return ds
 
-    def _split(self, *args, seed=None, **kwargs):
+    def split(self, *args, seed=None, **kwargs):
         """
         Shuffle and split the dataset according to some partition.
         """
