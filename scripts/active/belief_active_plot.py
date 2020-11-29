@@ -200,7 +200,8 @@ class BeliefActivePlot():
 
     def __init__(self, net, config,
                  lr, optimizer_type,
-                 data, acquisition, num_samples, num_thompson_samples, q,
+                 data, sample_frac,
+                 acquisition, num_samples, num_thompson_samples, q,
                  beliefs, early_stopping,
                  device, num_trials, num_rounds, num_epochs):
 
@@ -212,8 +213,11 @@ class BeliefActivePlot():
         self.lr = lr
         self.optimizer_type = optimizer_type
 
-        # experiment config
+        # data config
         self.data = data
+        self.sample_frac = sample_frac
+        
+        # experiment config
         self.acquisition = acquisition
         self.num_samples = num_samples
         self.num_thompson_samples = num_thompson_samples
@@ -377,7 +381,10 @@ class BeliefActivePlot():
             net.load_state_dict(state)
 
             # set _x_tr and _y_tr if exact GP
-            if isinstance(net.output_regressor, pinot.regressors.ExactGaussianProcessRegressor):
+            if isinstance(
+                net.output_regressor,
+                pinot.regressors.ExactGaussianProcessRegressor
+            ):
                 seen_gs, seen_ys = pinot.active.experiment._slice_fn_tuple(ds, seen)
                 net.g_last, net.y_last = seen_gs, seen_ys
 
@@ -394,6 +401,7 @@ class BeliefActivePlot():
 
         # convert from list of dicts to dict of lists
         beliefs = {'prospective': defaultdict(list), 'retrospective': defaultdict(list)}
+        print(round_beliefs[-1])
         for round_record in round_beliefs:
             for m in methods:
                 for direction in beliefs.keys():
@@ -497,7 +505,7 @@ class BeliefActivePlot():
         """ Generate data, put on GPU if possible.
         """
         # Load data
-        ds = getattr(pinot.data, self.data)()
+        ds = getattr(pinot.data, self.data)(sample_frac=self.sample_frac)
         
         # Limit to first two fields of tuple
         ds_data = [(d[0], d[1]) for d in ds]
@@ -619,6 +627,8 @@ if __name__ == '__main__':
 
 
     parser.add_argument('--data', type=str, default='esol')
+    parser.add_argument('--sample_frac', type=float, default=0.1, help="Proportion of dataset to read in"
+    )
     parser.add_argument('--acquisition', type=str, default='ExpectedImprovement')
     parser.add_argument('--num_samples', type=int, default=1000)
     parser.add_argument('--q', type=int, default=1)
@@ -663,6 +673,7 @@ if __name__ == '__main__':
 
         # experiment config
         data=args.data,
+        sample_frac=args.sample_frac,
         acquisition=args.acquisition,
         num_samples=args.num_samples,
         num_thompson_samples=args.num_thompson_samples,        

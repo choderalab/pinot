@@ -91,7 +91,7 @@ def from_csv(
                         # check if graph has only one node, then add self-loop
                         if g.num_nodes() == 1:
                             continue
-                            # TODO: for now, batch is not working when I run this
+                            # TODO: for now, batch is not working when I run this,
                             # might call `remove_self_loop` to guard double-loops
                             # g = dgl.add_self_loop(g)
 
