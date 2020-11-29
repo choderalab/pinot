@@ -198,16 +198,20 @@ def max_expected_improvement(net, data, unseen, **kwargs):
 
 class BeliefActivePlot():
 
-    def __init__(self, net, config,
-                 lr, optimizer_type,
-                 data, sample_frac,
-                 acquisition, num_samples, num_thompson_samples, q,
-                 beliefs, early_stopping,
-                 device, num_trials, num_rounds, num_epochs):
+    def __init__(
+        self, net, config,
+        n_inducing_points, annealing,
+        lr, optimizer_type,
+        data, sample_frac,
+        acquisition, num_samples, num_thompson_samples, q,
+        beliefs, early_stopping,
+        device, num_trials, num_rounds, num_epochs):
 
         # net config
         self.net = net
         self.config = config
+        self.n_inducing_points = n_inducing_points
+        self.annealing = annealing
 
         # optimizer config
         self.lr = lr
@@ -319,6 +323,7 @@ class BeliefActivePlot():
                 acquisitions_preset=acquisitions_preset,
                 slice_fn=pinot.active.experiment._slice_fn_tuple,
                 collate_fn=pinot.active.experiment._collate_fn_graph,
+                annealing=self.annealing,
                 train_class=self.train
             )
 
@@ -582,13 +587,15 @@ class BeliefActivePlot():
             net = pinot.Net(
                 representation=representation,
                 output_regressor_class=output_regressor,
+                n_inducing_points=self.n_inducing_points,
             )
 
         if self.net == 'semi':
             output_regressor = pinot.regressors.NeuralNetworkRegressor
             net = SemiSupervisedNet(
                 representation=representation,
-                output_regressor=output_regressor
+                output_regressor=output_regressor,
+                n_inducing_points=self.n_inducing_points,
             )
 
         elif self.net == 'semi_gp':
@@ -597,6 +604,7 @@ class BeliefActivePlot():
             net = SemiSupervisedNet(
                 representation=representation,
                 output_regressor=output_regressor,
+                n_inducing_points=self.n_inducing_points,
             )
 
         elif self.net == 'multitask':
@@ -604,6 +612,7 @@ class BeliefActivePlot():
             net = pinot.multitask.MultitaskNet(
                 representation=representation,
                 output_regressor=output_regressor,
+                n_inducing_points=self.n_inducing_points,
             )
 
         return net
@@ -666,7 +675,7 @@ if __name__ == '__main__':
         # net config
         net=args.net,
         config=args.config,
-        num_inducing_points=args.n_inducing_points,
+        n_inducing_points=args.n_inducing_points,
         annealing=args.annealing,
 
         # optimizer config

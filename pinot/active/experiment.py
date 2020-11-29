@@ -222,6 +222,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
         collate_fn=_collate_fn_tensor,
         net_state_dict=None,
         acquisitions_preset=None,
+        annealing=1.0,
         train_class=pinot.app.experiment.Train,
     ):
 
@@ -260,6 +261,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
         self.slice_fn = slice_fn
         self.collate_fn = collate_fn
         self.net_state_dict = net_state_dict
+        self.annealing = annealing
         self.train_class = train_class
         self.states = {}
 
@@ -320,6 +322,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
             optimizer=self.optimizer(self.net),
             n_epochs=self.num_epochs,
             net=self.net,
+            annealing=self.annealing,
             record_interval=999999,
         ).train()
 
