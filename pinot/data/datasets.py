@@ -51,8 +51,11 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
         ds = iter(self.ds)
         return ds
 
-    def split(self, *args, **kwargs):
-        """Split the dataset according to some partition. """
+    def _split(self, *args, seed=None, **kwargs):
+        """
+        Shuffle and split the dataset according to some partition.
+        """
+        self.shuffle(seed=seed)
         ds = pinot.data.utils.split(self, *args, **kwargs)
         dataset_partitions = []
         for ds_partition in ds:
@@ -61,17 +64,17 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
             )
         return tuple(dataset_partitions)
 
+    def shuffle(self, *args, seed=None, **kwargs):
+        """ Shuffle the records in the dataset. """
+        import random
+        random.seed(seed)
+        random.shuffle(self.ds)
+        return self
+
     def batch(self, *args, **kwargs):
         """Batch dataset."""
         ds = pinot.data.utils.batch(self, *args, **kwargs)
         return type(self)(ds)
-
-    def shuffle(self, *args, **kwargs):
-        """ Shuffle the records in the dataset. """
-        import random
-
-        random.shuffle(self.ds)
-        return self
 
     def from_csv(self, *args, **kwargs):
         """Read csv dataset. """

@@ -217,6 +217,8 @@ def normalize(ds):
 def split(ds, partition):
     """Split the dataset according to some partition.
 
+    TODO: Fix this.
+
     Parameters
     ----------
     ds :
