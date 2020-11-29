@@ -199,7 +199,7 @@ def max_expected_improvement(net, data, unseen, **kwargs):
 class BeliefActivePlot():
 
     def __init__(
-        self, net, config,
+        self, net, architecture,
         n_inducing_points, annealing,
         lr, optimizer_type,
         data, sample_frac,
@@ -209,7 +209,7 @@ class BeliefActivePlot():
 
         # net config
         self.net = net
-        self.config = config
+        self.architecture = architecture
         self.n_inducing_points = n_inducing_points
         self.annealing = annealing
 
@@ -580,7 +580,7 @@ class BeliefActivePlot():
         """
         Retrive GP using representation provided in args.
         """
-        representation = pinot.representation.SequentialMix(config=self.config)
+        representation = pinot.representation.SequentialMix(config=self.architecture)
 
         if hasattr(pinot.regressors, self.net):
             output_regressor = getattr(pinot.regressors, self.net)
