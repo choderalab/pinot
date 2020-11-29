@@ -641,7 +641,7 @@ if __name__ == '__main__':
     parser.add_argument('--acquisition', type=str, default='ExpectedImprovement')
     parser.add_argument('--num_samples', type=int, default=1000)
     parser.add_argument('--q', type=int, default=1)
-    parser.add_argument('--early_stopping', type=bool, default=True)
+    parser.add_argument('--early_stopping', type=int, default=0)
     
     parser.add_argument('--beliefs', nargs='+', type=str,
         default=['ThompsonSampling', 'MaxProbabilityOfImprovement', 'MaxUCB', 'MaxExpectedImprovement']
