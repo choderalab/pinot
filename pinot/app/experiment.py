@@ -66,7 +66,7 @@ def train(
     train : Train the model multiple times.
 
     """
-    def train_once(net, data, optimizer):
+    def train_once(net, data, optimizer, annealing):
         """
         TODO: FIX THE LOGGING MECHANISM
         Train the model for one batch.
@@ -83,7 +83,7 @@ def train(
                     net.loss(
                         *d,
                         kl_loss_scaling=batch_ratio,
-                        annealing=self.annealing
+                        annealing=annealing
                     )
                 )
                 loss.backward()
@@ -97,9 +97,9 @@ def train(
         # return mean_loss
 
     states = {}
-    for epoch_idx in range(int(self.n_epochs)):
+    for epoch_idx in range(int(n_epochs)):
         
-        mean_loss = train_once()
+        mean_loss = train_once(net, data, optimizer, annealing)
 
         if lr_scheduler:
             lr_scheduler.step()

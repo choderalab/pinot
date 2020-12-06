@@ -128,7 +128,7 @@ def run(args):
     train_data = train_data.batch(batch_size)
 
     # get results
-    results = train_and_test(
+    results = pinot.app.experiment.train_and_test(
         supNet,
         train_data,
         test_data,
@@ -147,15 +147,15 @@ def run(args):
 
     sup_train_metrics = {}
     sup_test_metrics  = {}
-    for metric in train_results.keys():
+    for metric in results['train'].keys():
         sup_train_metrics[metric] = results['train'][metric]["final"]
         sup_test_metrics[metric]  = results['test'][metric]["final"]
 
     logging.debug(sup_train_metrics)
     logging.debug(sup_test_metrics)
 
-    pickle.dump(train_results, open(f'./{args.output}/train_results_{savefile}.p', 'wb'))
-    pickle.dump(test_results, open(f'./{args.output}/test_results_{savefile}.p', 'wb'))
+    pickle.dump(results['train'], open(f'./{args.output}/train_results_{savefile}.p', 'wb'))
+    pickle.dump(results['test'], open(f'./{args.output}/test_results_{savefile}.p', 'wb'))
 
 
 if __name__ == '__main__':
