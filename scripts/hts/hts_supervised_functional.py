@@ -16,7 +16,12 @@ def run(args):
     except:
         pass
 
-    logging.basicConfig(filename=os.path.join(args.output, args.log), filemode='w', format='%(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
+    logging.basicConfig(
+        filename=os.path.join(args.output, args.log),
+        filemode='w',
+        format='%(name)s - %(levelname)s - %(message)s',
+        level=logging.DEBUG
+    )
     logging.debug(args)
 
     layer_type = args.architecture[0]
