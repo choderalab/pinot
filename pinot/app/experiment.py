@@ -17,6 +17,296 @@ import pickle
 import pinot
 
 # =============================================================================
+# MODULE FUNCTIONS - *STATELESS*
+# =============================================================================
+
+def train(
+    net,
+    data,
+    optimizer,
+    n_epochs=100,
+    record_interval=1,
+    lr_scheduler=None,
+    annealing=1.0,
+    logging=None,
+    state_save_file=None
+    ):
+    """
+    Train the model for multiple steps
+    and record the weights once every `record_interval`.
+
+    Parameters
+    ----------
+    net : `pinot.Net`
+        Forward pass model that combines representation and output regression
+        and generates predictive distribution.
+
+    data : `List` of `tuple` of `(dgl.DGLGraph, torch.Tensor)`
+        or `pinot.data.dataset.Dataset`
+        Pairs of graph, measurement.
+
+    optimizer : `torch.optim.Optimizer` or `pinot.Sampler`
+        Optimizer for training.
+
+    n_epochs : `int`
+        Number of epochs.
+
+    record_interval : `int`
+        (Default value = 1)
+        Interval states are recorded.
+
+    lr_scheduler: `torch.optim.lr_scheduler`
+        (Default value = None)
+        Learning rate scheduler, will apply after every training epoch
+
+    Methods
+    -------
+    train_once : Train model once.
+
+    train : Train the model multiple times.
+
+    """
+    def train_once(net, data, optimizer):
+        """
+        TODO: FIX THE LOGGING MECHANISM
+        Train the model for one batch.
+        """
+        total_loss = 0.
+        for d in data:
+            
+            batch_ratio = len(d[1]) / len(data)
+
+            def l():
+                """ """
+                optimizer.zero_grad()
+                loss = torch.sum(
+                    net.loss(
+                        *d,
+                        kl_loss_scaling=batch_ratio,
+                        annealing=self.annealing
+                    )
+                )
+                loss.backward()
+                # not sure how to log in a purely functional way
+                # loss_temp = loss.detach().cpu()
+                return loss
+
+            optimizer.step(l)
+            # total_loss += self.loss_temp / len(d[1])
+        # mean_loss = total_loss / len(self.data)
+        # return mean_loss
+
+    states = {}
+    for epoch_idx in range(int(self.n_epochs)):
+        
+        mean_loss = train_once()
+
+        if lr_scheduler:
+            lr_scheduler.step()
+
+        if epoch_idx % record_interval == 0:
+            
+            states[epoch_idx] = copy.deepcopy(net.state_dict())
+
+            if logging:
+                logging.debug(f'Epoch {epoch_idx} average loss: {mean_loss}')
+
+            # TODO: fix this hack
+            if state_save_file:
+                pickle.dump(
+                    states,
+                    open(f'./out/dict_state_{state_save_file}.p', 'wb')
+                )
+
+    states["final"] = copy.deepcopy(net.state_dict())
+
+    if hasattr(optimizer, "expectation_params"):
+        optimizer.expectation_params()
+
+    return states
+
+
+def test(
+    net,
+    data,
+    states,
+    sampler=None,
+    metrics=[pinot.rmse, pinot.r2]
+    ):
+    """ Test experiment. Metrics are applied to the saved states of the
+    model to characterize its performance.
+
+
+    Parameters
+    ----------
+    net : `pinot.Net`
+        Forward pass model that combines representation and output regression
+        and generates predictive distribution.
+
+    data : `List` of `tuple` of `(dgl.DGLGraph, torch.Tensor)`
+        or `pinot.data.dataset.Dataset`
+        Pairs of graph, measurement.
+
+    optimizer : `torch.optim.Optimizer` or `pinot.Sampler`
+        Optimizer for training.
+
+    metrics : `List` of `callable`
+        Metrics used to characterize the performance.
+
+    Methods
+    -------
+    test : Run the test experiment.
+
+    """
+    def compute_conditional(net, data, batch_size):
+        # compute conditional distribution in batched fashion
+        locs, scales = [], []
+        for idx, d in enumerate(data.batch(batch_size, partial_batch=True)):
+
+            g_batch, _ = d
+            distribution_batch = net.condition(g_batch)
+            loc_batch = distribution_batch.mean.flatten().cpu()
+            scale_batch = distribution_batch.variance.pow(0.5).flatten().cpu()
+            locs.append(loc_batch)
+            scales.append(scale_batch)
+
+        distribution = torch.distributions.normal.Normal(
+            loc=torch.cat(locs),
+            scale=torch.cat(scales)
+        )
+        return distribution        
+
+    # switch to test
+    net.eval()
+
+    # initialize an empty dict for each metrics
+    results = {}
+
+    for metric in metrics:
+        results[metric.__name__] = {}
+
+    # make g, y into single batches
+    g, y = data.batch(len(data))[0]
+    for state_name, state in states.items():  # loop through states
+        
+        net.load_state_dict(state)
+
+        if net.has_exact_gp:
+            batch_size = len(data)
+        else:
+            batch_size = 32
+        
+        # compute conditional distribution in batched fashion
+        distribution = compute_conditional(net, data, batch_size)
+        y = y.detach().cpu().reshape(-1, 1)
+        for metric in metrics:  # loop through the metrics
+            results[metric.__name__][state_name] = (
+                metric(
+                    net,
+                    distribution,
+                    y,
+                    sampler=sampler,
+                    batch_size=batch_size
+                )
+                .detach()
+                .cpu()
+                .numpy()
+            )
+
+    return results
+
+
+def train_and_test(
+    net,
+    data_tr,
+    data_te,
+    optimizer,
+    metrics=[pinot.rmse, pinot.r2, pinot.pearsonr, pinot.avg_nll],
+    n_epochs=100,
+    record_interval=1,
+    lr_scheduler=None,
+    annealing=1.0,
+    logging=None,
+    state_save_file=None
+    ):
+    """ Run training and test experiment.
+
+    Parameters
+    ----------
+    net : `pinot.Net`
+        Forward pass model that combines representation and output regression
+        and generates predictive distribution.
+
+    data : `List` of `tuple` of `(dgl.DGLGraph, torch.Tensor)`
+        or `pinot.data.dataset.Dataset`
+        Pairs of graph, measurement.
+
+    optimizer : `torch.optim.Optimizer` or `pinot.Sampler`
+        Optimizer for training.
+
+    metrics : `List` of `callable`
+        (Default value: `[pinot.rmse, pinot.r2, pinot.pearsonr, pinot.avg_nll]`)
+        Metrics used to characterize the performance.
+
+    n_epochs : `int`
+        Number of epochs.
+
+    record_interval : `int`
+        (Default value = 1)
+        Interval states are recorded.
+
+    train_cls: `Train`
+        (Default value = Train)
+        Train class to use
+
+    lr_scheduler: `torch.optim.lr_scheduler`
+        (Default value = None)
+        Learning rate scheduler, will apply after every training epoch
+
+    logging: 
+        (Default value = None)
+        A preconfigured logging object that can send to disk the average epoch loss
+
+    state_save_file : str
+        (Default value = None)
+    """
+    print('training now')
+    
+    states = train(
+        net=net,
+        data=data_tr,
+        optimizer=optimizer,
+        n_epochs=n_epochs,
+        lr_scheduler=lr_scheduler,
+        annealing=annealing,
+        logging=logging,
+        state_save_file=state_save_file
+    )
+
+    print('testing now')
+    
+    results_tr = test(
+        net=net,
+        data=data_tr,
+        metrics=metrics,
+        states=states,
+        sampler=optimizer,
+    )
+
+    results_te = test(
+        net=net,
+        data=data_te,
+        metrics=metrics,
+        states=states,
+        sampler=optimizer,
+    )
+
+    return {"train": results_tr, "test": results_te}
+
+
+
+
+# =============================================================================
 # MODULE CLASSES
 # =============================================================================
 
