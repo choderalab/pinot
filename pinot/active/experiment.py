@@ -6,6 +6,7 @@ import abc
 import dgl
 import copy
 import pinot
+from collections import OrderedDict
 from pinot.metrics import _independent
 
 # =============================================================================
@@ -175,6 +176,9 @@ class BayesOptExperiment(ActiveLearningExperiment):
     q : `int`
         Number of acquired candidates in each round.
 
+    acquisitions : `list`
+        Provided list of acquisitions to hard-code at each round.
+
     early_stopping : `bool`
         Whether the search ends when the best within the candidate pool
         is already acquired.
@@ -217,6 +221,8 @@ class BayesOptExperiment(ActiveLearningExperiment):
         slice_fn=_slice_fn_tensor,
         collate_fn=_collate_fn_tensor,
         net_state_dict=None,
+        acquisitions_preset=None,
+        annealing=1.0,
         train_class=pinot.app.experiment.Train,
     ):
 
@@ -255,9 +261,15 @@ class BayesOptExperiment(ActiveLearningExperiment):
         self.slice_fn = slice_fn
         self.collate_fn = collate_fn
         self.net_state_dict = net_state_dict
+        self.annealing = annealing
         self.train_class = train_class
         self.states = {}
-        self.acquisitions = []
+
+        if acquisitions_preset:
+            self.acquisitions = acquisitions_preset
+        else:
+            self.acquisitions = OrderedDict()
+
 
     def reset_net(self):
         """Reset everything."""
@@ -305,13 +317,16 @@ class BayesOptExperiment(ActiveLearningExperiment):
         self.net.train()
 
         # train the model
-        self.net = self.train_class(
+        tr = self.train_class(
             data=[self.seen_data],
             optimizer=self.optimizer(self.net),
             n_epochs=self.num_epochs,
             net=self.net,
+            annealing=self.annealing,
             record_interval=999999,
         ).train()
+
+        self.net = tr.net
 
 
     def acquire(self):
@@ -377,24 +392,33 @@ class BayesOptExperiment(ActiveLearningExperiment):
 
         """
         idx = 0
-        self.blind_pick(seed=seed)
-        self.update_data()
 
+        self.blind_pick(seed=seed)
+        
+        self.update_data()
+        
         while idx < num_rounds:
+
+            print(idx)
             
             if self.early_stopping and self.y_best == self.best_possible:
                 break
 
             self.train()
             self.states[idx] = copy.deepcopy(self.net.state_dict())
-            self.acquisitions.append(
-                tuple([self.seen.copy(), self.unseen.copy()])
-            )
+            
+            if idx not in self.acquisitions:
+                # using autonomous acquisitions
+                self.acquire()
+                self.acquisitions[idx] = tuple([self.seen.copy(), self.unseen.copy()])
+
+            else:
+                # using human acquisitions
+                self.seen, self.unseen = self.acquisitions[idx]
 
             if not self.unseen:
                 break
 
-            self.acquire()
             self.update_data()
 
             idx += 1

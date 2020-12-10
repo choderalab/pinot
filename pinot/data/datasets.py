@@ -2,8 +2,11 @@
 # IMPORTS
 # =============================================================================
 import pinot
-import numpy as np
 import dgl
+from dgl.data.utils import save_graphs
+from dgl.data.utils import load_graphs
+
+import numpy as np
 import pandas as pd
 import abc
 import torch
@@ -20,6 +23,7 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
     def __init__(self, ds=None):
         super(Dataset, self).__init__()
         self.ds = ds
+        self.device = torch.device("cpu")  # initialize on cpu
 
     def __len__(self):
         # 0 len if no graphs
@@ -27,7 +31,7 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
             return 0
 
         else:
-            return len(self.ds)
+            return sum(len(d[1]) for d in self.ds) # len(self.ds)
 
     def __getitem__(self, idx):
         if self.ds is None:
@@ -47,22 +51,30 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
         ds = iter(self.ds)
         return ds
 
-    def split(self, *args, **kwargs):
-        """Split the dataset according to some partition. """
+    def split(self, *args, seed=None, **kwargs):
+        """
+        Shuffle and split the dataset according to some partition.
+        """
+        self.shuffle(seed=seed)
         ds = pinot.data.utils.split(self, *args, **kwargs)
-        return ds
+        dataset_partitions = []
+        for ds_partition in ds:
+            dataset_partitions.append(
+                type(self)(ds_partition.ds)
+            )
+        return tuple(dataset_partitions)
+
+    def shuffle(self, *args, seed=None, **kwargs):
+        """ Shuffle the records in the dataset. """
+        import random
+        random.seed(seed)
+        random.shuffle(self.ds)
+        return self
 
     def batch(self, *args, **kwargs):
         """Batch dataset."""
         ds = pinot.data.utils.batch(self, *args, **kwargs)
-        return ds
-
-    def shuffle(self, *args, **kwargs):
-        """ Shuffle the records in the dataset. """
-        import random
-
-        random.shuffle(self.ds)
-        return self
+        return type(self)(ds)
 
     def from_csv(self, *args, **kwargs):
         """Read csv dataset. """
@@ -76,28 +88,33 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
         ----------
         path : path-like object
         """
-        import pickle
-
-        with open(path, "wb") as f_handle:
-            pickle.dump(self.ds, f_handle)
-
-    def load(self, path):
+        gs, ys = zip(*self.ds)
+        graph_labels = {'y': torch.stack(ys)}
+        save_graphs(path, list(gs), graph_labels)
+    
+    def load(self, path, indices=None):
         """ Load path to dataset.
-
         Parameters
         ----------
+        path : str
+            location of the saved serialized file
+        indices : list of int
+            subset of indices to import
         """
-        import pickle
-
-        with open(path, "rb") as f_handle:
-            self.ds = pickle.load(f_handle)
-
+        gs, labels = load_graphs(path, idx_list=indices)
+        ys = labels['y']
+        self.ds = list(zip(gs, ys))
         return self
 
     def __add__(self, x):
         return self.__class__(
             self.ds + x.ds
         )
+
+    def to(self, device):
+        self.device = device
+        self.ds = [(g.to(device), y.to(device)) for (g,y) in self.ds]
+        return self
 
 class AttributedDataset(Dataset):
     """ Dataset with attributes. """

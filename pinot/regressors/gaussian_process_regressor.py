@@ -66,7 +66,7 @@ class ExactGaussianProcessRegressor(GaussianProcessRegressor):
 
     """
 
-    def __init__(self, in_features, kernel=None, log_sigma=-3.0):
+    def __init__(self, in_features, kernel=None, log_sigma=-3.0, *args, **kwargs):
         super(ExactGaussianProcessRegressor, self).__init__()
 
         if kernel is None:
@@ -258,7 +258,6 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
         n_inducing_points=100,
         mu_initializer_std=0.1,
         sigma_initializer_value=-2.0,
-        kl_loss_scaling=1e-2,
         grid_boundary=1.0,
     ):
         super(VariationalGaussianProcessRegressor, self).__init__()
@@ -311,8 +310,6 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
 
         self.n_inducing_points = n_inducing_points
 
-        self.kl_loss_scaling = kl_loss_scaling
-
     def _y_tr_sigma(self):
         """ Getting the covariance matrix for variational training input."""
         # embed diagnoal of sigma
@@ -320,8 +317,8 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
 
         # (n_inducing_points, n_inducing_points)
         mask = torch.gt(
-            torch.range(0, self.y_tr_sigma_diag.shape[0] - 1)[:, None],
-            torch.range(0, self.y_tr_sigma_diag.shape[0] - 1)[None, :],
+            torch.arange(0, self.y_tr_sigma_diag.shape[0])[:, None],
+            torch.arange(0, self.y_tr_sigma_diag.shape[0])[None, :],
         )
 
         mask = mask.to(device=y_tr_diag.device)
@@ -443,7 +440,7 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
 
         return distribution
 
-    def loss(self, x_te, y_te, *args, **kwargs):
+    def loss(self, x_te, y_te, kl_loss_scaling=1.0, annealing=1.0, *args, **kwargs):
         """ Loss function.
 
         Parameters
@@ -454,6 +451,11 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
         y_te : `torch.Tensor`, `shape=(n_te, )`
             Training target.
 
+        kl_loss_scaling : float
+            Scaling factor, should be batch size / dataset size for appropriate VI objective
+
+        annealing : float
+            A scaling factor that might help with optimization during early training
 
         Returns
         -------
@@ -461,26 +463,33 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
             Loss function.
 
         """
-        # define prior
-        prior_mean = torch.zeros(self.n_inducing_points, 1)
-        prior_tril = self._k_tr_tr().cholesky()
+        if annealing != 0:
 
-        prior_tril = prior_tril.to(device=x_te.device)
-        prior_mean = prior_mean.to(device=x_te.device)
+            # define prior
+            prior_mean = torch.zeros(self.n_inducing_points, 1)
+            prior_tril = self._k_tr_tr().cholesky()
+
+            prior_tril = prior_tril.to(device=x_te.device)
+            prior_mean = prior_mean.to(device=x_te.device)
+
+            log_p_u = self.exp_log_full_gaussian(
+                self.y_tr_mu, self._y_tr_sigma(), prior_mean, prior_tril
+            )
+
+            log_q_u = -self.entropy_full_gaussian(
+                self.y_tr_mu, self._y_tr_sigma()
+            )
+
+            kl_term = kl_loss_scaling * annealing * (log_q_u - log_p_u)
+
+        else:
+            kl_term = 0.
 
         distribution = self.condition(x_te)
 
         nll = -distribution.log_prob(y_te.flatten()).mean()
 
-        log_p_u = self.exp_log_full_gaussian(
-            self.y_tr_mu, self._y_tr_sigma(), prior_mean, prior_tril
-        )
-
-        log_q_u = -self.entropy_full_gaussian(
-            self.y_tr_mu, self._y_tr_sigma()
-        )
-
-        loss = nll + self.kl_loss_scaling * (log_q_u - log_p_u)
+        loss = nll + kl_term
 
         # import pdb; pdb.set_trace()
         return loss

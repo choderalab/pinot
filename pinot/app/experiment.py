@@ -12,7 +12,299 @@ from datetime import datetime
 import os
 from abc import ABC
 import copy
+import logging
+import pickle
 import pinot
+
+# =============================================================================
+# MODULE FUNCTIONS - *STATELESS*
+# =============================================================================
+
+def train(
+    net,
+    data,
+    optimizer,
+    n_epochs=100,
+    record_interval=1,
+    lr_scheduler=None,
+    annealing=1.0,
+    logging=None,
+    state_save_file=None
+    ):
+    """
+    Train the model for multiple steps
+    and record the weights once every `record_interval`.
+
+    Parameters
+    ----------
+    net : `pinot.Net`
+        Forward pass model that combines representation and output regression
+        and generates predictive distribution.
+
+    data : `List` of `tuple` of `(dgl.DGLGraph, torch.Tensor)`
+        or `pinot.data.dataset.Dataset`
+        Pairs of graph, measurement.
+
+    optimizer : `torch.optim.Optimizer` or `pinot.Sampler`
+        Optimizer for training.
+
+    n_epochs : `int`
+        Number of epochs.
+
+    record_interval : `int`
+        (Default value = 1)
+        Interval states are recorded.
+
+    lr_scheduler: `torch.optim.lr_scheduler`
+        (Default value = None)
+        Learning rate scheduler, will apply after every training epoch
+
+    Methods
+    -------
+    train_once : Train model once.
+
+    train : Train the model multiple times.
+
+    """
+    def train_once(net, data, optimizer, annealing):
+        """
+        TODO: FIX THE LOGGING MECHANISM
+        Train the model for one batch.
+        """
+        total_loss = 0.
+        for d in data:
+            
+            batch_ratio = len(d[1]) / len(data)
+
+            def l():
+                """ """
+                optimizer.zero_grad()
+                loss = torch.sum(
+                    net.loss(
+                        *d,
+                        kl_loss_scaling=batch_ratio,
+                        annealing=annealing
+                    )
+                )
+                loss.backward()
+                # not sure how to log in a purely functional way
+                # loss_temp = loss.detach().cpu()
+                return loss
+
+            optimizer.step(l)
+            # total_loss += self.loss_temp / len(d[1])
+        # mean_loss = total_loss / len(self.data)
+        # return mean_loss
+
+    states = {}
+    for epoch_idx in range(int(n_epochs)):
+        
+        mean_loss = train_once(net, data, optimizer, annealing)
+
+        if lr_scheduler:
+            lr_scheduler.step()
+
+        if epoch_idx % record_interval == 0:
+            
+            states[epoch_idx] = copy.deepcopy(net.state_dict())
+
+            if logging:
+                logging.debug(f'Epoch {epoch_idx} average loss: {mean_loss}')
+
+            # TODO: fix this hack
+            if state_save_file:
+                pickle.dump(
+                    states,
+                    open(f'./out/dict_state_{state_save_file}.p', 'wb')
+                )
+
+    states["final"] = copy.deepcopy(net.state_dict())
+
+    if hasattr(optimizer, "expectation_params"):
+        optimizer.expectation_params()
+
+    return states
+
+
+def test(
+    net,
+    data,
+    states,
+    sampler=None,
+    metrics=[pinot.rmse, pinot.r2]
+    ):
+    """ Test experiment. Metrics are applied to the saved states of the
+    model to characterize its performance.
+
+
+    Parameters
+    ----------
+    net : `pinot.Net`
+        Forward pass model that combines representation and output regression
+        and generates predictive distribution.
+
+    data : `List` of `tuple` of `(dgl.DGLGraph, torch.Tensor)`
+        or `pinot.data.dataset.Dataset`
+        Pairs of graph, measurement.
+
+    optimizer : `torch.optim.Optimizer` or `pinot.Sampler`
+        Optimizer for training.
+
+    metrics : `List` of `callable`
+        Metrics used to characterize the performance.
+
+    Methods
+    -------
+    test : Run the test experiment.
+
+    """
+    def compute_conditional(net, data, batch_size):
+        # compute conditional distribution in batched fashion
+        locs, scales = [], []
+        for idx, d in enumerate(data.batch(batch_size, partial_batch=True)):
+
+            g_batch, _ = d
+            distribution_batch = net.condition(g_batch)
+            loc_batch = distribution_batch.mean.flatten().cpu()
+            scale_batch = distribution_batch.variance.pow(0.5).flatten().cpu()
+            locs.append(loc_batch)
+            scales.append(scale_batch)
+
+        distribution = torch.distributions.normal.Normal(
+            loc=torch.cat(locs),
+            scale=torch.cat(scales)
+        )
+        return distribution        
+
+    # switch to test
+    net.eval()
+
+    # initialize an empty dict for each metrics
+    results = {}
+
+    for metric in metrics:
+        results[metric.__name__] = {}
+
+    # make g, y into single batches
+    g, y = data.batch(len(data))[0]
+    for state_name, state in states.items():  # loop through states
+        
+        net.load_state_dict(state)
+
+        if net.has_exact_gp:
+            batch_size = len(data)
+        else:
+            batch_size = 32
+        
+        # compute conditional distribution in batched fashion
+        distribution = compute_conditional(net, data, batch_size)
+        y = y.detach().cpu().reshape(-1, 1)
+        for metric in metrics:  # loop through the metrics
+            results[metric.__name__][state_name] = (
+                metric(
+                    net,
+                    distribution,
+                    y,
+                    sampler=sampler,
+                    batch_size=batch_size
+                )
+                .detach()
+                .cpu()
+                .numpy()
+            )
+
+    return results
+
+
+def train_and_test(
+    net,
+    data_tr,
+    data_te,
+    optimizer,
+    metrics=[pinot.rmse, pinot.r2, pinot.pearsonr, pinot.avg_nll],
+    n_epochs=100,
+    record_interval=1,
+    lr_scheduler=None,
+    annealing=1.0,
+    logging=None,
+    state_save_file=None
+    ):
+    """ Run training and test experiment.
+
+    Parameters
+    ----------
+    net : `pinot.Net`
+        Forward pass model that combines representation and output regression
+        and generates predictive distribution.
+
+    data : `List` of `tuple` of `(dgl.DGLGraph, torch.Tensor)`
+        or `pinot.data.dataset.Dataset`
+        Pairs of graph, measurement.
+
+    optimizer : `torch.optim.Optimizer` or `pinot.Sampler`
+        Optimizer for training.
+
+    metrics : `List` of `callable`
+        (Default value: `[pinot.rmse, pinot.r2, pinot.pearsonr, pinot.avg_nll]`)
+        Metrics used to characterize the performance.
+
+    n_epochs : `int`
+        Number of epochs.
+
+    record_interval : `int`
+        (Default value = 1)
+        Interval states are recorded.
+
+    train_cls: `Train`
+        (Default value = Train)
+        Train class to use
+
+    lr_scheduler: `torch.optim.lr_scheduler`
+        (Default value = None)
+        Learning rate scheduler, will apply after every training epoch
+
+    logging: 
+        (Default value = None)
+        A preconfigured logging object that can send to disk the average epoch loss
+
+    state_save_file : str
+        (Default value = None)
+    """
+    print('training now')
+    
+    states = train(
+        net=net,
+        data=data_tr,
+        optimizer=optimizer,
+        n_epochs=n_epochs,
+        lr_scheduler=lr_scheduler,
+        annealing=annealing,
+        logging=logging,
+        state_save_file=state_save_file
+    )
+
+    print('testing now')
+    
+    results_tr = test(
+        net=net,
+        data=data_tr,
+        metrics=metrics,
+        states=states,
+        sampler=optimizer,
+    )
+
+    results_te = test(
+        net=net,
+        data=data_te,
+        metrics=metrics,
+        states=states,
+        sampler=optimizer,
+    )
+
+    return {"train": results_tr, "test": results_te}
+
+
+
 
 # =============================================================================
 # MODULE CLASSES
@@ -65,6 +357,9 @@ class Train:
         n_epochs=100,
         record_interval=1,
         lr_scheduler=None,
+        annealing=1.0,
+        logging=None,
+        state_save_file=None
     ):
 
         self.data = data
@@ -74,19 +369,39 @@ class Train:
         self.record_interval = record_interval
         self.states = {}
         self.lr_scheduler = lr_scheduler
+        self.annealing = annealing
+        self.logging = logging
+        self.state_save_file = state_save_file
 
     def train_once(self):
-        """Train the model for one batch."""
-        for x in self.data:
+        """
+        TODO: FIX THE LOGGING MECHANISM
+        Train the model for one batch.
+        """
+        total_loss = 0.
+        for d in self.data:
+            
+            batch_ratio = len(d[1]) / len(self.data)
 
             def l():
                 """ """
                 self.optimizer.zero_grad()
-                loss = torch.sum(self.net.loss(*x))
+                loss = torch.sum(
+                    self.net.loss(
+                        *d,
+                        kl_loss_scaling=batch_ratio,
+                        annealing=self.annealing
+                    )
+                )
                 loss.backward()
+                self.loss_temp = loss.detach().cpu()
                 return loss
 
             self.optimizer.step(l)
+            total_loss += self.loss_temp / len(d[1])
+
+        mean_loss = total_loss / len(self.data)
+        return mean_loss
 
     def train(self):
         """Train the model for multiple steps and
@@ -102,19 +417,33 @@ class Train:
         """
 
         for epoch_idx in range(int(self.n_epochs)):
-            self.train_once()
-            if self.lr_scheduler is not None:
+            
+            mean_loss = self.train_once()
+
+            if self.lr_scheduler:
                 self.lr_scheduler.step()
 
             if epoch_idx % self.record_interval == 0:
+                
                 self.states[epoch_idx] = copy.deepcopy(self.net.state_dict())
+
+                if logging:
+                    logging.debug(f'Epoch {epoch_idx} average loss: {mean_loss}')
+
+                # TODO: fix this hack
+                if self.state_save_file:
+                    pickle.dump(
+                        self.states,
+                        open(f'./out/dict_state_{self.state_save_file}.p', 'wb')
+                    )
+
 
         self.states["final"] = copy.deepcopy(self.net.state_dict())
 
-        if hasattr(self.optimizer, "expecation_params"):
+        if hasattr(self.optimizer, "expectation_params"):
             self.optimizer.expectation_params()
 
-        return self.net
+        return self
 
 
 class Test:
@@ -155,6 +484,26 @@ class Test:
 
     def test(self):
         """ Run test experiment. """
+        
+        def _independent(distribution):
+            """ Make predictive distribution for test set independent.
+
+            Parameters
+            ----------
+            distribution : `torch.distribution.Distribution`
+                Input distribution.
+
+            Returns
+            -------
+            distribution : `torch.distribution.Distribution`
+                Output distribution.
+
+            """
+            return torch.distributions.normal.Normal(
+                loc=distribution.mean.flatten(),
+                scale=distribution.variance.pow(0.5).flatten(),
+        )
+
         # switch to test
         self.net.eval()
 
@@ -164,58 +513,42 @@ class Test:
         for metric in self.metrics:
             results[metric.__name__] = {}
 
+        # make g, y into single batches
+        g, y = self.data.batch(len(self.data))[0]
         for state_name, state in self.states.items():  # loop through states
+            
             self.net.load_state_dict(state)
 
-            # concat y and y_hat in test set
+            if self.net.has_exact_gp:
+                batch_size = len(self.data)
+            else:
+                batch_size = 32
 
-            # y = []
-            # g = []
-            # for g_, y_ in self.data:
-            #     y.append(y_)
-            #     if isinstance(g_, dgl.DGLGraph):
-            #         g.append(g_)
-            #     else:
-            #         g += dgl.unbatch(g_)
-            #
-            # if y[0].dim() == 0:
-            #     y = torch.stack(y)
-            # else:
-            #     y = torch.cat(y)
-            #
-            # g = dgl.batch(g)
-            def _batch(x):
-                if isinstance(x[0], dgl.DGLGraph):
-                    _x = []
-                    for _g in x:
-                        _x += dgl.unbatch(_g)
-                    return dgl.batch(_x)
+            # compute conditional distribution in batched fashion
+            locs, scales = [], []
+            for idx, d in enumerate(self.data.batch(batch_size, partial_batch=True)):
+    
+                g_batch, _ = d
+                distribution_batch = self.net.condition(g_batch)
+                loc_batch = distribution_batch.mean.flatten().cpu()
+                scale_batch = distribution_batch.variance.pow(0.5).flatten().cpu()
+                locs.append(loc_batch)
+                scales.append(scale_batch)
 
-                else:
-                    if x[0].dim() == 0:
-                        return torch.stack(x)
+            distribution = torch.distributions.normal.Normal(
+                loc=torch.cat(locs),
+                scale=torch.cat(scales)
+            )
 
-                    else:
-                        return torch.cat(x)
-
-            xs = list(zip(*self.data))
-            xs = [_batch(x) for x in xs]
-
-            # get input and auxiliary arguments
-            g = xs[0]
-            y = xs[1]
-            _args = xs[2:]
-
-            # print('here')
-
+            y = y.detach().cpu().reshape(-1, 1)
             for metric in self.metrics:  # loop through the metrics
                 results[metric.__name__][state_name] = (
                     metric(
                         self.net,
-                        g,
+                        distribution,
                         y,
-                        *_args,
                         sampler=self.sampler,
+                        batch_size=batch_size
                     )
                     .detach()
                     .cpu()
@@ -224,7 +557,7 @@ class Test:
 
 
         self.results = results
-        return dict(results)
+        return self
 
 
 class TrainAndTest:
@@ -262,6 +595,13 @@ class TrainAndTest:
         (Default value = None)
         Learning rate scheduler, will apply after every training epoch
 
+    logging: 
+        (Default value = None)
+        A preconfigured logging object that can send to disk the average epoch loss
+
+    state_save_file : str
+        (Default value = None)
+
     Methods
     -------
     run : conduct experiment
@@ -279,6 +619,9 @@ class TrainAndTest:
         record_interval=1,
         train_cls=Train,
         lr_scheduler=None,
+        annealing=1.0,
+        logging=None,
+        state_save_file=None
     ):
         self.net = net  # deepcopy the model object
         self.data_tr = data_tr
@@ -289,6 +632,9 @@ class TrainAndTest:
         self.record_interval = record_interval
         self.train_cls = train_cls
         self.lr_scheduler = lr_scheduler
+        self.annealing = annealing
+        self.logging = logging
+        self.state_save_file = state_save_file
 
     def __str__(self):
         _str = ""
@@ -313,46 +659,48 @@ class TrainAndTest:
 
     def run(self):
         """ Run train and test experiments. """
-        train = self.train_cls(
+        
+        print('training now')
+        
+        tr = self.train_cls(
             net=self.net,
             data=self.data_tr,
             optimizer=self.optimizer,
             n_epochs=self.n_epochs,
             lr_scheduler=self.lr_scheduler,
-        )
+            annealing=self.annealing,
+            logging=self.logging,
+            state_save_file=self.state_save_file
+        ).train()
 
-        print('training now')
-
-        train.train()
-
-        self.states = train.states
+        self.states = tr.states
+        del tr
 
         print('testing now')
-        test = Test(
-            net=self.net,
-            data=self.data_te,
-            metrics=self.metrics,
-            states=self.states,
-            sampler=self.optimizer,
-        )
-
-        test.test()
-
-        self.results_te = test.results
-
-        test = Test(
+        
+        te_data_tr = Test(
             net=self.net,
             data=self.data_tr,
             metrics=self.metrics,
             states=self.states,
             sampler=self.optimizer,
-        )
+        ).test()
 
-        test.test()
+        self.results_tr = te_data_tr.results
 
-        self.results_tr = test.results
+        del te_data_tr
 
-        del train
+        te_data_te = Test(
+            net=self.net,
+            data=self.data_te,
+            metrics=self.metrics,
+            states=self.states,
+            sampler=self.optimizer,
+        ).test()
+
+        self.results_te = te_data_te.results
+
+        del te_data_te
 
         return {"test": self.results_te, "training": self.results_tr}
 

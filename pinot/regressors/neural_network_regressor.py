@@ -25,6 +25,7 @@ class NeuralNetworkRegressor(BaseRegressor):
         output_regression=None,
         noise_model="normal-heteroschedastic",
         measurement_dimension=1,
+        *args, **kwargs
     ):
 
         super(NeuralNetworkRegressor, self).__init__()
