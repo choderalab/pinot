@@ -99,8 +99,6 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
             self.ds + x.ds
         )
 
-
-
 class AttributedDataset(Dataset):
     """ Dataset with attributes. """
 
