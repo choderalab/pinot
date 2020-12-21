@@ -244,6 +244,5 @@ class Net(BaseNet):
 
         if sampler is not None and hasattr(sampler, 'sample_params'):
             sampler.sample_params()
-        
-        return self._condition(h, *args, **kwargs)
 
+        return self._condition(h, *args, **kwargs)
