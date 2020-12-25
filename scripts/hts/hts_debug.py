@@ -10,7 +10,8 @@ def test(
     data,
     states,
     sampler=None,
-    metrics=[pinot.rmse, pinot.r2, pinot.avg_nll, squared_error]
+    metrics=[pinot.rmse, pinot.r2, pinot.avg_nll, squared_error],
+    record_interval=50
     ):
     """ Test experiment. Metrics are applied to the saved states of the
     model to characterize its performance.
@@ -71,7 +72,7 @@ def test(
     g, y = data.batch(len(data))[0]
     for state_name, state in states.items():  # loop through states
         
-        if state_name % 100 == 0:
+        if state_name % record_interval == 0:
 
             net.load_state_dict(state)
 

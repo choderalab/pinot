@@ -59,7 +59,7 @@ def from_csv(
         """ """
         df_unsampled = pd.read_csv(path, error_bad_lines=False, **kwargs)
 
-        df = df_unsampled.sample(frac=sample_frac)
+        df = df_unsampled.sample(frac=sample_frac, random_state=seed)
 
         if dropna is True:
             df = df.dropna(axis=0, subset=[df.columns[y_cols[0]]])
