@@ -147,7 +147,7 @@ def run(args):
 
     start = time.time()
 
-    path = f'./bin/mpro_hts_{args.sample_frac[0]}.bin'
+    path = f'./bin/mpro_hts_{args.sample_frac[0]}_seed={seed}.bin'
     
     if os.path.isfile(path):
         # see if we've already serialized it
