@@ -10,7 +10,7 @@ def test(
     data,
     states,
     sampler=None,
-    metrics=[pinot.rmse, pinot.r2, squared_error]
+    metrics=[pinot.rmse, pinot.r2, pinot.avg_nll, squared_error]
     ):
     """ Test experiment. Metrics are applied to the saved states of the
     model to characterize its performance.
@@ -226,7 +226,7 @@ def run(args):
         supNet,
         data,
         states,
-        metrics=[pinot.rmse, pinot.r2, squared_error]
+        metrics=[pinot.rmse, pinot.r2, pinot.avg_nll, squared_error]
     )
 
     end = time.time()
