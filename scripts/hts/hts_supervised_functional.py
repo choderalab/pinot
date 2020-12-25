@@ -290,6 +290,14 @@ if __name__ == '__main__':
         help="Whether to fix random seed"
     )
 
+    parser.add_argument(
+        '--time_limit',
+        '--output',
+        type=str,
+        default="200:00",
+        help="Limit on training time. Format is [hour, minute]."
+    )
+
 
     args = parser.parse_args()
 

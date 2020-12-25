@@ -15,6 +15,7 @@ import copy
 import logging
 import pickle
 import pinot
+from datetime import timedelta, datetime
 
 # =============================================================================
 # MODULE FUNCTIONS - *STATELESS*
@@ -29,7 +30,8 @@ def train(
     lr_scheduler=None,
     annealing=1.0,
     logging=None,
-    state_save_file=None
+    state_save_file=None,
+    time_limit=None
     ):
     """
     Train the model for multiple steps
@@ -95,6 +97,11 @@ def train(
             # total_loss += self.loss_temp / len(d[1])
         # mean_loss = total_loss / len(self.data)
         # return mean_loss
+
+    if time_limit:
+        current_time = datetime.now()
+        hours, minutes = (int(t) for t in time_limit.split(':'))
+        limit_delta = timedelta(hours=hours, minutes=minutes)
 
     states = {}
     for epoch_idx in range(int(n_epochs)):
@@ -174,7 +181,7 @@ def test(
             loc=torch.cat(locs),
             scale=torch.cat(scales)
         )
-        return distribution        
+        return distribution
 
     # switch to test
     net.eval()
