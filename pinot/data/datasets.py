@@ -116,7 +116,6 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
         self.ds = [(g.to(device), y.to(device)) for (g,y) in self.ds]
         return self
 
-
 class AttributedDataset(Dataset):
     """ Dataset with attributes. """
 
