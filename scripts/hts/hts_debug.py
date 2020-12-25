@@ -184,11 +184,11 @@ def run(args):
         integerize = lambda x: int(x.replace('x', ''))
         n_layers = integerize(n_layers)
         n_units = integerize(n_units)
-        n_inducing_points = integerize(n_inducing_points)
+        n_inducing = integerize(n_inducing)
 
         architecture = [unit_type, n_units, 'activation', activation]*n_layers
 
-        return architecture, n_inducing_points
+        return architecture, n_inducing
 
 
     def get_net_and_optimizer(architecture, n_inducing_points):
