@@ -1,3 +1,5 @@
+import pinot
+
 def squared_error(net, distribution, y, *args, n_samples=16, batch_size=32, **kwargs):
     """ Squared error. """
     y_hat = distribution.sample().detach().cpu().reshape(-1, 1)
