@@ -8,7 +8,7 @@ do
     for seed in 0 1 2 3 4 5 6 7 8 9
     do
         name="${states}_${seed}"
-        bsub -q gpuqueue -n 2 -gpu "num=1:j_exclusive=yes" -R "rusage[mem=8] span[hosts=1]" -W 36:00 -o "logs_$name.stdout" -eo "logs_$name.stderr" \
+        bsub -q gpuqueue -n 2 -gpu "num=1:j_exclusive=yes" -R "rusage[mem=8] span[hosts=1]" -W 8:00 -o "logs_$name.stdout" -eo "logs_$name.stderr" \
         python3 hts_debug.py --states $states --cuda --seed $seed \
         --log "${name}.logs" --sample_frac 0.1
     done
