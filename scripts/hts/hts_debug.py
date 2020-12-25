@@ -219,9 +219,6 @@ def run(args):
 
     start = time.time()
     
-    # mini-batch if we're using variational GP
-    data = data.batch(batch_size)
-
     # get results
     debug_results = test(
         supNet,
