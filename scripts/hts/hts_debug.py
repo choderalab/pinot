@@ -124,17 +124,9 @@ def run(args):
     )
     logging.debug(args)
 
-    layer_type = args.architecture[0]
-    n_layers = len(args.architecture) // 4
-    n_units = args.architecture[1]
-    activation = args.architecture[3]
-
     seed = args.seed
-    savefile = (f'reg={args.regressor_type}_a={n_layers}x_{n_units}x'
-                f'_{layer_type}_{activation}_n={args.n_epochs}_b={args.batch_size}'
-                f'_wd={args.weight_decay}_lsp={args.label_split[0]}_frac={args.sample_frac}'
-                f'_anneal={args.annealing}_induce={args.n_inducing_points}_normalize={args.normalize}'
-                f'_{args.index}_seed={seed}')
+    savefile_no_seed = args.states.split('dict_state')[1].replace('seed=None.p', '')
+    savefile = (f'{savefile_no_seed}_seed={seed}')
 
     print(savefile)
     logging.debug("savefile = {}".format(savefile))
@@ -278,13 +270,6 @@ if __name__ == '__main__':
     )
 
     parser.add_argument(
-        '--weight_decay',
-        default=0.01,
-        type=float,
-        help="Weight decay for optimizer",
-    )
-
-    parser.add_argument(
         '--batch_size',
         default=32,
         type=int,
@@ -298,58 +283,12 @@ if __name__ == '__main__':
         default=0.005, # 0.1
         help="Proportion of dataset to use"
     )
-
-    parser.add_argument(
-        '--label_split',
-        nargs="+",
-        type=list,
-        default=[4, 1],
-        help="Training-testing split for labeled data"
-    )
-    parser.add_argument(
-        '--index',
-        type=int,
-        default=1,
-        help="Arbitrary index to append to logs"
-    )
-    parser.add_argument(
-        '--annealing',
-        type=float,
-        default=1.0,
-        help="Scaling factor on the KL term in the variational inference loss"
-    )
-    parser.add_argument(
-        '--n_inducing_points',
-        type=int,
-        default=100,
-        help="Number of inducing points to use for variational inference"
-    )
-    parser.add_argument(
-        '--record_interval',
-        type=int,
-        default=50,
-        help="Number of intervals before recording metrics"
-    )
-    parser.add_argument(
-        '--normalize',
-        type=int,
-        default=0,
-        help="Number of inducing points to use for variational inference"
-    )
     parser.add_argument(
         '--seed',
         type=int,
         default=0,
         help="Setting the seed for random sampling"
     )
-    parser.add_argument(
-        '--time_limit',
-        '--output',
-        type=str,
-        default="200:00",
-        help="Limit on training time. Format is [hour, minute]."
-    )
-
 
     args = parser.parse_args()
 
