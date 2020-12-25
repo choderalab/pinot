@@ -69,7 +69,7 @@ def test(
 
     # make g, y into single batches
     g, y = data.batch(len(data))[0]
-    for state_name, state in tqdm(states.items()):  # loop through states
+    for state_name, state in states.items():  # loop through states
         
         if state_name % 100 == 0:
 
