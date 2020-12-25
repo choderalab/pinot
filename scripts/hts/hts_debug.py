@@ -38,7 +38,6 @@ def test(
 
     """
     import torch
-    from tqdm import tqdm
     
     def compute_conditional(net, data, batch_size):
         # compute conditional distribution in batched fashion
