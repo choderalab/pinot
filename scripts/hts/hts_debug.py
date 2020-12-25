@@ -240,7 +240,7 @@ def run(args):
     
     # logging and write to file
     logging.debug("Finished testing net after {} seconds and save state dict".format(end-start))
-    pickle.dump(debug_results, open(f'./{args.output}/debug_{savefile}_seed={seed}.p', 'wb'))
+    pickle.dump(debug_results, open(f'./{args.output}/debug_{savefile}.p', 'wb'))
 
 
 if __name__ == '__main__':
