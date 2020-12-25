@@ -149,7 +149,7 @@ def run(args):
         data = data.load(path)
     else:
         # otherwise, load from scratch
-        data = getattr(pinot.data, args.data)(sample_frac=args.sample_frac[0])
+        data = pinot.data.mpro_hts(sample_frac=args.sample_frac[0], seed=seed)
         data.save(path)
 
     # move to cuda
