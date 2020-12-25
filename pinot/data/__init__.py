@@ -57,13 +57,14 @@ moonshot_sorted = lambda: datasets.TemporalDataset().from_csv(
     dropna=True,
 )
 
-mpro_hts = lambda sample_frac=1.0, seed=None: datasets.Dataset().from_csv(
+mpro_hts = lambda sample_frac=1.0, seed=None, shuffle=True: datasets.Dataset().from_csv(
     os.path.dirname(utils.__file__) + "/mpro_hts.csv",
     smiles_col=1,
     y_cols=[-1],
     delimiter=',',
-    seed=seed,
     dtype={"Smiles": str, "Standard Value": np.float32},
     header=1,
+    seed=seed,
     sample_frac=sample_frac,
+    shuffle=shuffle,
 )
