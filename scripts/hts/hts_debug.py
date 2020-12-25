@@ -211,7 +211,7 @@ def run(args):
         return net
 
     # get states
-    states = pickle.load(open(args.states, 'rb'))
+    states = pickle.load(open(f'./{args.output}/{args.states}', 'rb'))
 
     # make appropriately sized network
     architecture, n_inducing_points = parse_states(args.states)
