@@ -172,7 +172,7 @@ def run(args):
 
         """
         # parse filename
-        _, meta = t.split('dict_state_')
+        _, meta = states_file.split('dict_state_')
         (reg, n_layers, n_units, unit_type, activation,
          n_epochs, batch_size, _, split, frac,
          anneal_factor, n_inducing, normalize, index, _) = [
