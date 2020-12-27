@@ -64,7 +64,7 @@ def run(args):
     # filter out huge outliers
     if args.filter_outliers:
         outlier_threshold = -2
-        data = list(filter(lambda x: x[1] > outlier_threshold, data))
+        data.ds = list(filter(lambda x: x[1] > outlier_threshold, data))
     
     # Split the labeled moonshot data into training set and test set
     train_data, test_data = data.split(args.label_split, seed=seed)
