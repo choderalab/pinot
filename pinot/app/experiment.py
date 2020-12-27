@@ -15,7 +15,7 @@ import copy
 import logging
 import pickle
 import pinot
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
 
 # =============================================================================
 # MODULE FUNCTIONS - *STATELESS*
@@ -128,8 +128,8 @@ def train(
                     open(f'./out/dict_state_{state_save_file}.p', 'wb')
                 )
 
-        # check if we're within our timerange
-        if datetime.now() - start_time > limit_delta:
+        # check if we've hit our time limit
+        if (datetime.now() - start_time) > limit_delta:
             break
 
     states[f'final_{epoch_idx}'] = copy.deepcopy(net.state_dict())
@@ -241,7 +241,8 @@ def train_and_test(
     lr_scheduler=None,
     annealing=1.0,
     logging=None,
-    state_save_file=None
+    state_save_file=None,
+    time_limit=None
     ):
     """ Run training and test experiment.
 
@@ -294,7 +295,8 @@ def train_and_test(
         lr_scheduler=lr_scheduler,
         annealing=annealing,
         logging=logging,
-        state_save_file=state_save_file
+        state_save_file=state_save_file,
+        time_limit=time_limit
     )
 
     print('testing now')

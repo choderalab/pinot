@@ -141,7 +141,8 @@ def run(args):
         n_epochs=args.n_epochs,
         record_interval=args.record_interval,
         annealing=args.annealing,
-        state_save_file=savefile
+        state_save_file=savefile,
+        time_limit=args.time_limit
     )
 
     end = time.time()
