@@ -213,7 +213,12 @@ if __name__ == '__main__':
         default="out",
         help="Name of folder to store results"
     )
-
+    parser.add_argument(
+        '--time_limit',
+        type=str,
+        default="200:00",
+        help="Limit on training time. Format is hour:minute."
+    )
     parser.add_argument(
         '--log',
         type=str,
@@ -285,13 +290,6 @@ if __name__ == '__main__':
         action="store_true",
         default=False,
         help="Whether to fix random seed"
-    )
-
-    parser.add_argument(
-        '--time_limit',
-        type=str,
-        default="200:00",
-        help="Limit on training time. Format is [hour, minute]."
     )
     parser.add_argument(
         '--filter_outliers',
