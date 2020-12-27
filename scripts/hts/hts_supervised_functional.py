@@ -60,6 +60,10 @@ def run(args):
 
     # move to cuda
     data = data.to(device)
+
+    # filter out huge outliers
+    outlier_threshold = -2
+    data = list(filter(lambda x: x[1] > outlier_threshold, data))
     
     # Split the labeled moonshot data into training set and test set
     train_data, test_data = data.split(args.label_split, seed=seed)
