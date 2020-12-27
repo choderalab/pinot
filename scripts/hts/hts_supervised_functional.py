@@ -47,7 +47,7 @@ def run(args):
 
     start = time.time()
 
-    path = f'./bin/mpro_hts_{args.sample_frac[0]}.bin'
+    path = f'./bin/mpro_hts_{args.sample_frac[0]}_seed={seed}.bin'
     
     if os.path.isfile(path):
         # see if we've already serialized it
@@ -62,8 +62,9 @@ def run(args):
     data = data.to(device)
 
     # filter out huge outliers
-    outlier_threshold = -2
-    data = list(filter(lambda x: x[1] > outlier_threshold, data))
+    if args.filter_outliers:
+        outlier_threshold = -2
+        data = list(filter(lambda x: x[1] > outlier_threshold, data))
     
     # Split the labeled moonshot data into training set and test set
     train_data, test_data = data.split(args.label_split, seed=seed)
@@ -148,15 +149,6 @@ def run(args):
     # logging and clean-up
     logging.debug("Finished training supervised net after {} seconds and save state dict".format(end-start))
     torch.save(supNet.state_dict(), os.path.join(args.output, savefile + "_sup.th"))
-
-    sup_train_metrics = {}
-    sup_test_metrics  = {}
-    for metric in results['train'].keys():
-        sup_train_metrics[metric] = results['train'][metric]["final"]
-        sup_test_metrics[metric]  = results['test'][metric]["final"]
-
-    logging.debug(sup_train_metrics)
-    logging.debug(sup_test_metrics)
 
     pickle.dump(results['train'], open(f'./{args.output}/train_results_{savefile}.p', 'wb'))
     pickle.dump(results['test'], open(f'./{args.output}/test_results_{savefile}.p', 'wb'))
@@ -300,6 +292,18 @@ if __name__ == '__main__':
         type=str,
         default="200:00",
         help="Limit on training time. Format is [hour, minute]."
+    )
+    parser.add_argument(
+        '--filter_outliers',
+        action="store_true",
+        default=False,
+        help="Whether to filter huge outliers."
+    )
+    parser.add_argument(
+        '--seed',
+        type=int,
+        default=0,
+        help="Setting the seed for random sampling"
     )
 
 

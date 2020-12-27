@@ -34,6 +34,12 @@ def _independent(distribution):
 # =============================================================================
 # MODULE FUNCTIONS
 # =============================================================================
+def absolute_error(net, distribution, y, *args, **kwargs):
+    """ Squared error. """
+    y_hat = distribution.sample().detach().cpu().reshape(-1, 1)
+    return torch.abs(y - y_hat)
+
+
 def _rmse(y, y_hat):
     """RMSE"""
     y_hat = y_hat.unsqueeze(1) if y_hat.dim() == 1 else y_hat

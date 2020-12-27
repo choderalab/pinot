@@ -98,10 +98,13 @@ def train(
         # mean_loss = total_loss / len(self.data)
         # return mean_loss
 
+    # set time limit
+    start_time = datetime.now()
     if time_limit:
-        current_time = datetime.now()
         hours, minutes = (int(t) for t in time_limit.split(':'))
         limit_delta = timedelta(hours=hours, minutes=minutes)
+    else:
+        limit_delta = timedelta(days=365)
 
     states = {}
     for epoch_idx in range(int(n_epochs)):
@@ -125,7 +128,11 @@ def train(
                     open(f'./out/dict_state_{state_save_file}.p', 'wb')
                 )
 
-    states["final"] = copy.deepcopy(net.state_dict())
+        # check if we're within our timerange
+        if datetime.now() - start_time > limit_delta:
+            break
+
+    states[f'final_{epoch_idx}'] = copy.deepcopy(net.state_dict())
 
     if hasattr(optimizer, "expectation_params"):
         optimizer.expectation_params()
@@ -228,7 +235,7 @@ def train_and_test(
     data_tr,
     data_te,
     optimizer,
-    metrics=[pinot.rmse, pinot.r2, pinot.pearsonr, pinot.avg_nll],
+    metrics=[pinot.rmse, pinot.r2, pinot.pearsonr, pinot.avg_nll, pinot.absolute_error],
     n_epochs=100,
     record_interval=1,
     lr_scheduler=None,
