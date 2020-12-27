@@ -288,7 +288,6 @@ if __name__ == '__main__':
 
     parser.add_argument(
         '--time_limit',
-        '--output',
         type=str,
         default="200:00",
         help="Limit on training time. Format is [hour, minute]."
