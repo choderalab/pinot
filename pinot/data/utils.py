@@ -21,6 +21,7 @@ def from_csv(
     seed=2666,
     scale=1.0,
     dropna=False,
+    sample_frac=1.0,
     shuffle=True,
     **kwargs
 ):
@@ -42,6 +43,8 @@ def from_csv(
          (Default value = 1.0)
     dropna :
          (Default value = False)
+    sample_frac : float
+        Proportion of rows to read in
     shuffle :
          (Default value = True)
     **kwargs :
@@ -54,7 +57,9 @@ def from_csv(
 
     def _from_csv():
         """ """
-        df = pd.read_csv(path, error_bad_lines=False, **kwargs)
+        df_unsampled = pd.read_csv(path, error_bad_lines=False, **kwargs)
+
+        df = df_unsampled.sample(frac=sample_frac, random_state=seed)
 
         if dropna is True:
             df = df.dropna(axis=0, subset=[df.columns[y_cols[0]]])
@@ -67,30 +72,35 @@ def from_csv(
 
             df_smiles = [str(x) for x in df_smiles]
 
-            idxs = [
+            valid_idxs = [
                 idx
                 for idx in range(len(df_smiles))
                 if "nan" not in df_smiles[idx]
             ]
 
-            df_smiles = [df_smiles[idx] for idx in idxs]
+            ds = []
+            for idx, smiles in enumerate(df_smiles):
+                if idx in valid_idxs:
+                    try:
+                        mol = Chem.MolFromSmiles(smiles)
+                        g = pinot.graph.from_rdkit_mol(mol)
+                        y = torch.tensor(
+                            scale * df_y.values[idx], dtype=torch.float32
+                        )
 
-            mols = [Chem.MolFromSmiles(smiles) for smiles in df_smiles]
-            gs = [pinot.graph.from_rdkit_mol(mol) for mol in mols]
+                        # check if graph has only one node, then add self-loop
+                        if g.num_nodes() == 1:
+                            continue
+                            # TODO: for now, batch is not working when I run this,
+                            # might call `remove_self_loop` to guard double-loops
+                            # g = dgl.add_self_loop(g)
+
+                        ds.append(tuple([g, y]))
+                    except:
+                        pass
 
         elif toolkit == "openeye":
             raise NotImplementedError
-
-        ds = list(
-            zip(
-                gs,
-                list(
-                    torch.tensor(
-                        scale * df_y.values[idxs], dtype=torch.float32
-                    )
-                ),
-            )
-        )
 
         if shuffle is True:
             random.seed(seed)
@@ -207,6 +217,8 @@ def normalize(ds):
 def split(ds, partition):
     """Split the dataset according to some partition.
 
+    TODO: Fix this.
+
     Parameters
     ----------
     ds :
@@ -232,7 +244,7 @@ def split(ds, partition):
     return ds_batched
 
 
-def batch(ds, batch_size, seed=2666, shuffle=False):
+def batch(ds, batch_size, seed=2666, shuffle=False, partial_batch=False):
     """Batch graphs and values after shuffling.
 
     Parameters
@@ -254,11 +266,16 @@ def batch(ds, batch_size, seed=2666, shuffle=False):
     n_data_points = len(ds)
     n_batches = n_data_points // batch_size  # drop the rest
 
-    if shuffle is True:
+    if shuffle:
         random.seed(seed)
         random.shuffle(ds)
 
-    gs, ys = tuple(zip(*ds))
+    gs = []
+    ys = []
+    for d in ds:
+        gs.extend(dgl.unbatch(d[0]))
+        ys.extend(list(d[1]))
+    ys = [y.unsqueeze(0) for y in ys]
 
     gs_batched = [
         dgl.batch(gs[idx * batch_size : (idx + 1) * batch_size])
@@ -269,6 +286,14 @@ def batch(ds, batch_size, seed=2666, shuffle=False):
         torch.stack(ys[idx * batch_size : (idx + 1) * batch_size], dim=0)
         for idx in range(n_batches)
     ]
+
+    if partial_batch and n_data_points % batch_size != 0:
+        gs_batched.append(
+            dgl.batch(gs[(n_batches) * batch_size : ])
+        )
+        ys_batched.append(
+            torch.stack(ys[(n_batches) * batch_size : ], dim=0)
+        )
 
     return list(zip(gs_batched, ys_batched))
 
@@ -308,7 +333,7 @@ def prepare_semi_supervised_data(unlabelled_data, labelled_data, seed=2666):
     return semi_supervised_data
 
 
-def prepare_semi_supeprvised_data_from_labeled_data(
+def prepare_semi_supervised_data_from_labeled_data(
     labelled_data, r=0.2, seed=2666
 ):
     """Create semi-supervised data from labelled data by randomly removing the
