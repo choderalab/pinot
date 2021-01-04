@@ -69,6 +69,37 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
         self.ds = pinot.data.utils.from_csv(*args, **kwargs)()
         return self
 
+    def save(self, path):
+        """ Save dataset to path.
+
+        Parameters
+        ----------
+        path : path-like object
+        """
+        import pickle
+
+        with open(path, "wb") as f_handle:
+            pickle.dump(self.ds, f_handle)
+
+    def load(self, path):
+        """ Load path to dataset.
+
+        Parameters
+        ----------
+        """
+        import pickle
+
+        with open(path, "rb") as f_handle:
+            self.ds = pickle.load(f_handle)
+
+        return self
+
+    def __add__(self, x):
+        return self.__class__(
+            self.ds + x.ds
+        )
+
+
 
 class AttributedDataset(Dataset):
     """ Dataset with attributes. """
