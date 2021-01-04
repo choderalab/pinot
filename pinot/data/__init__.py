@@ -56,3 +56,10 @@ moonshot_sorted = lambda: datasets.TemporalDataset().from_csv(
     time_col=-2,
     dropna=True,
 )
+
+moonshot_multi = lambda: datasets.Dataset().from_csv(
+    os.path.dirname(utils.__file__) + '/moonshot_[1-3-21].csv',
+    smiles_col=1,
+    y_cols=[11, 12, 13, 14, 15, 16],
+    scale=0.01
+)
