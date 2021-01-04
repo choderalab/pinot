@@ -29,7 +29,7 @@ def run(args):
     n_units = args.architecture[1]
     activation = args.architecture[3]
 
-    seed = 0 if args.fix_seed else None
+    seed = args.seed if args.fix_seed else None
     savefile = (f'reg={args.regressor_type}_a={n_layers}x_{n_units}x'
                 f'_{layer_type}_{activation}_n={args.n_epochs}_b={args.batch_size}'
                 f'_wd={args.weight_decay}_lsp={args.label_split[0]}_frac={args.sample_frac}'
