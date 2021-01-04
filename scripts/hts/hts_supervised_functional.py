@@ -151,8 +151,8 @@ def run(args):
     logging.debug("Finished training supervised net after {} seconds and save state dict".format(end-start))
     torch.save(supNet.state_dict(), os.path.join(args.output, savefile + "_sup.th"))
 
-    pickle.dump(results['train'], open(f'./{args.output}/train_results_{savefile}.p', 'wb'))
-    pickle.dump(results['test'], open(f'./{args.output}/test_results_{savefile}.p', 'wb'))
+    pickle.dump(results['train'], open(f'{args.output}/train_results_{savefile}.p', 'wb'))
+    pickle.dump(results['test'], open(f'{args.output}/test_results_{savefile}.p', 'wb'))
 
 
 if __name__ == '__main__':
