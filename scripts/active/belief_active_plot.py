@@ -510,7 +510,7 @@ class BeliefActivePlot():
         """ Generate data, put on GPU if possible.
         """
         # Load data
-        data_func = get_attr(pinot.data, self.data)
+        data_func = getattr(pinot.data, self.data)
         if self.sample_frac != 1.0:
             ds = data_func(sample_frac=self.sample_frac)
         else:
