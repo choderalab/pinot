@@ -48,16 +48,13 @@ moonshot_with_date = lambda: datasets.TemporalDataset().from_csv(
     scale=0.01,
 )
 
-moonshot_sorted = lambda sample_frac=1.0, seed=None, shuffle=True: datasets.TemporalDataset().from_csv(
+moonshot_sorted = lambda: datasets.TemporalDataset().from_csv(
     os.path.dirname(utils.__file__) + "/moonshot_with_date.csv",
     smiles_col=1,
     y_cols=[14], # f inhibition at 20 uM
     scale=0.01,
     time_col=-2,
     dropna=True,
-    seed=seed,
-    sample_frac=sample_frac,
-    shuffle=shuffle,
 )
 
 mpro_hts = lambda sample_frac=1.0, seed=None, shuffle=True: datasets.Dataset().from_csv(
