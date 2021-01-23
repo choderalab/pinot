@@ -32,7 +32,7 @@ def train(
     logging=None,
     state_save_file=None,
     time_limit=None,
-    out_dir
+    out_dir='out'
     ):
     """
     Train the model for multiple steps
