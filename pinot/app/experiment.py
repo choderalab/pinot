@@ -31,7 +31,8 @@ def train(
     annealing=1.0,
     logging=None,
     state_save_file=None,
-    time_limit=None
+    time_limit=None,
+    out_dir
     ):
     """
     Train the model for multiple steps
@@ -125,7 +126,7 @@ def train(
             if state_save_file:
                 pickle.dump(
                     states,
-                    open(f'./out/dict_state_{state_save_file}.p', 'wb')
+                    open(f'{outdir}/dict_state_{state_save_file}.p', 'wb')
                 )
 
         # check if we've hit our time limit

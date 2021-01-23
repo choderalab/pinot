@@ -11,8 +11,8 @@ def run(args):
 
     # If output folder doesn't exist, create a new one
     try:
-        os.mkdir('bin')
         os.mkdir(args.output)
+        os.mkdir('bin')
     except:
         pass
 
