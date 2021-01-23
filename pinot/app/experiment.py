@@ -243,7 +243,8 @@ def train_and_test(
     annealing=1.0,
     logging=None,
     state_save_file=None,
-    time_limit=None
+    time_limit=None,
+    out_dir='out'
     ):
     """ Run training and test experiment.
 
@@ -297,7 +298,8 @@ def train_and_test(
         annealing=annealing,
         logging=logging,
         state_save_file=state_save_file,
-        time_limit=time_limit
+        time_limit=time_limit,
+        out_dir=out_dir
     )
 
     print('testing now')
