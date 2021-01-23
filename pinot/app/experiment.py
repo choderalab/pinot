@@ -126,7 +126,7 @@ def train(
             if state_save_file:
                 pickle.dump(
                     states,
-                    open(f'{outdir}/dict_state_{state_save_file}.p', 'wb')
+                    open(f'{out_dir}/dict_state_{state_save_file}.p', 'wb')
                 )
 
         # check if we've hit our time limit
