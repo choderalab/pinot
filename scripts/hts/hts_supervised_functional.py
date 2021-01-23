@@ -142,7 +142,8 @@ def run(args):
         record_interval=args.record_interval,
         annealing=args.annealing,
         state_save_file=savefile,
-        time_limit=args.time_limit
+        time_limit=args.time_limit,
+        out_dir=args.output
     )
 
     end = time.time()
