@@ -3,50 +3,22 @@ import math
 import gpytorch
 from gpytorch.variational import CholeskyVariationalDistribution
 from gpytorch.variational import VariationalStrategy
-from gpytorch.models import ApproximateGP, ExactGP
-
-
-class ExactGaussianProcesses(ExactGP):
-    def __init__(self, in_features, num_data, mean=None, covar=None):
-        # Can replace this with MultiTaskGaussianLikelihood when one wishes to use MultiTaskGP
-        likelihood = gpytorch.likelihoods.GaussianLikelihood()
-        temp_x = torch.zeros(num_data, in_features)
-        temp_y = torch.zeros(num_data, 1)
-        super(ExactGaussianProcesses, self).__init__(temp_x, temp_y, likelihood)
-        self.mean_module = gpytorch.means.LinearMean(in_features) if mean is None else mean
-        self.covar_module = gpytorch.kernels.RBFKernel() if covar is None else covar
-        self.num_data = num_data
-
-    def forward(self, h):
-        mean_x = self.mean_module(h)
-        covar_x = self.covar_module(h)
-        return gpytorch.distributions.MultivariateNormal(mean_x, covar_x)
-
-    def loss(self, h, y, *args, **kwargs):
-        """
-        Compute the negative log likelihood
-        :param h:
-        :param y:
-        :return:
-        """
-        self.set_train_data(h, y) # Only set new data during training
-        dist_f = self(h, *args, **kwargs)  # The predictive distribution
-        llh = self.likelihood(dist_f)  # Compute the likelihood distribution
-        return -llh.log_prob(y)  # Compute negative log likelihood of the observed labels
-
-    def condition(self, h, *args, **kwargs):
-        """
-        Returns the conditional distribution p(f|x)
-        :param h:
-        :return:
-        """
-        dist = self(h, *args, **kwargs)
-        return dist
+from gpytorch.models import ApproximateGP
 
 
 class VariationalGP(ApproximateGP):
     def __init__(self, in_features, num_data, inducing_points=None, num_inducing_points=100,
                  mean=None, covar=None, beta=1.0):
+        """
+        :param in_features: dimension of the input to GP layer
+        :param num_data: total number of training samples
+        :param inducing_points: inducing points, second dimension should be the same as in_features
+        :param num_inducing_points: number of inducing points, if inducing_points are not given, will be used
+            to randomly initialize inducing points
+        :param mean: gpytorch.means.Mean
+        :param covar: gpytorch.kernels.Kernel
+        :param beta: the relative weight of the KL term in ELBO
+        """
         if inducing_points is None:
             # Randomly initialize inducing points
             inducing_points = torch.rand(num_inducing_points, in_features)
@@ -75,7 +47,7 @@ class VariationalGP(ApproximateGP):
 
     def forward(self, h):
         """
-
+        Computes the GP prior
         :param h:
         :return:
         """
@@ -86,8 +58,8 @@ class VariationalGP(ApproximateGP):
     def loss(self, h, y, *args, **kwargs):
         """
         Computes the negative ELBO
-        :param h:
-        :param y:
+        :param h: learned features of graphs, shape (n, in_features)
+        :param y: labels of graphs, shape (n,)
         :return:
         """
         approximate_dist_f = self(h, *args, **kwargs)
@@ -101,7 +73,7 @@ class VariationalGP(ApproximateGP):
 
     def condition(self, x, *args, **kwargs):
         """ Computes the predictive distribution over y* given x*
-        :param x:
+        :param x: learned features of graphs, shape (n, in_features)
         :return:
         """
         dist_f = self(x, *args, **kwargs)
