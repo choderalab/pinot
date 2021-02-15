@@ -8,6 +8,7 @@ import copy
 import pinot
 from collections import OrderedDict
 from pinot.metrics import _independent
+from pinot.regressors import ExactGaussianProcessRegressor
 
 # =============================================================================
 # HELPER FUNCTIONS
@@ -224,14 +225,21 @@ class BayesOptExperiment(ActiveLearningExperiment):
         acquisitions_preset=None,
         annealing=1.0,
         train_class=pinot.app.experiment.Train,
+        update_representation_interval=20
     ):
 
         super(BayesOptExperiment, self).__init__()
 
         # model
         self.net = net
-        self.optimizer = optimizer
+        self.has_exactgp = type(net.output_regressor) == ExactGaussianProcessRegressor
         self.num_epochs = num_epochs
+        
+        # make optimizers
+        self.optimizer = optimizer(net)
+        # TODO: check that it is actually only picking the relevant parameters
+        self.optimizer_output_regressor = optimizer(net.output_regressor)
+        self.update_representation_interval = update_representation_interval
 
         # data
         self.data = data
@@ -247,6 +255,9 @@ class BayesOptExperiment(ActiveLearningExperiment):
             # If numerical data
             else:
                 self.g_all = torch.tensor([g for (g,y) in data])
+        
+        self.unseen_data = self.data
+        self.seen_data = tuple()
 
         # acquisition
         self.acquisition = acquisition
@@ -255,6 +266,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
         # early stopping
         self.early_stopping = early_stopping
         self.best_possible = torch.max(self.data[1])
+        self.y_best = torch.tensor(-float("Inf"))
 
         # bookkeeping
         self.workup = workup
@@ -280,7 +292,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
         if self.net_state_dict is not None:
             self.net.load_state_dict(self.net_state_dict)
 
-    def blind_pick(self, seed=2666):
+    def blind_pick(self, seed=2666, k=1):
         """ Randomly pick index from the candidate pool.
 
         Parameters
@@ -288,11 +300,14 @@ class BayesOptExperiment(ActiveLearningExperiment):
         seed : `int`
              (Default value = 2666)
              Random seed.
+        k : `int`
+            (Default value = 1)
+            The number of candidates to choose.
 
         Returns
         -------
-        best : `int`
-            The chosen candidate to start.
+        random_choices : `int`
+            The chosen candidates to start.
 
         Note
         ----
@@ -304,45 +319,68 @@ class BayesOptExperiment(ActiveLearningExperiment):
         """
         import random
         random.seed(seed)
-        best = random.choice(self.unseen)
-        self.seen.append(self.unseen.pop(best))
-        return best
+        random_choices = sorted(
+            random.sample(range(len(self.unseen)), k),
+            reverse=True
+        )
+        self.seen.extend([self.unseen.pop(c) for c in random_choices])
+        return random_choices
 
-    def train(self):
+    def train(self, train_data, update_representation=False):
         """Train the model with new data."""
-        # reset
-        self.reset_net()
 
         # set to train status
         self.net.train()
 
+        # optimize full net w/ graphs
+        if update_representation:
+            
+            # reset net
+            self.reset_net()
+            num_epochs = self.num_epochs
+            optimizer = self.optimizer
+            net = self.net
+
+        # optimize regressor-only w/ hidden rep
+        else:
+
+            # no reset, shallow training
+            num_epochs = 20
+            optimizer = self.optimizer_output_regressor
+            net = self.net.output_regressor
+
         # train the model
         tr = self.train_class(
-            data=[self.seen_data],
-            optimizer=self.optimizer(self.net),
-            n_epochs=self.num_epochs,
-            net=self.net,
+            net=net,
+            data=train_data,
+            optimizer=optimizer,
+            n_epochs=num_epochs,
             annealing=self.annealing,
             record_interval=999999,
         ).train()
 
-        self.net = tr.net
+        # update net
+        if update_representation:
+            self.net = tr.net
+        else:
+            self.net.output_regressor = tr.net
 
 
-    def acquire(self):
+    def acquire(self, net, unseen_data):
         """Acquire new training data."""
+        
         # set net to eval
-        self.net.eval()
+        net.eval()
 
         # split input target
-        gs, ys = self.unseen_data
+        inputs, ys = unseen_data
 
         # acquire no more points than are remaining
         if self.q <= len(self.unseen):
 
             # acquire pending points
             pending_pts = self.acquisition(
-                self.net, gs, q=self.q, y_best=self.y_best
+                net, inputs, q=self.q, y_best=self.y_best
             )
     
             # pop from the back so you don't disrupt the order
@@ -367,9 +405,8 @@ class BayesOptExperiment(ActiveLearningExperiment):
         # grab old data
         self.seen_data = self.slice_fn(self.data, self.seen)
 
-        # set y_max
-        gs, ys = self.seen_data
-
+        # set y_best
+        _, ys = self.seen_data
         self.y_best = torch.max(ys)
 
 
@@ -391,39 +428,79 @@ class BayesOptExperiment(ActiveLearningExperiment):
         self.old : Resulting indices of acquired candidates.
 
         """
+        # TODO: add pretrained models (i.e., ChEMBL)
         idx = 0
-
-        self.blind_pick(seed=seed)
-        
-        self.update_data()
-        
         while idx < num_rounds:
 
             print(idx)
             
+            # early stopping logic
             if self.early_stopping and self.y_best == self.best_possible:
                 break
 
-            self.train()
+            # train full net / representation
+            update_representation = idx % self.update_representation_interval == 0
+
+            # record net states before training
             self.states[idx] = copy.deepcopy(self.net.state_dict())
-            
+
+            # acquire points from unseen
             if idx not in self.acquisitions:
-                # using autonomous acquisitions
-                self.acquire()
+                
+                # in the first batch, choose randomly
+                if idx == 0:
+                    self.blind_pick(seed=seed, k=self.q)
+                
+                else:
+                    if update_representation:
+                        acquire_data = self.unseen_data
+                        net = self.net
+                    else:
+                        acquire_data = hidden_unseen_data
+                        net = self.net.output_regressor
+                    
+                    self.acquire(net, acquire_data)
+                
                 self.acquisitions[idx] = tuple([self.seen.copy(), self.unseen.copy()])
 
+            # using human acquisitions
             else:
-                # using human acquisitions
                 self.seen, self.unseen = self.acquisitions[idx]
 
+            # if we have seen all the points
             if not self.unseen:
                 break
 
+            # update data following acquisition
             self.update_data()
+
+            # train net using seen data
+            train_data = [self.seen_data] if update_representation else [hidden_seen_data]
+            self.train(train_data, update_representation=update_representation)
+
+            # get frozen hidden representation AFTER training
+            if update_representation:
+                get_h = lambda g, y: (self.net.representation(g), y)
+                self.hidden_data = [get_h(*d) for d in [self.data]][0]
+            
+            # update subsets by seen/unseen
+            hidden_seen_data = _slice_fn_tensor_pair(self.hidden_data, self.seen)
+            hidden_unseen_data = _slice_fn_tensor_pair(self.hidden_data, self.unseen)
 
             idx += 1
 
         return self.acquisitions
+
+
+
+
+
+
+
+
+
+
+
 
 
 class SemiSupervisedBayesOptExperiment(BayesOptExperiment):

@@ -204,8 +204,8 @@ class BeliefActivePlot():
         lr, optimizer_type,
         data, sample_frac,
         acquisition, num_samples, num_thompson_samples, q,
-        beliefs, early_stopping,
-        device, num_trials, num_rounds, num_epochs):
+        beliefs, early_stopping, device, num_trials,
+        num_rounds, num_epochs, update_representation_interval):
 
         # net config
         self.net = net
@@ -222,6 +222,7 @@ class BeliefActivePlot():
         self.sample_frac = sample_frac
         
         # experiment config
+        self.update_representation_interval = update_representation_interval
         self.acquisition = acquisition
         self.num_samples = num_samples
         self.num_thompson_samples = num_thompson_samples
@@ -324,7 +325,8 @@ class BeliefActivePlot():
                 slice_fn=pinot.active.experiment._slice_fn_tuple,
                 collate_fn=pinot.active.experiment._collate_fn_graph,
                 annealing=self.annealing,
-                train_class=self.train
+                train_class=self.train,
+                update_representation_interval=update_representation_interval
             )
 
             # run experiment
@@ -406,7 +408,6 @@ class BeliefActivePlot():
 
         # convert from list of dicts to dict of lists
         beliefs = {'prospective': defaultdict(list), 'retrospective': defaultdict(list)}
-        print(round_beliefs[-1])
         for round_record in round_beliefs:
             for m in methods:
                 for direction in beliefs.keys():
@@ -640,8 +641,7 @@ if __name__ == '__main__':
 
 
     parser.add_argument('--data', type=str, default='esol')
-    parser.add_argument('--sample_frac', type=float, default=0.1, help="Proportion of dataset to read in"
-    )
+    parser.add_argument('--sample_frac', type=float, default=0.1, help="Proportion of dataset to read in")
     parser.add_argument('--acquisition', type=str, default='ExpectedImprovement')
     parser.add_argument('--num_samples', type=int, default=1000)
     parser.add_argument('--q', type=int, default=1)
@@ -670,6 +670,12 @@ if __name__ == '__main__':
         type=int,
         default=100,
         help="Number of inducing points to use for variational inference"
+    )
+    parser.add_argument(
+        '--update_representation_interval',
+        type=int,
+        default=1,
+        help="Number of rounds before training the network representation"
     )
 
 

@@ -246,4 +246,3 @@ class Net(BaseNet):
             sampler.sample_params()
         
         return self._condition(h, *args, **kwargs)
-

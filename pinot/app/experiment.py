@@ -412,7 +412,7 @@ class Train:
                         annealing=self.annealing
                     )
                 )
-                loss.backward()
+                loss.backward(retain_graph=True)
                 self.loss_temp = loss.detach().cpu()
                 return loss
 
