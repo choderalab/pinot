@@ -246,21 +246,17 @@ def split(ds, partition):
 
 def batch(ds, batch_size, seed=2666, shuffle=False, partial_batch=False):
     """Batch graphs and values after shuffling.
-
     Parameters
     ----------
     ds :
-
     batch_size :
         
     seed :
          (Default value = 2666)
     shuffle :
          (Default value = False)
-
     Returns
     -------
-
     """
     # get the numebr of data
     n_data_points = len(ds)
@@ -296,6 +292,7 @@ def batch(ds, batch_size, seed=2666, shuffle=False, partial_batch=False):
         )
 
     return list(zip(gs_batched, ys_batched))
+
 
 
 def prepare_semi_supervised_data(unlabelled_data, labelled_data, seed=2666):

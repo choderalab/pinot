@@ -412,7 +412,7 @@ class Train:
                         annealing=self.annealing
                     )
                 )
-                loss.backward(retain_graph=True)
+                loss.backward() # retain_graph=True
                 self.loss_temp = loss.detach().cpu()
                 return loss
 
@@ -442,19 +442,19 @@ class Train:
             if self.lr_scheduler:
                 self.lr_scheduler.step()
 
-            if epoch_idx % self.record_interval == 0:
+            # if epoch_idx % self.record_interval == 0:
                 
-                self.states[epoch_idx] = copy.deepcopy(self.net.state_dict())
+            #     self.states[epoch_idx] = copy.deepcopy(self.net.state_dict())
 
-                if logging:
-                    logging.debug(f'Epoch {epoch_idx} average loss: {mean_loss}')
+            #     if logging:
+            #         logging.debug(f'Epoch {epoch_idx} average loss: {mean_loss}')
 
-                # TODO: fix this hack
-                if self.state_save_file:
-                    pickle.dump(
-                        self.states,
-                        open(f'./out/dict_state_{self.state_save_file}.p', 'wb')
-                    )
+            #     # TODO: fix this hack
+            #     if self.state_save_file:
+            #         pickle.dump(
+            #             self.states,
+            #             open(f'./out/dict_state_{self.state_save_file}.p', 'wb')
+            #         )
 
 
         self.states["final"] = copy.deepcopy(self.net.state_dict())

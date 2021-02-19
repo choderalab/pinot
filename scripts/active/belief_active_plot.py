@@ -255,10 +255,13 @@ class BeliefActivePlot():
         """
         Performs experiment loops.
         """
-        ds = self.generate_data()
+        ds, ds_dates = self.generate_data()
 
         # get results for each trial
-        final_results, prospective_beliefs, retrospective_beliefs = self.run_trials(ds)
+        final_results, prospective_beliefs, retrospective_beliefs = self.run_trials(
+            ds,
+            ds_dates=ds_dates
+        )
 
         # create pandas dataframe to play nice with seaborn
         best_df = pd.DataFrame(final_results)
@@ -268,7 +271,7 @@ class BeliefActivePlot():
         return best_df, pro_df, retro_df
 
 
-    def run_trials(self, ds):
+    def run_trials(self, ds, ds_dates=None):
         """
         Plot the results of an active training loop
 
@@ -286,9 +289,6 @@ class BeliefActivePlot():
         -------
         results
         """
-        # get the data
-        ds, ds_dates = self.generate_data()
-
         # prepare autonomous acquisition functions
         acq_fn = self.get_acquisition_fn()
         
@@ -316,8 +316,8 @@ class BeliefActivePlot():
             self.bo = pinot.active.experiment.BayesOptExperiment(
                 net=net,
                 data=ds,
+                utility_func=acq_fn,
                 optimizer=optimizer,
-                acquisition=acq_fn,
                 num_epochs=self.num_epochs,
                 early_stopping=self.early_stopping,
                 q=self.q,
@@ -326,11 +326,11 @@ class BeliefActivePlot():
                 collate_fn=pinot.active.experiment._collate_fn_graph,
                 annealing=self.annealing,
                 train_class=self.train,
-                update_representation_interval=update_representation_interval
+                update_representation_interval=self.update_representation_interval
             )
 
             # run experiment
-            acquisitions = self.bo.run(num_rounds=self.num_rounds)
+            acquisitions = self.bo.run(net, ds, num_rounds=self.num_rounds)
 
             # process acquisitions into pandas-friendly format
             self.results = self.process_results(acquisitions, ds, i)
