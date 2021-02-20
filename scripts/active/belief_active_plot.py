@@ -335,20 +335,20 @@ class BeliefActivePlot():
             # process acquisitions into pandas-friendly format
             self.results = self.process_results(acquisitions, ds, i)
             
-            # get beliefs
-            if self.belief_functions:
+            # # get beliefs
+            # if self.belief_functions:
 
-                self.beliefs = self.get_beliefs(net, ds, acquisitions, methods=self.belief_functions)
+            #     self.beliefs = self.get_beliefs(net, ds, acquisitions, methods=self.belief_functions)
 
-                # generate long-form records for pandas
-                self.prospective_beliefs.extend(
-                    self.process_beliefs(self.beliefs['prospective'], i)
-                )
+            #     # generate long-form records for pandas
+            #     self.prospective_beliefs.extend(
+            #         self.process_beliefs(self.beliefs['prospective'], i)
+            #     )
 
-                # generate long-form records for pandas
-                self.retrospective_beliefs.extend(
-                    self.process_beliefs(self.beliefs['retrospective'], i)
-                )
+            #     # generate long-form records for pandas
+            #     self.retrospective_beliefs.extend(
+            #         self.process_beliefs(self.beliefs['retrospective'], i)
+            #     )
 
         return self.results
 
@@ -507,20 +507,25 @@ class BeliefActivePlot():
         return self.results
 
 
-    def generate_data(self):
+    def generate_data(self, filter_outliers=True):
         """ Generate data, put on GPU if possible.
         """
         # Load data
         data_func = getattr(pinot.data, self.data)
         if self.sample_frac != 1.0:
-            ds = data_func(sample_frac=self.sample_frac)
+            data = data_func(sample_frac=self.sample_frac)
         else:
-            ds = data_func()
+            data = data_func()
 
         # Move data to GPU
-        ds = ds.to('cuda:0')
-                
-        return ds
+        data = data.to('cuda:0')
+
+        # filter outliers
+        if filter_outliers:
+            outlier_threshold = -2
+            data.ds = list(filter(lambda x: x[1] > outlier_threshold, data))
+
+        return data
 
 
     def gather_acquisitions(self, ds_dates):
@@ -697,6 +702,7 @@ if __name__ == '__main__':
         num_trials=args.num_trials,
         num_rounds=args.num_rounds,
         num_epochs=args.num_epochs,
+        update_representation_interval=10,
     )
 
     # run experiment
