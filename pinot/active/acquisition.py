@@ -127,7 +127,8 @@ def thompson_sampling(net, inputs, y_best=0.0, q=1, unique=True):
         The indices corresponding to pending points.
     """
     # obtain predictive posterior
-    distribution = _independent(net.condition(inputs))
+    with torch.no_grad():
+        distribution = _independent_batch(net, inputs)
     
     # obtain samples from posterior
     thetas = distribution.sample((q,))
