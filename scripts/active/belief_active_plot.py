@@ -709,7 +709,7 @@ if __name__ == '__main__':
     best_df = plot.generate()
 
     # write to disk
-    # beliefs_string = '_'.join(args.beliefs)
+    beliefs_string = '_'.join(args.beliefs)
     filename = f'{args.net}_{args.optimizer}_{args.data}_num_epochs{args.num_epochs}_{args.acquisition}_q{args.q}_beliefs{beliefs_string}_{args.index}.csv'
     
     best_df.to_csv(f'{args.output}/best_{filename}')
