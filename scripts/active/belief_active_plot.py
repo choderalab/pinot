@@ -252,20 +252,23 @@ class BeliefActivePlot():
         """
         Performs experiment loops.
         """
-        ds, ds_dates = self.generate_data()
+        ds = self.generate_data()
 
         # get results for each trial
-        final_results, prospective_beliefs, retrospective_beliefs = self.run_trials(
+        final_results = self.run_trials(
             ds,
-            ds_dates=ds_dates
         )
 
         # create pandas dataframe to play nice with seaborn
         best_df = pd.DataFrame(final_results)
-        pro_df = pd.DataFrame(prospective_beliefs)
-        retro_df = pd.DataFrame(retrospective_beliefs)
 
-        return best_df, pro_df, retro_df
+        # if beliefs:
+        #     prospective_beliefs, retrospective_beliefs = beliefs
+        #     pro_df = pd.DataFrame(prospective_beliefs)
+        #     retro_df = pd.DataFrame(retrospective_beliefs)
+        #     beliefs_df = [pro_df, retro_df]
+
+        return best_df
 
 
     def run_trials(self, ds, ds_dates=None):
@@ -347,7 +350,7 @@ class BeliefActivePlot():
                     self.process_beliefs(self.beliefs['retrospective'], i)
                 )
 
-        return self.results, self.prospective_beliefs, self.retrospective_beliefs
+        return self.results
 
 
     def get_beliefs(self, net, ds, acquisitions, methods=['ThompsonSampling']):
@@ -697,12 +700,12 @@ if __name__ == '__main__':
     )
 
     # run experiment
-    best_df, pro_ts_df, retro_ts_df = plot.generate()
+    best_df = plot.generate()
 
     # write to disk
-    beliefs_string = '_'.join(args.beliefs)
+    # beliefs_string = '_'.join(args.beliefs)
     filename = f'{args.net}_{args.optimizer}_{args.data}_num_epochs{args.num_epochs}_{args.acquisition}_q{args.q}_beliefs{beliefs_string}_{args.index}.csv'
     
     best_df.to_csv(f'{args.output}/best_{filename}')
-    pro_ts_df.to_csv(f'{args.output}/pro_{filename}')
-    retro_ts_df.to_csv(f'{args.output}/retro_{filename}')
+    # pro_ts_df.to_csv(f'{args.output}/pro_{filename}')
+    # retro_ts_df.to_csv(f'{args.output}/retro_{filename}')

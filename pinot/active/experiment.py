@@ -315,7 +315,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
         else:
 
             # no reset, shallow training
-            num_epochs = 2
+            num_epochs = 40
             optimizer = self.optimizer_output_regressor
             qsar_model = net.output_regressor
 
