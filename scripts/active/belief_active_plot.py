@@ -14,7 +14,7 @@ import pandas as pd
 import pinot
 from pinot.generative import SemiSupervisedNet
 from pinot.metrics import _independent
-from pinot.active.acquisition import thompson_sampling, _pi, _ei_analytical, _ucb
+from pinot.active.acquisition import _independent_batch, thompson_sampling, _pi, _ei_analytical, _ucb
 from pinot.active.biophysical_acquisition import (biophysical_thompson_sampling,
                                                   _sample_and_marginalize_delta_G)
 
@@ -24,11 +24,8 @@ from pinot.active.biophysical_acquisition import (biophysical_thompson_sampling,
 def _get_thompson_values(net, data, q=1):
     """ Gets the value associated with the Thompson Samples.
     """
-    # unpack data
-    gs, _ = data
-
     # get predictive posterior
-    distribution = _independent(net.condition(gs))
+    distribution = _independent_batch(net, data)
     
     # obtain samples from posterior
     thetas = distribution.sample((q,)).detach()
@@ -110,7 +107,7 @@ def thompson_sample(net, data, unseen, num_samples=1, **kwargs):
     if unseen:
 
         # prospective evaluates only unseen data
-        unseen_data = pinot.active.experiment._slice_fn_tuple(data, unseen)
+        unseen_data = data[unseen]
         ts_values, ts_indices = _ts(
             net,
             unseen_data,
@@ -379,7 +376,7 @@ class BeliefActivePlot():
         """        
         # loop through rounds
         round_beliefs = []
-        for idx, state in self.bo.states.items():
+        for idx, state in self.bo.net_params.items():
 
             # unpack acquisitions
             seen, unseen = acquisitions[idx]
@@ -480,7 +477,7 @@ class BeliefActivePlot():
             Processed data
         """
         # unpack data
-        gs, ys = ds
+        ys = torch.stack([d[1] for d in ds])
 
         # for acquisitions each round
         for round_, acquisition in acquisitions.items():
@@ -517,22 +514,10 @@ class BeliefActivePlot():
         else:
             ds = data_func()
 
-        # Limit to first two fields of tuple
-        ds_data = [(d[0], d[1]) for d in ds]
-        
-        # Gather dates if available
-        if len(ds[0]) > 2:
-            ds_dates = [d[2] for d in ds]
-        else:
-            ds_dates = []
-
-        # Batch data
-        ds_data = pinot.data.utils.batch(ds_data, len(ds), seed=None)
-        
         # Move data to GPU
-        ds_data = [tuple([i.to(self.device) for i in ds_data[0]])]
-        
-        return ds_data[0], ds_dates
+        ds = ds.to('cuda:0')
+                
+        return ds
 
 
     def gather_acquisitions(self, ds_dates):

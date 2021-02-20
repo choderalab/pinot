@@ -258,7 +258,40 @@ def batch(ds, batch_size, seed=2666, shuffle=False, partial_batch=False):
     Returns
     -------
     """
-    # get the numebr of data
+    def _batch_graphs(graphs, batch_size=0):
+        """ Converts list of graphs into list of DGLHeteroGraph batches """
+        n_graphs = len(graphs)
+        if not batch_size:
+            batch_size = n_graphs
+        n_batches = (n_graphs // batch_size)
+
+        graphs_batched = [
+            dgl.batch(
+                graphs[idx * batch_size : (idx + 1) * batch_size]
+            ) for idx in range(n_batches)
+        ]
+        return graphs_batched
+
+    def _batch_tensors(tensors, batch_size=0):
+        """ Converts list of graphs into list of tensor batches """
+        n_tensors = len(tensors)
+        if not batch_size:
+            batch_size = n_tensors
+        n_batches = (n_tensors // batch_size)
+
+        tensors_batched = [
+            torch.stack(
+                tensors[idx * batch_size : (idx + 1) * batch_size],
+                dim=0
+            )
+            for idx in range(n_batches)
+        ]
+
+        return tensors_batched
+
+
+    # get the number of data
+    is_graph = isinstance(ds[0][0], dgl.DGLHeteroGraph)
     n_data_points = len(ds)
     n_batches = n_data_points // batch_size  # drop the rest
 
@@ -266,32 +299,31 @@ def batch(ds, batch_size, seed=2666, shuffle=False, partial_batch=False):
         random.seed(seed)
         random.shuffle(ds)
 
-    gs = []
-    ys = []
+    inputs = []
+    outputs = []
     for d in ds:
-        gs.extend(dgl.unbatch(d[0]))
-        ys.extend(list(d[1]))
-    ys = [y.unsqueeze(0) for y in ys]
+        
+        in_, out = d
+        in_unbatch = dgl.unbatch(in_) if is_graph else list(in_)
+        out_unbatch = list(out)
+        inputs.extend(in_unbatch)
+        outputs.extend(out_unbatch)
 
-    gs_batched = [
-        dgl.batch(gs[idx * batch_size : (idx + 1) * batch_size])
-        for idx in range(n_batches)
-    ]
+    outputs = [o.unsqueeze(0) for o in outputs]
 
-    ys_batched = [
-        torch.stack(ys[idx * batch_size : (idx + 1) * batch_size], dim=0)
-        for idx in range(n_batches)
-    ]
+    _collate_fn_input = _batch_graphs if is_graph else _batch_tensors
+    inputs_batched = _collate_fn_input(inputs, batch_size)
+    outputs_batched = _batch_tensors(outputs, batch_size)
 
     if partial_batch and n_data_points % batch_size != 0:
-        gs_batched.append(
-            dgl.batch(gs[(n_batches) * batch_size : ])
+        inputs_batched.extend(
+            _collate_fn_input(inputs[(n_batches) * batch_size : ])
         )
-        ys_batched.append(
-            torch.stack(ys[(n_batches) * batch_size : ], dim=0)
+        outputs_batched.append(
+            torch.stack(outputs[(n_batches) * batch_size : ], dim=0)
         )
 
-    return list(zip(gs_batched, ys_batched))
+    return list(zip(inputs_batched, outputs_batched))
 
 
 

@@ -12,42 +12,21 @@ from pinot.metrics import _independent
 
 import torch
 
-def _batch_graphs(graphs, batch_size):
-    """ Converts single DGLHeterGraph into list of graphs. """
-    n_graphs = len(graphs)
-    partial_batch = n_graphs % batch_size != 0 # +1 if partial batches
-    n_batches = (n_graphs // batch_size) + int(partial_batch)
 
-    graphs_batched = [
-        dgl.batch(
-            graphs[idx * batch_size : (idx + 1) * batch_size]
-        ) for idx in range(n_batches)
-    ]
-    return graphs_batched
-
-def _get_num_obs(inputs):
-    """ Get number of observations in inputs. """
-    if isinstance(inputs, dgl.DGLHeteroGraph):
-        num_obs = inputs.batch_size
-    else:
-        num_obs = len(inputs)
-    return num_obs
-
-
-def _independent_batch(qsar_model, inputs, batch_size=512):
+def _independent_batch(qsar_model, candidate_data, batch_size=512):
     """ Infer distribution in batched fashion
     """
-    if isinstance(inputs, dgl.DGLHeteroGraph):
-        inputs_unbatch = dgl.unbatch(inputs)
-        input_batches = _batch_graphs(inputs_unbatch, batch_size)
-    else:
-        input_batches = inputs.split(batch_size)
+    candidate_data_batch = candidate_data.batch(
+        batch_size,
+        partial_batch=True
+    )
 
     locs, scales = [], []
-    for input_batch in input_batches:
-        distribution = qsar_model.condition(input_batch)
-        loc_batch = distribution.mean.flatten().cpu().detach()
-        scale_batch = distribution.variance.pow(0.5).flatten().cpu().detach()
+    for d in candidate_data_batch:
+        inputs, _ = d
+        distribution = qsar_model.condition(inputs)
+        loc_batch = distribution.mean.flatten().detach()
+        scale_batch = distribution.variance.pow(0.5).flatten().detach()
         locs.append(loc_batch)
         scales.append(scale_batch)
 
@@ -59,15 +38,12 @@ def _independent_batch(qsar_model, inputs, batch_size=512):
     return distribution
 
 
-def _get_utility(net, inputs, acq_func, max_batch_size=512, y_best=0.0):
+def _get_utility(net, candidate_data, acq_func, max_batch_size=512, y_best=0.0):
     """ Obtain distribution and utility from acquisition func.
     """
     # obtain predictive posterior
     with torch.no_grad():
-        if _get_num_obs(inputs) > max_batch_size:
-            distribution = _independent_batch(net, inputs)
-        else:
-            distribution = _independent(net.condition(inputs))
+        distribution = _independent_batch(net, candidate_data)
 
     # obtain utility from vanilla acquisition func
     utility = acq_func(distribution, y_best=y_best)

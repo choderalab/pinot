@@ -44,6 +44,10 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
             # return a Dataset object rather than list
             return self.__class__(ds=self.ds[idx])
 
+        elif isinstance(idx, list):
+            ds_idx = [self.ds[i] for i in idx]
+            return self.__class__(ds=ds_idx)
+
     def __iter__(self):
 
         # TODO:
@@ -110,6 +114,9 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
         return self.__class__(
             self.ds + x.ds
         )
+
+    def apply(self, func):
+        return self.__class__([func(d) for d in self.ds])
 
     def to(self, device):
         self.device = device

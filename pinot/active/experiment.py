@@ -248,10 +248,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
         # data
         self.data = data
         self.seen_index = []
-        if isinstance(data, tuple):
-            self.unseen_index = list(range(len(data[1])))
-        else:
-            self.unseen_index = list(range(len(data)))
+        self.unseen_index = list(range(len(data)))
         
         # acquisition
         self.utility_func = utility_func
@@ -259,7 +256,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
 
         # early stopping
         self.early_stopping = early_stopping
-        self.best_possible = torch.max(self.data[1])
+        self.best_possible = self.get_y_best(data, self.unseen_index)
 
         # bookkeeping
         self.workup = workup
@@ -293,12 +290,15 @@ class BayesOptExperiment(ActiveLearningExperiment):
         net,
         data,
         seen_index,
-        update_representation=False
+        update_representation=False,
+        batch_size=256
     ):
         """Train the model with new data."""
 
         # obtain seen data for training
-        train_data = self.slice_fn(data, seen_index)
+        train_data = data[seen_index].batch(
+            batch_size, partial_batch=True
+        )
 
         # optimize full net w/ graphs
         if update_representation:
@@ -324,7 +324,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
 
         tr = self.train_class(
             net=qsar_model,
-            data=[train_data],
+            data=train_data,
             optimizer=optimizer,
             n_epochs=num_epochs,
             annealing=self.annealing,
@@ -340,34 +340,28 @@ class BayesOptExperiment(ActiveLearningExperiment):
         return net
 
 
-    def get_y_best(self, data, seen_index):
-        """Update the internal data using old and new."""
+    def get_y_best(self, data, index):
+        """Get maximum value among an index over data."""
         
         # grab old data
-        seen_data = self.slice_fn(data, seen_index)
+        data_subset = data[index]
 
         # gather outputs
-        _, ys = seen_data
+        ys = [d[1] for d in data_subset]
 
         # find max output
-        y_best = torch.max(ys)
+        y_best = max(ys)
         
         return y_best
 
 
-    def prepare_inputs(self, net, data, update_representation=False):
-        """ Helper function for preparing inputs to BO loop
+    def get_hidden_inputs(self, net, data):
+        """ Helper function for getting hidden inputs if updating rep
         """
         # modify net or data if not updating representation
-        get_h = lambda g, y: (net.representation(g).detach(), y)
-        
-        if update_representation:
-            qsar_model = net
-            data_idx = data
-        else:
-            qsar_model = net.output_regressor
-            data_idx = [get_h(*d) for d in [data]][0]
-            
+        get_h = lambda x: (net.representation(x[0]).detach(), x[1])
+        qsar_model = net.output_regressor
+        data_idx = data.apply(get_h)
         return qsar_model, data_idx
 
 
@@ -384,14 +378,11 @@ class BayesOptExperiment(ActiveLearningExperiment):
         # set net to eval
         net.eval()
 
-        # split input target
-        inputs, ys = candidate_data
-
         # acquire no more points than are remaining
-        if self.q <= len(ys):
+        if self.q <= len(candidate_data):
 
             # acquire pending points
-            pending_pts = utility_func(net, inputs, q=q, y_best=y_best)
+            pending_pts = utility_func(net, candidate_data, q=q, y_best=y_best)
     
             # pop from the back so you don't disrupt the order
             pending_pts = pending_pts.sort(descending=True).values
@@ -399,7 +390,8 @@ class BayesOptExperiment(ActiveLearningExperiment):
         else:
 
             # set pending points to all remaining data
-            pending_pts = torch.range(len(ys)-1, 0, step=-1).long()
+            n_obs = len(candidate_data)
+            pending_pts = torch.range(n_obs-1, 0, step=-1).long()
 
         return pending_pts
 
@@ -425,7 +417,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
         else:
 
             # obtain unseen data for acquisitions
-            unseen_data = self.slice_fn(data, unseen_index)
+            unseen_data = data[unseen_index]
             
             # acquire pending points
             pending_indices = self._acquire(
@@ -482,9 +474,12 @@ class BayesOptExperiment(ActiveLearningExperiment):
             q = self.q
         seen_index, unseen_index = self.seen_index, self.unseen_index
 
-        # initialize y_best
-        idx = 0
+        # initialize variables
         y_best = -float("Inf")
+        qsar_model_idx = net
+        data_idx = data
+        
+        idx = 0
         while idx < num_rounds and unseen_index:
 
             print(idx)
@@ -494,12 +489,9 @@ class BayesOptExperiment(ActiveLearningExperiment):
                 break
 
             # train full net / representation?
-            update_representation = idx % self.update_representation_interval == 0
-
-            # prepare BO inputs depending on round
-            qsar_model_idx, data_idx = self.prepare_inputs(
-                net, data, update_representation=update_representation
-            )
+            interval_count = idx % self.update_representation_interval
+            update_representation = interval_count == 0
+            pre_update = interval_count == (self.update_representation_interval - 1)
 
             # use random policy in the first round
             if idx == 0:
@@ -520,7 +512,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
             )
 
             # record net states before training
-            self.net_params[idx] = copy.deepcopy(qsar_model_idx.state_dict())
+            self.net_params[idx] = copy.deepcopy(net.state_dict())
 
             # train
             net = self.train_round(
@@ -529,6 +521,12 @@ class BayesOptExperiment(ActiveLearningExperiment):
                 seen_index,
                 update_representation=update_representation
             )
+
+            # get hidden depending on round
+            if update_representation:
+                qsar_model_idx, data_idx = self.get_hidden_inputs(net, data)
+            elif pre_update:
+                qsar_model_idx, data_idx = net, data
 
             # record acquisitions + bookkeeping
             y_best = self.get_y_best(data_idx, seen_index)
