@@ -63,3 +63,14 @@ moonshot_multi = lambda: datasets.Dataset().from_csv(
     y_cols=[11, 12, 13, 14, 15, 16],
     scale=0.01
 )
+
+moonshot_pic50 = lambda seed=None, shuffle=True: datasets.Dataset().from_csv(
+    os.path.dirname(utils.__file__) + "/moonshot_IC50_filt.csv",
+    smiles_col=3,
+    y_cols=[-1],
+    delimiter=',',
+    dtype={"Smiles": str, "Standard Value": np.float32},
+    header=1,
+    seed=seed,
+    shuffle=shuffle,
+)
