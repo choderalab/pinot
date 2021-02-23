@@ -201,7 +201,7 @@ def test(
         results[metric.__name__] = {}
 
     # make g, y into single batches
-    g, y = data.batch(len(data))[0]
+    y = [d[1] for d in data]
     for state_name, state in states.items():  # loop through states
         
         net.load_state_dict(state)
@@ -533,7 +533,7 @@ class Test:
             results[metric.__name__] = {}
 
         # make g, y into single batches
-        g, y = self.data.batch(len(self.data))[0]
+        # g, y = self.data.batch(len(self.data))[0]
         for state_name, state in self.states.items():  # loop through states
             
             self.net.load_state_dict(state)
