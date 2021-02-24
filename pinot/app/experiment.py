@@ -201,7 +201,7 @@ def test(
         results[metric.__name__] = {}
 
     # make g, y into single batches
-    y = [d[1] for d in data]
+    y = torch.stack([d[1] for d in data]).cpu()
     for state_name, state in states.items():  # loop through states
         
         net.load_state_dict(state)
@@ -213,7 +213,6 @@ def test(
         
         # compute conditional distribution in batched fashion
         distribution = compute_conditional(net, data, batch_size)
-        y = y.detach().cpu().reshape(-1, 1)
         for metric in metrics:  # loop through the metrics
             results[metric.__name__][state_name] = (
                 metric(
