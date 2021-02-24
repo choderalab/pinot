@@ -201,7 +201,7 @@ def test(
         results[metric.__name__] = {}
 
     # make g, y into single batches
-    y = torch.tensor([d[1] for d in data]).cpu().reshape(-1, 1)
+    y = torch.cat([d[1] for d in data]).cpu().reshape(-1, 1)
     for state_name, state in states.items():  # loop through states
         
         net.load_state_dict(state)
