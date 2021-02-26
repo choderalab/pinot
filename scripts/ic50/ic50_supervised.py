@@ -28,13 +28,14 @@ def run(args):
     n_layers = len(args.architecture) // 4
     n_units = args.architecture[1]
     activation = args.architecture[3]
+    architecture_str = f'{n_layers}x_{n_units}x_{layer_type}_{activation}'
 
     seed = args.seed if args.fix_seed else None
     savefile = (f'reg={args.regressor_type}_a={n_layers}x_{n_units}x'
                 f'_{layer_type}_{activation}_n={args.n_epochs}_b={args.batch_size}'
                 f'_wd={args.weight_decay}_lsp={args.label_split[0]}_frac={args.sample_frac}'
                 f'_anneal={args.annealing}_induce={args.n_inducing_points}_normalize={args.normalize}'
-                f'_{args.index}_seed={seed}')
+                f'_{args.index}_seed={seed}_pretrainepoch={args.pretrain_epoch}_pretrainfrac={args.pretrain_frac}')
 
     print(savefile)
     logging.debug("savefile = {}".format(savefile))
@@ -74,13 +75,30 @@ def run(args):
     #############################################################################
 
 
-    def get_net_and_optimizer(args):
+    def get_net_and_optimizer(args, architecture_str):
         """
 
         """
+        def _get_pretrain_path(args, architecture_str):
+            pretrain_dir = '/data/chodera/retchinm/hts_2_21_2021/'
+            prefix = f'dict_state_reg=vgp_a={architecture_str}_n=350_b=32_wd=0.01_lsp=4_frac=['
+            postfix = ']_anneal=1.0_induce=80_normalize=0_1_seed=0.p'
+            pretrain_path = pretrain_dir + prefix + args.pretrain_frac + postfix
+            return pretrain_path
+        
         representation = pinot.representation.sequential.SequentialMix(
             args.architecture,
         )
+        
+        if args.pretrain:
+            pretrain_path = _get_pretrain_path(args, architecture_str)
+            states = pickle.load(open(pretrain_path))
+            states_idx = states[args.pretrain_epoch]
+            states_idx_representation = {
+                k: v for k, v in states_idx.items()
+                if 'representation' in k
+            }
+            representation.load(states_idx_representation)
 
         if args.regressor_type == "gp":
             output_regressor = pinot.regressors.ExactGaussianProcessRegressor
@@ -95,15 +113,21 @@ def run(args):
             output_regressor_class=output_regressor,
             n_inducing_points=args.n_inducing_points
         )
-        optimizer = pinot.app.utils.optimizer_translation(
+        optimizer_init = pinot.app.utils.optimizer_translation(
             opt_string=args.optimizer,
             lr=args.lr,
             weight_decay=args.weight_decay,
         )
         net.to(device)
-        return net, optimizer(net)
 
-    supNet, optimizer = get_net_and_optimizer(args)
+        if args.pretrain:
+            optimizer = optimizer_init(net.output_regressor)
+        else:
+            optimizer = optimizer_init(net)
+        return net, optimizer
+
+
+    supNet, optimizer = get_net_and_optimizer(args, architecture_str)
 
     start = time.time()
     
@@ -281,6 +305,24 @@ if __name__ == '__main__':
         type=int,
         default=0,
         help="Setting the seed for random sampling"
+    )
+    parser.add_argument(
+        '--pretrain_frac',
+        type=float,
+        default=0.1,
+        help="Which of pretrained models to use by fraction of dataset"
+    )
+    parser.add_argument(
+        '--pretrain_path',
+        type=str,
+        default="/data/chodera/retchinm/hts_2_21_2021/",
+        help="Path where the pretrained model states are stored"
+    )
+    parser.add_argument(
+        '--pretrain_epoch',
+        type=int,
+        default=349,
+        help="The epoch of training curve to use for pretrained representation"
     )
 
 
