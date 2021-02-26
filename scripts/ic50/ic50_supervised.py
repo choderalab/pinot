@@ -90,7 +90,7 @@ def run(args):
             args.architecture,
         )
         
-        if args.pretrain:
+        if args.pretrain_epoch != -1:
             pretrain_path = _get_pretrain_path(args, architecture_str)
             states = pickle.load(open(pretrain_path))
             states_idx = states[args.pretrain_epoch]
@@ -321,8 +321,8 @@ if __name__ == '__main__':
     parser.add_argument(
         '--pretrain_epoch',
         type=int,
-        default=349,
-        help="The epoch of training curve to use for pretrained representation"
+        default=-1,
+        help="Epoch of training curve for pretrained representation; -1 means no pretraining"
     )
 
 
