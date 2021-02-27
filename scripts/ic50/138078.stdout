@@ -1,0 +1,122 @@
+Sender: LSF System <lsfadmin@lx04>
+Subject: Job 138078: <#BSUB -o %J.stdout;for units in 32;do;    for unit_type in "GraphSAGE";    do;        for n_layers in 3 4;        do;            layer="$unit_type $units activation tanh ";            architecture=$(for a in `eval echo {1..$n_layers}`; do echo $layer; done);            for inducing_pt in 80;            do;                for annealing in 1.0;                do;                    for regressor in 'vgp';                    do;			for normalize in 0;			do;			    for seed in 0;			    do;			        for pretrain_epoch in -1 20 80 160 280 349;				do;				    for pretrain_frac in 0.1 0.2 0.4 1.0;				    do;                            		    name="${regressor}_${n_layers}_${unit_type}_${units}_${sample_frac}_${annealing}_${inducing_pt}_${normalize}_${seed}";                            		    bsub -q gpuqueue -n 2 -gpu "num=1:j_exclusive=yes" -R "rusage[mem=8] span[hosts=1]" -W 1:30 -o "logs_$name.stdout" -eo "logs_$name.stderr" \;			    		    python3 ic50_supervised.py --data moonshot_pic50 --n_epochs 350 --cuda --regressor_type $regressor --architecture $architecture \;				            --log "${name}.logs" --record_interval 50 --n_inducing_points $inducing_pt --annealing $annealing \;			    		    --normalize $normalize --time_limit "1:00" --filter_outliers --fix_seed --seed $seed --output "/data/chodera/retchinm/pIC50" \;					    --pretrain_epoch $pretrain_epoch --pretrain_frac $pretrain_frac;			    	    done;				done;			    done;	    	        done;                    done;                done;            done;        done;    done;done> in cluster <lila> Done
+
+Job <#BSUB -o %J.stdout;for units in 32;do;    for unit_type in "GraphSAGE";    do;        for n_layers in 3 4;        do;            layer="$unit_type $units activation tanh ";            architecture=$(for a in `eval echo {1..$n_layers}`; do echo $layer; done);            for inducing_pt in 80;            do;                for annealing in 1.0;                do;                    for regressor in 'vgp';                    do;			for normalize in 0;			do;			    for seed in 0;			    do;			        for pretrain_epoch in -1 20 80 160 280 349;				do;				    for pretrain_frac in 0.1 0.2 0.4 1.0;				    do;                            		    name="${regressor}_${n_layers}_${unit_type}_${units}_${sample_frac}_${annealing}_${inducing_pt}_${normalize}_${seed}";                            		    bsub -q gpuqueue -n 2 -gpu "num=1:j_exclusive=yes" -R "rusage[mem=8] span[hosts=1]" -W 1:30 -o "logs_$name.stdout" -eo "logs_$name.stderr" \;			    		    python3 ic50_supervised.py --data moonshot_pic50 --n_epochs 350 --cuda --regressor_type $regressor --architecture $architecture \;				            --log "${name}.logs" --record_interval 50 --n_inducing_points $inducing_pt --annealing $annealing \;			    		    --normalize $normalize --time_limit "1:00" --filter_outliers --fix_seed --seed $seed --output "/data/chodera/retchinm/pIC50" \;					    --pretrain_epoch $pretrain_epoch --pretrain_frac $pretrain_frac;			    	    done;				done;			    done;	    	        done;                    done;                done;            done;        done;    done;done> was submitted from host <lilac> by user <retchinm> in cluster <lila> at Fri Feb 26 22:01:53 2021
+Job was executed on host(s) <lx04>, in queue <cpuqueue>, as user <retchinm> in cluster <lila> at Fri Feb 26 22:01:54 2021
+</home/retchinm> was used as the home directory.
+</home/retchinm/pinot/scripts/ic50> was used as the working directory.
+Started at Fri Feb 26 22:01:54 2021
+Terminated at Fri Feb 26 22:01:57 2021
+Results reported at Fri Feb 26 22:01:57 2021
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#BSUB -o %J.stdout
+for units in 32
+do
+    for unit_type in "GraphSAGE"
+    do
+        for n_layers in 3 4
+        do
+            layer="$unit_type $units activation tanh "
+            architecture=$(for a in `eval echo {1..$n_layers}`; do echo $layer; done)
+            for inducing_pt in 80
+            do
+                for annealing in 1.0
+                do
+                    for regressor in 'vgp'
+                    do
+			for normalize in 0
+			do
+			    for seed in 0
+			    do
+			        for pretrain_epoch in -1 20 80 160 280 349
+				do
+				    for pretrain_frac in 0.1 0.2 0.4 1.0
+				    do
+                            		    name="${regressor}_${n_layers}_${unit_type}_${units}_${sample_frac}_${annealing}_${inducing_pt}_${normalize}_${seed}"
+                            		    bsub -q gpuqueue -n 2 -gpu "num=1:j_exclusive=yes" -R "rusage[mem=8] span[hosts=1]" -W 1:30 -o "logs_$name.stdout" -eo "logs_$name.stderr" \
+			    		    python3 ic50_supervised.py --data moonshot_pic50 --n_epochs 350 --cuda --regressor_type $regressor --architecture $architecture \
+				            --log "${name}.logs" --record_interval 50 --n_inducing_points $inducing_pt --annealing $annealing \
+			    		    --normalize $normalize --time_limit "1:00" --filter_outliers --fix_seed --seed $seed --output "/data/chodera/retchinm/pIC50" \
+					    --pretrain_epoch $pretrain_epoch --pretrain_frac $pretrain_frac
+			    	    done
+				done
+			    done
+	    	        done
+                    done
+                done
+            done
+        done
+    done
+done
+
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   1.63 sec.
+    Max Memory :                                 -
+    Average Memory :                             -
+    Total Requested Memory :                     2.00 GB
+    Delta Memory :                               -
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                5
+    Run time :                                   4 sec.
+    Turnaround time :                            4 sec.
+
+The output (if any) follows:
+
+Job <138079> is submitted to queue <gpuqueue>.
+Job <138080> is submitted to queue <gpuqueue>.
+Job <138081> is submitted to queue <gpuqueue>.
+Job <138082> is submitted to queue <gpuqueue>.
+Job <138083> is submitted to queue <gpuqueue>.
+Job <138084> is submitted to queue <gpuqueue>.
+Job <138085> is submitted to queue <gpuqueue>.
+Job <138086> is submitted to queue <gpuqueue>.
+Job <138087> is submitted to queue <gpuqueue>.
+Job <138088> is submitted to queue <gpuqueue>.
+Job <138089> is submitted to queue <gpuqueue>.
+Job <138090> is submitted to queue <gpuqueue>.
+Job <138091> is submitted to queue <gpuqueue>.
+Job <138092> is submitted to queue <gpuqueue>.
+Job <138093> is submitted to queue <gpuqueue>.
+Job <138094> is submitted to queue <gpuqueue>.
+Job <138095> is submitted to queue <gpuqueue>.
+Job <138096> is submitted to queue <gpuqueue>.
+Job <138097> is submitted to queue <gpuqueue>.
+Job <138098> is submitted to queue <gpuqueue>.
+Job <138099> is submitted to queue <gpuqueue>.
+Job <138100> is submitted to queue <gpuqueue>.
+Job <138101> is submitted to queue <gpuqueue>.
+Job <138102> is submitted to queue <gpuqueue>.
+Job <138103> is submitted to queue <gpuqueue>.
+Job <138104> is submitted to queue <gpuqueue>.
+Job <138105> is submitted to queue <gpuqueue>.
+Job <138106> is submitted to queue <gpuqueue>.
+Job <138107> is submitted to queue <gpuqueue>.
+Job <138108> is submitted to queue <gpuqueue>.
+Job <138109> is submitted to queue <gpuqueue>.
+Job <138110> is submitted to queue <gpuqueue>.
+Job <138111> is submitted to queue <gpuqueue>.
+Job <138112> is submitted to queue <gpuqueue>.
+Job <138113> is submitted to queue <gpuqueue>.
+Job <138114> is submitted to queue <gpuqueue>.
+Job <138115> is submitted to queue <gpuqueue>.
+Job <138116> is submitted to queue <gpuqueue>.
+Job <138117> is submitted to queue <gpuqueue>.
+Job <138118> is submitted to queue <gpuqueue>.
+Job <138119> is submitted to queue <gpuqueue>.
+Job <138120> is submitted to queue <gpuqueue>.
+Job <138121> is submitted to queue <gpuqueue>.
+Job <138122> is submitted to queue <gpuqueue>.
+Job <138123> is submitted to queue <gpuqueue>.
+Job <138124> is submitted to queue <gpuqueue>.
+Job <138125> is submitted to queue <gpuqueue>.
+Job <138126> is submitted to queue <gpuqueue>.

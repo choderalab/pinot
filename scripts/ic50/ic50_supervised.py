@@ -248,7 +248,7 @@ if __name__ == '__main__':
         '--sample_frac',
         nargs="+",
         type=float,
-        default=0.005, # 0.1
+        default=1.0, # 0.1
         help="Proportion of dataset to use"
     )
 
