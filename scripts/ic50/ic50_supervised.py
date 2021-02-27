@@ -83,23 +83,13 @@ def run(args):
             pretrain_dir = '/data/chodera/retchinm/hts_2_21_2021/'
             prefix = f'dict_state_reg=vgp_a={architecture_str}_n=350_b=32_wd=0.01_lsp=4_frac=['
             postfix = ']_anneal=1.0_induce=80_normalize=0_1_seed=0.p'
-            pretrain_path = pretrain_dir + prefix + args.pretrain_frac + postfix
+            pretrain_path = pretrain_dir + prefix + str(args.pretrain_frac) + postfix
             return pretrain_path
         
         representation = pinot.representation.sequential.SequentialMix(
             args.architecture,
         )
         
-        if args.pretrain_epoch != -1:
-            pretrain_path = _get_pretrain_path(args, architecture_str)
-            states = pickle.load(open(pretrain_path))
-            states_idx = states[args.pretrain_epoch]
-            states_idx_representation = {
-                k: v for k, v in states_idx.items()
-                if 'representation' in k
-            }
-            representation.load(states_idx_representation)
-
         if args.regressor_type == "gp":
             output_regressor = pinot.regressors.ExactGaussianProcessRegressor
         elif args.regressor_type == "nn":
@@ -113,6 +103,7 @@ def run(args):
             output_regressor_class=output_regressor,
             n_inducing_points=args.n_inducing_points
         )
+
         optimizer_init = pinot.app.utils.optimizer_translation(
             opt_string=args.optimizer,
             lr=args.lr,
@@ -120,10 +111,19 @@ def run(args):
         )
         net.to(device)
 
-        if args.pretrain:
+        if args.pretrain_epoch != -1:
+            pretrain_path = _get_pretrain_path(args, architecture_str)
+            states = pickle.load(open(pretrain_path, 'rb'))
+            states_idx = states[args.pretrain_epoch]
+            states_idx_representation = {
+                k: v for k, v in states_idx.items()
+                if 'representation' in k
+            }
+            net.representation.load(states_idx_representation)
             optimizer = optimizer_init(net.output_regressor)
         else:
             optimizer = optimizer_init(net)
+        
         return net, optimizer
 
 
