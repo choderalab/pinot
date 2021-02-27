@@ -119,7 +119,7 @@ def run(args):
                 k: v for k, v in states_idx.items()
                 if 'representation' in k
             }
-            net.representation.load(states_idx_representation)
+            net.representation.load_state_dict(states_idx_representation)
             optimizer = optimizer_init(net.output_regressor)
         else:
             optimizer = optimizer_init(net)
