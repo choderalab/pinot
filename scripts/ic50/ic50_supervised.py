@@ -116,7 +116,7 @@ def run(args):
             states = pickle.load(open(pretrain_path, 'rb'))
             states_idx = states[args.pretrain_epoch]
             states_idx_representation = {
-                k.replace('representation', ''): v
+                k.replace('representation.', ''): v
                 for k, v in states_idx.items()
                 if 'representation' in k
             }
