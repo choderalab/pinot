@@ -113,6 +113,7 @@ def run(args):
 
         if args.pretrain_epoch != -1:
             pretrain_path = _get_pretrain_path(args, architecture_str)
+            # look into torch.load and torch.dump
             states = pickle.load(open(pretrain_path, 'rb'))
             states_idx = states[args.pretrain_epoch]
             states_idx_representation = {
@@ -311,7 +312,7 @@ if __name__ == '__main__':
         '--pretrain_frac',
         type=float,
         default=0.1,
-        help="Which of pretrained models to use by fraction of dataset"
+        help="Which of pretrained models to use by fraction of HTS dataset trained"
     )
     parser.add_argument(
         '--pretrain_path',
