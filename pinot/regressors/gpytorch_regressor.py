@@ -7,7 +7,7 @@ from gpytorch.models import ApproximateGP
 
 
 class VariationalGP(ApproximateGP):
-    def __init__(self, in_features, num_data, inducing_points=None, num_inducing_points=100,
+    def __init__(self, in_features, num_data, inducing_points=None, n_inducing_points=100,
                  mean=None, covar=None, beta=1.0):
         """
         :param in_features: dimension of the input to GP layer
@@ -21,7 +21,7 @@ class VariationalGP(ApproximateGP):
         """
         if inducing_points is None:
             # Randomly initialize inducing points
-            inducing_points = torch.rand(num_inducing_points, in_features)
+            inducing_points = torch.rand(n_inducing_points, in_features)
 
         variational_distribution = CholeskyVariationalDistribution(
             inducing_points.size(-2)
@@ -45,7 +45,7 @@ class VariationalGP(ApproximateGP):
         self.num_data = num_data
         self.beta = beta
 
-    def forward(self, h):
+    def forward(self, h, **kwargs):
         """
         Computes the GP prior
         :param h:

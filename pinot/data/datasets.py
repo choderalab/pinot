@@ -2,8 +2,11 @@
 # IMPORTS
 # =============================================================================
 import pinot
-import numpy as np
 import dgl
+from dgl.data.utils import save_graphs
+from dgl.data.utils import load_graphs
+
+import numpy as np
 import pandas as pd
 import abc
 import torch
@@ -40,6 +43,10 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
         elif isinstance(idx, slice):  # implement slicing
             # return a Dataset object rather than list
             return self.__class__(ds=self.ds[idx])
+
+        elif isinstance(idx, list):
+            ds_idx = [self.ds[i] for i in idx]
+            return self.__class__(ds=ds_idx)
 
     def __iter__(self):
 
@@ -80,6 +87,7 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
 
     def save(self, path):
         """ Save dataset to path.
+
         Parameters
         ----------
         path : path-like object
@@ -107,12 +115,13 @@ class Dataset(abc.ABC, torch.utils.data.Dataset):
             self.ds + x.ds
         )
 
+    def apply(self, func):
+        return self.__class__([func(d) for d in self.ds])
+
     def to(self, device):
         self.device = device
         self.ds = [(g.to(device), y.to(device)) for (g,y) in self.ds]
         return self
-
-
 
 class AttributedDataset(Dataset):
     """ Dataset with attributes. """

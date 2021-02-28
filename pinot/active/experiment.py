@@ -6,6 +6,7 @@ import abc
 import dgl
 import copy
 import pinot
+from collections import OrderedDict
 from pinot.metrics import _independent
 
 # =============================================================================
@@ -123,10 +124,16 @@ def _slice_fn_tuple(x, idxs):
     `tensor_slices` : `torch.Tensor`
         Sliced and stacked tensor.
     """
-    gs, ys = x
-    graph_slices = _slice_fn_graph(gs, idxs)
-    tensor_slices = _slice_fn_tensor(ys, idxs)
-    return graph_slices, tensor_slices
+    inputs, outputs = x
+
+    if isinstance(inputs, dgl.DGLHeteroGraph):
+        _slice_fn_input = _slice_fn_graph
+    else:
+        _slice_fn_input = _slice_fn_tensor
+
+    input_slices = _slice_fn_input(inputs, idxs)
+    output_slices = _slice_fn_tensor(outputs, idxs)
+    return input_slices, output_slices
 
 
 # =============================================================================
@@ -139,12 +146,12 @@ class ActiveLearningExperiment(torch.nn.Module, abc.ABC):
         super(ActiveLearningExperiment, self).__init__()
 
     @abc.abstractmethod
-    def train(self, *args, **kwargs):
+    def train_round(self, *args, **kwargs):
         """ Train the model. """
         raise NotImplementedError
 
     @abc.abstractmethod
-    def acquire(self, *args, **kwargs):
+    def acquire_round(self, *args, **kwargs):
         """ Acquire new data points from pool or space. """
         raise NotImplementedError
 
@@ -174,6 +181,9 @@ class BayesOptExperiment(ActiveLearningExperiment):
 
     q : `int`
         Number of acquired candidates in each round.
+
+    acquisitions : `list`
+        Provided list of acquisitions to hard-code at each round.
 
     early_stopping : `bool`
         Whether the search ends when the best within the candidate pool
@@ -207,7 +217,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
         self,
         net,
         data,
-        acquisition,
+        utility_func,
         optimizer,
         num_epochs=100,
         q=1,
@@ -217,118 +227,162 @@ class BayesOptExperiment(ActiveLearningExperiment):
         slice_fn=_slice_fn_tensor,
         collate_fn=_collate_fn_tensor,
         net_state_dict=None,
+        acquisitions_preset=None,
+        annealing=1.0,
         train_class=pinot.app.experiment.Train,
+        update_representation_interval=20
     ):
 
         super(BayesOptExperiment, self).__init__()
 
         # model
         self.net = net
-        self.optimizer = optimizer
         self.num_epochs = num_epochs
+        
+        # make optimizers
+        self.optimizer = optimizer(net)
+        # TODO: check that it is actually only picking the relevant parameters
+        self.optimizer_output_regressor = optimizer(net.output_regressor)
+        self.update_representation_interval = update_representation_interval
 
         # data
         self.data = data
-        self.seen = []
-        if isinstance(data, tuple):
-            self.unseen = list(range(len(data[1])))
-            self.g_all = data[0]
-        else:
-            self.unseen = list(range(len(data)))
-            # If the data is DGLGraph
-            if type(data[0][0]) == dgl.DGLGraph:
-                self.g_all = dgl.batch([g for (g, y) in data])
-            # If numerical data
-            else:
-                self.g_all = torch.tensor([g for (g,y) in data])
-
+        self.seen_index = []
+        self.unseen_index = list(range(len(data)))
+        
         # acquisition
-        self.acquisition = acquisition
+        self.utility_func = utility_func
         self.q = q
 
         # early stopping
         self.early_stopping = early_stopping
-        self.best_possible = torch.max(self.data[1])
+        self.best_possible = self.get_y_best(data, self.unseen_index)
 
         # bookkeeping
         self.workup = workup
         self.slice_fn = slice_fn
         self.collate_fn = collate_fn
         self.net_state_dict = net_state_dict
+        self.annealing = annealing
         self.train_class = train_class
-        self.states = {}
-        self.acquisitions = []
+        self.net_params = {}
 
-    def reset_net(self):
+        if acquisitions_preset:
+            self.acquisitions = acquisitions_preset
+        else:
+            self.acquisitions = OrderedDict()
+
+
+    def reset_net(self, net):
         """Reset everything."""
         # TODO:
         # reset optimizer too
-        (p.reset_parameters() for _, p in self.net.named_children())
+        (p.reset_parameters() for _, p in net.named_children())
 
         if self.net_state_dict is not None:
-            self.net.load_state_dict(self.net_state_dict)
+            net.load_state_dict(self.net_state_dict)
 
-    def blind_pick(self, seed=2666):
-        """ Randomly pick index from the candidate pool.
+        return net
 
-        Parameters
-        ----------
-        seed : `int`
-             (Default value = 2666)
-             Random seed.
 
-        Returns
-        -------
-        best : `int`
-            The chosen candidate to start.
-
-        Note
-        ----
-        Random seed set to `2666`, the title of the single greatest novel in
-        human literary history by Roberto Bolano.
-        This needs to be set to `None`
-        if parallel experiments were to be performed.
-
-        """
-        import random
-        random.seed(seed)
-        best = random.choice(self.unseen)
-        self.seen.append(self.unseen.pop(best))
-        return best
-
-    def train(self):
+    def train_round(
+        self,
+        net,
+        data,
+        seen_index,
+        update_representation=False,
+        batch_size=256
+    ):
         """Train the model with new data."""
-        # reset
-        self.reset_net()
 
-        # set to train status
-        self.net.train()
+        # obtain seen data for training
+        train_data = data[seen_index].batch(
+            batch_size, partial_batch=True
+        )
+
+        # optimize full net w/ graphs
+        if update_representation:
+            
+            # reset net - TEST EMPIRICALLY
+            net = self.reset_net(net)
+
+            # TODO: ***reset optimizer***
+            num_epochs = self.num_epochs
+            optimizer = self.optimizer
+            qsar_model = net
+
+        # optimize regressor-only w/ hidden rep
+        else:
+
+            # no reset, shallow training
+            num_epochs = 40
+            optimizer = self.optimizer_output_regressor
+            qsar_model = net.output_regressor
 
         # train the model
-        self.net = self.train_class(
-            data=[self.seen_data],
-            optimizer=self.optimizer(self.net),
-            n_epochs=self.num_epochs,
-            net=self.net,
+        qsar_model.train()
+
+        tr = self.train_class(
+            net=qsar_model,
+            data=train_data,
+            optimizer=optimizer,
+            n_epochs=num_epochs,
+            annealing=self.annealing,
             record_interval=999999,
         ).train()
 
+        # update net
+        if update_representation:
+            net = tr.net
+        else:
+            net.output_regressor = tr.net
 
-    def acquire(self):
+        return net
+
+
+    def get_y_best(self, data, index):
+        """Get maximum value among an index over data."""
+        
+        # grab old data
+        data_subset = data[index]
+
+        # gather outputs
+        ys = [d[1] for d in data_subset]
+
+        # find max output
+        y_best = max(ys)
+        
+        return y_best
+
+
+    def get_hidden_inputs(self, net, data):
+        """ Helper function for getting hidden inputs if updating rep
+        """
+        # modify net or data if not updating representation
+        get_h = lambda x: (net.representation(x[0]).detach(), x[1])
+        qsar_model = net.output_regressor
+        data_idx = data.apply(get_h)
+        return qsar_model, data_idx
+
+
+    def _acquire(
+        self,
+        net,
+        candidate_data,
+        utility_func,
+        q=1,
+        y_best=float("-Inf")
+    ):
         """Acquire new training data."""
+        
         # set net to eval
-        self.net.eval()
-
-        # split input target
-        gs, ys = self.unseen_data
+        net.eval()
 
         # acquire no more points than are remaining
-        if self.q <= len(self.unseen):
+        if self.q <= len(candidate_data):
 
             # acquire pending points
-            pending_pts = self.acquisition(
-                self.net, gs, q=self.q, y_best=self.y_best
-            )
+            pending_pts = utility_func(net, candidate_data, q=q, y_best=y_best)
     
             # pop from the back so you don't disrupt the order
             pending_pts = pending_pts.sort(descending=True).values
@@ -336,29 +390,63 @@ class BayesOptExperiment(ActiveLearningExperiment):
         else:
 
             # set pending points to all remaining data
-            pending_pts = torch.range(len(self.unseen)-1, 0, step=-1).long()
+            n_obs = len(candidate_data)
+            pending_pts = torch.range(n_obs-1, 0, step=-1).long()
 
-        self.seen.extend([self.unseen.pop(p) for p in pending_pts])
+        return pending_pts
 
 
-    def update_data(self):
-        """Update the internal data using old and new."""
-        if len(self.unseen):
-            # grab new data
-            self.unseen_data = self.slice_fn(self.data, self.unseen)
+    def acquire_round(
+        self,
+        qsar_model,
+        data,
+        utility_func,
+        seen_index,
+        unseen_index,
+        q=1,
+        y_best=float("-Inf"),
+        acquisitions_preset=None,
+    ):
+        """ Acquires pending points given what has been seen
+        """
+        # preset acquisition policy
+        if acquisitions_preset is not None:
+            seen_index, unseen_index = acquisitions_preset
+
+        # autonomous acquisition policy
         else:
-            self.unseen_data = tuple()
 
-        # grab old data
-        self.seen_data = self.slice_fn(self.data, self.seen)
+            # obtain unseen data for acquisitions
+            unseen_data = data[unseen_index]
+            
+            # acquire pending points
+            pending_indices = self._acquire(
+                qsar_model,
+                unseen_data,
+                utility_func,
+                q=q,
+                y_best=y_best
+            )
 
-        # set y_max
-        gs, ys = self.seen_data
+            # update seen and unseen
+            seen_index.extend([
+                unseen_index.pop(p)
+                for p in pending_indices
+            ])
 
-        self.y_best = torch.max(ys)
+        return seen_index, unseen_index
 
 
-    def run(self, num_rounds=999999, seed=None):
+    def run(
+        self,
+        net=None,
+        data=None,
+        utility_func=None,
+        q=0,
+        num_rounds=999999,
+        acquisitions=OrderedDict(),
+        acquisitions_preset=None
+    ):
         """Run the model and conduct rounds of acquisition and training.
 
         Parameters
@@ -376,30 +464,86 @@ class BayesOptExperiment(ActiveLearningExperiment):
         self.old : Resulting indices of acquired candidates.
 
         """
-        idx = 0
-        self.blind_pick(seed=seed)
-        self.update_data()
+        if not net:
+            net = self.net
+        if not data:
+            data = self.data
+        if not utility_func:
+            utility_func = self.utility_func
+        if not q:
+            q = self.q
+        seen_index, unseen_index = self.seen_index, self.unseen_index
 
-        while idx < num_rounds:
+        # initialize variables
+        y_best = -float("Inf")
+        qsar_model_idx = net
+        data_idx = data
+        
+        idx = 0
+        while idx < num_rounds and unseen_index:
+
+            print(idx)
             
-            if self.early_stopping and self.y_best == self.best_possible:
+            # early stopping logic
+            if self.early_stopping and y_best == self.best_possible:
                 break
 
-            self.train()
-            self.states[idx] = copy.deepcopy(self.net.state_dict())
-            self.acquisitions.append(
-                tuple([self.seen.copy(), self.unseen.copy()])
+            # train full net / representation?
+            interval_count = idx % self.update_representation_interval
+            update_representation = interval_count == 0
+            pre_update = interval_count == (self.update_representation_interval - 1)
+
+            # use random policy in the first round
+            if idx == 0:
+                utility_func_idx = pinot.active.acquisition.random
+            else:
+                utility_func_idx = self.utility_func
+
+            # acquire points
+            seen_index, unseen_index = self.acquire_round(
+                qsar_model_idx,
+                data_idx,
+                utility_func_idx,
+                seen_index,
+                unseen_index,
+                q=q,
+                y_best=y_best,
+                acquisitions_preset=acquisitions_preset
             )
 
-            if not self.unseen:
-                break
+            # record net states before training
+            self.net_params[idx] = copy.deepcopy(net.state_dict())
 
-            self.acquire()
-            self.update_data()
+            # train
+            net = self.train_round(
+                net,
+                data_idx,
+                seen_index,
+                update_representation=update_representation
+            )
+
+            # get hidden depending on round
+            if update_representation:
+                qsar_model_idx, data_idx = self.get_hidden_inputs(net, data)
+            elif pre_update:
+                qsar_model_idx, data_idx = net, data
+
+            # record acquisitions + bookkeeping
+            y_best = self.get_y_best(data_idx, seen_index)
+            acquisitions[idx] = tuple([seen_index.copy(), unseen_index.copy()])
+            self.seen_index, self.unseen_index = seen_index, unseen_index
 
             idx += 1
 
-        return self.acquisitions
+        return acquisitions
+
+
+
+
+
+
+
+
 
 
 class SemiSupervisedBayesOptExperiment(BayesOptExperiment):
