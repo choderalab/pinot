@@ -173,10 +173,10 @@ def test(
     test : Run the test experiment.
 
     """
-    def compute_conditional(net, data, batch_size):
+    def compute_conditional(net, data_batch):
         # compute conditional distribution in batched fashion
         locs, scales = [], []
-        for idx, d in enumerate(data.batch(batch_size, partial_batch=True)):
+        for idx, d in enumerate(data_batch):
 
             g_batch, _ = d
             distribution_batch = net.condition(g_batch)
@@ -199,20 +199,20 @@ def test(
 
     for metric in metrics:
         results[metric.__name__] = {}
-
+    
+    # prepare data into batches
+    batch_size = 256 if not net.has_exact_gp else len(data)
+    data_batch = data.batch(batch_size, partial_batch=True)
+    
     # make g, y into single batches
     y = torch.cat([d[1] for d in data]).cpu().reshape(-1, 1)
+
     for state_name, state in states.items():  # loop through states
         
         net.load_state_dict(state)
-
-        if net.has_exact_gp:
-            batch_size = len(data)
-        else:
-            batch_size = 32
         
         # compute conditional distribution in batched fashion
-        distribution = compute_conditional(net, data, batch_size)
+        distribution = compute_conditional(net, data_batch)
         for metric in metrics:  # loop through the metrics
             results[metric.__name__][state_name] = (
                 metric(
