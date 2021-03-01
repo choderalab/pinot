@@ -58,6 +58,22 @@ def run(args):
     if args.filter_outliers:
         outlier_threshold = -2
         data.ds = list(filter(lambda x: x[1] > outlier_threshold, data))
+
+
+    # Normalize training data using train mean and train std
+    if args.normalize:
+        gs, ys_tr = zip(*train_data.ds)
+        ys_tr = torch.cat(ys_tr).reshape(-1, 1)
+        mean_tr, std_tr = ys_tr.mean(), ys_tr.std()
+        ys_norm_tr = (ys_tr - mean_tr)/std_tr
+        train_data.ds = list(zip(gs, ys_norm_tr))
+
+        # Normalize testing data using train mean and train std
+        gs, ys_te = zip(*test_data.ds)
+        ys_te = torch.cat(ys_te).reshape(-1, 1)
+        ys_norm_te = (ys_te - mean_tr)/std_tr
+        test_data.ds = list(zip(gs, ys_norm_te))
+    
     
     # Split the labeled moonshot data into training set and test set
     train_data, test_data = data.split(args.label_split, seed=seed)
@@ -111,20 +127,20 @@ def run(args):
         )
         net.to(device)
 
-        if args.pretrain_epoch != -1:
-            pretrain_path = _get_pretrain_path(args, architecture_str)
-            # look into torch.load and torch.dump
-            states = pickle.load(open(pretrain_path, 'rb'))
-            states_idx = states[args.pretrain_epoch]
-            states_idx_representation = {
-                k.replace('representation.', ''): v
-                for k, v in states_idx.items()
-                if 'representation' in k
-            }
-            net.representation.load_state_dict(states_idx_representation)
-            optimizer = optimizer_init(net.output_regressor)
-        else:
-            optimizer = optimizer_init(net)
+        # if args.pretrain_epoch != -1:
+        #     pretrain_path = _get_pretrain_path(args, architecture_str)
+        #     # look into torch.load and torch.dump
+        #     states = pickle.load(open(pretrain_path, 'rb'))
+        #     states_idx = states[args.pretrain_epoch]
+        #     states_idx_representation = {
+        #         k.replace('representation.', ''): v
+        #         for k, v in states_idx.items()
+        #         if 'representation' in k
+        #     }
+        #     net.representation.load_state_dict(states_idx_representation)
+        #     optimizer = optimizer_init(net.output_regressor)
+        # else:
+        optimizer = optimizer_init(net)
         
         return net, optimizer
 
