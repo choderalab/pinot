@@ -56,7 +56,7 @@ def rmse(net, distribution, y, *args, n_samples=16, batch_size=32, **kwargs):
     for _ in range(n_samples):
         
         y_hat = distribution.sample().detach().cpu().reshape(-1, 1)
-        print(y_hat.shape, y.shape, flush=True)
+        # print(y_hat.shape, y.shape, flush=True)
         results.append(_rmse(y, y_hat))
 
     return torch.tensor(results).mean()
