@@ -58,7 +58,10 @@ def run(args):
     if args.filter_outliers:
         outlier_threshold = -2
         data.ds = list(filter(lambda x: x[1] > outlier_threshold, data))
+    
 
+    # Split the labeled moonshot data into training set and test set
+    train_data, test_data = data.split(args.label_split, seed=seed)
 
     # Normalize training data using train mean and train std
     if args.normalize:
@@ -73,10 +76,6 @@ def run(args):
         ys_te = torch.cat(ys_te).reshape(-1, 1)
         ys_norm_te = (ys_te - mean_tr)/std_tr
         test_data.ds = list(zip(gs, ys_norm_te))
-    
-    
-    # Split the labeled moonshot data into training set and test set
-    train_data, test_data = data.split(args.label_split, seed=seed)
 
     # Set batch size and log
     batch_size = args.batch_size if args.regressor_type != 'gp' else len(train_data)
