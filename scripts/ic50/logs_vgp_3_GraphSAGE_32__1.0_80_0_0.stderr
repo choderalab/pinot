@@ -1,0 +1,53 @@
+Using backend: pytorch
+Traceback (most recent call last):
+  File "ic50_supervised.py", line 332, in <module>
+    run(args)
+  File "ic50_supervised.py", line 2, in run
+    import pinot
+  File "/lila/home/retchinm/pinot/pinot/__init__.py", line 2, in <module>
+    import pinot.graph
+  File "/lila/home/retchinm/pinot/pinot/graph.py", line 7, in <module>
+    import dgl
+  File "/home/retchinm/miniconda3/envs/michael/lib/python3.8/site-packages/dgl/__init__.py", line 14, in <module>
+    from .backend import load_backend, backend_name
+  File "/home/retchinm/miniconda3/envs/michael/lib/python3.8/site-packages/dgl/backend/__init__.py", line 73, in <module>
+    load_backend(get_preferred_backend())
+  File "/home/retchinm/miniconda3/envs/michael/lib/python3.8/site-packages/dgl/backend/__init__.py", line 23, in load_backend
+    mod = importlib.import_module('.%s' % mod_name, __name__)
+  File "/home/retchinm/miniconda3/envs/michael/lib/python3.8/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "/home/retchinm/miniconda3/envs/michael/lib/python3.8/site-packages/dgl/backend/pytorch/__init__.py", line 1, in <module>
+    from .tensor import *
+  File "/home/retchinm/miniconda3/envs/michael/lib/python3.8/site-packages/dgl/backend/pytorch/tensor.py", line 13, in <module>
+    from ...function.base import TargetCode
+  File "/home/retchinm/miniconda3/envs/michael/lib/python3.8/site-packages/dgl/function/__init__.py", line 5, in <module>
+    from .message import *
+  File "/home/retchinm/miniconda3/envs/michael/lib/python3.8/site-packages/dgl/function/message.py", line 8, in <module>
+    from .._deprecate.runtime import ir
+  File "/home/retchinm/miniconda3/envs/michael/lib/python3.8/site-packages/dgl/_deprecate/runtime/__init__.py", line 4, in <module>
+    from . import scheduler
+  File "/home/retchinm/miniconda3/envs/michael/lib/python3.8/site-packages/dgl/_deprecate/runtime/scheduler.py", line 4, in <module>
+    from ... import utils
+  File "/home/retchinm/miniconda3/envs/michael/lib/python3.8/site-packages/dgl/utils/__init__.py", line 3, in <module>
+    from .data import *
+  File "/home/retchinm/miniconda3/envs/michael/lib/python3.8/site-packages/dgl/utils/data.py", line 4, in <module>
+    import networkx as nx
+  File "/home/retchinm/miniconda3/envs/michael/lib/python3.8/site-packages/networkx/__init__.py", line 61, in <module>
+    import networkx.generators
+  File "/home/retchinm/miniconda3/envs/michael/lib/python3.8/site-packages/networkx/generators/__init__.py", line 16, in <module>
+    from networkx.generators.intersection import *
+  File "/home/retchinm/miniconda3/envs/michael/lib/python3.8/site-packages/networkx/generators/intersection.py", line 5, in <module>
+    from networkx.algorithms import bipartite
+  File "/home/retchinm/miniconda3/envs/michael/lib/python3.8/site-packages/networkx/algorithms/__init__.py", line 6, in <module>
+    from networkx.algorithms.centrality import *
+  File "/home/retchinm/miniconda3/envs/michael/lib/python3.8/site-packages/networkx/algorithms/centrality/__init__.py", line 5, in <module>
+    from .current_flow_closeness import *
+  File "/home/retchinm/miniconda3/envs/michael/lib/python3.8/site-packages/networkx/algorithms/centrality/current_flow_closeness.py", line 15, in <module>
+    @not_implemented_for("directed")
+  File "/home/retchinm/miniconda3/envs/michael/lib/python3.8/site-packages/networkx/utils/decorators.py", line 58, in not_implemented_for
+    def _not_implemented_for(not_implement_for_func, *args, **kwargs):
+  File "/home/retchinm/miniconda3/envs/michael/lib/python3.8/site-packages/decorator.py", line 285, in decorator
+    dec = FunctionMaker.create(
+  File "/home/retchinm/miniconda3/envs/michael/lib/python3.8/site-packages/decorator.py", line 214, in create
+    ibody = '\n'.join('    ' + line for line in body.splitlines())
+KeyboardInterrupt
