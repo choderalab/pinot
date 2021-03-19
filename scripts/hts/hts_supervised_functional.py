@@ -133,11 +133,20 @@ def run(args):
     train_data = train_data.batch(batch_size)
 
     # get results
+    metrics = [
+        pinot.pearsonr,
+        pinot.absolute_error,
+        pinot.y_hat,
+        pinot.rmse,
+        pinot.r2,
+        pinot.avg_nll
+    ]
     results = pinot.app.experiment.train_and_test(
         supNet,
         train_data,
         test_data,
         optimizer,
+        metrics=metrics,
         n_epochs=args.n_epochs,
         record_interval=args.record_interval,
         annealing=args.annealing,

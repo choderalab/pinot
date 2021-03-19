@@ -126,20 +126,20 @@ def run(args):
         )
         net.to(device)
 
-        # if args.pretrain_epoch != -1:
-        #     pretrain_path = _get_pretrain_path(args, architecture_str)
-        #     # look into torch.load and torch.dump
-        #     states = pickle.load(open(pretrain_path, 'rb'))
-        #     states_idx = states[args.pretrain_epoch]
-        #     states_idx_representation = {
-        #         k.replace('representation.', ''): v
-        #         for k, v in states_idx.items()
-        #         if 'representation' in k
-        #     }
-        #     net.representation.load_state_dict(states_idx_representation)
-        #     optimizer = optimizer_init(net.output_regressor)
-        # else:
-        optimizer = optimizer_init(net)
+        if args.pretrain_epoch != -1:
+            pretrain_path = _get_pretrain_path(args, architecture_str)
+            # look into torch.load and torch.dump
+            states = pickle.load(open(pretrain_path, 'rb'))
+            states_idx = states[args.pretrain_epoch]
+            states_idx_representation = {
+                k.replace('representation.', ''): v
+                for k, v in states_idx.items()
+                if 'representation' in k
+            }
+            net.representation.load_state_dict(states_idx_representation)
+            optimizer = optimizer_init(net.output_regressor)
+        else:
+            optimizer = optimizer_init(net)
         
         return net, optimizer
 
@@ -151,12 +151,23 @@ def run(args):
     # mini-batch if we're using variational GP
     train_data = train_data.batch(batch_size)
 
+    # define metrics
+    metrics = [
+        pinot.pearsonr,
+        pinot.absolute_error,
+        pinot.y_hat,
+        pinot.rmse,
+        pinot.r2,
+        pinot.avg_nll
+    ]
+
     # get results
     results = pinot.app.experiment.train_and_test(
         supNet,
         train_data,
         test_data,
         optimizer,
+        metrics=metrics,
         n_epochs=args.n_epochs,
         record_interval=args.record_interval,
         annealing=args.annealing,
