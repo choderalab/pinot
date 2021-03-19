@@ -39,6 +39,11 @@ def absolute_error(net, distribution, y, *args, **kwargs):
     y_hat = distribution.sample().detach().cpu().reshape(-1, 1)
     return torch.abs(y - y_hat)
 
+def y_hat(net, distribution, y, *args, **kwargs):
+    """ Squared error. """
+    y_hat = distribution.sample().detach().cpu().reshape(-1, 1)
+    return {'y': y, 'y_hat': y_hat}
+
 
 def _rmse(y, y_hat):
     """RMSE"""
