@@ -37,10 +37,11 @@ def _independent(distribution):
 def absolute_error(net, distribution, y, *args, **kwargs):
     """ Squared error. """
     y_hat = distribution.sample().detach().cpu().reshape(-1, 1)
-    return torch.abs(y - y_hat)
+    abs_error_result = torch.abs(y - y_hat)
+    return abs_error_result.detach().cpu().numpy()
 
 def y_hat(net, distribution, y, *args, **kwargs):
-    """ Squared error. """
+    """ Paired y and y_hat outputs. """
     y_hat = distribution.sample().detach().cpu().reshape(-1, 1)
     return {'y': y, 'y_hat': y_hat}
 
@@ -64,8 +65,8 @@ def rmse(net, distribution, y, *args, n_samples=16, batch_size=32, **kwargs):
         # print(y_hat.shape, y.shape, flush=True)
         results.append(_rmse(y, y_hat))
 
-    return torch.tensor(results).mean()
-
+    rmse_result = torch.tensor(results).mean()
+    return rmse_result.detach().cpu().numpy()
 
 
 def _r2(y, y_hat):
@@ -83,7 +84,8 @@ def _r2(y, y_hat):
 def r2(net, distribution, y, *args, n_samples=16, batch_size=32, **kwargs):
     """ R2 """
     y_hat = distribution.mean.detach().cpu().reshape(-1, 1)
-    return _r2(y, y_hat)
+    r2_result = _r2(y, y_hat)
+    return r2_result.detach().cpu().numpy()
 
 
 def pearsonr(net, distribution, y, *args, batch_size=32, **kwargs):
@@ -94,8 +96,8 @@ def pearsonr(net, distribution, y, *args, batch_size=32, **kwargs):
     y_hat = distribution.mean.detach().cpu().reshape(-1, 1)
     result = pr(y.flatten().numpy(), y_hat.flatten().numpy())
     correlation, _ = result
-
-    return torch.Tensor([correlation])[0]
+    correlation_result = torch.Tensor([correlation])[0]
+    return correlation_result.detach().cpu().numpy()
 
 
 
@@ -110,4 +112,5 @@ def avg_nll(net, distribution, y, *args, batch_size=32, **kwargs):
 
     # calculate the log_prob
     log_prob = distribution.log_prob(y).detach().cpu().mean()
-    return -log_prob
+    nll_result = -log_prob
+    return nll_result.detach().cpu().numpy()

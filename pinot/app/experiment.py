@@ -222,9 +222,6 @@ def test(
                     sampler=sampler,
                     batch_size=batch_size
                 )
-                .detach()
-                .cpu()
-                .numpy()
             )
 
     return results
@@ -572,9 +569,6 @@ class Test:
                         sampler=self.sampler,
                         batch_size=batch_size
                     )
-                    .detach()
-                    .cpu()
-                    .numpy()
                 )
 
 
