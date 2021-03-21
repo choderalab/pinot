@@ -315,7 +315,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
         else:
 
             # no reset, shallow training
-            num_epochs = 40
+            num_epochs = 40 # 40
             optimizer = self.optimizer_output_regressor
             qsar_model = net.output_regressor
 
@@ -491,7 +491,7 @@ class BayesOptExperiment(ActiveLearningExperiment):
             # train full net / representation?
             interval_count = idx % self.update_representation_interval
             update_representation = interval_count == 0
-            pre_update = interval_count == (self.update_representation_interval - 1)
+            update_next_round = interval_count == (self.update_representation_interval - 1)
 
             # use random policy in the first round
             if idx == 0:
@@ -523,9 +523,9 @@ class BayesOptExperiment(ActiveLearningExperiment):
             )
 
             # get hidden depending on round
-            if update_representation:
+            if update_representation and not update_next_round:
                 qsar_model_idx, data_idx = self.get_hidden_inputs(net, data)
-            elif pre_update:
+            elif update_next_round:
                 qsar_model_idx, data_idx = net, data
 
             # record acquisitions + bookkeeping
