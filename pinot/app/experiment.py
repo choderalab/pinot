@@ -212,7 +212,7 @@ class Test:
                 results[metric.__name__][state_name] = (
                     metric(
                         self.net,
-                        g,
+                        pinot.metrics._independent(self.net.condition(g)),
                         y,
                         *_args,
                         sampler=self.sampler,

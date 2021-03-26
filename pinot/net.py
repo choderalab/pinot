@@ -241,7 +241,6 @@ class Net(BaseNet):
             h_last = self.representation(self.g_last)
             kwargs = {**{"x_tr": h_last, "y_tr": self.y_last}, **kwargs}
 
-
         if sampler is not None and hasattr(sampler, 'sample_params'):
             sampler.sample_params()
         
