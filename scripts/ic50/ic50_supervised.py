@@ -116,7 +116,8 @@ def run(args):
         net = pinot.Net(
             representation=representation,
             output_regressor_class=output_regressor,
-            n_inducing_points=args.n_inducing_points
+            n_inducing_points=args.n_inducing_points,
+            grid_boundary=8.0
         )
 
         optimizer_init = pinot.app.utils.optimizer_translation(
