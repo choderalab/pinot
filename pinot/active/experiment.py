@@ -291,7 +291,8 @@ class BayesOptExperiment(ActiveLearningExperiment):
         data,
         seen_index,
         update_representation=False,
-        batch_size=256
+        batch_size=256,
+        reset_net=True,
     ):
         """Train the model with new data."""
 
@@ -304,7 +305,8 @@ class BayesOptExperiment(ActiveLearningExperiment):
         if update_representation:
             
             # reset net - TEST EMPIRICALLY
-            net = self.reset_net(net)
+            if reset_net:
+                net = self.reset_net(net)
 
             # TODO: ***reset optimizer***
             num_epochs = self.num_epochs
@@ -445,7 +447,8 @@ class BayesOptExperiment(ActiveLearningExperiment):
         q=0,
         num_rounds=999999,
         acquisitions=OrderedDict(),
-        acquisitions_preset=None
+        acquisitions_preset=None,
+        reset_net=False
     ):
         """Run the model and conduct rounds of acquisition and training.
 
@@ -519,7 +522,8 @@ class BayesOptExperiment(ActiveLearningExperiment):
                 net,
                 data_idx,
                 seen_index,
-                update_representation=update_representation
+                update_representation=update_representation,
+                reset_net=reset_net
             )
 
             # get hidden depending on round
