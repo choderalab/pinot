@@ -113,11 +113,12 @@ def run(args):
             output_regressor = pinot.regressors.VariationalGaussianProcessRegressor
 
         # First train a fully supervised Net to use as Baseline
+        grid_boundary = 1.0 if args.normalize else 8.0 
         net = pinot.Net(
             representation=representation,
             output_regressor_class=output_regressor,
             n_inducing_points=args.n_inducing_points,
-            grid_boundary=8.0
+            grid_boundary=grid_boundary
         )
 
         optimizer_init = pinot.app.utils.optimizer_translation(
