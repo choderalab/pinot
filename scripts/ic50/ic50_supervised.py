@@ -95,7 +95,7 @@ def run(args):
 
         """
         def _get_pretrain_path(args, architecture_str):
-            pretrain_dir = '/data/chodera/retchinm/hts_2_21_2021/'
+            pretrain_dir = '/data/chodera/retchinm/hts_3_20_2021/'
             prefix = f'dict_state_reg=vgp_a={architecture_str}_n=350_b=32_wd=0.01_lsp=4_frac=['
             postfix = ']_anneal=1.0_induce=80_normalize=0_1_seed=0.p'
             pretrain_path = pretrain_dir + prefix + str(args.pretrain_frac) + postfix
