@@ -256,6 +256,7 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
         kernel=None,
         log_sigma=-3.0,
         n_inducing_points=100,
+        mu_initializer_mean=0.0,
         mu_initializer_std=0.1,
         sigma_initializer_value=-2.0,
         grid_boundary=1.0,
@@ -291,7 +292,7 @@ class VariationalGaussianProcessRegressor(GaussianProcessRegressor):
         # (n_inducing_points, 1)
         self.y_tr_mu = torch.nn.Parameter(
             torch.distributions.normal.Normal(
-                loc=torch.zeros(n_inducing_points, 1),
+                loc=mu_initializer_mean * torch.ones(n_inducing_points, 1),
                 scale=mu_initializer_std * torch.ones(n_inducing_points, 1),
             ).sample()
         )

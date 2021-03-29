@@ -180,8 +180,9 @@ def test(
 
             g_batch, _ = d
             distribution_batch = net.condition(g_batch)
-            loc_batch = distribution_batch.mean.flatten().cpu()
-            scale_batch = distribution_batch.variance.pow(0.5).flatten().cpu()
+            loc_batch = distribution_batch.mean.detach().flatten().cpu()
+            scale_batch = distribution_batch.variance.pow(0.5).detach().flatten().cpu()
+            del distribution_batch
             locs.append(loc_batch)
             scales.append(scale_batch)
 
@@ -201,7 +202,7 @@ def test(
         results[metric.__name__] = {}
     
     # prepare data into batches
-    batch_size = 256 if not net.has_exact_gp else len(data)
+    batch_size = 128 if not net.has_exact_gp else len(data)
     data_batch = data.batch(batch_size, partial_batch=True)
     
     # make g, y into single batches

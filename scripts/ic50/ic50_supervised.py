@@ -113,12 +113,13 @@ def run(args):
             output_regressor = pinot.regressors.VariationalGaussianProcessRegressor
 
         # First train a fully supervised Net to use as Baseline
-        grid_boundary = 1.0 if args.normalize else 8.0 
         net = pinot.Net(
             representation=representation,
             output_regressor_class=output_regressor,
             n_inducing_points=args.n_inducing_points,
-            grid_boundary=grid_boundary
+            mu_initializer_mean=args.mu_mean,
+            mu_initializer_std=args.mu_std,
+            std_initializer_value=args.std_value
         )
 
         optimizer_init = pinot.app.utils.optimizer_translation(
@@ -352,6 +353,24 @@ if __name__ == '__main__':
         '--pretrain_epoch',
         type=int,
         default=-1,
+        help="Epoch of training curve for pretrained representation; -1 means no pretraining"
+    )
+    parser.add_argument(
+        '--mu_mean',
+        type=int,
+        default=0.0,
+        help=""
+    )
+    parser.add_argument(
+        '--mu_std',
+        type=float,
+        default=0.1,
+        help="Epoch of training curve for pretrained representation; -1 means no pretraining"
+    )
+    parser.add_argument(
+        '--std_value',
+        type=float,
+        default=-2,
         help="Epoch of training curve for pretrained representation; -1 means no pretraining"
     )
 
