@@ -314,9 +314,8 @@ if __name__ == '__main__':
     )
     parser.add_argument(
         '--filter_threshold',
-        nargs="+",
         type=float,
-        default=0.005, # 0.1
+        default=-2.0, # 0.1
         help="Proportion of dataset to use"
     )
 
