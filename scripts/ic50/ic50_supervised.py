@@ -120,7 +120,7 @@ def run(args):
             n_inducing_points=args.n_inducing_points,
             mu_initializer_mean=args.mu_mean,
             mu_initializer_std=args.mu_std,
-            std_initializer_value=args.std_value
+            sigma_initializer_value=args.std_value
         )
 
         optimizer_init = pinot.app.utils.optimizer_translation(
