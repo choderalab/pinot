@@ -34,7 +34,7 @@ def run(args):
                 f'_{layer_type}_{activation}_n={args.n_epochs}_b={args.batch_size}'
                 f'_wd={args.weight_decay}_lsp={args.label_split[0]}_frac={args.sample_frac}'
                 f'_anneal={args.annealing}_induce={args.n_inducing_points}_normalize={args.normalize}'
-                f'_{args.index}_seed={seed}')
+                f'_{args.index}_seed={seed}_filterthreshold={args.filter_threshold}')
 
     print(savefile)
     logging.debug("savefile = {}".format(savefile))
@@ -63,8 +63,7 @@ def run(args):
 
     # filter out huge outliers
     if args.filter_outliers:
-        outlier_threshold = -2
-        data.ds = list(filter(lambda x: x[1] > outlier_threshold, data))
+        data.ds = list(filter(lambda x: x[1] > args.filter_threshold, data))
     
     # Split the labeled moonshot data into training set and test set
     train_data, test_data = data.split(args.label_split, seed=seed)
@@ -313,7 +312,13 @@ if __name__ == '__main__':
         default=0,
         help="Setting the seed for random sampling"
     )
-
+    parser.add_argument(
+        '--filter_threshold',
+        nargs="+",
+        type=float,
+        default=0.005, # 0.1
+        help="Proportion of dataset to use"
+    )
 
     args = parser.parse_args()
 
