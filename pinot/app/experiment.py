@@ -173,18 +173,6 @@ def test(
     test : Run the test experiment.
 
     """
-    def get_memory():
-        import psutil
-        # gives a single float value
-        print('cpu_usage\t', psutil.cpu_percent())
-        # you can have the percentage of used RAM
-        print('used_ram\t', psutil.virtual_memory().percent)
-        # you can calculate percentage of available memory
-        print(
-            '%_available\t',
-            psutil.virtual_memory().available * 100 / psutil.virtual_memory().total
-        )
-    
     def compute_conditional(net, data_batch):
         # compute conditional distribution in batched fashion
         locs, scales = [], []
@@ -197,7 +185,6 @@ def test(
             del distribution_batch
             locs.append(loc_batch)
             scales.append(scale_batch)
-            get_memory()
 
 
         distribution = torch.distributions.normal.Normal(
