@@ -34,7 +34,8 @@ def run(args):
                 f'_{layer_type}_{activation}_n={args.n_epochs}_b={args.batch_size}'
                 f'_wd={args.weight_decay}_lsp={args.label_split[0]}_frac={args.sample_frac}'
                 f'_anneal={args.annealing}_induce={args.n_inducing_points}_normalize={args.normalize}'
-                f'_{args.index}_seed={seed}_filterthreshold={args.filter_threshold}')
+                f'_{args.index}_seed={seed}_filterthreshold={args.filter_threshold}'
+                f'_mumean={args.mu_mean}_mustd={args.mu_std}_stdvalue={args.std_value}')
 
     print(savefile)
     logging.debug("savefile = {}".format(savefile))
@@ -318,6 +319,25 @@ if __name__ == '__main__':
         default=-2.0, # 0.1
         help="Proportion of dataset to use"
     )
+    parser.add_argument(
+        '--mu_mean',
+        type=float,
+        default=0.0,
+        help=""
+    )
+    parser.add_argument(
+        '--mu_std',
+        type=float,
+        default=0.1,
+        help="Epoch of training curve for pretrained representation; -1 means no pretraining"
+    )
+    parser.add_argument(
+        '--std_value',
+        type=float,
+        default=-2,
+        help="Epoch of training curve for pretrained representation; -1 means no pretraining"
+    )
+
 
     args = parser.parse_args()
 

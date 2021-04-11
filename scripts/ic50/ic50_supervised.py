@@ -358,7 +358,7 @@ if __name__ == '__main__':
     )
     parser.add_argument(
         '--mu_mean',
-        type=int,
+        type=float,
         default=0.0,
         help=""
     )
