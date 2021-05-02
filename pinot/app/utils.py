@@ -131,3 +131,53 @@ def optimizer_translation(opt_string, lr, *args, **kwargs):
                 net.parameters(), lr
             )
     return opt
+
+
+# =============================================================================
+# VARIATIONAL GP UTILS
+# =============================================================================
+
+from sklearn import cluster
+import torch
+
+def _initial_values_for_GP(train_dataset, feature_extractor, n_inducing_points):
+    """ Assumes that both dataset and feature extractor
+        are either cuda or not cuda.
+        Also assumes the train_dataset is unbatched
+    """
+    steps = 10
+    indices = torch.randperm(len(train_dataset))[:1000].chunk(steps)
+    f_X_samples = []
+
+    with torch.no_grad():
+        for i in range(steps):
+            f_X_sample = torch.cat([
+                feature_extractor(train_dataset[j.item()][0])
+                for j in indices[i]
+            ])
+            f_X_samples.append(f_X_sample)
+    
+    return torch.cat(f_X_samples)
+            
+def _get_kmeans(f_X_sample, n_inducing_points):
+    """ Get k means for multidimensional input.
+    """
+    kmeans = cluster.MiniBatchKMeans(
+        n_clusters=n_inducing_points, batch_size=n_inducing_points * 10
+    )
+    kmeans.fit(f_X_sample.cpu().numpy())
+    cluster_centers = torch.from_numpy(kmeans.cluster_centers_)
+
+    return cluster_centers
+
+def initialize_inducing_points(train_dataset, feature_extractor, n_inducing_points):
+    """ Get initial inducing points for variational GP model.
+    """
+    f_X_sample = _initial_values_for_GP(
+        train_dataset,
+        feature_extractor,
+        n_inducing_points
+    )
+    
+    initial_inducing_points = _get_kmeans(f_X_sample, n_inducing_points)
+    return initial_inducing_points

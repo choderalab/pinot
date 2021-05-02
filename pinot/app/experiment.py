@@ -32,7 +32,8 @@ def train(
     logging=None,
     state_save_file=None,
     time_limit=None,
-    out_dir='out'
+    out_dir='out',
+    initialize_k_means=True
     ):
     """
     Train the model for multiple steps
@@ -107,6 +108,7 @@ def train(
     else:
         limit_delta = timedelta(days=365)
 
+    # perform training loop
     states = {}
     for epoch_idx in range(int(n_epochs)):
         
@@ -380,7 +382,8 @@ class Train:
         lr_scheduler=None,
         annealing=1.0,
         logging=None,
-        state_save_file=None
+        state_save_file=None,
+        initialize_k_means=True
     ):
 
         self.data = data
@@ -393,6 +396,7 @@ class Train:
         self.annealing = annealing
         self.logging = logging
         self.state_save_file = state_save_file
+        self.initialize_k_means = True
 
     def train_once(self):
         """
