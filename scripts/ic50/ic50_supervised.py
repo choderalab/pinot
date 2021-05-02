@@ -167,6 +167,7 @@ def run(args):
         supNet.output_regressor.x_tr = torch.nn.Parameter(
             init_induce_points
         )
+        supNet.to(device)
 
 
     start = time.time()
