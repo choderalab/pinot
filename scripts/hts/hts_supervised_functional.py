@@ -127,6 +127,26 @@ def run(args):
 
     supNet, optimizer = get_net_and_optimizer(args)
 
+
+    # if the net regressor is a VGP
+    # set inducing points using k-means
+    # before mini-batching
+    if isinstance(
+        supNet.output_regressor,
+        pinot.regressors.VariationalGaussianProcessRegressor
+    ) and args.initialize_k_means:
+
+        init_induce_points = pinot.app.utils.initialize_inducing_points(
+            train_dataset=train_data,
+            feature_extractor=supNet.representation,
+            n_inducing_points=supNet.output_regressor.n_inducing_points
+        )
+
+        supNet.output_regressor.x_tr = torch.nn.Parameter(
+            init_induce_points
+        )
+
+
     start = time.time()
     
     # mini-batch if we're using variational GP
@@ -141,6 +161,7 @@ def run(args):
         pinot.r2,
         pinot.avg_nll
     ]
+
     results = pinot.app.experiment.train_and_test(
         supNet,
         train_data,
@@ -336,6 +357,12 @@ if __name__ == '__main__':
         type=float,
         default=-2,
         help="Epoch of training curve for pretrained representation; -1 means no pretraining"
+    )
+    parser.add_argument(
+        '--initialize_k_means',
+        type=int,
+        default=1,
+        help="Sets inducing points with k-means if equal to 1"
     )
 
 
