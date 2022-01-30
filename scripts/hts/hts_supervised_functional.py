@@ -69,6 +69,13 @@ def run(args):
     # Split the labeled moonshot data into training set and test set
     train_data, test_data = data.split(args.label_split, seed=seed)
 
+    if args.filter_neg_train:
+        train_data.ds = list(filter(lambda x: x[1] > 0.0, train_data))
+
+    if args.filter_neg_test:
+        test_data.ds = list(filter(lambda x: x[1] > 0.0, test_data))
+
+
     # Normalize training data using train mean and train std
     if args.normalize:
         gs, ys_tr = zip(*train_data.ds)
@@ -82,6 +89,7 @@ def run(args):
         ys_te = torch.cat(ys_te).reshape(-1, 1)
         ys_norm_te = (ys_te - mean_tr)/std_tr
         test_data.ds = list(zip(gs, ys_norm_te))
+
 
     # Set batch size and log
     batch_size = args.batch_size if args.regressor_type != 'gp' else len(train_data)
@@ -328,6 +336,18 @@ if __name__ == '__main__':
         action="store_true",
         default=False,
         help="Whether to filter huge outliers."
+    )
+    parser.add_argument(
+        '--filter_neg_train',
+        action="store_true",
+        default=False,
+        help="Whether to filter negatives in the training set."
+    )
+    parser.add_argument(
+        '--filter_neg_test',
+        action="store_true",
+        default=False,
+        help="Whether to filter negatives in the testing set."
     )
     parser.add_argument(
         '--seed',
