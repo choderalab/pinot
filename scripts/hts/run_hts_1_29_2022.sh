@@ -1,10 +1,8 @@
 #BSUB -o %J.stdout
 for units in 32
 do
-
 for unit_type in "GraphSAGE"
 do
-
 for n_layers in 3
 do
 
@@ -13,37 +11,26 @@ architecture=$(for a in `eval echo {1..$n_layers}`; do echo $layer; done)
 
 for inducing_pt in 100
 do
-
 for annealing in 1.0
 do
-
 for regressor in 'vgp'
 do
-
 for sample_frac in 0.1 1.0
 do
-
 for mu_mean in -0.5 0.5
 do
-
 for mu_std in 0.1 0.4
 do
-
 for std_value in -3.0 -1.0
 do
-
 for normalize in 0
 do
-
 for seed in 0
 do
-
 for filter_threshold in -2.0
 do
-
 for filter_neg_train in 0 1
 do
-
 for filter_neg_test in 0 1
 do
 
