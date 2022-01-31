@@ -340,14 +340,14 @@ if __name__ == '__main__':
     )
     parser.add_argument(
         '--filter_neg_train',
-        action="store_true",
-        default=False,
+        action=int,
+        default=1,
         help="Whether to filter negatives in the training set."
     )
     parser.add_argument(
         '--filter_neg_test',
-        action="store_true",
-        default=False,
+        action=int,
+        default=1,
         help="Whether to filter negatives in the testing set."
     )
     parser.add_argument(
