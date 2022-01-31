@@ -47,8 +47,25 @@ do
 for filter_neg_test in 0 1
 do
 
-name="${regressor}_${n_layers}_${unit_type}_${units}_${sample_frac}_${annealing}_${inducing_pt}_${normalize}_${seed}_${mu_mean}_${mu_std}_${std_value}"
-                bsub \
+long_name="${regressor}_
+${n_layers}_
+${unit_type}_
+${units}_
+${sample_frac}_
+${annealing}_
+${inducing_pt}_
+${normalize}_
+${seed}_
+${mu_mean}_
+${mu_std}_
+${std_value}_
+${filter_neg_train}_
+${filter_neg_test}_
+${filter_threshold}"
+
+name=`echo $long_name | sed 's/ //g'`
+
+bsub \
 -q gpuqueue \
 -n 2 \
 -gpu "num=1:j_exclusive=yes" \
@@ -79,6 +96,7 @@ name="${regressor}_${n_layers}_${unit_type}_${units}_${sample_frac}_${annealing}
 --filter_threshold $filter_threshold \
 --filter_neg_train $filter_neg_train \
 --filter_neg_test $filter_neg_test
+
 done
 done
 done
