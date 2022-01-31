@@ -29,9 +29,9 @@ for seed in 0
 do
 for filter_threshold in -2.0
 do
-for filter_neg_train in 0 1
+for filter_neg_train in {0..1}
 do
-for filter_neg_test in 0 1
+for filter_neg_test in {0..1}
 do
 
 long_name="${regressor}_
@@ -76,7 +76,7 @@ bsub \
 --filter_outliers \
 --fix_seed \
 --seed $seed \
---output "/data/chodera/retchinm/hts_4_11_2021" \
+--output "/data/chodera/retchinm/hts_1_31_2022" \
 --mu_mean $mu_mean \
 --mu_std $mu_std \
 --std_value $std_value \
