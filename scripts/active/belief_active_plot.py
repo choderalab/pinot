@@ -702,7 +702,7 @@ if __name__ == '__main__':
         num_trials=args.num_trials,
         num_rounds=args.num_rounds,
         num_epochs=args.num_epochs,
-        update_representation_interval=10,
+        update_representation_interval=1,
     )
 
     # run experiment
