@@ -34,9 +34,11 @@ def run(args):
                 f'_{layer_type}_{activation}_n={args.n_epochs}_b={args.batch_size}'
                 f'_wd={args.weight_decay}_lsp={args.label_split[0]}_frac={args.sample_frac}'
                 f'_anneal={args.annealing}_induce={args.n_inducing_points}_normalize={args.normalize}'
-                f'_{args.index}_seed={seed}_filterthreshold={args.filter_threshold}'
+                f'_index={args.index}_seed={seed}_filterthreshold={args.filter_threshold}'
                 f'_mumean={args.mu_mean}_mustd={args.mu_std}_stdvalue={args.std_value}'
-                f'_filter_neg_train={args.filter_neg_train}_filter_neg_test={args.filter_neg_test}')
+                f'_filter_neg_train={args.filter_neg_train}_filter_neg_test={args.filter_neg_test}'
+                f'_initialize_k_means={args.initialize_k_means}'
+    )
 
     print(savefile)
     logging.debug("savefile = {}".format(savefile))
